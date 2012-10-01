@@ -23,16 +23,6 @@ public class JsonWebSignature extends JsonWebStructure
         this.payload = payload;
     }
 
-    public String getPayloadCharEncoding()
-    {
-        return payloadCharEncoding;
-    }
-
-    public void setPayloadCharEncoding(String payloadCharEncoding)
-    {
-        this.payloadCharEncoding = payloadCharEncoding;
-    }
-
     public void setCompactSerialization(String compactSerialization)
     {
         String[] parts = CompactSerialization.deserialize(compactSerialization);
@@ -98,6 +88,16 @@ public class JsonWebSignature extends JsonWebStructure
     public String getPayload()
     {
         return payload;
+    }
+
+    public String getPayloadCharEncoding()
+    {
+        return payloadCharEncoding;
+    }
+
+    public void setPayloadCharEncoding(String payloadCharEncoding)
+    {
+        this.payloadCharEncoding = payloadCharEncoding;
     }
 
     private String getEncodedPayload()
