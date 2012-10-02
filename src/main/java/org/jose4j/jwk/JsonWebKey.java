@@ -6,7 +6,7 @@ import java.security.PublicKey;
 
 /**
  */
-public abstract class JsonWebKeyKeyObject
+public abstract class JsonWebKey
 {
     public static final String ALGORITHM_MEMBER_NAME = "alg";
     public static final String USE_MEMBER_NAME = "use";
@@ -17,12 +17,12 @@ public abstract class JsonWebKeyKeyObject
 
     private PublicKey publicKey;
 
-    protected JsonWebKeyKeyObject(PublicKey publicKey)
+    protected JsonWebKey(PublicKey publicKey)
     {
         this.publicKey = publicKey;
     }
 
-    public JsonWebKeyKeyObject(Map<String, String> params)
+    public JsonWebKey(Map<String, String> params)
     {
         use = params.get(USE_MEMBER_NAME);
         keyId = params.get(KEY_ID_MEMBER_NAME);
@@ -76,7 +76,7 @@ public abstract class JsonWebKeyKeyObject
 
     public static class Factory
     {
-        public static JsonWebKeyKeyObject newJwk(Map<String,String> params)
+        public static JsonWebKey newJwk(Map<String,String> params)
         {
             String alg = params.get(ALGORITHM_MEMBER_NAME);
 

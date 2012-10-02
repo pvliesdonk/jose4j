@@ -14,7 +14,7 @@ public class JsonWebKeyTest extends TestCase
 {
     public void testParseExample()
     {
-        String jwkJson = "{\"jwk\":\n" +
+        String jwkJson = "{\"keys\":\n" +
                 "     [\n" +
                 "       {\"alg\":\"EC\",\n" +
                 "        \"crv\":\"P-256\",\n" +
@@ -35,24 +35,24 @@ public class JsonWebKeyTest extends TestCase
                 "     ]\n" +
                 "   }";
 
-        JsonWebKeyContainer jwkContainer = new JsonWebKeyContainer(jwkJson);
-        List<JsonWebKeyKeyObject> webKeyKeyObjects = jwkContainer.getKeys();
+        JsonWebKeySet jwkSet = new JsonWebKeySet(jwkJson);
+        List<JsonWebKey> jwks = jwkSet.getKeys();
 
-        assertEquals(2, webKeyKeyObjects.size());
+        assertEquals(2, jwks.size());
 
-        Iterator<JsonWebKeyKeyObject> iterator = webKeyKeyObjects.iterator();
+        Iterator<JsonWebKey> iterator = jwks.iterator();
         assertTrue(iterator.next() instanceof EllipticCurveJsonWebKey);
         assertTrue(iterator.next() instanceof RsaJsonWebKey);
 
-        assertTrue(jwkContainer.getKey("1") instanceof EllipticCurveJsonWebKey);
-        assertTrue(jwkContainer.getKey("2011-04-29") instanceof RsaJsonWebKey);
+        assertTrue(jwkSet.getKey("1") instanceof EllipticCurveJsonWebKey);
+        assertTrue(jwkSet.getKey("2011-04-29") instanceof RsaJsonWebKey);
 
-        assertEquals(Use.ENCRYPTION, jwkContainer.getKey("1").getUse());
+        assertEquals(Use.ENCRYPTION, jwkSet.getKey("1").getUse());
 
-        assertNull(jwkContainer.getKey(null));
-        assertNull(jwkContainer.getKey("nope"));
+        assertNull(jwkSet.getKey(null));
+        assertNull(jwkSet.getKey("nope"));
 
-        String json = jwkContainer.toJson();
+        String json = jwkSet.toJson();
         assertNotNull(json);
         assertTrue(json.contains("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx"));
     }
@@ -63,20 +63,20 @@ public class JsonWebKeyTest extends TestCase
         String kid = "my-key-id";
         webKey.setKeyId(kid);
         webKey.setUse(Use.SIGNATURE);
-        JsonWebKeyContainer jwkJsonWebKeyContainer = new JsonWebKeyContainer(Collections.<JsonWebKeyKeyObject>singletonList(webKey));
-        String json = jwkJsonWebKeyContainer.toJson();
+        JsonWebKeySet jwkSet = new JsonWebKeySet(Collections.<JsonWebKey>singletonList(webKey));
+        String json = jwkSet.toJson();
         assertTrue(json.contains(Use.SIGNATURE));
         assertTrue(json.contains(kid));
 
-        JsonWebKeyContainer parsedContainer = new JsonWebKeyContainer(json);
-        List<JsonWebKeyKeyObject> webKeyKeyObjects = parsedContainer.getKeys();
+        JsonWebKeySet parsedJwkSet = new JsonWebKeySet(json);
+        List<JsonWebKey> webKeyKeyObjects = parsedJwkSet.getKeys();
         assertEquals(1, webKeyKeyObjects.size());
-        JsonWebKeyKeyObject keyObject = parsedContainer.getKey(kid);
-        assertEquals(RsaJsonWebKey.ALGORITHM_VALUE, keyObject.getAlgorithm());
-        assertEquals(kid, keyObject.getKeyId());
-        assertEquals(Use.SIGNATURE, keyObject.getUse());
+        JsonWebKey jwk = parsedJwkSet.getKey(kid);
+        assertEquals(RsaJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm());
+        assertEquals(kid, jwk.getKeyId());
+        assertEquals(Use.SIGNATURE, jwk.getUse());
 
-        RsaJsonWebKey rsaJsonWebKey = (RsaJsonWebKey) keyObject;
+        RsaJsonWebKey rsaJsonWebKey = (RsaJsonWebKey) jwk;
         assertEquals(ExampleRsaKeyFromJws.PUBLIC_KEY.getModulus(), rsaJsonWebKey.getRSAPublicKey().getModulus());
         assertEquals(ExampleRsaKeyFromJws.PUBLIC_KEY.getPublicExponent(), rsaJsonWebKey.getRSAPublicKey().getPublicExponent());
     }

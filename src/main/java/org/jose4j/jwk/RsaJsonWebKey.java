@@ -9,7 +9,7 @@ import java.math.BigInteger;
 
 /**
  */
-public class RsaJsonWebKey extends JsonWebKeyKeyObject
+public class RsaJsonWebKey extends JsonWebKey
 {
     public static final String MODULUS_MEMBER_NAME = "mod";
     public static final String EXPONENT_MEMBER_NAME = "exp";

@@ -6,42 +6,42 @@ import java.util.*;
 
 /**
  */
-public class JsonWebKeyContainer
+public class JsonWebKeySet
 {
-    public static final String JWK_MEMBER_NAME = "jwk";
+    public static final String JWK_SET_MEMBER_NAME = "keys";
 
-    private List<JsonWebKeyKeyObject> keys;
+    private List<JsonWebKey> keys;
 
-    public JsonWebKeyContainer(String json)
+    public JsonWebKeySet(String json)
     {
         Map<String,Object> parsed = JsonUtil.parseJson(json);
-        List<Map<String,String>> jwksList = (List<Map<String,String>>) parsed.get(JWK_MEMBER_NAME);
+        List<Map<String,String>> jwksList = (List<Map<String,String>>) parsed.get(JWK_SET_MEMBER_NAME);
 
-        keys = new ArrayList<JsonWebKeyKeyObject>(jwksList.size());
+        keys = new ArrayList<JsonWebKey>(jwksList.size());
         for (Map<String,String> jwkParamsMap : jwksList)
         {
-            keys.add(JsonWebKeyKeyObject.Factory.newJwk(jwkParamsMap));      
+            keys.add(JsonWebKey.Factory.newJwk(jwkParamsMap));
         }
     }
 
-    public JsonWebKeyContainer(List<JsonWebKeyKeyObject> keys)
+    public JsonWebKeySet(List<JsonWebKey> keys)
     {
         this.keys = keys;
     }
 
-    public List<JsonWebKeyKeyObject> getKeys()
+    public List<JsonWebKey> getKeys()
     {
         return keys;
     }
 
-    public JsonWebKeyKeyObject getKey(String keyId)
+    public JsonWebKey getKey(String keyId)
     {
         if (keyId == null)
         {
             return null;
         }
 
-        for (JsonWebKeyKeyObject key : keys)
+        for (JsonWebKey key : keys)
         {
             if (keyId.equals(key.getKeyId()))
             {
@@ -56,13 +56,13 @@ public class JsonWebKeyContainer
     {
         LinkedList<Map<String, String>> keyList = new LinkedList<Map<String, String>>();
 
-        for (JsonWebKeyKeyObject key : keys)
+        for (JsonWebKey key : keys)
         {
             keyList.add(key.toParams());
         }
 
         Map<String,Object> jwk = new LinkedHashMap<String,Object>();
-        jwk.put(JWK_MEMBER_NAME, keyList);
+        jwk.put(JWK_SET_MEMBER_NAME, keyList);
         return JsonUtil.toJson(jwk);
     }
 }

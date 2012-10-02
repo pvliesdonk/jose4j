@@ -7,7 +7,7 @@ import java.math.BigInteger;
 
 /**
  */
-public class EllipticCurveJsonWebKey extends JsonWebKeyKeyObject
+public class EllipticCurveJsonWebKey extends JsonWebKey
 {
     public static final String ALGORITHM_VALUE = "EC";
 
