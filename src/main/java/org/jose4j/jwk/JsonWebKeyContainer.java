@@ -24,11 +24,6 @@ public class JsonWebKeyContainer
         }
     }
 
-    public JsonWebKeyContainer(JsonWebKeyKeyObject keys)
-    {
-        this.keys = Arrays.asList(keys);
-    }
-
     public JsonWebKeyContainer(List<JsonWebKeyKeyObject> keys)
     {
         this.keys = keys;

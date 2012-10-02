@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import java.util.List;
 import java.util.Iterator;
+import java.util.Collections;
 
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 
@@ -62,7 +63,7 @@ public class JsonWebKeyTest extends TestCase
         String kid = "my-key-id";
         webKey.setKeyId(kid);
         webKey.setUse(Use.SIGNATURE);
-        JsonWebKeyContainer jwkJsonWebKeyContainer = new JsonWebKeyContainer(webKey);
+        JsonWebKeyContainer jwkJsonWebKeyContainer = new JsonWebKeyContainer(Collections.<JsonWebKeyKeyObject>singletonList(webKey));
         String json = jwkJsonWebKeyContainer.toJson();
         assertTrue(json.contains(Use.SIGNATURE));
         assertTrue(json.contains(kid));
