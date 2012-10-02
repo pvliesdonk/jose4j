@@ -80,4 +80,11 @@ public class JsonWebKeyTest extends TestCase
         assertEquals(ExampleRsaKeyFromJws.PUBLIC_KEY.getModulus(), rsaJsonWebKey.getRSAPublicKey().getModulus());
         assertEquals(ExampleRsaKeyFromJws.PUBLIC_KEY.getPublicExponent(), rsaJsonWebKey.getRSAPublicKey().getPublicExponent());
     }
+
+    public void testFactoryWithRsaPublicKey()
+    {
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(ExampleRsaKeyFromJws.PUBLIC_KEY);
+        assertTrue(jwk instanceof RsaJsonWebKey);
+        assertEquals(RsaJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm()); 
+    }
 }

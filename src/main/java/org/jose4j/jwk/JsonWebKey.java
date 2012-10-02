@@ -3,6 +3,7 @@ package org.jose4j.jwk;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
 
 /**
  */
@@ -91,6 +92,18 @@ public abstract class JsonWebKey
             else
             {
                 throw new IllegalArgumentException("Unknown key algorithm: " + alg);
+            }
+        }
+
+        public static JsonWebKey newJwk(PublicKey publicKey)
+        {
+            if (RSAPublicKey.class.isInstance(publicKey))
+            {
+                return new RsaJsonWebKey((RSAPublicKey)publicKey);
+            }
+            else
+            {
+                throw new IllegalArgumentException("Unsupported public key " + publicKey);
             }
         }
     }
