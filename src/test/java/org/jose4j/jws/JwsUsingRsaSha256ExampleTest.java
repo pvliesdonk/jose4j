@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 
-import org.jose4j.keys.ExampleRsaKeyFromJws01;
+import org.jose4j.keys.ExampleRsaKeyFromJws;
 
 /**
  */
@@ -18,7 +18,7 @@ public class JwsUsingRsaSha256ExampleTest extends TestCase
         
         JsonWebSignature jws = new JsonWebSignature();
         jws.setCompactSerialization(JWS);
-        jws.setKey(ExampleRsaKeyFromJws01.PUBLIC_KEY);
+        jws.setKey(ExampleRsaKeyFromJws.PUBLIC_KEY);
         assertTrue("signature should validate", jws.verifySignature());
     }
 
@@ -29,7 +29,7 @@ public class JwsUsingRsaSha256ExampleTest extends TestCase
         JsonWebSignature jws = new JsonWebSignature();
         jws.setPayload("{\"iss\":\"joe\",\r\n \"exp\":1300819380,\r\n \"http://example.com/is_root\":true}");
         jws.setHeaderAsString("{\"alg\":\"RS256\"}");
-        jws.setKey(ExampleRsaKeyFromJws01.PRIVATE_KEY);
+        jws.setKey(ExampleRsaKeyFromJws.PRIVATE_KEY);
 
         String compactSerialization = jws.getCompactSerialization();
 

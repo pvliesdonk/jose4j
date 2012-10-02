@@ -9,9 +9,9 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 /**
- * The example RSA key used in JWS -01 http://tools.ietf.org/html/draft-ietf-jose-json-web-signature-01
+ * The example RSA key used in JWS -01 to at least -05 http://tools.ietf.org/html/draft-ietf-jose-json-web-signature
  */
-public class ExampleRsaKeyFromJws01
+public class ExampleRsaKeyFromJws
 {
     public static int [] N_UNSIGNED_BYTES = {161, 248, 22, 10, 226, 227, 201, 180, 101, 206, 141,
             45, 101, 98, 99, 54, 43, 146, 125, 190, 41, 225, 240,

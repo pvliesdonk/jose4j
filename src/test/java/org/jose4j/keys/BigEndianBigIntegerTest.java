@@ -14,9 +14,9 @@ public class BigEndianBigIntegerTest extends TestCase
 {
     public void testExampleStuff()
     {
-        basicConversionTest(BigEndianBigInteger.toBase64Url(ExampleRsaKeyFromJws01.PUBLIC_KEY.getPublicExponent()));
-        basicConversionTest(BigEndianBigInteger.toBase64Url(ExampleRsaKeyFromJws01.PUBLIC_KEY.getModulus()));
-        basicConversionTest(BigEndianBigInteger.toBase64Url(ExampleRsaKeyFromJws01.PRIVATE_KEY.getPrivateExponent()));
+        basicConversionTest(BigEndianBigInteger.toBase64Url(ExampleRsaKeyFromJws.PUBLIC_KEY.getPublicExponent()));
+        basicConversionTest(BigEndianBigInteger.toBase64Url(ExampleRsaKeyFromJws.PUBLIC_KEY.getModulus()));
+        basicConversionTest(BigEndianBigInteger.toBase64Url(ExampleRsaKeyFromJws.PRIVATE_KEY.getPrivateExponent()));
     }
 
     public void testBasicConversions()

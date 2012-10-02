@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import java.util.List;
 import java.util.Iterator;
 
-import org.jose4j.keys.ExampleRsaKeyFromJws01;
+import org.jose4j.keys.ExampleRsaKeyFromJws;
 
 /**
  */
@@ -58,7 +58,7 @@ public class JsonWebKeyTest extends TestCase
 
     public void testFromRsaPublicKeyAndBack()
     {
-        RsaJsonWebKey webKey = new RsaJsonWebKey(ExampleRsaKeyFromJws01.PUBLIC_KEY);
+        RsaJsonWebKey webKey = new RsaJsonWebKey(ExampleRsaKeyFromJws.PUBLIC_KEY);
         String kid = "my-key-id";
         webKey.setKeyId(kid);
         webKey.setUse(Use.SIGNATURE);
@@ -76,7 +76,7 @@ public class JsonWebKeyTest extends TestCase
         assertEquals(Use.SIGNATURE, keyObject.getUse());
 
         RsaJsonWebKey rsaJsonWebKey = (RsaJsonWebKey) keyObject;
-        assertEquals(ExampleRsaKeyFromJws01.PUBLIC_KEY.getModulus(), rsaJsonWebKey.getRSAPublicKey().getModulus());
-        assertEquals(ExampleRsaKeyFromJws01.PUBLIC_KEY.getPublicExponent(), rsaJsonWebKey.getRSAPublicKey().getPublicExponent());
+        assertEquals(ExampleRsaKeyFromJws.PUBLIC_KEY.getModulus(), rsaJsonWebKey.getRSAPublicKey().getModulus());
+        assertEquals(ExampleRsaKeyFromJws.PUBLIC_KEY.getPublicExponent(), rsaJsonWebKey.getRSAPublicKey().getPublicExponent());
     }
 }
