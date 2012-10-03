@@ -10,7 +10,7 @@ public class JsonWebKeySet
 {
     public static final String JWK_SET_MEMBER_NAME = "keys";
 
-    private List<JsonWebKey> keys;
+    private Collection<JsonWebKey> keys;
 
     public JsonWebKeySet(String json)
     {
@@ -24,12 +24,12 @@ public class JsonWebKeySet
         }
     }
 
-    public JsonWebKeySet(List<JsonWebKey> keys)
+    public JsonWebKeySet(Collection<JsonWebKey> keys)
     {
         this.keys = keys;
     }
 
-    public List<JsonWebKey> getKeys()
+    public Collection<JsonWebKey> getJsonWebKeys()
     {
         return keys;
     }

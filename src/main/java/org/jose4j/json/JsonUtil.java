@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.io.Writer;
+import java.io.IOException;
 
 /**
  */
@@ -43,5 +45,10 @@ public class JsonUtil
     public static String toJson(Map<String,?> map)
     {
         return JSONValue.toJSONString(map);
+    }
+
+    public static void writeJson(Map<String,?> map, Writer w) throws IOException
+    {
+        JSONValue.writeJSONString(map, w);
     }
 }

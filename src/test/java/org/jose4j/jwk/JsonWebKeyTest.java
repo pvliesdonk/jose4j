@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Collections;
+import java.util.Collection;
 
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 
@@ -36,7 +37,7 @@ public class JsonWebKeyTest extends TestCase
                 "   }";
 
         JsonWebKeySet jwkSet = new JsonWebKeySet(jwkJson);
-        List<JsonWebKey> jwks = jwkSet.getKeys();
+        Collection<JsonWebKey> jwks = jwkSet.getJsonWebKeys();
 
         assertEquals(2, jwks.size());
 
@@ -69,7 +70,7 @@ public class JsonWebKeyTest extends TestCase
         assertTrue(json.contains(kid));
 
         JsonWebKeySet parsedJwkSet = new JsonWebKeySet(json);
-        List<JsonWebKey> webKeyKeyObjects = parsedJwkSet.getKeys();
+        Collection<JsonWebKey> webKeyKeyObjects = parsedJwkSet.getJsonWebKeys();
         assertEquals(1, webKeyKeyObjects.size());
         JsonWebKey jwk = parsedJwkSet.getKey(kid);
         assertEquals(RsaJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm());
@@ -85,6 +86,6 @@ public class JsonWebKeyTest extends TestCase
     {
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(ExampleRsaKeyFromJws.PUBLIC_KEY);
         assertTrue(jwk instanceof RsaJsonWebKey);
-        assertEquals(RsaJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm()); 
+        assertEquals(RsaJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm());
     }
 }

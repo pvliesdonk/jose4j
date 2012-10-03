@@ -67,6 +67,12 @@ public abstract class JsonWebKey
         return params;
     }
 
+    @Override
+    public String toString()
+    {
+        return getClass().getName() + toParams();
+    }
+
     protected void putIfNotNull(String name, String value, Map<String, String> params)
     {
         if (value != null)
@@ -103,7 +109,7 @@ public abstract class JsonWebKey
             }
             else
             {
-                throw new IllegalArgumentException("Unsupported public key " + publicKey);
+                throw new IllegalArgumentException("Unsupported (currently) public key " + publicKey);
             }
         }
     }
