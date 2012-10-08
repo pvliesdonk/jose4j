@@ -2,9 +2,7 @@ package org.jose4j.jws;
 
 import junit.framework.TestCase;
 import junit.framework.Assert;
-import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jwx.CompactSerialization;
-import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.keys.HmacKey;
 
 import java.security.Key;

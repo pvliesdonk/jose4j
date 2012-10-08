@@ -85,6 +85,13 @@ public class AlgorithmFactory<A extends Algorithm>
 
     public A getAlgorithm(String algorithmIdentifier)
     {
-        return algorithms.get(algorithmIdentifier);
+        A algo = algorithms.get(algorithmIdentifier);
+        
+        if (algo == null)
+        {
+            throw new IllegalArgumentException(algorithmIdentifier + " is an unknown or unsupported algorithm (not one of " + algorithms.keySet() + ").");
+        }
+        
+        return algo;
     }
 }

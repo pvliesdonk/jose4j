@@ -6,11 +6,15 @@ import org.apache.commons.codec.binary.Hex;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.keys.BigEndianBigInteger;
+import org.jose4j.jwk.JsonWebKeySet;
+import org.jose4j.jwk.JsonWebKey;
+import org.jose4j.jwk.RsaJsonWebKey;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Arrays;
 import java.security.*;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.KeySpec;
 import java.security.spec.InvalidKeySpecException;
@@ -32,27 +36,41 @@ public class App
 
         BigInteger n = ExampleRsaKeyFromJws.PUBLIC_KEY.getModulus();
         String myHexing = Hex.encodeHexString(BigEndianBigInteger.toByteArray(n));
-        System.out.println(myHexing);
+//        System.out.println(myHexing);
 
         String exampleNinHex = "a1f8160ae2e3c9b465ce8d2d656263362b927dbe29e1f02477fc1625cc90a136e38bd93497c5b6ea63dd7711e67c7429f956b0fb8a8f089adc4b69893cc1333f53edd019b87784252fec914fe4857769594bea4280d32c0f55bf62944f130396bc6e9bdf6ebdd2bda3678eeca0c668f701b38dbffb38c8342ce2fe6d27fade4a5a4874979dd4b9cf9adec4c75b05852c2c0f5ef8a5c1750392f944e8ed64c110c6b647609aa4783aeb9c6c9ad755313050638b83665c6f6f7a82a396702a1f641b82d3ebf2392219491fb686872c5716f50af8358d9a8b9d17c340728f7f87d89a18d8fcab67ad84590c2ecf759339363c07034d6f606f9e21e05456cae5e9a1";
 
-        System.out.println(exampleNinHex);
-
-        System.out.println(exampleNinHex.equals(myHexing));
+//               System.out.println(exampleNinHex);
+//
+//        System.out.println(exampleNinHex.equals(myHexing));
 
 
         BigInteger publicExponent = ExampleRsaKeyFromJws.PUBLIC_KEY.getPublicExponent();
         myHexing = Hex.encodeHexString(BigEndianBigInteger.toByteArray(publicExponent));
 
-        System.out.println(myHexing);
+//        System.out.println(myHexing);
         String pubExEx = "010001";
-        System.out.println(pubExEx);
-        System.out.println(pubExEx.equals(myHexing));
+//        System.out.println(pubExEx);
+//        System.out.println(pubExEx.equals(myHexing));
 //        testJwsRsaExample();
 //
 //        System.out.println("+++++++++++++++++++++");
 //
 //        testJwsHmacExample();
+
+        String jwks = "{\"keys\":[{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"5\",\"mod\":\"jEEnYC3tBKkYVRY7DAzWxIjxjptoKlm_GfIO2WbRIudVdS-vfr9HMEO2q3-XO10a8MQCFHQOyOdQdhtGsMyWrXbdfV6ivfPM7_2MO1UuYgV2tDhLzjjShzeMkomrsB_nAWtX8Qun1XsRBu_GIdJbd4WMoTbNVaaAf1-U8ieHDNE\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"4\",\"mod\":\"6cKl2TEtFUfBs4zZCatIov1F7SDu_0azkbKzG-0HhiFyHsGZeP4EtHH9tXEJcKNLxZXeFCO9yK_n6LS4KiH87fRYAs6aHiNHdaPWo5D4kdiYG-HNAEMqJzWR9eykUomuUZRe6fiKLOBcgdWjstB7I5PAqFy75RXDLqFuRPDWub8\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"3\",\"mod\":\"h7Jep0xSV6s-fZoHzQuZGT5g_I6q4chSrO0-yxYMehbmds9JFoJxQ2lcBnhkl8C4QudNk93Nyp_VGV33sytW7-22JpN2GFrxI80xzbZlZ7B1pxAZdP74C27YFJEBnwineiLowlHjc0OFQ-gwso6MYzwxV8NttwIDq4tBqbs1pxE\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"2\",\"mod\":\"ktR38dP3vITaViAE_Wg4YX0CApH40QvtXKea-1GSsW8Yl1VxIq_dOcZPKgLLWm9is5g9WZuCYj3sRVfrRmKXoN0qjUX-ZC-L4oxMJzNMGIZ93XiiKC1bdMnHXhdkRhZB5M_-qlx5Cmw69qeQ_wuHJwV4hDjbQeUcfoZySCppfNM\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"1\",\"mod\":\"y2ZGB-Ol6kmpFqWxc02xrjocp9VS9JsstaZl6Gy9hDmKXkkuKnap4hcWcHfF2PK0uLMJYUE_3se1dNBhR3M2ByOajHiSBGj_y_FYiTdjHb2bpkAJQ7wVT9ncT_Fx7V_kYvIevy1NBCr47bwqz4WJcUyZbHXFFoaOYnWHBVyjUl0\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"0\",\"mod\":\"sjMKXtiyCUz6kAT9H9Ve0cHnWxJFN9d_eHNtk318QsJqt86BfhTlpdY7DbE7M0MVyVXIMTjXUDHnvZ4tCDXB3Q\",\"exp\":\"AQAB\"}]}";
+        JsonWebKeySet jwkset = new JsonWebKeySet(jwks);
+        JsonWebKey webKey = jwkset.getKey("4");
+        RsaJsonWebKey rsaWebKey = (RsaJsonWebKey) webKey;
+
+        myHexing = Hex.encodeHexString(BigEndianBigInteger.toByteArray(rsaWebKey.getRSAPublicKey().getModulus()));
+        System.out.println(myHexing);
+
+        myHexing = Hex.encodeHexString(BigEndianBigInteger.toByteArray(rsaWebKey.getRSAPublicKey().getPublicExponent()));
+        System.out.println(myHexing);
+
+
+
 
     }
 
@@ -235,8 +253,9 @@ public class App
         return "{\"iss\":\"joe\"," + newline + " \"exp\":1300819380," + newline +" \"http://example.com/is_root\":true}";
     }
 
-    private static Base64 getBase64url() {Base64 b64url = new Base64(-1, null, true);
-        return b64url;
+    private static Base64 getBase64url()
+    {
+        return new Base64(-1, null, true);
     }
 
     private static byte[] getKey(int[] keyFromExample)

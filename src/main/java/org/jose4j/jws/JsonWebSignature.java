@@ -65,8 +65,9 @@ public class JsonWebSignature extends JsonWebStructure
         {
             throw new IllegalStateException(HeaderParameterNames.ALGORITHM + " header not set.");    
         }
-        AlgorithmFactoryFactory instance = AlgorithmFactoryFactory.getInstance();
-        return instance.getJsonWebSignatureAlgorithm(algo);
+
+        AlgorithmFactoryFactory factory = AlgorithmFactoryFactory.getInstance();
+        return factory.getJsonWebSignatureAlgorithm(algo);
     }
 
     private byte[] getSecuredInputBytes()
