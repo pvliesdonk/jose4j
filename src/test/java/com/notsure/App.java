@@ -2,7 +2,10 @@ package com.notsure;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.codec.binary.Hex;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.keys.ExampleRsaKeyFromJws;
+import org.jose4j.keys.BigEndianBigInteger;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -27,8 +30,24 @@ public class App
     public static void main( String[] args ) throws Exception
     {
 
+        BigInteger n = ExampleRsaKeyFromJws.PUBLIC_KEY.getModulus();
+        String myHexing = Hex.encodeHexString(BigEndianBigInteger.toByteArray(n));
+        System.out.println(myHexing);
+
+        String exampleNinHex = "a1f8160ae2e3c9b465ce8d2d656263362b927dbe29e1f02477fc1625cc90a136e38bd93497c5b6ea63dd7711e67c7429f956b0fb8a8f089adc4b69893cc1333f53edd019b87784252fec914fe4857769594bea4280d32c0f55bf62944f130396bc6e9bdf6ebdd2bda3678eeca0c668f701b38dbffb38c8342ce2fe6d27fade4a5a4874979dd4b9cf9adec4c75b05852c2c0f5ef8a5c1750392f944e8ed64c110c6b647609aa4783aeb9c6c9ad755313050638b83665c6f6f7a82a396702a1f641b82d3ebf2392219491fb686872c5716f50af8358d9a8b9d17c340728f7f87d89a18d8fcab67ad84590c2ecf759339363c07034d6f606f9e21e05456cae5e9a1";
+
+        System.out.println(exampleNinHex);
+
+        System.out.println(exampleNinHex.equals(myHexing));
 
 
+        BigInteger publicExponent = ExampleRsaKeyFromJws.PUBLIC_KEY.getPublicExponent();
+        myHexing = Hex.encodeHexString(BigEndianBigInteger.toByteArray(publicExponent));
+
+        System.out.println(myHexing);
+        String pubExEx = "010001";
+        System.out.println(pubExEx);
+        System.out.println(pubExEx.equals(myHexing));
 //        testJwsRsaExample();
 //
 //        System.out.println("+++++++++++++++++++++");

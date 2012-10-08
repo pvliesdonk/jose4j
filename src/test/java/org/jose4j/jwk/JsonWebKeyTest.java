@@ -2,7 +2,6 @@ package org.jose4j.jwk;
 
 import junit.framework.TestCase;
 
-import java.util.List;
 import java.util.Iterator;
 import java.util.Collections;
 import java.util.Collection;
