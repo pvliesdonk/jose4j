@@ -1,6 +1,7 @@
 package org.jose4j.jws;
 
 import org.jose4j.jwa.Algorithm;
+import org.jose4j.keys.KeyType;
 
 import java.security.Key;
 

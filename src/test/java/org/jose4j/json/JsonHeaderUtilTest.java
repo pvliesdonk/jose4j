@@ -45,5 +45,4 @@ public class JsonHeaderUtilTest extends TestCase
             // expected
         }
     }
-
 }

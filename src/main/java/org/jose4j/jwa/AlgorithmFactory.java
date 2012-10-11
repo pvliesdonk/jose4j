@@ -6,10 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.Properties;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  */
@@ -89,9 +86,14 @@ public class AlgorithmFactory<A extends Algorithm>
         
         if (algo == null)
         {
-            throw new IllegalArgumentException(algorithmIdentifier + " is an unknown or unsupported algorithm (not one of " + algorithms.keySet() + ").");
+            throw new IllegalArgumentException(algorithmIdentifier + " is an unknown or unsupported algorithm (not one of " + getSupportedAlgorithms() + ").");
         }
         
         return algo;
+    }
+
+    public Set<String> getSupportedAlgorithms()
+    {
+        return Collections.unmodifiableSet(algorithms.keySet());
     }
 }

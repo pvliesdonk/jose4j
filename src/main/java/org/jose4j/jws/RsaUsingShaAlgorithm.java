@@ -1,6 +1,7 @@
 package org.jose4j.jws;
 
 import org.jose4j.jwa.AlgorithmInfo;
+import org.jose4j.keys.KeyType;
 
 import java.security.*;
 
@@ -12,6 +13,7 @@ public class RsaUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSignat
     {
         setAlgorithmIdentifier(id);
         setJavaAlgorithm(javaAlgo);
+        setKeyType(KeyType.ASYMMETRIC);
     }
 
     public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes)

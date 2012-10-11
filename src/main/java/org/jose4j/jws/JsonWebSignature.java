@@ -2,10 +2,12 @@ package org.jose4j.jws;
 
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
+import org.jose4j.jwa.AlgorithmFactory;
 import org.jose4j.jwx.CompactSerialization;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.StringUtil;
+import org.jose4j.keys.KeyType;
 
 /**
  */
@@ -66,8 +68,9 @@ public class JsonWebSignature extends JsonWebStructure
             throw new IllegalStateException(HeaderParameterNames.ALGORITHM + " header not set.");    
         }
 
-        AlgorithmFactoryFactory factory = AlgorithmFactoryFactory.getInstance();
-        return factory.getJsonWebSignatureAlgorithm(algo);
+        AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
+        AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory = factoryFactory.getJwsAlgorithmFactory();
+        return jwsAlgorithmFactory.getAlgorithm(algo);
     }
 
     private byte[] getSecuredInputBytes()
@@ -99,6 +102,11 @@ public class JsonWebSignature extends JsonWebStructure
     public void setPayloadCharEncoding(String payloadCharEncoding)
     {
         this.payloadCharEncoding = payloadCharEncoding;
+    }
+
+    public KeyType getKeyType()
+    {
+        return getAlgorithm().getKeyType();
     }
 
     private String getEncodedPayload()

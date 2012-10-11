@@ -1,11 +1,14 @@
 package org.jose4j.jwa;
 
+import org.jose4j.keys.KeyType;
+
 /**
  */
 public abstract class AlgorithmInfo
 {
     private String algorithmIdentifier;
     private String javaAlgorithm;
+    private KeyType keyType;
 
     public void setAlgorithmIdentifier(String algorithmIdentifier)
     {
@@ -25,5 +28,15 @@ public abstract class AlgorithmInfo
     public String getAlgorithmIdentifier()
     {
         return algorithmIdentifier;
+    }
+
+    public KeyType getKeyType()
+    {
+        return keyType;
+    }
+
+    public void setKeyType(KeyType keyType)
+    {
+        this.keyType = keyType;
     }
 }

@@ -3,6 +3,7 @@ package org.jose4j.jws;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.keys.KeyType;
 
 import java.security.Key;
 
@@ -15,6 +16,7 @@ public class PlaintextNoneAlgorithm extends AlgorithmInfo implements JsonWebSign
     public PlaintextNoneAlgorithm()
     {
         setAlgorithmIdentifier(AlgorithmIdentifiers.NONE);
+        setKeyType(KeyType.NONE);
     }
 
     public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes)

@@ -2,6 +2,7 @@ package org.jose4j.jwa;
 
 import org.jose4j.jws.*;
 import org.jose4j.jwe.*;
+import org.jose4j.keys.KeyType;
 
 import java.security.Key;
 
@@ -11,7 +12,7 @@ public class AlgorithmFactoryFactory
 {
     private static final AlgorithmFactoryFactory factoryFactory = new AlgorithmFactoryFactory();
 
-    private AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory;
+    private final AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory;
     private AlgorithmFactory<KeyEncryptionAlgorithm> jweKeyEncAlgorithmFactory;
     private AlgorithmFactory<SymmetricEncryptionAlgorithm> jweSymmEncAlgorithmFactory;
 
@@ -29,9 +30,9 @@ public class AlgorithmFactoryFactory
         return factoryFactory;
     }
 
-    public JsonWebSignatureAlgorithm getJsonWebSignatureAlgorithm(String name)
+    public AlgorithmFactory<JsonWebSignatureAlgorithm> getJwsAlgorithmFactory()
     {
-        return jwsAlgorithmFactory.getAlgorithm(name);
+        return jwsAlgorithmFactory;
     }
 
     public KeyEncryptionAlgorithm getKeyEncryptionAlgorithm(String algo)
@@ -52,6 +53,11 @@ public class AlgorithmFactoryFactory
                 }
 
                 public String getAlgorithmIdentifier()
+                {
+                    return null;  //To change body of implemented methods use File | Settings | File Templates.
+                }
+
+                public KeyType getKeyType()
                 {
                     return null;  //To change body of implemented methods use File | Settings | File Templates.
                 }
