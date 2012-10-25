@@ -1,10 +1,13 @@
 package org.jose4j.jwt;
 
+import java.util.Date;
+
 /**
  */
 public class IntDate
 {
     private long value;
+    private static final long CONVERSION = 1000L;
 
     private IntDate(long value)
     {
@@ -23,7 +26,7 @@ public class IntDate
 
     public static IntDate fromMillis(long millisecondsFromEpoch)
     {
-        return fromSeconds(millisecondsFromEpoch / 1000L);
+        return fromSeconds(millisecondsFromEpoch / CONVERSION);
     }
 
     public void addSeconds(int seconds)
@@ -39,5 +42,43 @@ public class IntDate
     public long getValue()
     {
         return value;
+    }
+
+    public long getValueInMillis()
+    {
+        return getValue() * CONVERSION;  
+    }
+
+    public boolean before(IntDate when)
+    {
+        return value < when.getValue();
+    }
+
+    public boolean after(IntDate when)
+    {
+        return value > when.getValue();
+    }
+
+    @Override
+    public String toString()
+    {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("IntDate");
+        sb.append("{").append(getValue()).append(" --> ");
+        sb.append(new Date(getValueInMillis()));
+        sb.append('}');                           
+        return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        return (this == other) || ((other instanceof IntDate) && (value == ((IntDate) other).value));
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return (int) (value ^ (value >>> 32));
     }
 }
