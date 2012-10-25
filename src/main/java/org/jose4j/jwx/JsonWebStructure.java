@@ -55,6 +55,16 @@ public abstract class JsonWebStructure
         return getHeader(HeaderParameterNames.ALGORITHM);
     }
 
+    public void setKeyIdHeaderValue(String kid)
+    {
+        setHeader(HeaderParameterNames.KEY_ID, kid);
+    }
+
+    public String getKeyIdHeaderValue()
+    {
+        return getHeader(HeaderParameterNames.KEY_ID);
+    }
+
     public Key getKey()
     {
         return key;
