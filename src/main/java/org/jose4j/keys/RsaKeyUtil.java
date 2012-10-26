@@ -1,12 +1,13 @@
 package org.jose4j.keys;
 
+import org.jose4j.lang.JoseException;
+
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.PrivateKey;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.interfaces.RSAPublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -31,7 +32,7 @@ public class RsaKeyUtil
         }
     }
 
-    public RSAPublicKey publicKey(BigInteger modulus, BigInteger publicExponent)
+    public RSAPublicKey publicKey(BigInteger modulus, BigInteger publicExponent) throws JoseException
     {
         RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus, publicExponent);
         try
@@ -41,11 +42,11 @@ public class RsaKeyUtil
         }
         catch (InvalidKeySpecException e)
         {
-            throw new IllegalArgumentException("Invalid key spec", e);
+            throw new JoseException("Invalid key spec: " + e, e);
         }
     }
 
-    public RSAPrivateKey privateKey(BigInteger modulus, BigInteger privateExponent)
+    public RSAPrivateKey privateKey(BigInteger modulus, BigInteger privateExponent) throws JoseException
     {
         RSAPrivateKeySpec keySpec = new RSAPrivateKeySpec(modulus, privateExponent);
         try
@@ -55,7 +56,7 @@ public class RsaKeyUtil
         }
         catch (InvalidKeySpecException e)
         {
-            throw new IllegalArgumentException("Invalid key spec", e);
+            throw new JoseException("Invalid key spec: " + e, e);
         }
     }
 }

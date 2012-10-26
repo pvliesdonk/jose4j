@@ -2,6 +2,7 @@ package org.jose4j.jwa;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jose4j.lang.JoseException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,13 +81,13 @@ public class AlgorithmFactory<A extends Algorithm>
         return (A) daClass.newInstance();
     }
 
-    public A getAlgorithm(String algorithmIdentifier)
+    public A getAlgorithm(String algorithmIdentifier) throws JoseException
     {
         A algo = algorithms.get(algorithmIdentifier);
         
         if (algo == null)
         {
-            throw new IllegalArgumentException(algorithmIdentifier + " is an unknown or unsupported algorithm (not one of " + getSupportedAlgorithms() + ").");
+            throw new JoseException(algorithmIdentifier + " is an unknown or unsupported algorithm (not one of " + getSupportedAlgorithms() + ").");
         }
         
         return algo;

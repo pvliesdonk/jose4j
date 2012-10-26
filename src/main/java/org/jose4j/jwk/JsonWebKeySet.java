@@ -1,6 +1,7 @@
 package org.jose4j.jwk;
 
 import org.jose4j.json.JsonUtil;
+import org.jose4j.lang.JoseException;
 
 import java.util.*;
 
@@ -12,7 +13,7 @@ public class JsonWebKeySet
 
     private Collection<JsonWebKey> keys;
 
-    public JsonWebKeySet(String json)
+    public JsonWebKeySet(String json) throws JoseException
     {
         Map<String,Object> parsed = JsonUtil.parseJson(json);
         List<Map<String,String>> jwksList = (List<Map<String,String>>) parsed.get(JWK_SET_MEMBER_NAME);

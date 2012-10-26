@@ -4,6 +4,7 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.jose4j.lang.JoseException;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -27,7 +28,7 @@ public class JsonHeaderUtil
         }
     };
 
-    public static Map<String,String> parseJson(String jsonString)
+    public static Map<String,String> parseJson(String jsonString) throws JoseException
     {
         try
         {
@@ -36,7 +37,11 @@ public class JsonHeaderUtil
         }
         catch (ParseException e)
         {
-            throw new IllegalArgumentException("Parsing error.", e);
+            throw new JoseException("Parsing error: " + e, e);
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new JoseException("Parsing error: " + e, e);    
         }
     }
 
@@ -48,7 +53,7 @@ public class JsonHeaderUtil
     static class DupeKeyDisallowingLinkedHashMap extends LinkedHashMap<String,String>
     {
         @Override
-        public String put(String key, String value)
+        public String put(String key, String value) 
         {
             if (this.containsKey(key))
             {

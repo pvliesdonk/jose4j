@@ -1,6 +1,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.jwa.AlgorithmInfo;
+import org.jose4j.lang.JoseException;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -37,7 +38,7 @@ public class Aes128CbcSymmetricEncryptionAlgorithm extends AlgorithmInfo impleme
 
     }
 
-    private Cipher getCipher()
+    private Cipher getCipher() throws JoseException
     {
         try
         {
@@ -45,11 +46,11 @@ public class Aes128CbcSymmetricEncryptionAlgorithm extends AlgorithmInfo impleme
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new IllegalStateException(e.toString() , e);
+            throw new JoseException(e.toString() , e);
         }
         catch (NoSuchPaddingException e)
         {
-            throw new IllegalStateException(e.toString() , e);
+            throw new JoseException(e.toString() , e);
         }
     }
 }

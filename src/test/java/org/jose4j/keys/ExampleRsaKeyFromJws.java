@@ -1,6 +1,7 @@
 package org.jose4j.keys;
 
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.JoseException;
 import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.RsaKeyUtil;
 
@@ -70,6 +71,21 @@ public class ExampleRsaKeyFromJws
 
     static RsaKeyUtil rsaKeyUtil = new RsaKeyUtil();
 
-    public static RSAPrivateKey PRIVATE_KEY = rsaKeyUtil.privateKey(N, D);
-    public static RSAPublicKey PUBLIC_KEY = rsaKeyUtil.publicKey(N, E);
+    public static RSAPrivateKey PRIVATE_KEY;
+    public static RSAPublicKey PUBLIC_KEY;
+
+    static
+    {
+        try
+        {
+            PRIVATE_KEY = rsaKeyUtil.privateKey(N, D);
+            PUBLIC_KEY = rsaKeyUtil.publicKey(N, E);
+        }
+        catch (JoseException e)
+        {
+            throw new IllegalStateException(e.getMessage(),e);
+        }
+    }
+
+
 }

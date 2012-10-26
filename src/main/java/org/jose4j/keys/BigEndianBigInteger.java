@@ -1,6 +1,8 @@
 package org.jose4j.keys;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.lang.JoseException;
+
 import java.math.BigInteger;
 
 /**
@@ -44,7 +46,7 @@ public class BigEndianBigInteger
         return magnitude;
     }
 
-    public static String toBase64Url(BigInteger bigInteger)
+    public static String toBase64Url(BigInteger bigInteger) //throws JoseException
     {
         Base64Url base64Url = new Base64Url();
         byte[] bytes = toByteArray(bigInteger);

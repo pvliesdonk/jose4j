@@ -2,6 +2,7 @@ package org.jose4j.jwk;
 
 import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.RsaKeyUtil;
+import org.jose4j.lang.JoseException;
 
 import java.util.Map;
 import java.security.interfaces.RSAPublicKey;
@@ -24,7 +25,7 @@ public class RsaJsonWebKey extends JsonWebKey
         this.publicKey = publicKey;
     }
 
-    public RsaJsonWebKey(Map<String, String> params)
+    public RsaJsonWebKey(Map<String, String> params) throws JoseException
     {
         super(params);
         String b64Modulus = params.get(MODULUS_MEMBER_NAME);

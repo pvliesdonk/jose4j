@@ -4,6 +4,7 @@ import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.json.simple.JSONValue;
+import org.jose4j.lang.JoseException;
 
 import java.util.Map;
 import java.util.List;
@@ -29,7 +30,7 @@ public class JsonUtil
         }
     };
 
-    public static Map<String,Object> parseJson(String jsonString)
+    public static Map<String,Object> parseJson(String jsonString) throws JoseException
     {
         try
         {
@@ -38,7 +39,7 @@ public class JsonUtil
         }
         catch (ParseException e)
         {
-            throw new IllegalArgumentException("Parsing error.", e);
+            throw new JoseException("Parsing error.", e);
         }
     }
 

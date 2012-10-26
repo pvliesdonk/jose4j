@@ -5,6 +5,7 @@ import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.lang.ByteGenerator;
 import org.jose4j.lang.DefaultByteGenerator;
 import org.jose4j.lang.StringUtil;
+import org.jose4j.lang.JoseException;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.base64url.Base64Url;
 
@@ -56,30 +57,30 @@ public class JsonWebEncryption extends JsonWebStructure
     }
 
 
-    private SymmetricEncryptionAlgorithm getSymmetricEncryptionAlgorithm()
+    private SymmetricEncryptionAlgorithm getSymmetricEncryptionAlgorithm() throws JoseException
     {
         String algo = getHeader(HeaderParameterNames.ENCRYPTION_METHOD);
         if (algo == null)
         {
-            throw new IllegalStateException(HeaderParameterNames.ENCRYPTION_METHOD + " header not set.");
+            throw new JoseException(HeaderParameterNames.ENCRYPTION_METHOD + " header not set.");
         }
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
         return factoryFactory.getSymmetricEncryptionAlgorithm(algo);
     }
 
-    private KeyEncryptionAlgorithm getKeyEncryptionAlgorithm()
+    private KeyEncryptionAlgorithm getKeyEncryptionAlgorithm() throws JoseException
     {
         String algo = getAlgorithmHeaderValue();
         if (algo == null)
         {
-            throw new IllegalStateException(HeaderParameterNames.ALGORITHM + " header not set.");
+            throw new JoseException(HeaderParameterNames.ALGORITHM + " header not set.");
         }
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
         return factoryFactory.getKeyEncryptionAlgorithm(algo);
     }
 
 
-    public String getCompactSerialization()
+    public String getCompactSerialization() throws JoseException
     {
         SymmetricEncryptionAlgorithm symmetricEncryptionAlgorithm = getSymmetricEncryptionAlgorithm();
         byte[] contentMasterKeyBytes = byteGenerator.randomBytes(symmetricEncryptionAlgorithm.getKeySize() / 8);

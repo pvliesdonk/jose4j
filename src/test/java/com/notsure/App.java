@@ -4,6 +4,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.codec.binary.Hex;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.JoseException;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.jwk.JsonWebKeySet;
@@ -230,6 +231,6 @@ public class App
 
     private static byte[] getKey(int[] keyFromExample)
     {
-        return ByteUtil.convertUnsignedToSignedTwosComp(keyFromExample);
+        return ByteUtil.convertUnsignedToSignedTwosComp(keyFromExample);   
     }
 }

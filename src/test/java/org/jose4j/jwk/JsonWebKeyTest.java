@@ -7,12 +7,13 @@ import java.util.Collections;
 import java.util.Collection;
 
 import org.jose4j.keys.ExampleRsaKeyFromJws;
+import org.jose4j.lang.JoseException;
 
 /**
  */
 public class JsonWebKeyTest extends TestCase
 {
-    public void testParseExample()
+    public void testParseExample() throws JoseException
     {
         String jwkJson = "{\"keys\":\n" +
                 "     [\n" +
@@ -57,7 +58,7 @@ public class JsonWebKeyTest extends TestCase
         assertTrue(json.contains("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx"));
     }
 
-    public void testFromRsaPublicKeyAndBack()
+    public void testFromRsaPublicKeyAndBack() throws JoseException
     {
         RsaJsonWebKey webKey = new RsaJsonWebKey(ExampleRsaKeyFromJws.PUBLIC_KEY);
         String kid = "my-key-id";
@@ -81,7 +82,7 @@ public class JsonWebKeyTest extends TestCase
         assertEquals(ExampleRsaKeyFromJws.PUBLIC_KEY.getPublicExponent(), rsaJsonWebKey.getRSAPublicKey().getPublicExponent());
     }
 
-    public void testFactoryWithRsaPublicKey()
+    public void testFactoryWithRsaPublicKey() throws JoseException
     {
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(ExampleRsaKeyFromJws.PUBLIC_KEY);
         assertTrue(jwk instanceof RsaJsonWebKey);

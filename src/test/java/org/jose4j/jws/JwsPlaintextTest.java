@@ -2,6 +2,7 @@ package org.jose4j.jws;
 
 import junit.framework.TestCase;
 import org.jose4j.keys.HmacKey;
+import org.jose4j.lang.JoseException;
 
 import java.security.Key;
 
@@ -13,7 +14,7 @@ public class JwsPlaintextTest extends TestCase
     String PAYLOAD = "{\"iss\":\"joe\",\r\n \"exp\":1300819380,\r\n \"http://example.com/is_root\":true}";
     Key KEY = new HmacKey(new byte[] {1,2,3,4,5,-3,28,123,-53});
 
-    public void testExampleDecode()
+    public void testExampleDecode() throws JoseException
     {
         JsonWebSignature jws = new JsonWebSignature();
         jws.setCompactSerialization(JWS);
@@ -22,7 +23,7 @@ public class JwsPlaintextTest extends TestCase
         assertEquals(PAYLOAD, payload);
     }
 
-    public void testADecode()
+    public void testADecode() throws JoseException
     {
         String cs = "eyJhbGciOiJub25lIn0.eyJhdXRoX3RpbWUiOjEzMzk2MTMyNDgsImV4cCI6MTMzOTYxMzU0OCwiaXNzIjoiaHR0cHM6XC9cL2V4YW1wbGUuY29tIiwiYXVkIjoiYSIsImp0aSI6ImpJQThxYTM1QXJvVjZpUDJxNHdSQWwiLCJ1c2VyX2lkIjoiam9obiIsImlhdCI6MTMzOTYxMzI0OCwiYWNyIjozfQ.";
         JsonWebSignature jws = new JsonWebSignature();
@@ -32,7 +33,7 @@ public class JwsPlaintextTest extends TestCase
         System.out.println(payload);
     }
 
-    public void testExampleEncode()
+    public void testExampleEncode() throws JoseException
     {
         JsonWebSignature jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.NONE);
@@ -51,13 +52,13 @@ public class JwsPlaintextTest extends TestCase
             String cs = jws.getCompactSerialization();
             fail("signing should have failed with alg=none and a key provided but produced " + cs);
         }
-        catch (IllegalStateException e)
+        catch (JoseException e)
         {
             // we expect this b/c there should't be a key with alg=none
         }
     }
 
-    public void testExampleVerifyWithKeyNoGood()
+    public void testExampleVerifyWithKeyNoGood() throws JoseException
     {
         JsonWebSignature jws = new JsonWebSignature();
         jws.setCompactSerialization(JWS);
@@ -68,7 +69,7 @@ public class JwsPlaintextTest extends TestCase
             fail("verification should have failed with alg=none and a key provided");
 
         }
-        catch (IllegalStateException e)
+        catch (JoseException e)
         {
             // we expect this b/c there should't be a key with alg=none
         }

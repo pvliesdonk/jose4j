@@ -1,6 +1,7 @@
 package org.jose4j.jwx;
 
 import org.jose4j.json.JsonHeaderUtil;
+import org.jose4j.lang.JoseException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,7 +18,7 @@ public abstract class JsonWebStructure
 
     private Key key;
 
-    abstract public String getCompactSerialization();
+    abstract public String getCompactSerialization() throws JoseException;
 
     public String getHeader()
     {
@@ -34,7 +35,7 @@ public abstract class JsonWebStructure
         this.header = null;
     }
 
-    public void setHeaderAsString(String header)
+    public void setHeaderAsString(String header) throws JoseException
     {
         this.header = header;
         headerMap = JsonHeaderUtil.parseJson(header);

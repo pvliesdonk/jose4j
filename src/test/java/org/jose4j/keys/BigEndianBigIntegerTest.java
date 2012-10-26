@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.DecoderException;
+import org.jose4j.lang.JoseException;
 
 /**
  */

@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import java.security.Key;
 
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.JoseException;
 import org.jose4j.keys.HmacKey;
 
 /**
@@ -23,7 +24,7 @@ public class JwsUsingHmacSha256ExampleTest extends TestCase
     byte[] KEY_SIGNED_BYTES = ByteUtil.convertUnsignedToSignedTwosComp(KEY_UNSIGNED_BYTES);
     Key KEY = new HmacKey(KEY_SIGNED_BYTES);
 
-    public void testVerifyExample()
+    public void testVerifyExample() throws JoseException
     {
         JsonWebSignature jws = new JsonWebSignature();
         jws.setCompactSerialization(JWS);
@@ -33,7 +34,7 @@ public class JwsUsingHmacSha256ExampleTest extends TestCase
         assertEquals(PAYLOAD, jws.getPayload());
     }
 
-    public void testSignExample()
+    public void testSignExample() throws JoseException
     {
         JsonWebSignature jws = new JsonWebSignature();
         jws.setPayload(PAYLOAD);

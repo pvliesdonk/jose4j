@@ -1,5 +1,7 @@
 package org.jose4j.jwk;
 
+import org.jose4j.lang.JoseException;
+
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.security.PublicKey;
@@ -83,7 +85,7 @@ public abstract class JsonWebKey
 
     public static class Factory
     {
-        public static JsonWebKey newJwk(Map<String,String> params)
+        public static JsonWebKey newJwk(Map<String,String> params) throws JoseException
         {
             String alg = params.get(ALGORITHM_MEMBER_NAME);
 
@@ -97,11 +99,11 @@ public abstract class JsonWebKey
             }
             else
             {
-                throw new IllegalArgumentException("Unknown key algorithm: " + alg);
+                throw new JoseException("Unknown key algorithm: " + alg);
             }
         }
 
-        public static JsonWebKey newJwk(PublicKey publicKey)
+        public static JsonWebKey newJwk(PublicKey publicKey) throws JoseException
         {
             if (RSAPublicKey.class.isInstance(publicKey))
             {
@@ -109,7 +111,7 @@ public abstract class JsonWebKey
             }
             else
             {
-                throw new IllegalArgumentException("Unsupported (currently) public key " + publicKey);
+                throw new JoseException("Unsupported (currently) public key " + publicKey);
             }
         }
     }

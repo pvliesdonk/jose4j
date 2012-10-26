@@ -2,6 +2,7 @@ package org.jose4j.jwe.kdf;
 
 import org.jose4j.lang.StringUtil;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.JoseException;
 import org.apache.commons.codec.CharEncoding;
 
 import java.security.MessageDigest;
@@ -25,7 +26,7 @@ class ShaConcatKeyDerivationFunction
         this.digestMethod = "SHA-" + digestLenght;
     }
 
-    public byte[] kdf(byte[] sharedSecret, int keydatalen, byte[] label)
+    public byte[] kdf(byte[] sharedSecret, int keydatalen, byte[] label) throws JoseException
     {
         long reps = getReps(keydatalen);
         MessageDigest digester = getDigester();
@@ -52,7 +53,7 @@ class ShaConcatKeyDerivationFunction
         return derivedKeyingMaterial;
     }
 
-    private MessageDigest getDigester()
+    private MessageDigest getDigester() throws JoseException
     {
         try
         {
@@ -60,11 +61,11 @@ class ShaConcatKeyDerivationFunction
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new IllegalStateException("Must have " + digestMethod, e);
+            throw new JoseException("Must have " + digestMethod, e);
         }
     }
 
-    long getReps(int keydatalen)
+    long getReps(int keydatalen) throws JoseException
     {
         double repsD = (float) keydatalen / (float) digestLenght;
         repsD = Math.ceil(repsD);
@@ -73,7 +74,7 @@ class ShaConcatKeyDerivationFunction
         if (reps > MAX_REPS)
         {
             String msg = keydatalen + " key length gives reps > (2^32 - 1), so ABORTING: outputing an error indicator and stoping.";
-            throw new IllegalArgumentException(msg);
+            throw new JoseException(msg);
         }
 
         return reps;

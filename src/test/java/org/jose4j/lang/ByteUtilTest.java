@@ -74,7 +74,7 @@ public class ByteUtilTest extends TestCase
         assertEquals(4, bytes.length);
     }
 
-    public void testConvert()
+    public void testConvert() throws JoseException
     {
         for (int i = 0; i < 256; i++)
         {
@@ -84,7 +84,7 @@ public class ByteUtilTest extends TestCase
         }
     }
 
-    public void testConvert2()
+    public void testConvert2() throws JoseException
     {
         boolean keepGoing = true;
         for (byte b = Byte.MIN_VALUE; keepGoing; b++)

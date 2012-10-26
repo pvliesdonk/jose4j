@@ -7,6 +7,7 @@ import org.jose4j.jwx.CompactSerialization;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.StringUtil;
+import org.jose4j.lang.JoseException;
 import org.jose4j.keys.KeyType;
 
 /**
@@ -25,12 +26,12 @@ public class JsonWebSignature extends JsonWebStructure
         this.payload = payload;
     }
 
-    public void setCompactSerialization(String compactSerialization)
+    public void setCompactSerialization(String compactSerialization) throws JoseException
     {
         String[] parts = CompactSerialization.deserialize(compactSerialization);
         if (parts.length != COMPACT_SERIALIZATION_PARTS)
         {
-            throw new IllegalArgumentException("A JWS Compact Serialization must have exactly 3 parts separated by period ('.') characters");
+            throw new JoseException("A JWS Compact Serialization must have exactly 3 parts separated by period ('.') characters");
         }
 
         setHeaderAsString(base64url.base64UrlDecodeToUtf8String(parts[0]));
@@ -38,13 +39,13 @@ public class JsonWebSignature extends JsonWebStructure
         setSignature(base64url.base64UrlDecode(parts[2]));
     }
 
-    public String getCompactSerialization()
+    public String getCompactSerialization() throws JoseException
     {
         this.sign();
         return CompactSerialization.serialize(getSecuredInput(), getEncodedSignature());
     }
 
-    private void sign()
+    private void sign() throws JoseException
     {
         JsonWebSignatureAlgorithm algorithm = getAlgorithm();
         byte[] inputBytes = getSecuredInputBytes();
@@ -52,7 +53,7 @@ public class JsonWebSignature extends JsonWebStructure
         setSignature(signatureBytes);
     }
 
-    public boolean verifySignature()
+    public boolean verifySignature() throws JoseException
     {
         JsonWebSignatureAlgorithm algorithm = getAlgorithm();
         byte[] signatureBytes = getSignature();
@@ -60,12 +61,12 @@ public class JsonWebSignature extends JsonWebStructure
         return algorithm.verifySignature(signatureBytes, getKey(), inputBytes);
     }
 
-    private JsonWebSignatureAlgorithm getAlgorithm()
+    private JsonWebSignatureAlgorithm getAlgorithm() throws JoseException
     {
         String algo = getAlgorithmHeaderValue();
         if (algo == null)
         {
-            throw new IllegalStateException(HeaderParameterNames.ALGORITHM + " header not set.");    
+            throw new JoseException(HeaderParameterNames.ALGORITHM + " header not set.");
         }
 
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
@@ -73,13 +74,13 @@ public class JsonWebSignature extends JsonWebStructure
         return jwsAlgorithmFactory.getAlgorithm(algo);
     }
 
-    private byte[] getSecuredInputBytes()
+    private byte[] getSecuredInputBytes() throws JoseException
     {
         String securedInput = getSecuredInput();
         return StringUtil.getBytesUtf8(securedInput);
     }
 
-    private String getSecuredInput()
+    private String getSecuredInput() throws JoseException
     {
         return CompactSerialization.serialize(getEncodedHeader(), getEncodedPayload());
     }
@@ -104,7 +105,7 @@ public class JsonWebSignature extends JsonWebStructure
         this.payloadCharEncoding = payloadCharEncoding;
     }
 
-    public KeyType getKeyType()
+    public KeyType getKeyType() throws JoseException
     {
         return getAlgorithm().getKeyType();
     }

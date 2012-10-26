@@ -5,14 +5,14 @@ import junit.framework.TestCase;
 import java.util.Arrays;
 
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.JoseException;
 import static org.jose4j.jwe.kdf.ShaConcatKeyDerivationFunction.*;
-import org.jose4j.jwe.kdf.ShaConcatKeyDerivationFunction;
 
 /**
  */
 public class SimpleSha256ConcatKeyDerivationFunctionTest extends TestCase
 {
-    public void testGetReps()
+    public void testGetReps() throws JoseException
     {
         ShaConcatKeyDerivationFunction kdf = new Sha256ConcatKeyDerivationFunction();
         assertEquals(1, kdf.getReps(256));
@@ -22,22 +22,22 @@ public class SimpleSha256ConcatKeyDerivationFunctionTest extends TestCase
         assertEquals(5, kdf.getReps(1025));
     }
 
-    public void testSizeEtc256()
+    public void testSizeEtc256() throws JoseException
     {
         testKdfSizeAndOtherStuff(256);
     }
 
-    public void testSizeEtc384()
+    public void testSizeEtc384() throws JoseException
     {
         testKdfSizeAndOtherStuff(384);
     }
 
-    public void testSizeEtc512()
+    public void testSizeEtc512() throws JoseException
     {
         testKdfSizeAndOtherStuff(512);
     }
 
-    public void testKdfSizeAndOtherStuff(int keydatalen)
+    public void testKdfSizeAndOtherStuff(int keydatalen) throws JoseException
     {
         ShaConcatKeyDerivationFunction kdf1 = new Sha256ConcatKeyDerivationFunction();
         byte[] secret = {1, 62, 3, 4, 9, 83, 123, 12, 111, 1, 1, 0, -1, 8, 7 , 12, 45, 118, 99, 9};
@@ -65,7 +65,7 @@ public class SimpleSha256ConcatKeyDerivationFunctionTest extends TestCase
         System.out.println(Arrays.toString(bytes));
     }
 
-    public void testJune20EmailExample1()
+    public void testJune20EmailExample1() throws JoseException
     {
         /*
             EXAMPLE 1:
@@ -120,7 +120,7 @@ public class SimpleSha256ConcatKeyDerivationFunctionTest extends TestCase
         assertTrue(Arrays.equals(cikInts, ByteUtil.convertSignedTwosCompToUnsigned(cik)));
     }
 
-    public void testJune20EmailExample2()
+    public void testJune20EmailExample2() throws JoseException
     {
         /*
             EXAMPLE 2:

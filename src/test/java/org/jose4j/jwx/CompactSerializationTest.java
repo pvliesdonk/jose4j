@@ -4,11 +4,13 @@ import junit.framework.TestCase;
 
 import java.util.Arrays;
 
+import org.jose4j.lang.JoseException;
+
 /**
  */
 public class CompactSerializationTest extends TestCase
 {
-    public void testDeserialize1()
+    public void testDeserialize1() throws JoseException
     {
         String cs = "one.two.three";
         String[] parts = CompactSerialization.deserialize(cs);
@@ -19,7 +21,7 @@ public class CompactSerializationTest extends TestCase
         assertEquals(i, parts.length);
     }
 
-    public void testDeserialize2()
+    public void testDeserialize2()  throws JoseException
     {
         String cs = "one.two.three.four";
         String[] parts = CompactSerialization.deserialize(cs);
@@ -31,7 +33,7 @@ public class CompactSerializationTest extends TestCase
         assertEquals(i, parts.length);
     }
 
-    public void testDeserialize3()
+    public void testDeserialize3() throws JoseException
     {
         String cs = "one.two.";
         String[] parts = CompactSerialization.deserialize(cs);
@@ -42,7 +44,7 @@ public class CompactSerializationTest extends TestCase
         assertEquals(i, parts.length);
     }
 
-    public void testDeserialize4()
+    public void testDeserialize4() throws JoseException
     {
         String cs = "one.two.three.";
         String[] parts = CompactSerialization.deserialize(cs);
@@ -62,7 +64,7 @@ public class CompactSerializationTest extends TestCase
             String[] parts = CompactSerialization.deserialize(cs);
             fail("Empty string inside compact serialization ("+cs+") not okay " +  Arrays.toString(parts));
         }
-        catch (IllegalArgumentException e)
+        catch (JoseException e)
         {
         }
     }
@@ -75,7 +77,7 @@ public class CompactSerializationTest extends TestCase
             String[] parts = CompactSerialization.deserialize(cs);
             fail("Empty string inside compact serialization ("+cs+") not okay " +  Arrays.toString(parts));
         }
-        catch (IllegalArgumentException e)
+        catch (JoseException e)
         {
         }
     }
@@ -88,30 +90,30 @@ public class CompactSerializationTest extends TestCase
             String[] parts = CompactSerialization.deserialize(cs);
             fail("Empty string inside compact serialization ("+cs+") not okay " +  Arrays.toString(parts));
         }
-        catch (IllegalArgumentException e)
+        catch (JoseException e)
         {
         }
     }
 
-    public void testSerialize1()
+    public void testSerialize1() throws JoseException
     {
         String cs = CompactSerialization.serialize("one", "two", "three");
         assertEquals("one.two.three", cs);
     }
 
-    public void testSerialize2()
+    public void testSerialize2() throws JoseException
     {
         String cs = CompactSerialization.serialize("one", "two", "three", "four");
         assertEquals("one.two.three.four", cs);
     }
 
-    public void testSerialize3()
+    public void testSerialize3() throws JoseException
     {
         String cs = CompactSerialization.serialize("one", "two", "three", null);
         assertEquals("one.two.three.", cs);
     }
 
-    public void testSerialize4()
+    public void testSerialize4() throws JoseException
     {
         String cs = CompactSerialization.serialize("one", "two", "three", "");
         assertEquals("one.two.three.", cs);
@@ -124,7 +126,7 @@ public class CompactSerializationTest extends TestCase
             String cs = CompactSerialization.serialize("one", "", "three", "");
             fail("serialize shouldn't work " + cs);
         }
-        catch (IllegalArgumentException e)
+        catch (JoseException e)
         {
         }
     }
@@ -136,7 +138,7 @@ public class CompactSerializationTest extends TestCase
             String cs = CompactSerialization.serialize("one", null, "three", "");
             fail("serialize shouldn't work " + cs);
         }
-        catch (IllegalArgumentException e)
+        catch (JoseException e)
         {
         }
     }
@@ -148,7 +150,7 @@ public class CompactSerializationTest extends TestCase
             String cs = CompactSerialization.serialize("", "two", "three", "four");
             fail("serialize shouldn't work " + cs);
         }
-        catch (IllegalArgumentException e)
+        catch (JoseException e)
         {
         }
     }
@@ -160,7 +162,7 @@ public class CompactSerializationTest extends TestCase
             String cs = CompactSerialization.serialize(null, "two", "three", "four");
             fail("serialize shouldn't work " + cs);
         }
-        catch (IllegalArgumentException e)
+        catch (JoseException e)
         {
         }
     }

@@ -2,6 +2,7 @@ package org.jose4j.jws;
 
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.JoseException;
 import org.jose4j.keys.KeyType;
 
 import javax.crypto.Mac;
@@ -20,7 +21,7 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
         setKeyType(KeyType.SYMMETRIC);
     }
 
-    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes)
+    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException
     {
         Mac mac = getMacInstance();
         initMacWithKey(mac, key);
@@ -29,14 +30,14 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
         return ByteUtil.secureEquals(signatureBytes, calculatedSigature);
     }
 
-    public byte[] sign(Key key, byte[] securedInputBytes)
+    public byte[] sign(Key key, byte[] securedInputBytes) throws JoseException
     {
         Mac mac = getMacInstance();
         initMacWithKey(mac, key);
         return mac.doFinal(securedInputBytes);
     }
 
-    private void initMacWithKey(Mac mac, Key key)
+    private void initMacWithKey(Mac mac, Key key) throws JoseException
     {
         try
         {
@@ -44,11 +45,11 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
         }
         catch (InvalidKeyException e)
         {
-            throw new IllegalStateException("Key is not valid for " + getJavaAlgorithm(), e);
+            throw new JoseException("Key is not valid for " + getJavaAlgorithm(), e);
         }
     }
 
-    private Mac getMacInstance()
+    private Mac getMacInstance() throws JoseException
     {
         Mac mac;
 
@@ -58,7 +59,7 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new IllegalStateException("Unable to get an implementation of algorithm name: " + getJavaAlgorithm(), e);
+            throw new JoseException("Unable to get an implementation of algorithm name: " + getJavaAlgorithm(), e);
         }
 
         return /* of the */ mac;

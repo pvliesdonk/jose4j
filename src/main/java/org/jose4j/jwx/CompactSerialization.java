@@ -1,5 +1,7 @@
 package org.jose4j.jwx;
 
+import org.jose4j.lang.JoseException;
+
 /**
  */
 public class CompactSerialization
@@ -11,7 +13,7 @@ public class CompactSerialization
 
     private static final String NO_EMPTY_PARTS_MSG = "Compact serialization cannot contain empty middle or beginning parts.";
 
-    public static String[] deserialize(String compactSerialization)
+    public static String[] deserialize(String compactSerialization) throws JoseException
     {
         String[] parts = compactSerialization.split(PERIOD_SEPARATOR_REGEX);
 
@@ -19,7 +21,7 @@ public class CompactSerialization
         {
             if (EMPTY_STRING.equals(part))
             {
-                throw new IllegalArgumentException(NO_EMPTY_PARTS_MSG);
+                throw new JoseException(NO_EMPTY_PARTS_MSG);
             }
         }
 
@@ -34,7 +36,7 @@ public class CompactSerialization
         return parts;
     }
 
-    public static String serialize(String... parts)
+    public static String serialize(String... parts) throws JoseException
     {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < parts.length; i++)
@@ -45,7 +47,7 @@ public class CompactSerialization
             {
                 if (EMPTY_STRING.equals(part))
                 {
-                    throw new IllegalArgumentException(NO_EMPTY_PARTS_MSG);
+                    throw new JoseException(NO_EMPTY_PARTS_MSG);
                 }
                 sb.append(PERIOD_SEPARATOR);
             }

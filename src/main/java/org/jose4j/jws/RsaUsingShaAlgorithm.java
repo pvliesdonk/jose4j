@@ -2,6 +2,7 @@ package org.jose4j.jws;
 
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.KeyType;
+import org.jose4j.lang.JoseException;
 
 import java.security.*;
 
@@ -16,7 +17,7 @@ public class RsaUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSignat
         setKeyType(KeyType.ASYMMETRIC);
     }
 
-    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes)
+    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException
     {
         Signature signature = getSignature();
         initForVerify(signature, key);
@@ -27,11 +28,11 @@ public class RsaUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSignat
         }
         catch (SignatureException e)
         {
-            throw new IllegalStateException("Problem verifying signature.", e);
+            throw new JoseException("Problem verifying signature.", e);
         }
     }
 
-    public byte[] sign(Key key, byte[] securedInputBytes)
+    public byte[] sign(Key key, byte[] securedInputBytes) throws JoseException
     {
         Signature signature = getSignature();
         initForSign(signature, key);
@@ -42,11 +43,11 @@ public class RsaUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSignat
         }
         catch (SignatureException e)
         {
-            throw new IllegalStateException("Problem creating signature.", e);
+            throw new JoseException("Problem creating signature.", e);
         }
     }
 
-    private void initForSign(Signature signature, Key key)
+    private void initForSign(Signature signature, Key key) throws JoseException
     {
         try
         {
@@ -55,15 +56,15 @@ public class RsaUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSignat
         }
         catch (ClassCastException e)
         {
-            throw new IllegalStateException("Key is not valid (not a private key) for " + getJavaAlgorithm(), e);
+            throw new JoseException("Key is not valid (not a private key) for " + getJavaAlgorithm() + " " + e);
         }
         catch (InvalidKeyException e)
         {
-            throw new IllegalStateException("Key is not valid for " + getJavaAlgorithm(), e);
+            throw new JoseException("Key is not valid for " + getJavaAlgorithm(), e);
         }
     }
     
-    private void initForVerify(Signature signature, Key key)
+    private void initForVerify(Signature signature, Key key) throws JoseException
     {
         try
         {
@@ -72,15 +73,15 @@ public class RsaUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSignat
         }
         catch (ClassCastException e)
         {
-            throw new IllegalStateException("Key is not valid (not a public key) for " + getJavaAlgorithm(), e);
+            throw new JoseException("Key is not valid (not a public key) for " + getJavaAlgorithm() + " " +  e);
         }
         catch (InvalidKeyException e)
         {
-            throw new IllegalStateException("Key is not valid for " + getJavaAlgorithm(), e);
+            throw new JoseException("Key is not valid for " + getJavaAlgorithm(), e);
         }
     }
 
-    private Signature getSignature()
+    private Signature getSignature() throws JoseException
     {
         try
         {
@@ -88,7 +89,7 @@ public class RsaUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSignat
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new IllegalStateException("Unable to get an implementation of algorithm name: " + getJavaAlgorithm(), e);
+            throw new JoseException("Unable to get an implementation of algorithm name: " + getJavaAlgorithm(), e);
         }
     }
 }

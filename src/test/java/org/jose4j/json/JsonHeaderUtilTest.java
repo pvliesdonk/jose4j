@@ -4,11 +4,13 @@ import junit.framework.TestCase;
 
 import java.util.Map;
 
+import org.jose4j.lang.JoseException;
+
 /**
  */
 public class JsonHeaderUtilTest extends TestCase
 {
-    public void testParseJson1()
+    public void testParseJson1() throws JoseException
     {
         String basic = "{\"key\":\"value\"}";
         Map<String,String> map = JsonHeaderUtil.parseJson(basic);
@@ -25,7 +27,7 @@ public class JsonHeaderUtilTest extends TestCase
             Map<String,String> map = JsonHeaderUtil.parseJson(basic);
             fail("parsing of " + basic + " should fail because the same member name occurs multiple times but returned: " + map);
         }
-        catch (IllegalArgumentException e)
+        catch (JoseException e)
         {
             // expected
         }
@@ -40,7 +42,7 @@ public class JsonHeaderUtilTest extends TestCase
             Map<String,String> map = JsonHeaderUtil.parseJson(basic);
             fail("parsing of " + basic + " should fail because of array but returned: " + map);
         }
-        catch (IllegalArgumentException e)
+        catch (JoseException e)
         {
             // expected
         }
