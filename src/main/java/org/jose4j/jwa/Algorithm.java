@@ -8,5 +8,6 @@ public interface Algorithm
 {
     String getJavaAlgorithm();
     String getAlgorithmIdentifier();
-    KeyType getKeyType();    
+    KeyType getKeyType();
+    String getKeyAlgorithm();
 }

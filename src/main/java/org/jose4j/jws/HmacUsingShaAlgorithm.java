@@ -4,6 +4,7 @@ import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.keys.KeyType;
+import org.jose4j.keys.HmacKey;
 
 import javax.crypto.Mac;
 import java.security.InvalidKeyException;
@@ -19,6 +20,7 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
         setAlgorithmIdentifier(id);
         setJavaAlgorithm(javaAlgo);
         setKeyType(KeyType.SYMMETRIC);
+        setKeyAlgorithm(HmacKey.ALGORITHM);
     }
 
     public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException

@@ -9,6 +9,7 @@ public abstract class AlgorithmInfo
     private String algorithmIdentifier;
     private String javaAlgorithm;
     private KeyType keyType;
+    private String keyAlgorithm;
 
     public void setAlgorithmIdentifier(String algorithmIdentifier)
     {
@@ -38,5 +39,15 @@ public abstract class AlgorithmInfo
     public void setKeyType(KeyType keyType)
     {
         this.keyType = keyType;
+    }
+
+    public String getKeyAlgorithm()
+    {
+        return keyAlgorithm;
+    }
+
+    public void setKeyAlgorithm(String keyAlgorithm)
+    {
+        this.keyAlgorithm = keyAlgorithm;
     }
 }

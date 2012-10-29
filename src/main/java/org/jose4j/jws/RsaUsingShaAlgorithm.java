@@ -2,6 +2,7 @@ package org.jose4j.jws;
 
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.KeyType;
+import org.jose4j.keys.RsaKeyUtil;
 import org.jose4j.lang.JoseException;
 
 import java.security.*;
@@ -15,7 +16,8 @@ public class RsaUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSignat
         setAlgorithmIdentifier(id);
         setJavaAlgorithm(javaAlgo);
         setKeyType(KeyType.ASYMMETRIC);
-    }
+        setKeyAlgorithm(RsaKeyUtil.RSA);
+    }               
 
     public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException
     {
@@ -56,14 +58,14 @@ public class RsaUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSignat
         }
         catch (ClassCastException e)
         {
-            throw new JoseException("Key is not valid (not a private key) for " + getJavaAlgorithm() + " " + e);
+            throw new JoseException(getBadKeyMessage(key) + "(not a private key) for " + getJavaAlgorithm() + " " + e);
         }
         catch (InvalidKeyException e)
         {
-            throw new JoseException("Key is not valid for " + getJavaAlgorithm(), e);
+            throw new JoseException(getBadKeyMessage(key) + "for " + getJavaAlgorithm(), e);
         }
     }
-    
+
     private void initForVerify(Signature signature, Key key) throws JoseException
     {
         try
@@ -73,12 +75,17 @@ public class RsaUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSignat
         }
         catch (ClassCastException e)
         {
-            throw new JoseException("Key is not valid (not a public key) for " + getJavaAlgorithm() + " " +  e);
+            throw new JoseException(getBadKeyMessage(key) + "(not a public key) for " + getJavaAlgorithm() + " " +  e);
         }
         catch (InvalidKeyException e)
         {
-            throw new JoseException("Key is not valid for " + getJavaAlgorithm(), e);
+            throw new JoseException(getBadKeyMessage(key) + "for " + getJavaAlgorithm(), e);
         }
+    }
+
+    private String getBadKeyMessage(Key key)
+    {
+        return "The given key (algorithm="+key.getAlgorithm()+") is not valid ";
     }
 
     private Signature getSignature() throws JoseException

@@ -18,7 +18,7 @@ import java.math.BigInteger;
 public class RsaKeyUtil
 {
     private KeyFactory keyFactory;
-    private static final String RSA = "RSA";
+    public static final String RSA = "RSA";
 
     public RsaKeyUtil()
     {

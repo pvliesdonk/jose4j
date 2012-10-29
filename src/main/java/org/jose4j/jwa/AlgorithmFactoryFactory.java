@@ -44,7 +44,7 @@ public class AlgorithmFactoryFactory
             {
                 public byte[] encrypt(Key key, byte[] contentMasterKey)
                 {
-                    return contentMasterKey; // TODO  
+                    return contentMasterKey; // TODO
                 }
 
                 public String getJavaAlgorithm()
@@ -58,6 +58,11 @@ public class AlgorithmFactoryFactory
                 }
 
                 public KeyType getKeyType()
+                {
+                    return null;  //To change body of implemented methods use File | Settings | File Templates.
+                }
+
+                public String getKeyAlgorithm()
                 {
                     return null;  //To change body of implemented methods use File | Settings | File Templates.
                 }
