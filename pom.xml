@@ -103,4 +103,7 @@
     </plugins>
   </reporting>
 
+  <scm>
+    <connection>scm:git:https://bitbucket.org/b_c/jose4j.git</connection>
+  </scm>
 </project>                                                     
