@@ -105,4 +105,11 @@
   <scm>
     <connection>scm:git:https://bitbucket.org/b_c/jose4j.git</connection>
   </scm>
+
+  <distributionManagement>
+  	<repository>
+  		<id>maven-repository</id>
+  		<url>file:///${basedir}/target/deploy</url>
+  	</repository>
+  </distributionManagement>
 </project>                                                     
