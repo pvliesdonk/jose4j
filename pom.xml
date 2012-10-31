@@ -8,7 +8,7 @@
   <packaging>jar</packaging>
   <name>JOSE (JWS, JWE, JWK, JWA) for Java + maybe JWT</name>
 
-  <url>http://todo.abcd</url>
+  <url>https://bitbucket.org/b_c/jose4j/</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -46,4 +46,16 @@
       <scope>test</scope>      
     </dependency>
   </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
 </project>                                                     
