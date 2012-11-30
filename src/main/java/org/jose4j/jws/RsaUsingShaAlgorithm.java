@@ -86,7 +86,7 @@ public class RsaUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSignat
     {
         try
         {
-           PublicKey publicKey = (PublicKey) key;
+           PublicKey publicKey = (PublicKey) key;                                       
            signature.initVerify(publicKey);
         }
         catch (ClassCastException e)
@@ -101,7 +101,8 @@ public class RsaUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSignat
 
     private String getBadKeyMessage(Key key)
     {
-        return "The given key (algorithm="+key.getAlgorithm()+") is not valid ";
+        String msg = key == null ? "key is null" : "algorithm=" + key.getAlgorithm();
+        return "The given key (" + msg + ") is not valid ";
     }
 
     private Signature getSignature() throws JoseException
