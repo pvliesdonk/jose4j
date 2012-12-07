@@ -28,8 +28,8 @@ import java.math.BigInteger;
  */
 public class RsaJsonWebKey extends JsonWebKey
 {
-    public static final String MODULUS_MEMBER_NAME = "mod";
-    public static final String EXPONENT_MEMBER_NAME = "exp";
+    public static final String MODULUS_MEMBER_NAME = "n";
+    public static final String EXPONENT_MEMBER_NAME = "e";
 
     public static final String ALGORITHM_VALUE = "RSA";
 
