@@ -83,7 +83,7 @@ public class ExampleRsaKeyFromJws
            79, 117, 167, 80, 225, 57, 84, 110, 58, 138, 115,
            157};
     public static byte[] D_SIGNED_BYTES = ByteUtil.convertUnsignedToSignedTwosComp(D_UNSIGNED_BYTES);
-    public static BigInteger D = new BigInteger(1, D_SIGNED_BYTES);
+    public static BigInteger D = BigEndianBigInteger.fromBytes(D_SIGNED_BYTES);
 
     static RsaKeyUtil rsaKeyUtil = new RsaKeyUtil();
 
