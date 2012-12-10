@@ -20,19 +20,23 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.codec.binary.Hex;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.JoseException;
 import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.jwk.JsonWebKeySet;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.RsaJsonWebKey;
+import org.jose4j.base64url.Base64Url;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Arrays;
 import java.security.*;
-import java.security.spec.RSAPrivateKeySpec;
-import java.security.spec.KeySpec;
-import java.security.spec.InvalidKeySpecException;
+import java.security.spec.*;
 import java.math.BigInteger;
+
+import sun.security.util.DerInputStream;
+import sun.security.util.DerValue;
+import sun.security.util.DerOutputStream;
 
 /**
  * Hello world!
@@ -47,19 +51,153 @@ public class App
 
     public static void main(String[] args) throws Exception
     {
-        String myHexing;
+//        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
+//        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+//
+//        keyGen.initialize(256, random);
+//
+//        KeyPair pair = keyGen.generateKeyPair();
+//        PrivateKey priv = pair.getPrivate();
+//        PublicKey pub = pair.getPublic();
 
-        String jwks = "{\"keys\":[{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"5\",\"mod\":\"jEEnYC3tBKkYVRY7DAzWxIjxjptoKlm_GfIO2WbRIudVdS-vfr9HMEO2q3-XO10a8MQCFHQOyOdQdhtGsMyWrXbdfV6ivfPM7_2MO1UuYgV2tDhLzjjShzeMkomrsB_nAWtX8Qun1XsRBu_GIdJbd4WMoTbNVaaAf1-U8ieHDNE\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"4\",\"mod\":\"6cKl2TEtFUfBs4zZCatIov1F7SDu_0azkbKzG-0HhiFyHsGZeP4EtHH9tXEJcKNLxZXeFCO9yK_n6LS4KiH87fRYAs6aHiNHdaPWo5D4kdiYG-HNAEMqJzWR9eykUomuUZRe6fiKLOBcgdWjstB7I5PAqFy75RXDLqFuRPDWub8\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"3\",\"mod\":\"h7Jep0xSV6s-fZoHzQuZGT5g_I6q4chSrO0-yxYMehbmds9JFoJxQ2lcBnhkl8C4QudNk93Nyp_VGV33sytW7-22JpN2GFrxI80xzbZlZ7B1pxAZdP74C27YFJEBnwineiLowlHjc0OFQ-gwso6MYzwxV8NttwIDq4tBqbs1pxE\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"2\",\"mod\":\"ktR38dP3vITaViAE_Wg4YX0CApH40QvtXKea-1GSsW8Yl1VxIq_dOcZPKgLLWm9is5g9WZuCYj3sRVfrRmKXoN0qjUX-ZC-L4oxMJzNMGIZ93XiiKC1bdMnHXhdkRhZB5M_-qlx5Cmw69qeQ_wuHJwV4hDjbQeUcfoZySCppfNM\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"1\",\"mod\":\"y2ZGB-Ol6kmpFqWxc02xrjocp9VS9JsstaZl6Gy9hDmKXkkuKnap4hcWcHfF2PK0uLMJYUE_3se1dNBhR3M2ByOajHiSBGj_y_FYiTdjHb2bpkAJQ7wVT9ncT_Fx7V_kYvIevy1NBCr47bwqz4WJcUyZbHXFFoaOYnWHBVyjUl0\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"0\",\"mod\":\"sjMKXtiyCUz6kAT9H9Ve0cHnWxJFN9d_eHNtk318QsJqt86BfhTlpdY7DbE7M0MVyVXIMTjXUDHnvZ4tCDXB3Q\",\"exp\":\"AQAB\"}]}";
-        JsonWebKeySet jwkset = new JsonWebKeySet(jwks);
-        JsonWebKey webKey = jwkset.getKey("4");
-        RsaJsonWebKey rsaWebKey = (RsaJsonWebKey) webKey;
+         // The ECDSA key consists of a public part, the EC point (x, y)
+        int[] xints = {127, 205, 206, 39, 112, 246, 196, 93, 65, 131, 203,
+          238, 111, 219, 75, 123, 88, 7, 51, 53, 123, 233, 239,
+          19, 186, 207, 110, 60, 123, 209, 84, 69};
+        int[] yints =  {199, 241, 68, 205, 27, 189, 155, 126, 135, 44, 223,
+            237, 185, 238, 185, 244, 179, 105, 93, 110, 169, 11,
+            36, 173, 138, 70, 35, 40, 133, 136, 229, 173};
+        // and a private part d.
+        int[] dints = {142, 155, 16, 158, 113, 144, 152, 191, 152, 4, 135,
+           223, 31, 93, 119, 233, 203, 41, 96, 110, 190, 210,
+           38, 59, 95, 87, 194, 19, 223, 132, 244, 178};
 
-        myHexing = Hex.encodeHexString(BigEndianBigInteger.toByteArray(rsaWebKey.getRSAPublicKey().getModulus()));
-        System.out.println(myHexing);
+        byte[] xbytes = ByteUtil.convertUnsignedToSignedTwosComp(xints);
+        byte[] ybytes = ByteUtil.convertUnsignedToSignedTwosComp(yints);
+        BigInteger x = BigEndianBigInteger.fromBytes(xbytes);
+        BigInteger y = BigEndianBigInteger.fromBytes(ybytes);
 
-        myHexing = Hex.encodeHexString(BigEndianBigInteger.toByteArray(rsaWebKey.getRSAPublicKey().getPublicExponent()));
-        System.out.println(myHexing);
+
+        /**
+         * Creates an elliptic curve with the specified elliptic field
+         * <code>field</code>, the coefficients <code>a</code> and
+         * <code>b</code>, and the <code>seed</code> used for curve generation.
+         * @param field the finite field that this elliptic curve is over.
+         * @param a the first coefficient of this elliptic curve.
+         * @param b the second coefficient of this elliptic curve.
+         * @param seed the bytes used during curve generation for later
+         * validation. Contents of this array are copied to protect against
+         * subsequent modification.
+         * @exception NullPointerException if <code>field</code>,
+         * <code>a</code>, or <code>b</code> is null.
+         * @exception IllegalArgumentException if <code>a</code>
+         * or <code>b</code> is not null and not in <code>field</code>.
+         */
+        ECFieldFp field = new ECFieldFp(new BigInteger("115792089210356248762697446949407573530086143415290314195533631308867097853951"));
+        BigInteger a = new BigInteger("ffffffff00000001000000000000000000000000fffffffffffffffffffffffc", 16);
+        BigInteger b = new BigInteger("5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b", 16);
+        EllipticCurve curve = new EllipticCurve(field, a, b);
+
+        //g the generator which is also known as the base point.
+        BigInteger gx = new BigInteger("6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296", 16);
+        BigInteger gy = new BigInteger("4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5", 16);
+        ECPoint g = new ECPoint(gx, gy);
+
+        // Order n
+        BigInteger n = new BigInteger("115792089210356248762697446949407573529996955224135760342422259061068512044369");
+
+        // cofactor h (Thus, for these curves over prime fileds, the cofactor is always h = 1)
+        int h = 1;
+
+        /**
+         * Creates elliptic curve domain parameters based on the
+         * specified values.
+         * @param curve the elliptic curve which this parameter
+         * defines.
+         * @param g the generator which is also known as the base point.
+         * @param n the order of the generator <code>g</code>.
+         * @param h the cofactor.*/
+        ECParameterSpec spec = new ECParameterSpec(curve, g, n, h);
+
+        ECPoint w = new ECPoint(x, y);
+        ECPublicKeySpec ecPublicKeySpec = new ECPublicKeySpec(w, spec);
+
+        byte[] dbytes = ByteUtil.convertUnsignedToSignedTwosComp(dints);
+        BigInteger d = BigEndianBigInteger.fromBytes(dbytes);
+        ECPrivateKeySpec ecPrivateKeySpec = new ECPrivateKeySpec(d, spec);
+
+        KeyFactory keyFactory = KeyFactory.getInstance("EC");
+        PrivateKey privateKey = keyFactory.generatePrivate(ecPrivateKeySpec);
+
+        Signature signature = Signature.getInstance("SHA256withECDSA");
+        signature.initSign(privateKey);
+
+        // exampel from jws
+        String jwsSi = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ";
+        byte[] securedInputBytes = jwsSi.getBytes("ASCII");
+        signature.update(securedInputBytes);
+
+        byte[] realSig = signature.sign();
+        System.out.println("sig length in bytes " + realSig.length) ;
+        System.out.println("Signature: " + new BigInteger(1, realSig).toString(16));
+
+        Signature verifier = Signature.getInstance("SHA256withECDSA");
+        PublicKey publicKey = keyFactory.generatePublic(ecPublicKeySpec);
+        verifier.initVerify(publicKey);
+        verifier.update(securedInputBytes);
+        boolean b1 = verifier.verify(realSig);
+
+
+
+        // sun classes 
+        DerInputStream in = new DerInputStream(realSig);
+        DerValue[] values = in.getSequence(2);
+        BigInteger r = values[0].getPositiveBigInteger();
+        BigInteger s = values[1].getPositiveBigInteger();
+
+        byte[] bytesr = BigEndianBigInteger.toByteArray(r);
+        byte[] bytess = BigEndianBigInteger.toByteArray(s);
+
+        System.out.println(b1);
+
+        Base64Url b64u = new Base64Url();
+        byte[] exampleSigBytes = b64u.base64UrlDecode("DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q");
+
+        byte[] encodedSig = encodeSignature(exampleSigBytes);
+
+
+        System.out.println("example sig length in bytes " + exampleSigBytes.length);
+
+        Signature verifier2 = Signature.getInstance("SHA256withECDSA");
+        verifier2.initVerify(publicKey);
+        verifier2.update(securedInputBytes);
+        boolean b2 = verifier2.verify(encodedSig);
+        System.out.println(b2);
     }
+
+    private static byte[] encodeSignature(byte[] signature) throws SignatureException {
+
+            try {
+
+                int n = signature.length >> 1;
+                byte[] bytes = new byte[n];
+                System.arraycopy(signature, 0, bytes, 0, n);
+                BigInteger r = new BigInteger(1, bytes);
+                System.arraycopy(signature, n, bytes, 0, n);
+                BigInteger s = new BigInteger(1, bytes);
+
+                DerOutputStream out = new DerOutputStream(signature.length + 10);
+                out.putInteger(r);
+                out.putInteger(s);
+                DerValue result = new DerValue(DerValue.tag_Sequence, out.toByteArray());
+
+                return result.toByteArray();
+
+            } catch (Exception e) {
+                throw new SignatureException("Could not encode signature", e);
+            }
+        }
+
 
     public static void testJwsRsaExample() throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException
     {
@@ -245,5 +383,21 @@ public class App
     private static byte[] getKey(int[] keyFromExample)
     {
         return ByteUtil.convertUnsignedToSignedTwosComp(keyFromExample);   
+    }
+
+    private void someHexKeyThingForTesting() throws JoseException
+    {
+        String myHexing;
+
+        String jwks = "{\"keys\":[{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"5\",\"mod\":\"jEEnYC3tBKkYVRY7DAzWxIjxjptoKlm_GfIO2WbRIudVdS-vfr9HMEO2q3-XO10a8MQCFHQOyOdQdhtGsMyWrXbdfV6ivfPM7_2MO1UuYgV2tDhLzjjShzeMkomrsB_nAWtX8Qun1XsRBu_GIdJbd4WMoTbNVaaAf1-U8ieHDNE\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"4\",\"mod\":\"6cKl2TEtFUfBs4zZCatIov1F7SDu_0azkbKzG-0HhiFyHsGZeP4EtHH9tXEJcKNLxZXeFCO9yK_n6LS4KiH87fRYAs6aHiNHdaPWo5D4kdiYG-HNAEMqJzWR9eykUomuUZRe6fiKLOBcgdWjstB7I5PAqFy75RXDLqFuRPDWub8\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"3\",\"mod\":\"h7Jep0xSV6s-fZoHzQuZGT5g_I6q4chSrO0-yxYMehbmds9JFoJxQ2lcBnhkl8C4QudNk93Nyp_VGV33sytW7-22JpN2GFrxI80xzbZlZ7B1pxAZdP74C27YFJEBnwineiLowlHjc0OFQ-gwso6MYzwxV8NttwIDq4tBqbs1pxE\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"2\",\"mod\":\"ktR38dP3vITaViAE_Wg4YX0CApH40QvtXKea-1GSsW8Yl1VxIq_dOcZPKgLLWm9is5g9WZuCYj3sRVfrRmKXoN0qjUX-ZC-L4oxMJzNMGIZ93XiiKC1bdMnHXhdkRhZB5M_-qlx5Cmw69qeQ_wuHJwV4hDjbQeUcfoZySCppfNM\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"1\",\"mod\":\"y2ZGB-Ol6kmpFqWxc02xrjocp9VS9JsstaZl6Gy9hDmKXkkuKnap4hcWcHfF2PK0uLMJYUE_3se1dNBhR3M2ByOajHiSBGj_y_FYiTdjHb2bpkAJQ7wVT9ncT_Fx7V_kYvIevy1NBCr47bwqz4WJcUyZbHXFFoaOYnWHBVyjUl0\",\"exp\":\"AQAB\"},{\"alg\":\"RSA\",\"use\":\"sig\",\"kid\":\"0\",\"mod\":\"sjMKXtiyCUz6kAT9H9Ve0cHnWxJFN9d_eHNtk318QsJqt86BfhTlpdY7DbE7M0MVyVXIMTjXUDHnvZ4tCDXB3Q\",\"exp\":\"AQAB\"}]}";
+        JsonWebKeySet jwkset = new JsonWebKeySet(jwks);
+        JsonWebKey webKey = jwkset.getKey("4");
+        RsaJsonWebKey rsaWebKey = (RsaJsonWebKey) webKey;
+
+        myHexing = Hex.encodeHexString(BigEndianBigInteger.toByteArray(rsaWebKey.getRSAPublicKey().getModulus()));
+        System.out.println(myHexing);
+
+        myHexing = Hex.encodeHexString(BigEndianBigInteger.toByteArray(rsaWebKey.getRSAPublicKey().getPublicExponent()));
+        System.out.println(myHexing);
     }
 }
