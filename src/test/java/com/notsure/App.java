@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.security.*;
 import java.security.spec.*;
 import java.math.BigInteger;
+import java.io.IOException;
 
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
@@ -78,23 +79,12 @@ public class App
         BigInteger y = BigEndianBigInteger.fromBytes(ybytes);
 
 
-        /**
-         * Creates an elliptic curve with the specified elliptic field
-         * <code>field</code>, the coefficients <code>a</code> and
-         * <code>b</code>, and the <code>seed</code> used for curve generation.
-         * @param field the finite field that this elliptic curve is over.
-         * @param a the first coefficient of this elliptic curve.
-         * @param b the second coefficient of this elliptic curve.
-         * @param seed the bytes used during curve generation for later
-         * validation. Contents of this array are copied to protect against
-         * subsequent modification.
-         * @exception NullPointerException if <code>field</code>,
-         * <code>a</code>, or <code>b</code> is null.
-         * @exception IllegalArgumentException if <code>a</code>
-         * or <code>b</code> is not null and not in <code>field</code>.
-         */
+
+        // field the finite field that this elliptic curve is over.
         ECFieldFp field = new ECFieldFp(new BigInteger("115792089210356248762697446949407573530086143415290314195533631308867097853951"));
+        // a the first coefficient of this elliptic curve.
         BigInteger a = new BigInteger("ffffffff00000001000000000000000000000000fffffffffffffffffffffffc", 16);
+        // b the second coefficient of this elliptic curve.
         BigInteger b = new BigInteger("5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b", 16);
         EllipticCurve curve = new EllipticCurve(field, a, b);
 
@@ -118,6 +108,7 @@ public class App
          * @param n the order of the generator <code>g</code>.
          * @param h the cofactor.*/
         ECParameterSpec spec = new ECParameterSpec(curve, g, n, h);
+
 
         ECPoint w = new ECPoint(x, y);
         ECPublicKeySpec ecPublicKeySpec = new ECPublicKeySpec(w, spec);
@@ -148,7 +139,6 @@ public class App
         boolean b1 = verifier.verify(realSig);
 
 
-
         // sun classes 
         DerInputStream in = new DerInputStream(realSig);
         DerValue[] values = in.getSequence(2);
@@ -163,8 +153,7 @@ public class App
         Base64Url b64u = new Base64Url();
         byte[] exampleSigBytes = b64u.base64UrlDecode("DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q");
 
-        byte[] encodedSig = encodeSignature(exampleSigBytes);
-
+        byte[] encodedSig = convertXMLDSIGtoASN1(exampleSigBytes);
 
         System.out.println("example sig length in bytes " + exampleSigBytes.length);
 
@@ -175,28 +164,151 @@ public class App
         System.out.println(b2);
     }
 
-    private static byte[] encodeSignature(byte[] signature) throws SignatureException {
+    private static byte[] derEncodeSignature(byte[] signatureBytes) throws IOException
+    {
+        int half = signatureBytes.length / 2;
+        byte[] tempBytes = new byte[half];
+        System.arraycopy(signatureBytes, 0, tempBytes, 0, half);
+        BigInteger r = BigEndianBigInteger.fromBytes(tempBytes);
+        System.arraycopy(signatureBytes, half, tempBytes, 0, half);
+        BigInteger s = BigEndianBigInteger.fromBytes(tempBytes);
 
-            try {
+        DerOutputStream derOutputStream = new DerOutputStream();
+        derOutputStream.putInteger(r);
+        derOutputStream.putInteger(s);
+        DerValue result = new DerValue(DerValue.tag_Sequence, derOutputStream.toByteArray());
 
-                int n = signature.length >> 1;
-                byte[] bytes = new byte[n];
-                System.arraycopy(signature, 0, bytes, 0, n);
-                BigInteger r = new BigInteger(1, bytes);
-                System.arraycopy(signature, n, bytes, 0, n);
-                BigInteger s = new BigInteger(1, bytes);
+        return result.toByteArray();
+    }
 
-                DerOutputStream out = new DerOutputStream(signature.length + 10);
-                out.putInteger(r);
-                out.putInteger(s);
-                DerValue result = new DerValue(DerValue.tag_Sequence, out.toByteArray());
+     /**
+      * From apache xml sec org.apache.xml.security.algorithms.implementations.SignatureECDSA
+      *
+      *
+     * Converts a XML Signature ECDSA Value to an ASN.1 DSA value.
+     *
+     * The JAVA JCE ECDSA Signature algorithm creates ASN.1 encoded (r,s) value
+     * pairs; the XML Signature requires the core BigInteger values.
+     *
+     * @param xmldsigBytes
+     * @return the encoded ASN.1 bytes
+     *
+     * @throws IOException
+     * @see <A HREF="http://www.w3.org/TR/xmldsig-core/#dsa-sha1">6.4.1 DSA</A>
+     * @see <A HREF="ftp://ftp.rfc-editor.org/in-notes/rfc4050.txt">3.3. ECDSA Signatures</A>
+     */
+    public static byte[] convertXMLDSIGtoASN1(byte xmldsigBytes[]) throws IOException {
 
-                return result.toByteArray();
+        int rawLen = xmldsigBytes.length/2;
 
-            } catch (Exception e) {
-                throw new SignatureException("Could not encode signature", e);
-            }
+        int i;
+
+        for (i = rawLen; (i > 0) && (xmldsigBytes[rawLen - i] == 0); i--);
+
+        int j = i;
+
+        if (xmldsigBytes[rawLen - i] < 0) {
+            j += 1;
         }
+
+        int k;
+
+        for (k = rawLen; (k > 0) && (xmldsigBytes[2*rawLen - k] == 0); k--);
+
+        int l = k;
+
+        if (xmldsigBytes[2*rawLen - k] < 0) {
+            l += 1;
+        }
+
+        int len = 2 + j + 2 + l;
+        if (len > 255) {
+            throw new IOException("Invalid XMLDSIG format of ECDSA signature");
+        }
+        int offset;
+        byte asn1Bytes[];
+        if (len < 128) {
+            asn1Bytes = new byte[2 + 2 + j + 2 + l];
+            offset = 1;
+        } else {
+            asn1Bytes = new byte[3 + 2 + j + 2 + l];
+            asn1Bytes[1] = (byte) 0x81;
+            offset = 2;
+        }
+        asn1Bytes[0] = 48;
+        asn1Bytes[offset++] = (byte) len;
+        asn1Bytes[offset++] = 2;
+        asn1Bytes[offset++] = (byte) j;
+
+        System.arraycopy(xmldsigBytes, rawLen - i, asn1Bytes, (offset + j) - i, i);
+
+        offset += j;
+
+        asn1Bytes[offset++] = 2;
+        asn1Bytes[offset++] = (byte) l;
+
+        System.arraycopy(xmldsigBytes, 2*rawLen - k, asn1Bytes, (offset + l) - k, k);
+
+        return asn1Bytes;
+    }
+
+     /**
+     * From apache xml sec org.apache.xml.security.algorithms.implementations.SignatureECDSA
+      *
+      *
+     * Converts an ASN.1 ECDSA value to a XML Signature ECDSA Value.
+     *
+     * The JAVA JCE ECDSA Signature algorithm creates ASN.1 encoded (r,s) value
+     * pairs; the XML Signature requires the core BigInteger values.
+     *
+     * @param asn1Bytes
+     * @return the decode bytes
+     *
+     * @throws IOException
+     * @see <A HREF="http://www.w3.org/TR/xmldsig-core/#dsa-sha1">6.4.1 DSA</A>
+     * @see <A HREF="ftp://ftp.rfc-editor.org/in-notes/rfc4050.txt">3.3. ECDSA Signatures</A>
+     */
+    public static byte[] convertASN1toXMLDSIG(byte asn1Bytes[]) throws IOException {
+
+        if (asn1Bytes.length < 8 || asn1Bytes[0] != 48) {
+            throw new IOException("Invalid ASN.1 format of ECDSA signature");
+        }
+        int offset;
+        if (asn1Bytes[1] > 0) {
+            offset = 2;
+        } else if (asn1Bytes[1] == (byte) 0x81) {
+            offset = 3;
+        } else {
+            throw new IOException("Invalid ASN.1 format of ECDSA signature");
+        }
+
+        byte rLength = asn1Bytes[offset + 1];
+        int i;
+
+        for (i = rLength; (i > 0) && (asn1Bytes[(offset + 2 + rLength) - i] == 0); i--);
+
+        byte sLength = asn1Bytes[offset + 2 + rLength + 1];
+        int j;
+
+        for (j = sLength;
+            (j > 0) && (asn1Bytes[(offset + 2 + rLength + 2 + sLength) - j] == 0); j--);
+
+        int rawLen = Math.max(i, j);
+
+        if ((asn1Bytes[offset - 1] & 0xff) != asn1Bytes.length - offset
+            || (asn1Bytes[offset - 1] & 0xff) != 2 + rLength + 2 + sLength
+            || asn1Bytes[offset] != 2
+            || asn1Bytes[offset + 2 + rLength] != 2) {
+            throw new IOException("Invalid ASN.1 format of ECDSA signature");
+        }
+        byte xmldsigBytes[] = new byte[2*rawLen];
+
+        System.arraycopy(asn1Bytes, (offset + 2 + rLength) - i, xmldsigBytes, rawLen - i, i);
+        System.arraycopy(asn1Bytes, (offset + 2 + rLength + 2 + sLength) - j, xmldsigBytes,
+                         2*rawLen - j, j);
+
+        return xmldsigBytes;
+    }
 
 
     public static void testJwsRsaExample() throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException
