@@ -22,7 +22,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.keys.BigEndianBigInteger;
-import org.jose4j.keys.EllipticCurves;
+import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.jwk.JsonWebKeySet;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.RsaJsonWebKey;
@@ -36,7 +36,6 @@ import java.security.spec.*;
 import java.math.BigInteger;
 import java.io.IOException;
 
-import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 import sun.security.util.DerOutputStream;
 
@@ -61,36 +60,8 @@ public class App
 //        KeyPair pair = keyGen.generateKeyPair();
 //        PrivateKey priv = pair.getPrivate();
 //        PublicKey pub = pair.getPublic();
-
-         // The ECDSA key consists of a public part, the EC point (x, y)
-        int[] xints = {127, 205, 206, 39, 112, 246, 196, 93, 65, 131, 203,
-          238, 111, 219, 75, 123, 88, 7, 51, 53, 123, 233, 239,
-          19, 186, 207, 110, 60, 123, 209, 84, 69};
-        int[] yints =  {199, 241, 68, 205, 27, 189, 155, 126, 135, 44, 223,
-            237, 185, 238, 185, 244, 179, 105, 93, 110, 169, 11,
-            36, 173, 138, 70, 35, 40, 133, 136, 229, 173};
-        // and a private part d.
-        int[] dints = {142, 155, 16, 158, 113, 144, 152, 191, 152, 4, 135,
-           223, 31, 93, 119, 233, 203, 41, 96, 110, 190, 210,
-           38, 59, 95, 87, 194, 19, 223, 132, 244, 178};
-
-        byte[] xbytes = ByteUtil.convertUnsignedToSignedTwosComp(xints);
-        byte[] ybytes = ByteUtil.convertUnsignedToSignedTwosComp(yints);
-        BigInteger x = BigEndianBigInteger.fromBytes(xbytes);
-        BigInteger y = BigEndianBigInteger.fromBytes(ybytes);
-
-        ECPoint w = new ECPoint(x, y);
-        ECPublicKeySpec ecPublicKeySpec = new ECPublicKeySpec(w, EllipticCurves.P_256);
-
-        byte[] dbytes = ByteUtil.convertUnsignedToSignedTwosComp(dints);
-        BigInteger d = BigEndianBigInteger.fromBytes(dbytes);
-        ECPrivateKeySpec ecPrivateKeySpec = new ECPrivateKeySpec(d, EllipticCurves.P_256);
-
-        KeyFactory keyFactory = KeyFactory.getInstance("EC");
-        PrivateKey privateKey = keyFactory.generatePrivate(ecPrivateKeySpec);
-
         Signature signature = Signature.getInstance("SHA256withECDSA");
-        signature.initSign(privateKey);
+        signature.initSign(ExampleEcKeysFromJws.PRIVATE_256);
 
         // exampel from jws
         String jwsSi = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ";
@@ -102,20 +73,9 @@ public class App
         System.out.println("Signature: " + new BigInteger(1, realSig).toString(16));
 
         Signature verifier = Signature.getInstance("SHA256withECDSA");
-        PublicKey publicKey = keyFactory.generatePublic(ecPublicKeySpec);
-        verifier.initVerify(publicKey);
+        verifier.initVerify(ExampleEcKeysFromJws.PUBLIC_256);
         verifier.update(securedInputBytes);
         boolean b1 = verifier.verify(realSig);
-
-
-        // sun classes 
-        DerInputStream in = new DerInputStream(realSig);
-        DerValue[] values = in.getSequence(2);
-        BigInteger r = values[0].getPositiveBigInteger();
-        BigInteger s = values[1].getPositiveBigInteger();
-
-        byte[] bytesr = BigEndianBigInteger.toByteArray(r);
-        byte[] bytess = BigEndianBigInteger.toByteArray(s);
 
         System.out.println(b1);
 
@@ -127,7 +87,7 @@ public class App
         System.out.println("example sig length in bytes " + exampleSigBytes.length);
 
         Signature verifier2 = Signature.getInstance("SHA256withECDSA");
-        verifier2.initVerify(publicKey);
+        verifier2.initVerify(ExampleEcKeysFromJws.PUBLIC_256);
         verifier2.update(securedInputBytes);
         boolean b2 = verifier2.verify(encodedSig);
         System.out.println(b2);

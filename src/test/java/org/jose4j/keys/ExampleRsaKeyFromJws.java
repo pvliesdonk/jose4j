@@ -26,7 +26,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 /**
- * The example RSA key used in JWS -01 to at least -05 http://tools.ietf.org/html/draft-ietf-jose-json-web-signature
+ * The example RSA key used in http://tools.ietf.org/html/draft-ietf-jose-json-web-signature
  */
 public class ExampleRsaKeyFromJws
 {
@@ -85,15 +85,14 @@ public class ExampleRsaKeyFromJws
     public static byte[] D_SIGNED_BYTES = ByteUtil.convertUnsignedToSignedTwosComp(D_UNSIGNED_BYTES);
     public static BigInteger D = BigEndianBigInteger.fromBytes(D_SIGNED_BYTES);
 
-    static RsaKeyUtil rsaKeyUtil = new RsaKeyUtil();
-
-    public static RSAPrivateKey PRIVATE_KEY;
-    public static RSAPublicKey PUBLIC_KEY;
+    public static final RSAPrivateKey PRIVATE_KEY;
+    public static final RSAPublicKey PUBLIC_KEY;
 
     static
     {
         try
         {
+            RsaKeyUtil rsaKeyUtil = new RsaKeyUtil();
             PRIVATE_KEY = rsaKeyUtil.privateKey(N, D);
             PUBLIC_KEY = rsaKeyUtil.publicKey(N, E);
         }
