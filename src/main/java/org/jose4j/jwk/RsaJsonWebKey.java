@@ -33,12 +33,9 @@ public class RsaJsonWebKey extends JsonWebKey
 
     public static final String ALGORITHM_VALUE = "RSA";
 
-    private RSAPublicKey publicKey;
-
     public RsaJsonWebKey(RSAPublicKey publicKey)
     {
         super(publicKey);
-        this.publicKey = publicKey;
     }
 
     public RsaJsonWebKey(Map<String, String> params) throws JoseException
@@ -61,16 +58,17 @@ public class RsaJsonWebKey extends JsonWebKey
 
     public RSAPublicKey getRSAPublicKey()
     {
-        return publicKey;
+        return (RSAPublicKey)publicKey;
     }
 
     protected void fillTypeSpecificParams(Map<String, String> params)
     {
-        BigInteger modulus = publicKey.getModulus();
+        RSAPublicKey rsaPublicKey = getRSAPublicKey();
+        BigInteger modulus = rsaPublicKey.getModulus();
         String b64Modulus = BigEndianBigInteger.toBase64Url(modulus);
         params.put(MODULUS_MEMBER_NAME, b64Modulus);
 
-        BigInteger publicExponent = publicKey.getPublicExponent();
+        BigInteger publicExponent = rsaPublicKey.getPublicExponent();
         String b64Exponent = BigEndianBigInteger.toBase64Url(publicExponent);
         params.put(EXPONENT_MEMBER_NAME, b64Exponent);
     }

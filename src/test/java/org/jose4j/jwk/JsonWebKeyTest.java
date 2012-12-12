@@ -21,8 +21,11 @@ import junit.framework.TestCase;
 import java.util.Iterator;
 import java.util.Collections;
 import java.util.Collection;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
 
 import org.jose4j.keys.ExampleRsaKeyFromJws;
+import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.lang.JoseException;
 
 /**
@@ -61,8 +64,12 @@ public class JsonWebKeyTest extends TestCase
         assertTrue(iterator.next() instanceof EllipticCurveJsonWebKey);
         assertTrue(iterator.next() instanceof RsaJsonWebKey);
 
-        assertTrue(jwkSet.getKey("1") instanceof EllipticCurveJsonWebKey);
-        assertTrue(jwkSet.getKey("2011-04-29") instanceof RsaJsonWebKey);
+        JsonWebKey webKey1 = jwkSet.getKey("1");
+        assertTrue(webKey1 instanceof EllipticCurveJsonWebKey);
+        assertNotNull(webKey1.getPublicKey());
+        JsonWebKey webKey2011 = jwkSet.getKey("2011-04-29");
+        assertTrue(webKey2011 instanceof RsaJsonWebKey);
+        assertNotNull(webKey2011.getPublicKey());
 
         assertEquals(Use.ENCRYPTION, jwkSet.getKey("1").getUse());
 
@@ -102,6 +109,52 @@ public class JsonWebKeyTest extends TestCase
     {
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(ExampleRsaKeyFromJws.PUBLIC_KEY);
         assertTrue(jwk instanceof RsaJsonWebKey);
+        assertTrue(jwk.getPublicKey() instanceof RSAPublicKey);
         assertEquals(RsaJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm());
     }
+
+    public void testFromEcPublicKeyAndBack() throws JoseException
+    {
+
+        for (ECPublicKey publicKey : new ECPublicKey[] {ExampleEcKeysFromJws.PUBLIC_256, ExampleEcKeysFromJws.PUBLIC_521})
+        {
+            EllipticCurveJsonWebKey webKey = new EllipticCurveJsonWebKey(publicKey);
+            String kid = "kkiidd";
+            webKey.setKeyId(kid);
+            webKey.setUse(Use.ENCRYPTION);
+            JsonWebKeySet jwkSet = new JsonWebKeySet(Collections.<JsonWebKey>singletonList(webKey));
+            String json = jwkSet.toJson();
+
+            assertTrue(json.contains(Use.ENCRYPTION));
+            assertTrue(json.contains(kid));
+
+            JsonWebKeySet parsedJwkSet = new JsonWebKeySet(json);
+            Collection<JsonWebKey> webKeyKeyObjects = parsedJwkSet.getJsonWebKeys();
+            assertEquals(1, webKeyKeyObjects.size());
+            JsonWebKey jwk = parsedJwkSet.getKey(kid);
+            assertEquals(EllipticCurveJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm());
+            assertEquals(kid, jwk.getKeyId());
+            assertEquals(Use.ENCRYPTION, jwk.getUse());
+
+            EllipticCurveJsonWebKey ecJsonWebKey = (EllipticCurveJsonWebKey) jwk;
+            assertEquals(publicKey.getW().getAffineX(), ecJsonWebKey.getECPublicKey().getW().getAffineX());
+            assertEquals(publicKey.getW().getAffineY(), ecJsonWebKey.getECPublicKey().getW().getAffineY());
+            assertEquals(publicKey.getParams().getCofactor(), ecJsonWebKey.getECPublicKey().getParams().getCofactor());
+            assertEquals(publicKey.getParams().getCurve(), ecJsonWebKey.getECPublicKey().getParams().getCurve());
+            assertEquals(publicKey.getParams().getGenerator(), ecJsonWebKey.getECPublicKey().getParams().getGenerator());
+            assertEquals(publicKey.getParams().getOrder(), ecJsonWebKey.getECPublicKey().getParams().getOrder());
+        }
+    }
+
+    public void testFactoryWithEcPublicKey() throws JoseException
+    {
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(ExampleEcKeysFromJws.PUBLIC_256);
+        assertTrue(jwk.getPublicKey() instanceof ECPublicKey);
+        assertTrue(jwk instanceof EllipticCurveJsonWebKey);        
+        assertEquals(EllipticCurveJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm());
+    }
+
+    // todo think we need a test some place for "The array representation MUST not be shortened to omit
+    // any leading zero bytes contained in the value." from jwk/jwa 'cause I'm pretty sure we are (or would be) shortening now
+    
 }

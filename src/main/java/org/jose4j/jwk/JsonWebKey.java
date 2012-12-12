@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.interfaces.ECPublicKey;
 
 /**
  */
@@ -34,7 +35,7 @@ public abstract class JsonWebKey
     private String use;
     private String keyId;
 
-    private PublicKey publicKey;
+    protected PublicKey publicKey;
 
     protected JsonWebKey(PublicKey publicKey)
     {
@@ -125,9 +126,13 @@ public abstract class JsonWebKey
             {
                 return new RsaJsonWebKey((RSAPublicKey)publicKey);
             }
+            else if (ECPublicKey.class.isInstance(publicKey))
+            {
+                return new EllipticCurveJsonWebKey((ECPublicKey)publicKey);
+            }
             else
             {
-                throw new JoseException("Unsupported (currently) public key " + publicKey);
+                throw new JoseException("Unsupported or unknown public key " + publicKey);
             }
         }
     }

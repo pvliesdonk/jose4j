@@ -21,6 +21,8 @@ import java.security.spec.ECFieldFp;
 import java.security.spec.EllipticCurve;
 import java.security.spec.ECPoint;
 import java.math.BigInteger;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Values for these curve parameters from FIPS PUB 186-3
@@ -28,6 +30,26 @@ import java.math.BigInteger;
  */
 public class EllipticCurves
 {
+
+    private static final Map<String, ECParameterSpec> nameToSpec = new HashMap<String, ECParameterSpec>();
+    private static final Map<EllipticCurve, String> curveToName = new HashMap<EllipticCurve, String>();
+
+    private static void addCurve(String name, ECParameterSpec spec)
+    {
+        nameToSpec.put(name, spec);
+        curveToName.put(spec.getCurve(), name);
+    }
+
+    public static ECParameterSpec getSpec(String name)
+    {
+        return nameToSpec.get(name);
+    }
+
+    public static String getName(EllipticCurve curve)
+    {
+        return curveToName.get(curve);
+    }
+
     // cofactor h (Thus, for these curves over prime fileds, the cofactor is always h = 1)
     private static final int COFACTOR = 1;
 
@@ -51,7 +73,7 @@ public class EllipticCurves
         new BigInteger("115792089210356248762697446949407573529996955224135760342422259061068512044369"),
         COFACTOR);
 
-    public static final ECParameterSpec P_348 = new ECParameterSpec(
+    public static final ECParameterSpec P_384 = new ECParameterSpec(
         new EllipticCurve(
             // field the finite field that this elliptic curve is over.
             new ECFieldFp(new BigInteger("39402006196394479212279040100143613805079739270465" +
@@ -119,4 +141,13 @@ public class EllipticCurves
                 "53296399637136332111386476861244038034037280889270" +
                 "7005449"),
         COFACTOR);
+
+
+    static
+    {
+        addCurve("P-256", EllipticCurves.P_256);
+        addCurve("P-384", EllipticCurves.P_384);
+        addCurve("P-521", EllipticCurves.P_521);
+    }
+
 }

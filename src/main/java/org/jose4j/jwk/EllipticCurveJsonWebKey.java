@@ -17,9 +17,17 @@
 package org.jose4j.jwk;
 
 import org.jose4j.keys.BigEndianBigInteger;
+import org.jose4j.keys.EcKeyUtil;
+import org.jose4j.keys.EllipticCurves;
+import org.jose4j.lang.JoseException;
 
 import java.util.Map;
+import java.util.HashMap;
 import java.math.BigInteger;
+import java.security.interfaces.ECPublicKey;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.ECPoint;
+import java.security.spec.EllipticCurve;
 
 /**
  */
@@ -32,13 +40,17 @@ public class EllipticCurveJsonWebKey extends JsonWebKey
     public static final String X_MEMBER_NAME = "x";
     public static final String Y_MEMBER_NAME = "y";
 
-    private  Map<String, String> params; // TODO  just a temp thing to hold data for parsing tests 
+    public EllipticCurveJsonWebKey(ECPublicKey publicKey)
+    {
+        super(publicKey);
+    }
 
-    public EllipticCurveJsonWebKey(Map<String, String> params)
+    public EllipticCurveJsonWebKey(Map<String, String> params) throws JoseException
     {
         super(params);
 
-        String curve = params.get(CURVE_MEMBER_NAME);
+        String curveName = params.get(CURVE_MEMBER_NAME);
+        ECParameterSpec curve = EllipticCurves.getSpec(curveName);
 
         String b64x = params.get(X_MEMBER_NAME);
         BigInteger x = BigEndianBigInteger.fromBase64Url(b64x);
@@ -46,11 +58,16 @@ public class EllipticCurveJsonWebKey extends JsonWebKey
         String b64y = params.get(Y_MEMBER_NAME);
         BigInteger y = BigEndianBigInteger.fromBase64Url(b64y);
 
-        //TODO
+        EcKeyUtil keyUtil = new EcKeyUtil();
 
-        this.params = params;
+        publicKey = keyUtil.publicKey(x, y, curve);
     }
-    
+
+    public ECPublicKey getECPublicKey()
+    {
+        return (ECPublicKey) publicKey;
+    }
+
     public String getAlgorithm()
     {
         return ALGORITHM_VALUE;
@@ -58,6 +75,21 @@ public class EllipticCurveJsonWebKey extends JsonWebKey
 
     protected void fillTypeSpecificParams(Map<String, String> params)
     {
-        params.putAll(this.params);  // TODO
+        ECPublicKey ecPublicKey = getECPublicKey();
+
+        ECPoint w = ecPublicKey.getW();
+
+        BigInteger x = w.getAffineX();
+        String b64x = BigEndianBigInteger.toBase64Url(x);
+        params.put(X_MEMBER_NAME, b64x);
+
+        BigInteger y = w.getAffineY();
+        String b64y = BigEndianBigInteger.toBase64Url(y);
+        params.put(Y_MEMBER_NAME, b64y);
+
+        ECParameterSpec spec = ecPublicKey.getParams();
+        EllipticCurve curve = spec.getCurve();
+        String name = EllipticCurves.getName(curve);
+        params.put(CURVE_MEMBER_NAME, name);
     }
 }
