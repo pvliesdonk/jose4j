@@ -18,6 +18,8 @@ package org.jose4j.jws;
 
 import org.jose4j.lang.JoseException;
 import org.jose4j.jwx.CompactSerialization;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import junit.framework.Assert;
 
 import java.security.Key;
@@ -26,6 +28,8 @@ import java.security.Key;
  */
 public class JwsTestSupport
 {
+    static Log log = LogFactory.getLog(JwsTestSupport.class);
+
     static void testBasicRoundTrip(String payload, String jwsAlgo, Key signingKey1, Key verificationKey1, Key signingKey2, Key verificationKey2) throws JoseException
     {
         JsonWebSignature jwsWithKey1 = new JsonWebSignature();
@@ -33,6 +37,8 @@ public class JwsTestSupport
         jwsWithKey1.setAlgorithmHeaderValue(jwsAlgo);
         jwsWithKey1.setKey(signingKey1);
         String serializationWithKey1 = jwsWithKey1.getCompactSerialization();
+
+        log.debug(jwsAlgo + " " + serializationWithKey1);
 
         JsonWebSignature jwsWithKey2 = new JsonWebSignature();
         jwsWithKey2.setKey(signingKey2);
@@ -69,7 +75,6 @@ public class JwsTestSupport
         Assert.assertEquals(payload, jwsWithKey2.getPayload());
     }
 
-
     static void validateBasicStructure(String compactSerialization) throws JoseException
     {
         Assert.assertNotNull(compactSerialization);
@@ -78,4 +83,37 @@ public class JwsTestSupport
         Assert.assertEquals(JsonWebSignature.COMPACT_SERIALIZATION_PARTS, parts.length);
     }
 
+    static void testBadKeyOnSign(String alg, Key key)
+    {
+        try
+        {
+            JsonWebSignature jwsWithKey1 = new JsonWebSignature();
+            jwsWithKey1.setPayload("whatever");
+            jwsWithKey1.setAlgorithmHeaderValue(alg);
+            jwsWithKey1.setKey(key);
+            String cs = jwsWithKey1.getCompactSerialization();
+            Assert.fail("Should have failed with some kind of invalid key message but got " + cs);
+        }
+        catch (JoseException e)
+        {
+            log.debug("Expected: " + e);
+        }
+    }
+
+    static void testBadKeyOnVerify(String compactSerialization, Key key) throws JoseException
+    {
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setCompactSerialization(compactSerialization);
+        jws.setKey(key);
+        try
+        {
+            jws.verifySignature();
+            Assert.fail("Should have failed with some kind of invalid key message");
+        }
+        catch (JoseException e)
+        {
+            log.debug("Expected: " + e);
+        }
+    }
 }
+

@@ -16,9 +16,7 @@
 
 package org.jose4j.jws;
 
-import org.jose4j.keys.EcKeyUtil;
-import org.jose4j.keys.EllipticCurves;
-import org.jose4j.keys.ExampleEcKeysFromJws;
+import org.jose4j.keys.*;
 import org.jose4j.lang.JoseException;
 
 import java.security.*;
@@ -33,8 +31,8 @@ public class EcdsaUsingShaTest extends TestCase
 
     public void testP256RoundTripGenKeys() throws JoseException
     {
-        KeyPair keyPair1 = keyUtil.generateKeyPair(EllipticCurves.P_256);
-        KeyPair keyPair2 = keyUtil.generateKeyPair(EllipticCurves.P_256);
+        KeyPair keyPair1 = keyUtil.generateKeyPair(EllipticCurves.P256);
+        KeyPair keyPair2 = keyUtil.generateKeyPair(EllipticCurves.P256);
         String algo = AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256;
         PrivateKey priv1 = keyPair1.getPrivate();
         PublicKey pub1 = keyPair1.getPublic();
@@ -45,8 +43,8 @@ public class EcdsaUsingShaTest extends TestCase
 
     public void testP384RoundTripGenKeys() throws JoseException
     {
-        KeyPair keyPair1 = keyUtil.generateKeyPair(EllipticCurves.P_384);
-        KeyPair keyPair2 = keyUtil.generateKeyPair(EllipticCurves.P_384);
+        KeyPair keyPair1 = keyUtil.generateKeyPair(EllipticCurves.P384);
+        KeyPair keyPair2 = keyUtil.generateKeyPair(EllipticCurves.P384);
         String algo = AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384;
         PrivateKey priv1 = keyPair1.getPrivate();
         PublicKey pub1 = keyPair1.getPublic();
@@ -57,8 +55,8 @@ public class EcdsaUsingShaTest extends TestCase
 
     public void testP521RoundTripGenKeys() throws JoseException
     {
-        KeyPair keyPair1 = keyUtil.generateKeyPair(EllipticCurves.P_521);
-        KeyPair keyPair2 = keyUtil.generateKeyPair(EllipticCurves.P_521);
+        KeyPair keyPair1 = keyUtil.generateKeyPair(EllipticCurves.P521);
+        KeyPair keyPair2 = keyUtil.generateKeyPair(EllipticCurves.P521);
         String algo = AlgorithmIdentifiers.ECDSA_USING_P521_CURVE_AND_SHA512;
         PrivateKey priv1 = keyPair1.getPrivate();
         PublicKey pub1 = keyPair1.getPublic();
@@ -72,7 +70,7 @@ public class EcdsaUsingShaTest extends TestCase
         String algo = AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256;
         PrivateKey priv1 = ExampleEcKeysFromJws.PRIVATE_256;
         PublicKey pub1 = ExampleEcKeysFromJws.PUBLIC_256;
-        KeyPair keyPair = keyUtil.generateKeyPair(EllipticCurves.P_256);
+        KeyPair keyPair = keyUtil.generateKeyPair(EllipticCurves.P256);
         PrivateKey priv2 = keyPair.getPrivate();
         PublicKey pub2 = keyPair.getPublic();
         JwsTestSupport.testBasicRoundTrip("something here", algo, priv1, pub1, priv2, pub2);
@@ -83,9 +81,30 @@ public class EcdsaUsingShaTest extends TestCase
         String algo = AlgorithmIdentifiers.ECDSA_USING_P521_CURVE_AND_SHA512;
         PrivateKey priv1 = ExampleEcKeysFromJws.PRIVATE_521;
         PublicKey pub1 = ExampleEcKeysFromJws.PUBLIC_521;
-        KeyPair keyPair = keyUtil.generateKeyPair(EllipticCurves.P_521);
+        KeyPair keyPair = keyUtil.generateKeyPair(EllipticCurves.P521);
         PrivateKey priv2 = keyPair.getPrivate();
         PublicKey pub2 = keyPair.getPublic();
         JwsTestSupport.testBasicRoundTrip("touché", algo, priv1, pub1, priv2, pub2);
+    }
+
+    public void testBadKeys() throws JoseException
+    {
+        String cs256 = "eyJhbGciOiJFUzI1NiJ9.UEFZTE9BRCEhIQ.WcL6cqkJSkzwK4Y85Lj96l-_WVmII6foW8d7CJNgdgDxi6NnTdXQD1Ze2vdXGcErIu9sJX9EXkmiaHSd0GQkgA";
+        String cs384 = "eyJhbGciOiJFUzM4NCJ9.VGhlIHVtbGF1dCAoIC8_P21sYT90LyB1dW0tbG93dCkgcmVmZXJzIHRvIGEgc291bmQgc2hpZnQu.UO2zG037CLktsDeHJ71w48DmTMmCjsEEKhFGSE1uBQUG8rRZousdJR8p2rykZglU2RdWG48AE4Rf5_WfiZuP5ANC_bLgiOz1rwlSe6ds2romfdQ-enn7KTvr9Cmqt2Ot";
+        String cs512 = "eyJhbGciOiJFUzUxMiJ9.Pz8_Pz8.AJS7SrxiK6zpJkXjV4iWM_oUcE294hV3RK-y5uQD2Otx-UwZNFEH6L66ww5ukQ7R1rykiWd9PNjzlzrgwfJqF2KyASmO6Hz7dZr9EYPIX6rrEpWjsp1tDJ0_Hq45Rk2eJ5z3cFTIpVu6V7CGXwVWvVCDQzcGpmZIFR939aI49Z_HWT7b";
+        for (String cs : new String[] {cs256, cs384, cs512})
+        {
+            JwsTestSupport.testBadKeyOnVerify(cs, ExampleRsaKeyFromJws.PRIVATE_KEY);
+            JwsTestSupport.testBadKeyOnVerify(cs, null);
+            JwsTestSupport.testBadKeyOnVerify(cs, new HmacKey(new byte[2048]));
+            JwsTestSupport.testBadKeyOnVerify(cs, ExampleRsaKeyFromJws.PUBLIC_KEY);
+            JwsTestSupport.testBadKeyOnVerify(cs, ExampleEcKeysFromJws.PRIVATE_256);
+            JwsTestSupport.testBadKeyOnVerify(cs, ExampleEcKeysFromJws.PRIVATE_521);
+        }
+
+        JwsTestSupport.testBadKeyOnVerify(cs256, ExampleEcKeysFromJws.PUBLIC_521);
+        JwsTestSupport.testBadKeyOnVerify(cs384, ExampleEcKeysFromJws.PUBLIC_521);
+        JwsTestSupport.testBadKeyOnVerify(cs384, ExampleEcKeysFromJws.PUBLIC_256);
+        JwsTestSupport.testBadKeyOnVerify(cs512, ExampleEcKeysFromJws.PUBLIC_256);
     }
 }

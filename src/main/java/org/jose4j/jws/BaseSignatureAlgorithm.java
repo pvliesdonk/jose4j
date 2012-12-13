@@ -24,7 +24,7 @@ import java.security.*;
 
 /**
  */
-public class BaseSignatureAlgorithm extends AlgorithmInfo implements JsonWebSignatureAlgorithm
+public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements JsonWebSignatureAlgorithm
 {
     public BaseSignatureAlgorithm(String id, String javaAlgo, String keyAlgo)
     {
@@ -71,10 +71,6 @@ public class BaseSignatureAlgorithm extends AlgorithmInfo implements JsonWebSign
             PrivateKey privateKey = (PrivateKey) key;
             signature.initSign(privateKey);
         }
-        catch (ClassCastException e)
-        {
-            throw new JoseException(getBadKeyMessage(key) + "(not a private key) for " + getJavaAlgorithm() + " " + e);
-        }
         catch (InvalidKeyException e)
         {
             throw new JoseException(getBadKeyMessage(key) + "for " + getJavaAlgorithm(), e);
@@ -87,10 +83,6 @@ public class BaseSignatureAlgorithm extends AlgorithmInfo implements JsonWebSign
         {
            PublicKey publicKey = (PublicKey) key;
            signature.initVerify(publicKey);
-        }
-        catch (ClassCastException e)
-        {
-            throw new JoseException(getBadKeyMessage(key) + "(not a public key) for " + getJavaAlgorithm() + " " +  e);
         }
         catch (InvalidKeyException e)
         {
@@ -113,6 +105,44 @@ public class BaseSignatureAlgorithm extends AlgorithmInfo implements JsonWebSign
         catch (NoSuchAlgorithmException e)
         {
             throw new JoseException("Unable to get an implementation of algorithm name: " + getJavaAlgorithm(), e);
+        }
+    }
+
+    public abstract void validatePrivateKey(PrivateKey privateKey) throws JoseException;
+
+    public void validateSigningKey(Key key) throws JoseException
+    {
+        try
+        {
+            validatePrivateKey((PrivateKey)key);
+        }
+        catch (ClassCastException e)
+        {
+            throw new JoseException(getBadKeyMessage(key) + "(not a private key or is the wrong type of key) for " + getJavaAlgorithm() + "/" + getAlgorithmIdentifier() + " " +  e);
+        }
+    }
+
+    public abstract void validatePublicKey(PublicKey publicKey) throws JoseException;
+
+    public void validateVerificationKey(Key key) throws JoseException
+    {
+        checkForNullKey(key);
+
+        try
+        {
+            validatePublicKey((PublicKey)key);
+        }
+        catch (ClassCastException e)
+        {
+            throw new JoseException(getBadKeyMessage(key) + "(not a public key or is the wrong type of key) for " + getJavaAlgorithm() + "/" + getAlgorithmIdentifier() + " " +  e);
+        }
+    }
+
+    private void checkForNullKey(Key key) throws JoseException
+    {
+        if (key == null)
+        {
+            throw new JoseException("Key cannot be null");
         }
     }
 }

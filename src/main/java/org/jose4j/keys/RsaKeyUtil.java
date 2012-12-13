@@ -18,13 +18,11 @@ package org.jose4j.keys;
 
 import org.jose4j.lang.JoseException;
 
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.PrivateKey;
+import java.security.*;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.ECParameterSpec;
 import java.security.interfaces.RSAPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.math.BigInteger;
@@ -34,6 +32,8 @@ import java.math.BigInteger;
 public class RsaKeyUtil
 {
     private KeyFactory keyFactory;
+    private KeyPairGenerator keyGenerator;
+
     public static final String RSA = "RSA";
 
     public RsaKeyUtil()
@@ -41,6 +41,7 @@ public class RsaKeyUtil
         try
         {
             keyFactory = KeyFactory.getInstance(RSA);
+            keyGenerator = KeyPairGenerator.getInstance(RSA);
         }
         catch (NoSuchAlgorithmException e)
         {
@@ -74,5 +75,11 @@ public class RsaKeyUtil
         {
             throw new JoseException("Invalid key spec: " + e, e);
         }
+    }
+
+    public KeyPair generateKeyPair(int bits)
+    {
+        keyGenerator.initialize(bits);
+        return keyGenerator.generateKeyPair();
     }
 }

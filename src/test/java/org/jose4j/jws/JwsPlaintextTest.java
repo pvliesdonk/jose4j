@@ -19,6 +19,8 @@ package org.jose4j.jws;
 import junit.framework.TestCase;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.JoseException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.security.Key;
 
@@ -26,6 +28,8 @@ import java.security.Key;
  */
 public class JwsPlaintextTest extends TestCase
 {
+    Log log = LogFactory.getLog(this.getClass());
+
     String JWS = "eyJhbGciOiJub25lIn0.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.";
     String PAYLOAD = "{\"iss\":\"joe\",\r\n \"exp\":1300819380,\r\n \"http://example.com/is_root\":true}";
     Key KEY = new HmacKey(new byte[] {1,2,3,4,5,-3,28,123,-53});
@@ -46,7 +50,7 @@ public class JwsPlaintextTest extends TestCase
         jws.setCompactSerialization(cs);
         assertTrue(jws.verifySignature());
         String payload = jws.getPayload();
-        System.out.println(payload);
+        log.debug(payload);
     }
 
     public void testExampleEncode() throws JoseException

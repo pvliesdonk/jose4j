@@ -23,6 +23,6 @@ public class HmacUsingSha256Algorithm extends HmacUsingShaAlgorithm
 {
     public HmacUsingSha256Algorithm()
     {
-        super(AlgorithmIdentifiers.HMAC_SHA256, "HmacSHA256");
+        super(AlgorithmIdentifiers.HMAC_SHA256, "HmacSHA256", 256);
     }
 }

@@ -26,6 +26,8 @@ import org.jose4j.lang.StringUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.keys.KeyType;
 
+import java.security.Key;
+
 /**
  */
 public class JsonWebSignature extends JsonWebStructure
@@ -64,17 +66,21 @@ public class JsonWebSignature extends JsonWebStructure
     private void sign() throws JoseException
     {
         JsonWebSignatureAlgorithm algorithm = getAlgorithm();
+        Key signingKey = getKey();
+        algorithm.validateSigningKey(signingKey);
         byte[] inputBytes = getSecuredInputBytes();
-        byte[] signatureBytes = algorithm.sign(getKey(), inputBytes);
+        byte[] signatureBytes = algorithm.sign(signingKey, inputBytes);
         setSignature(signatureBytes);
     }
 
     public boolean verifySignature() throws JoseException
     {
         JsonWebSignatureAlgorithm algorithm = getAlgorithm();
+        Key verificationKey = getKey();
+        algorithm.validateVerificationKey(verificationKey);
         byte[] signatureBytes = getSignature();
         byte[] inputBytes = getSecuredInputBytes();
-        return algorithm.verifySignature(signatureBytes, getKey(), inputBytes);
+        return algorithm.verifySignature(signatureBytes, verificationKey, inputBytes);
     }
 
     private JsonWebSignatureAlgorithm getAlgorithm() throws JoseException

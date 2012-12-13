@@ -94,11 +94,11 @@ public class ExampleEcKeysFromJws
 
         try
         {
-            PRIVATE_256 = ecKeyUtil.privateKey(D_256, EllipticCurves.P_256);
-            PUBLIC_256 = ecKeyUtil.publicKey(X_256, Y_256, EllipticCurves.P_256);
+            PRIVATE_256 = ecKeyUtil.privateKey(D_256, EllipticCurves.P256);
+            PUBLIC_256 = ecKeyUtil.publicKey(X_256, Y_256, EllipticCurves.P256);
 
-            PRIVATE_521 = ecKeyUtil.privateKey(D_521, EllipticCurves.P_521);
-            PUBLIC_521 = ecKeyUtil.publicKey(X_521, Y_521, EllipticCurves.P_521);
+            PRIVATE_521 = ecKeyUtil.privateKey(D_521, EllipticCurves.P521);
+            PUBLIC_521 = ecKeyUtil.publicKey(X_521, Y_521, EllipticCurves.P521);
         }
         catch (JoseException e)
         {

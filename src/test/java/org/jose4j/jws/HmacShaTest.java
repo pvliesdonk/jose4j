@@ -27,8 +27,12 @@ import java.security.Key;
  */
 public class HmacShaTest extends TestCase
 {
-    Key KEY1 = new HmacKey(new byte[]{41, -99, 60, 91, 49, 70, -99, -14, -108, -81, 60, 37, 104, -116, 106, 104, -2, -95, 56, 103, 64, 10, -56, 120, 37, -48, 6, 9, 110, -96, 27, -4});
-    Key KEY2 = new HmacKey(new byte[]{-67, 34, -45, 50, 13, 84, -79, 114, -16, -44, 26, -39, 4, -1, 26, 9, 38, 78, -107, 39, -81, 75, -18, 38, 56, 34, 13, 78, -73, 62, -60, 52});
+    Key KEY1 = new HmacKey(new byte[]{-41, -1, 60, 1, 1, 45, -92, -114, 8, -1, -60, 7, 54, -16, 16, 14, -20, -85, 56,
+            103, 4, 10, -56, 120, 37, -48, 6, 9, 110, -96, 27, -4, 41, -99, 60, 91, 49, 70, -99, -14, -108, -81, 60,
+            37, 104, -116, 106, 104, -2, -95, 56, 103, 64, 10, -56, 120, 37, -48, 6, 9, 110, -96, 27, -4});
+    Key KEY2 = new HmacKey(new byte[]{-67, 34, -45, 50, 13, 84, -79, 124, -16, -44, 26, -39, 4, -1, 26, 9, 38, 78,
+            -107, 39, -81, 75, -18, 38, 96, 34, 13, 79, -73, 62, -60, 52, 71, -99, 60, 91, 124, 70, -9, -14, -108,
+            -104, 6, 7, 104, -116, 6, 64, -2, -95, 56, 103, 64, 10, -56, 120, 37, -48, 6, 9, 110, -92, 27, -4});
 
     public void testHmacSha256A() throws JoseException
     {
@@ -70,5 +74,44 @@ public class HmacShaTest extends TestCase
         JwsTestSupport.testBasicRoundTrip(payload, jwsAlgo, KEY1, KEY1, KEY2, KEY2);
     }
 
+    public void testMinKeySize256ForSign()
+    {
+        JwsTestSupport.testBadKeyOnSign(AlgorithmIdentifiers.HMAC_SHA256, new HmacKey(new byte[1]));
+    }
 
+    public void testMinKeySize256ForSign2()
+    {
+        JwsTestSupport.testBadKeyOnSign(AlgorithmIdentifiers.HMAC_SHA256, new HmacKey(new byte[31]));
+    }
+
+    public void testMinKeySize384ForSign()
+    {
+        JwsTestSupport.testBadKeyOnSign(AlgorithmIdentifiers.HMAC_SHA384, new HmacKey(new byte[47]));
+    }
+
+    public void testMinKeySize512ForSign()
+    {
+        JwsTestSupport.testBadKeyOnSign(AlgorithmIdentifiers.HMAC_SHA512, new HmacKey(new byte[63]));
+    }
+
+    public void testMinKeySize256ForVerify() throws JoseException
+    {
+        String compactSerialization = "eyJhbGciOiJIUzI1NiJ9.c29tZSBjb250ZW50IHRoYXQgaXMgdGhlIHBheWxvYWQ.qGO7O7W2ECVl6uO7lfsXDgEF-EUEti0i-a_AimulIRA";
+        Key key = new HmacKey(new byte[31]);
+        JwsTestSupport.testBadKeyOnVerify(compactSerialization, key);
+    }
+
+    public void testMinKeySize384ForVerify() throws JoseException
+    {
+        String compactSerialization = "eyJhbGciOiJIUzM4NCJ9.eyJtZWgiOiJtZWgifQ.fptKQJmGN3fBP_FiQzdAGdmx-Q5iWjQvJrLfdmFnebxbQuzOmzejBrzYh4MyS01a";
+        Key key = new HmacKey(new byte[47]);
+        JwsTestSupport.testBadKeyOnVerify(compactSerialization, key);
+    }
+
+    public void testMinKeySize512ForVerify() throws JoseException
+    {
+        String compactSerialization = "eyJhbGciOiJIUzUxMiJ9.eyJtZWgiOiJtZWh2YWx1ZSJ9.NeB669dYkPmqgLqgd_sVqwIfCvb4XN-K67gpMJR93wfw_DylpxB1ell2opHM-E5P9jNKE2GYxTxwcI68Z2CTxw";
+        Key key = new HmacKey(new byte[63]);
+        JwsTestSupport.testBadKeyOnVerify(compactSerialization, key);
+    }
 }

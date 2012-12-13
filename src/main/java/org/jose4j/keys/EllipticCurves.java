@@ -31,6 +31,10 @@ import java.util.HashMap;
 public class EllipticCurves
 {
 
+    public static final String P_256 = "P-256";
+    public static final String P_384 = "P-384";
+    public static final String P_521 = "P-521";
+
     private static final Map<String, ECParameterSpec> nameToSpec = new HashMap<String, ECParameterSpec>();
     private static final Map<EllipticCurve, String> curveToName = new HashMap<EllipticCurve, String>();
 
@@ -53,7 +57,7 @@ public class EllipticCurves
     // cofactor h (Thus, for these curves over prime fileds, the cofactor is always h = 1)
     private static final int COFACTOR = 1;
 
-    public static final ECParameterSpec P_256 = new ECParameterSpec(
+    public static final ECParameterSpec P256 = new ECParameterSpec(
         new EllipticCurve(
             // field the finite field that this elliptic curve is over.
             new ECFieldFp(new BigInteger("115792089210356248762697446949407573530086143415290314195533631308867097853951")),
@@ -73,7 +77,7 @@ public class EllipticCurves
         new BigInteger("115792089210356248762697446949407573529996955224135760342422259061068512044369"),
         COFACTOR);
 
-    public static final ECParameterSpec P_384 = new ECParameterSpec(
+    public static final ECParameterSpec P384 = new ECParameterSpec(
         new EllipticCurve(
             // field the finite field that this elliptic curve is over.
             new ECFieldFp(new BigInteger("39402006196394479212279040100143613805079739270465" +
@@ -104,7 +108,7 @@ public class EllipticCurves
                     "659399113263569398956308152294913554433653942643"),
         COFACTOR);
 
-        public static final ECParameterSpec P_521 = new ECParameterSpec(
+        public static final ECParameterSpec P521 = new ECParameterSpec(
         new EllipticCurve(
             // field the finite field that this elliptic curve is over.
             new ECFieldFp(new BigInteger("68647976601306097149819007990813932172694353001433" +
@@ -142,12 +146,11 @@ public class EllipticCurves
                 "7005449"),
         COFACTOR);
 
-
     static
     {
-        addCurve("P-256", EllipticCurves.P_256);
-        addCurve("P-384", EllipticCurves.P_384);
-        addCurve("P-521", EllipticCurves.P_521);
+        addCurve(P_256, EllipticCurves.P256);
+        addCurve(P_384, EllipticCurves.P384);
+        addCurve(P_521, EllipticCurves.P521);
     }
 
 }

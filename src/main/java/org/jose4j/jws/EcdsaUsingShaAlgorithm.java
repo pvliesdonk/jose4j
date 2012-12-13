@@ -18,9 +18,15 @@ package org.jose4j.jws;
 
 
 import org.jose4j.keys.EcKeyUtil;
+import org.jose4j.keys.EllipticCurves;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.EllipticCurve;
+import java.security.interfaces.ECPublicKey;
 import java.io.IOException;
 
 
@@ -28,9 +34,12 @@ import java.io.IOException;
  */
 public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements JsonWebSignatureAlgorithm
 {
-    public EcdsaUsingShaAlgorithm(String id, String javaAlgo)
+    private String curveName;
+
+    public EcdsaUsingShaAlgorithm(String id, String javaAlgo, String curveName)
     {
         super(id, javaAlgo, EcKeyUtil.EC);
+        this.curveName = curveName;
     }
 
     public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException
@@ -57,7 +66,7 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
         }
         catch (IOException e)
         {
-            throw new JoseException("", e);
+            throw new JoseException("Unable to convert ", e);
         }
     }
 
@@ -183,5 +192,26 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
         System.arraycopy(derEncodedBytes, (offset + 2 + rLength + 2 + sLength) - j, concatenatedSignatureBytes, 2*rawLen - j, j);
 
         return concatenatedSignatureBytes;
+    }
+
+    public void validatePrivateKey(PrivateKey privateKey) throws JoseException
+    {
+        // todo
+    }
+
+    public void validatePublicKey(PublicKey publicKey) throws JoseException
+    {
+        ECPublicKey ecPublicKey = (ECPublicKey) publicKey;
+        ECParameterSpec spec = ecPublicKey.getParams();
+        EllipticCurve curve = spec.getCurve();
+
+        String name = EllipticCurves.getName(curve);
+
+        if (!curveName.endsWith(name))
+        {
+            throw new JoseException(getAlgorithmIdentifier() + "/" + getJavaAlgorithm() + " expects a key using " +
+                    curveName + " but was " + name);
+        }
+
     }
 }

@@ -38,21 +38,33 @@ public class PlaintextNoneAlgorithm extends AlgorithmInfo implements JsonWebSign
 
     public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException
     {
-        if (key != null)
-        {
-            throw new JoseException(CANNOT_HAVE_KEY_MESSAGE);
-        }
+        validateKey(key);
 
         return (signatureBytes.length == 0);
     }
 
     public byte[] sign(Key key, byte[] securedInputBytes) throws JoseException
     {
+        validateKey(key);
+
+        return ByteUtil.EMPTY_BYTES;
+    }
+
+    public void validateSigningKey(Key key) throws JoseException
+    {
+        validateKey(key);
+    }
+
+    public void validateVerificationKey(Key key) throws JoseException
+    {
+        validateKey(key);
+    }
+
+    private void validateKey(Key key) throws JoseException
+    {
         if (key != null)
         {
             throw new JoseException(CANNOT_HAVE_KEY_MESSAGE);
         }
-
-        return ByteUtil.EMPTY_BYTES;
     }
 }

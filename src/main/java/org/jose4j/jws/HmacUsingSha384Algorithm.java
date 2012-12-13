@@ -22,6 +22,6 @@ public class HmacUsingSha384Algorithm extends HmacUsingShaAlgorithm
 {
     public HmacUsingSha384Algorithm()
     {
-        super(AlgorithmIdentifiers.HMAC_SHA384, "HmacSHA384");
+        super(AlgorithmIdentifiers.HMAC_SHA384, "HmacSHA384", 384);
     }
 }

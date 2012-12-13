@@ -22,15 +22,31 @@ import org.jose4j.keys.RsaKeyUtil;
 import org.jose4j.lang.JoseException;
 
 import java.security.*;
+import java.security.interfaces.RSAPublicKey;
 
 /**
  */
 public class RsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements JsonWebSignatureAlgorithm
 {
+    static final int MIN_RSA_KEY_LENGTH = 2048;    
+
     public RsaUsingShaAlgorithm(String id, String javaAlgo)
     {
         super(id, javaAlgo, RsaKeyUtil.RSA);
-    }               
+    }
 
+    public void validatePublicKey(PublicKey key) throws JoseException
+    {
+        int size = ((RSAPublicKey) key).getModulus().bitLength();
+        if  (size < MIN_RSA_KEY_LENGTH)
+        {
+            throw new JoseException("A key of size "+MIN_RSA_KEY_LENGTH+
+                    " bits or larger MUST be used with the RSA digital signature algorithms (given key was only "+size+ " bits).");
+        }
+    }
 
+    public void validatePrivateKey(PrivateKey privateKey) throws JoseException
+    {
+        // todo
+    }
 }

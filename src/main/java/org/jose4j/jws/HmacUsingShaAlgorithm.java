@@ -31,12 +31,15 @@ import java.security.NoSuchAlgorithmException;
  */
 public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSignatureAlgorithm
 {
-    public HmacUsingShaAlgorithm(String id, String javaAlgo)
+    private int minimumKeyLength;
+
+    public HmacUsingShaAlgorithm(String id, String javaAlgo, int minimumKeyLength)
     {
         setAlgorithmIdentifier(id);
         setJavaAlgorithm(javaAlgo);
         setKeyType(KeyType.SYMMETRIC);
         setKeyAlgorithm(HmacKey.ALGORITHM);
+        this.minimumKeyLength = minimumKeyLength;
     }
 
     public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException
@@ -83,5 +86,24 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
         return /* of the */ mac;
     }
 
+    void validateKey(Key key) throws JoseException
+    {
+        int length = key.getEncoded().length * 8;
+        if (length < minimumKeyLength)
+        {
+            throw new JoseException("A key of the same size as the hash output (i.e. "+minimumKeyLength+
+                    " bits for "+getAlgorithmIdentifier()+
+                    ") or larger MUST be used with the HMAC SHA algorithms but this key is only " + length + " bits");
+        }
+    }
 
+    public void validateSigningKey(Key key) throws JoseException
+    {
+        validateKey(key);
+    }
+
+    public void validateVerificationKey(Key key) throws JoseException
+    {
+        validateKey(key);
+    }
 }

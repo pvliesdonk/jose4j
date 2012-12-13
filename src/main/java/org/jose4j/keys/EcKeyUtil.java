@@ -37,7 +37,7 @@ public class EcKeyUtil
         try
         {
             keyFactory = KeyFactory.getInstance(EC);
-            keyGenerator = KeyPairGenerator.getInstance(EcKeyUtil.EC);
+            keyGenerator = KeyPairGenerator.getInstance(EC);
         }
         catch (NoSuchAlgorithmException e)
         {

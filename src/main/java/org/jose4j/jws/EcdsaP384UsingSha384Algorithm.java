@@ -16,12 +16,14 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.keys.EllipticCurves;
+
 /**
  */
 public class EcdsaP384UsingSha384Algorithm extends EcdsaUsingShaAlgorithm
 {
     public EcdsaP384UsingSha384Algorithm()
     {
-        super(AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384, "SHA384withECDSA");
+        super(AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384, "SHA384withECDSA", EllipticCurves.P_384);
     }
 }

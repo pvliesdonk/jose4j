@@ -28,4 +28,6 @@ public interface JsonWebSignatureAlgorithm extends Algorithm
 {
     boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException;
     byte[] sign(Key key, byte[] securedInputBytes) throws JoseException ;
+    void validateSigningKey(Key key) throws JoseException;
+    void validateVerificationKey(Key key) throws JoseException;
 }
