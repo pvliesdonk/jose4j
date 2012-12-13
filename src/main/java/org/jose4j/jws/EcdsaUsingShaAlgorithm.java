@@ -51,7 +51,7 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
         }
         catch (IOException e)
         {
-            throw new JoseException("Unable to process signature value", e);
+            throw new JoseException("Unable to convert R and S as a concatenated byte array to DER encoding.", e);
         }
 
         return super.verifySignature(derEncodedSignatureBytes, key, securedInputBytes);
@@ -66,7 +66,7 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
         }
         catch (IOException e)
         {
-            throw new JoseException("Unable to convert ", e);
+            throw new JoseException("Unable to convert DER encoding to R and S as a concatenated byte array.", e);
         }
     }
 
