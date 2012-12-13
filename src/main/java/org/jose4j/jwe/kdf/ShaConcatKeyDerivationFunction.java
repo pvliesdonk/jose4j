@@ -16,10 +16,10 @@
 
 package org.jose4j.jwe.kdf;
 
-import org.jose4j.lang.StringUtil;
+import org.apache.commons.codec.CharEncoding;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
-import org.apache.commons.codec.CharEncoding;
+import org.jose4j.lang.StringUtil;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

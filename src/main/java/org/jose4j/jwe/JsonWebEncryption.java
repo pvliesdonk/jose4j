@@ -16,14 +16,14 @@
 
 package org.jose4j.jwe;
 
-import org.jose4j.jwx.JsonWebStructure;
+import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwx.HeaderParameterNames;
+import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.ByteGenerator;
 import org.jose4j.lang.DefaultByteGenerator;
-import org.jose4j.lang.StringUtil;
 import org.jose4j.lang.JoseException;
-import org.jose4j.jwa.AlgorithmFactoryFactory;
-import org.jose4j.base64url.Base64Url;
+import org.jose4j.lang.StringUtil;
 
 import javax.crypto.SecretKey;
 

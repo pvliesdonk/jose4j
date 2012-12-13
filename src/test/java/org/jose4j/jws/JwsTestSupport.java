@@ -16,11 +16,11 @@
 
 package org.jose4j.jws;
 
-import org.jose4j.lang.JoseException;
-import org.jose4j.jwx.CompactSerialization;
+import junit.framework.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import junit.framework.Assert;
+import org.jose4j.jwx.CompactSerialization;
+import org.jose4j.lang.JoseException;
 
 import java.security.Key;
 

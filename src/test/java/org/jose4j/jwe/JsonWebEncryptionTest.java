@@ -17,8 +17,8 @@
 package org.jose4j.jwe;
 
 import junit.framework.TestCase;
-import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.jwx.HeaderParameterNames;
+import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.JoseException;
 
 /**

@@ -21,7 +21,6 @@ import org.jose4j.lang.JoseException;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.NoSuchAlgorithmException;
 
 /**

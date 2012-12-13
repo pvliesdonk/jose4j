@@ -21,13 +21,12 @@ import org.jose4j.keys.EcKeyUtil;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.lang.JoseException;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.math.BigInteger;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.EllipticCurve;
+import java.util.Map;
 
 /**
  */

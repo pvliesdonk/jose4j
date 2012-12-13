@@ -18,9 +18,9 @@ package org.jose4j.jws;
 
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.HeaderParameterNames;
+import org.jose4j.keys.KeyType;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
-import org.jose4j.keys.KeyType;
 
 import java.security.Key;
 

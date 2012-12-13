@@ -17,12 +17,12 @@
 package org.jose4j.jwe.kdf;
 
 import junit.framework.TestCase;
-
-import java.util.Arrays;
-
+import static org.jose4j.jwe.kdf.ShaConcatKeyDerivationFunction.ENCRYPTION_LABEL;
+import static org.jose4j.jwe.kdf.ShaConcatKeyDerivationFunction.INTEGRITY_LABEL;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
-import static org.jose4j.jwe.kdf.ShaConcatKeyDerivationFunction.*;
+
+import java.util.Arrays;
 
 /**
  */

@@ -17,14 +17,14 @@
 package org.jose4j.jws;
 
 import org.jose4j.base64url.Base64Url;
-import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwa.AlgorithmFactory;
+import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwx.CompactSerialization;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
-import org.jose4j.lang.StringUtil;
-import org.jose4j.lang.JoseException;
 import org.jose4j.keys.KeyType;
+import org.jose4j.lang.JoseException;
+import org.jose4j.lang.StringUtil;
 
 import java.security.Key;
 

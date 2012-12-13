@@ -18,11 +18,11 @@ package org.jose4j.keys;
 
 import org.jose4j.lang.JoseException;
 
-import java.security.*;
-import java.security.spec.*;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.ECPrivateKey;
 import java.math.BigInteger;
+import java.security.*;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.spec.*;
 
 /**
  */

@@ -16,12 +16,13 @@
 
 package org.jose4j.jws;
 
+import junit.framework.TestCase;
 import org.jose4j.keys.*;
 import org.jose4j.lang.JoseException;
 
-import java.security.*;
-
-import junit.framework.TestCase;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 /**
  */

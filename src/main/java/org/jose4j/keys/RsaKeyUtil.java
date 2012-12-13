@@ -18,14 +18,13 @@ package org.jose4j.keys;
 
 import org.jose4j.lang.JoseException;
 
+import java.math.BigInteger;
 import java.security.*;
-import java.security.spec.RSAPublicKeySpec;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
-import java.security.spec.ECParameterSpec;
-import java.security.interfaces.RSAPublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.math.BigInteger;
+import java.security.spec.RSAPublicKeySpec;
 
 /**
  */

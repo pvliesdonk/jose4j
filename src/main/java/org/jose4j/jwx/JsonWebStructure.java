@@ -19,9 +19,9 @@ package org.jose4j.jwx;
 import org.jose4j.json.JsonHeaderUtil;
 import org.jose4j.lang.JoseException;
 
+import java.security.Key;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.security.Key;
 
 /**
  */

@@ -17,7 +17,6 @@
 package org.jose4j.keys;
 
 import org.jose4j.base64url.Base64Url;
-import org.jose4j.lang.JoseException;
 
 import java.math.BigInteger;
 

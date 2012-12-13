@@ -17,13 +17,11 @@
 package org.jose4j.keys;
 
 import junit.framework.TestCase;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 
 import java.math.BigInteger;
 import java.util.Arrays;
-
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.DecoderException;
-import org.jose4j.lang.JoseException;
 
 /**
  */

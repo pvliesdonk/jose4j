@@ -16,12 +16,11 @@
 
 package org.jose4j.jws;
 
-import org.jose4j.jwa.AlgorithmInfo;
-import org.jose4j.keys.KeyType;
 import org.jose4j.keys.RsaKeyUtil;
 import org.jose4j.lang.JoseException;
 
-import java.security.*;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 /**

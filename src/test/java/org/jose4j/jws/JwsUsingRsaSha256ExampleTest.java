@@ -17,10 +17,6 @@
 package org.jose4j.jws;
 
 import junit.framework.TestCase;
-
-import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.JoseException;
 

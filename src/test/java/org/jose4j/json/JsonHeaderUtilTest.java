@@ -17,10 +17,9 @@
 package org.jose4j.json;
 
 import junit.framework.TestCase;
+import org.jose4j.lang.JoseException;
 
 import java.util.Map;
-
-import org.jose4j.lang.JoseException;
 
 /**
  */

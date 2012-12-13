@@ -21,13 +21,13 @@ import org.jose4j.keys.EcKeyUtil;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.lang.JoseException;
 
+import java.io.IOException;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.EllipticCurve;
-import java.security.interfaces.ECPublicKey;
-import java.io.IOException;
 
 
 /**

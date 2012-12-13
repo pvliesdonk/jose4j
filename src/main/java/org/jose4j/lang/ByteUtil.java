@@ -17,9 +17,9 @@
 package org.jose4j.lang;
 
 
-import java.nio.ByteBuffer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class ByteUtil
 {

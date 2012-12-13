@@ -16,13 +16,13 @@
 
 package org.jose4j.keys;
 
-import java.security.spec.ECParameterSpec;
-import java.security.spec.ECFieldFp;
-import java.security.spec.EllipticCurve;
-import java.security.spec.ECPoint;
 import java.math.BigInteger;
-import java.util.Map;
+import java.security.spec.ECFieldFp;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.ECPoint;
+import java.security.spec.EllipticCurve;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Values for these curve parameters from FIPS PUB 186-3

@@ -17,12 +17,11 @@
 package org.jose4j.jws;
 
 import junit.framework.TestCase;
+import org.jose4j.lang.ByteUtil;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.nio.ByteBuffer;
-
-import org.jose4j.lang.ByteUtil;
+import java.util.Arrays;
 
 /**
  */

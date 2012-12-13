@@ -16,14 +16,13 @@
 
 package org.jose4j.json;
 
+import org.jose4j.lang.JoseException;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.jose4j.lang.JoseException;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 

@@ -16,8 +16,8 @@
 
 package org.jose4j.jwa;
 
-import org.jose4j.jws.*;
 import org.jose4j.jwe.*;
+import org.jose4j.jws.JsonWebSignatureAlgorithm;
 import org.jose4j.keys.KeyType;
 
 import java.security.Key;

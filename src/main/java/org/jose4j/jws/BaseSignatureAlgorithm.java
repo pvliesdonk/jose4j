@@ -16,9 +16,9 @@
 
 package org.jose4j.jws;
 
-import org.jose4j.lang.JoseException;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.KeyType;
+import org.jose4j.lang.JoseException;
 
 import java.security.*;
 

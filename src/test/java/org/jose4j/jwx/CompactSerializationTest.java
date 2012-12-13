@@ -17,10 +17,9 @@
 package org.jose4j.jwx;
 
 import junit.framework.TestCase;
+import org.jose4j.lang.JoseException;
 
 import java.util.Arrays;
-
-import org.jose4j.lang.JoseException;
 
 /**
  */

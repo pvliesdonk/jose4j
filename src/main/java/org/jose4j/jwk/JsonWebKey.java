@@ -18,11 +18,11 @@ package org.jose4j.jwk;
 
 import org.jose4j.lang.JoseException;
 
-import java.util.Map;
-import java.util.LinkedHashMap;
 import java.security.PublicKey;
-import java.security.interfaces.RSAPublicKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  */

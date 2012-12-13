@@ -17,12 +17,11 @@
 package org.jose4j.jws;
 
 import junit.framework.TestCase;
-
-import java.security.Key;
-
+import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
-import org.jose4j.keys.HmacKey;
+
+import java.security.Key;
 
 /**
  */

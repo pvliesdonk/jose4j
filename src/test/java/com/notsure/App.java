@@ -17,24 +17,26 @@
 package com.notsure;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.codec.binary.Hex;
-import org.jose4j.lang.ByteUtil;
-import org.jose4j.lang.JoseException;
+import org.apache.commons.codec.binary.StringUtils;
+import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwk.JsonWebKey;
+import org.jose4j.jwk.JsonWebKeySet;
+import org.jose4j.jwk.RsaJsonWebKey;
+import org.jose4j.jws.EcdsaUsingShaAlgorithm;
 import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.ExampleEcKeysFromJws;
-import org.jose4j.jwk.JsonWebKeySet;
-import org.jose4j.jwk.JsonWebKey;
-import org.jose4j.jwk.RsaJsonWebKey;
-import org.jose4j.base64url.Base64Url;
-import org.jose4j.jws.EcdsaUsingShaAlgorithm;
+import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.JoseException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.util.Arrays;
-import java.security.*;
-import java.security.spec.*;
 import java.math.BigInteger;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+import java.security.spec.RSAPrivateKeySpec;
+import java.util.Arrays;
 
 
 

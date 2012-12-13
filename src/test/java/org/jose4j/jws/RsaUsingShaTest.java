@@ -16,17 +16,16 @@
 
 package org.jose4j.jws;
 
-import org.jose4j.keys.ExampleRsaKeyFromJws;
-import org.jose4j.keys.RsaKeyUtil;
-import org.jose4j.keys.HmacKey;
+import junit.framework.TestCase;
 import org.jose4j.keys.ExampleEcKeysFromJws;
+import org.jose4j.keys.ExampleRsaKeyFromJws;
+import org.jose4j.keys.HmacKey;
+import org.jose4j.keys.RsaKeyUtil;
 import org.jose4j.lang.JoseException;
 
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.KeyPair;
-
-import junit.framework.TestCase;
 
 /**
  */

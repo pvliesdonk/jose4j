@@ -17,10 +17,10 @@
 package org.jose4j.jws;
 
 import junit.framework.TestCase;
-import org.jose4j.keys.HmacKey;
-import org.jose4j.lang.JoseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jose4j.keys.HmacKey;
+import org.jose4j.lang.JoseException;
 
 import java.security.Key;
 

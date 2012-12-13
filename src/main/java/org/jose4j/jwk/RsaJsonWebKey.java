@@ -20,9 +20,9 @@ import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.RsaKeyUtil;
 import org.jose4j.lang.JoseException;
 
-import java.util.Map;
-import java.security.interfaces.RSAPublicKey;
 import java.math.BigInteger;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Map;
 
 /**
  */

@@ -19,9 +19,9 @@ package org.jose4j.keys;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 
+import java.math.BigInteger;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
-import java.math.BigInteger;
 
 /**
  * example EC keys from http://tools.ietf.org/html/draft-ietf-jose-json-web-signature
