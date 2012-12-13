@@ -20,6 +20,9 @@ import junit.framework.TestCase;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.nio.ByteBuffer;
+
+import org.jose4j.lang.ByteUtil;
 
 /**
  */
@@ -27,11 +30,28 @@ public class EcdsaUsingShaAlgorithmTest extends TestCase
 {
     public void testEncodingDecoding() throws IOException
     {
-        byte[] before = {1, 2};
-        byte[] der = EcdsaUsingShaAlgorithm.convertConcatenatedToDer(before);
-        byte[] bytes = EcdsaUsingShaAlgorithm.convertDerToConcatenated(der);
-        System.out.println(Arrays.toString(before));
-        System.out.println(Arrays.toString(der));
-        System.out.println(Arrays.toString(bytes));
+        // not sure this is a *useful* test but what the heck...
+
+        int[] rints = {14, 209, 33, 83, 121, 99, 108, 72, 60, 47, 127, 21, 88,
+            7, 212, 2, 163, 178, 40, 3, 58, 249, 124, 126, 23, 129,
+            154, 195, 22, 158, 166, 101};
+        
+        int[] sints =  {197, 10, 7, 211, 140, 60, 112, 229, 216, 241, 45, 175,
+            8, 74, 84, 128, 166, 101, 144, 197, 242, 147, 80, 154,
+            143, 63, 127, 138, 131, 163, 84, 213};
+
+        byte[] rbytes = ByteUtil.convertUnsignedToSignedTwosComp(rints);
+        byte[] sbytes = ByteUtil.convertUnsignedToSignedTwosComp(sints);
+
+        ByteBuffer buffer = ByteBuffer.allocate(rbytes.length + sbytes.length);
+        buffer.put(rbytes);
+        buffer.put(sbytes);
+
+        byte[] concatedBytes = buffer.array();
+        byte[] derEncoded = EcdsaUsingShaAlgorithm.convertConcatenatedToDer(concatedBytes);
+        assertFalse(Arrays.equals(concatedBytes, derEncoded));
+        byte[] backToConcated = EcdsaUsingShaAlgorithm.convertDerToConcatenated(derEncoded);
+
+        assertTrue(Arrays.equals(concatedBytes, backToConcated));
     }
 }
