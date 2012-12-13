@@ -16,21 +16,12 @@
 
 package org.jose4j.jws;
 
-import org.jose4j.jwa.AlgorithmInfo;
-import org.jose4j.keys.KeyType;
-import org.jose4j.keys.RsaKeyUtil;
-import org.jose4j.lang.JoseException;
-
-import java.security.*;
-
 /**
  */
-public class RsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements JsonWebSignatureAlgorithm
+public class EcdsaP384UsingSha384Algorithm extends EcdsaUsingShaAlgorithm
 {
-    public RsaUsingShaAlgorithm(String id, String javaAlgo)
+    public EcdsaP384UsingSha384Algorithm()
     {
-        super(id, javaAlgo, RsaKeyUtil.RSA);
-    }               
-
-
+        super(AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384, "SHA384withECDSA");
+    }
 }

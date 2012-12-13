@@ -17,8 +17,6 @@
 package org.jose4j.jws;
 
 import junit.framework.TestCase;
-import junit.framework.Assert;
-import org.jose4j.jwx.CompactSerialization;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.JoseException;
 
@@ -69,49 +67,8 @@ public class HmacShaTest extends TestCase
 
     void testBasicRoundTrip(String payload, String jwsAlgo) throws JoseException
     {
-        JsonWebSignature jwsWithKey1 = new JsonWebSignature();
-        jwsWithKey1.setPayload(payload);
-        jwsWithKey1.setAlgorithmHeaderValue(jwsAlgo);
-        jwsWithKey1.setKey(KEY1);
-        String serializationWithKey1 = jwsWithKey1.getCompactSerialization();
-
-        JsonWebSignature jwsWithKey2 = new JsonWebSignature();
-        jwsWithKey2.setKey(KEY2);        
-        jwsWithKey2.setAlgorithmHeaderValue(jwsAlgo);
-        jwsWithKey2.setPayload(payload);
-        String serializationWithKey2 = jwsWithKey2.getCompactSerialization();
-        validateBasicStructure(serializationWithKey1);
-        validateBasicStructure(serializationWithKey2);
-        assertFalse(serializationWithKey1.equals(serializationWithKey2));
-
-        JsonWebSignature jws = new JsonWebSignature();
-        jws.setCompactSerialization(serializationWithKey1);
-        jws.setKey(KEY1);
-        assertTrue(jws.verifySignature());
-        assertEquals(payload, jws.getPayload());
-
-        jws = new JsonWebSignature();
-        jws.setCompactSerialization(serializationWithKey2);
-        jws.setKey(KEY1);
-        assertFalse(jws.verifySignature());
-
-        jws = new JsonWebSignature();
-        jws.setCompactSerialization(serializationWithKey2);
-        jws.setKey(KEY2);
-        assertTrue(jws.verifySignature());
-        assertEquals(payload, jws.getPayload());
-
-        jws = new JsonWebSignature();
-        jws.setCompactSerialization(serializationWithKey1);
-        jws.setKey(KEY2);
-        assertFalse(jws.verifySignature());
+        JwsTestSupport.testBasicRoundTrip(payload, jwsAlgo, KEY1, KEY1, KEY2, KEY2);
     }
 
-    void validateBasicStructure(String compactSerialization) throws JoseException
-    {
-        Assert.assertNotNull(compactSerialization);
-        Assert.assertEquals(compactSerialization.trim(), compactSerialization);
-        String[] parts = CompactSerialization.deserialize(compactSerialization);
-        Assert.assertEquals(JsonWebSignature.COMPACT_SERIALIZATION_PARTS, parts.length);
-    }
+
 }

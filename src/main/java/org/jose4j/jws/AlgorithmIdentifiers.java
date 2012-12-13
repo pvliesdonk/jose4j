@@ -32,6 +32,6 @@ public class AlgorithmIdentifiers
 
     public static final String ECDSA_USING_P256_CURVE_AND_SHA256 = "ES256";
     public static final String ECDSA_USING_P384_CURVE_AND_SHA384 = "ES384";
-    public static final String ECDSA_USING_P512_CURVE_AND_SHA512 = "ES512";
+    public static final String ECDSA_USING_P521_CURVE_AND_SHA512 = "ES512";
 
 }

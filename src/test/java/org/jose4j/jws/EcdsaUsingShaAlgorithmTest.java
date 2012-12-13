@@ -16,21 +16,22 @@
 
 package org.jose4j.jws;
 
-import org.jose4j.jwa.AlgorithmInfo;
-import org.jose4j.keys.KeyType;
-import org.jose4j.keys.RsaKeyUtil;
-import org.jose4j.lang.JoseException;
+import junit.framework.TestCase;
 
-import java.security.*;
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  */
-public class RsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements JsonWebSignatureAlgorithm
+public class EcdsaUsingShaAlgorithmTest extends TestCase
 {
-    public RsaUsingShaAlgorithm(String id, String javaAlgo)
+    public void testEncodingDecoding() throws IOException
     {
-        super(id, javaAlgo, RsaKeyUtil.RSA);
-    }               
-
-
+        byte[] before = {1, 2};
+        byte[] der = EcdsaUsingShaAlgorithm.convertConcatenatedToDer(before);
+        byte[] bytes = EcdsaUsingShaAlgorithm.convertDerToConcatenated(der);
+        System.out.println(Arrays.toString(before));
+        System.out.println(Arrays.toString(der));
+        System.out.println(Arrays.toString(bytes));
+    }
 }

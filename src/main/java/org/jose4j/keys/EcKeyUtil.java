@@ -18,10 +18,7 @@ package org.jose4j.keys;
 
 import org.jose4j.lang.JoseException;
 
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.PrivateKey;
+import java.security.*;
 import java.security.spec.*;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.ECPrivateKey;
@@ -32,6 +29,7 @@ import java.math.BigInteger;
 public class EcKeyUtil
 {
     private KeyFactory keyFactory;
+    private KeyPairGenerator keyGenerator;
     public static final String EC = "EC";
 
     public EcKeyUtil()
@@ -39,10 +37,11 @@ public class EcKeyUtil
         try
         {
             keyFactory = KeyFactory.getInstance(EC);
+            keyGenerator = KeyPairGenerator.getInstance(EcKeyUtil.EC);
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new IllegalStateException("Couldn't find "+ EC + " KeyFactory!", e);
+            throw new IllegalStateException("Couldn't find "+ EC + " KeyFactory or KeyPairGenerator!", e);
         }
     }
 
@@ -74,6 +73,19 @@ public class EcKeyUtil
         catch (InvalidKeySpecException e)
         {
             throw new JoseException("Invalid key spec: " + e, e);
+        }
+    }
+
+    public KeyPair generateKeyPair(ECParameterSpec spec) throws JoseException
+    {
+        try
+        {
+            keyGenerator.initialize(spec);
+            return keyGenerator.generateKeyPair();
+        }
+        catch (InvalidAlgorithmParameterException e)
+        {
+            throw new JoseException("Unable to create keypair", e);
         }
     }
 }

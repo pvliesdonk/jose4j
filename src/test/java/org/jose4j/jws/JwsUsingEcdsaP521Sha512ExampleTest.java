@@ -16,21 +16,21 @@
 
 package org.jose4j.jws;
 
-import org.jose4j.jwa.AlgorithmInfo;
-import org.jose4j.keys.KeyType;
-import org.jose4j.keys.RsaKeyUtil;
 import org.jose4j.lang.JoseException;
-
-import java.security.*;
+import org.jose4j.keys.ExampleEcKeysFromJws;
+import junit.framework.TestCase;
 
 /**
  */
-public class RsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements JsonWebSignatureAlgorithm
+public class JwsUsingEcdsaP521Sha512ExampleTest extends TestCase
 {
-    public RsaUsingShaAlgorithm(String id, String javaAlgo)
+    String JWS = "eyJhbGciOiJFUzUxMiJ9.UGF5bG9hZA.AdwMgeerwtHoh-l192l60hp9wAHZFVJbLfD_UxMi70cwnZOYaRI1bKPWROc-mZZqwqT2SI-KGDKB34XO0aw_7XdtAG8GaSwFKdCAPZgoXD2YBJZCPEX3xKpRwcdOO8KpEHwJjyqOgzDO7iKvU8vcnwNrmxYbSW9ERBXukOXolLzeO_Jn";
+
+    public void testVerifyExample() throws JoseException
     {
-        super(id, javaAlgo, RsaKeyUtil.RSA);
-    }               
-
-
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setCompactSerialization(JWS);
+        jws.setKey(ExampleEcKeysFromJws.PUBLIC_521);
+        assertTrue("signature should validate", jws.verifySignature());
+    }
 }

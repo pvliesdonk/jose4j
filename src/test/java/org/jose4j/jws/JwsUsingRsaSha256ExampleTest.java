@@ -32,7 +32,6 @@ public class JwsUsingRsaSha256ExampleTest extends TestCase
 
     public void testVerifyExample() throws JoseException
     {
-        
         JsonWebSignature jws = new JsonWebSignature();
         jws.setCompactSerialization(JWS);
         jws.setKey(ExampleRsaKeyFromJws.PUBLIC_KEY);
