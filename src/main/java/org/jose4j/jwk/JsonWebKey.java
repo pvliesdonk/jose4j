@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public abstract class JsonWebKey
 {
-    public static final String ALGORITHM_MEMBER_NAME = "alg";
+    public static final String KEY_TYPE_MEMBER_NAME = "kty";
     public static final String USE_MEMBER_NAME = "use";
     public static final String KEY_ID_MEMBER_NAME = "kid";
 
@@ -79,7 +79,7 @@ public abstract class JsonWebKey
     public Map<String, String> toParams()
     {
         Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put(ALGORITHM_MEMBER_NAME, getAlgorithm());
+        params.put(KEY_TYPE_MEMBER_NAME, getAlgorithm());
         putIfNotNull(USE_MEMBER_NAME, getUse(), params);
         putIfNotNull(KEY_ID_MEMBER_NAME, getKeyId(), params);
         fillTypeSpecificParams(params);
@@ -104,7 +104,7 @@ public abstract class JsonWebKey
     {
         public static JsonWebKey newJwk(Map<String,String> params) throws JoseException
         {
-            String alg = params.get(ALGORITHM_MEMBER_NAME);
+            String alg = params.get(KEY_TYPE_MEMBER_NAME);
 
             if (RsaJsonWebKey.ALGORITHM_VALUE.equals(alg))
             {
