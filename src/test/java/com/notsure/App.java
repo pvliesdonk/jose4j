@@ -24,10 +24,15 @@ import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.JsonWebKeySet;
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jws.EcdsaUsingShaAlgorithm;
+import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
+import org.jose4j.jwt.ReservedClaimNames;
+import org.jose4j.jwt.IntDate;
+import org.json.simple.JSONObject;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -37,7 +42,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.util.Arrays;
-
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 
 /**
@@ -51,6 +57,28 @@ public class App
     static String newline = new String(new char[]{0x0d, 0x0a});
 
     public static void main(String[] args) throws Exception
+    {
+        JsonWebSignature jws = new JsonWebSignature();
+        Map payload =  new LinkedHashMap();
+
+        payload.put(ReservedClaimNames.ISSUER, "https://idp.example.com");        
+        IntDate date = IntDate.now();
+        payload.put(ReservedClaimNames.EXPIRATION_TIME, date.getValue());
+        payload.put(ReservedClaimNames.AUDIENCE, "https://sp.example.org");
+        payload.put(ReservedClaimNames.JWT_ID, "tmYvYVU2x8LvN72B5Q_EacH._5A");
+        payload.put("acr", "2");
+        payload.put("sub", "Brian");
+       
+        jws.setPayload(JSONObject.toJSONString(payload));
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
+        jws.setKey(ExampleEcKeysFromJws.PRIVATE_256);
+        System.out.println(jws.getCompactSerialization());
+        System.out.println(jws.getHeader() + "." + jws.getPayload() + ".<SIGNATURE>");
+        System.out.println();
+    }
+
+
+    public static void someECstuff() throws Exception
     {
         Signature signature = Signature.getInstance("SHA256withECDSA");
         signature.initSign(ExampleEcKeysFromJws.PRIVATE_256);
@@ -84,8 +112,6 @@ public class App
         boolean b2 = verifier2.verify(encodedSig);
         System.out.println(b2);
     }
-
-
 
     public static void testJwsRsaExample() throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException
     {
