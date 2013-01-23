@@ -17,12 +17,15 @@
 package org.jose4j.jwk;
 
 import org.jose4j.lang.JoseException;
+import org.jose4j.json.JsonUtil;
 
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.HashMap;
 
 /**
  */
@@ -86,6 +89,12 @@ public abstract class JsonWebKey
         return params;
     }
 
+    public String toJson()
+    {
+        Map<String, String> params = toParams();
+        return JsonUtil.toJson(params);
+    }
+
     @Override
     public String toString()
     {
@@ -134,6 +143,20 @@ public abstract class JsonWebKey
             {
                 throw new JoseException("Unsupported or unknown public key " + publicKey);
             }
+        }
+
+        public static JsonWebKey newJwk(String json) throws JoseException
+        {
+            Map<String, Object> parsed = JsonUtil.parseJson(json);
+            Map<String, String> params = new HashMap<String,String>();
+            for (Map.Entry<String,Object> e : parsed.entrySet())
+            {
+                if (String.class.isInstance(e.getValue()))
+                {
+                    params.put(e.getKey(), (String) e.getValue());
+                }
+            }
+            return newJwk(params);
         }
     }
 }

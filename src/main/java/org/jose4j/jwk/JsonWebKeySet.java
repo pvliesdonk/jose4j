@@ -75,7 +75,8 @@ public class JsonWebKeySet
 
         for (JsonWebKey key : keys)
         {
-            keyList.add(key.toParams());
+            Map<String, String> params = key.toParams();
+            keyList.add(params);
         }
 
         Map<String,Object> jwk = new LinkedHashMap<String,Object>();

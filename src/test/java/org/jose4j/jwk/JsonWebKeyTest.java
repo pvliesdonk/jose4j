@@ -108,6 +108,11 @@ public class JsonWebKeyTest extends TestCase
     public void testFactoryWithRsaPublicKey() throws JoseException
     {
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(ExampleRsaKeyFromJws.PUBLIC_KEY);
+        assertIsRsa(jwk);
+    }
+
+    private void assertIsRsa(JsonWebKey jwk)
+    {
         assertTrue(jwk instanceof RsaJsonWebKey);
         assertTrue(jwk.getPublicKey() instanceof RSAPublicKey);
         assertEquals(RsaJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm());
@@ -149,9 +154,53 @@ public class JsonWebKeyTest extends TestCase
     public void testFactoryWithEcPublicKey() throws JoseException
     {
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(ExampleEcKeysFromJws.PUBLIC_256);
+        assertIsEllipticCurve(jwk);
+    }
+
+    private void assertIsEllipticCurve(JsonWebKey jwk)
+    {
         assertTrue(jwk.getPublicKey() instanceof ECPublicKey);
-        assertTrue(jwk instanceof EllipticCurveJsonWebKey);        
+        assertTrue(jwk instanceof EllipticCurveJsonWebKey);
         assertEquals(EllipticCurveJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm());
+    }
+
+    public void testEcSingleJwkToAndFromJson() throws JoseException
+    {
+        String jwkJson =
+                "       {\"kty\":\"EC\",\n" +
+                "        \"crv\":\"P-256\",\n" +
+                "        \"x\":\"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4\",\n" +
+                "        \"y\":\"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM\",\n" +
+                "        \"use\":\"enc\",\n" +
+                "        \"kid\":\"1\"}";
+
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
+        assertIsEllipticCurve(jwk);
+
+        String jsonOut = jwk.toJson();
+        JsonWebKey jwk2 = JsonWebKey.Factory.newJwk(jsonOut);
+        assertIsEllipticCurve(jwk2);
+    }
+
+    public void testRsaSingleJwkToAndFromJson() throws JoseException
+    {
+        String jwkJson =
+                  "       {\"kty\":\"RSA\",\n" +
+                "        \"n\": \"0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
+                "   4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMs" +
+                "   tn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2" +
+                "   QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbI" +
+                "   SD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqb" +
+                "   w0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw\",\n" +
+                "        \"e\":\"AQAB\",\n" +
+                "        \"alg\":\"RS256\"}";
+
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
+        assertIsRsa(jwk);
+
+        String jsonOut = jwk.toJson();
+        JsonWebKey jwk2 = JsonWebKey.Factory.newJwk(jsonOut);
+        assertIsRsa(jwk2); 
     }
 
     // todo think we need a test some place for "The array representation MUST not be shortened to omit
