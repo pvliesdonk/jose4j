@@ -55,7 +55,7 @@ public class JsonUtil
         }
         catch (ParseException e)
         {
-            throw new JoseException("Parsing error.", e);
+            throw new JoseException("Parsing error: " + e, e);
         }
     }
 
