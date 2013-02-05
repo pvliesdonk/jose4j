@@ -83,7 +83,7 @@ public class App
         Signature signature = Signature.getInstance("SHA256withECDSA");
         signature.initSign(ExampleEcKeysFromJws.PRIVATE_256);
 
-        // exampel from jws
+        // example from jws
         String jwsSi = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ";
         byte[] securedInputBytes = jwsSi.getBytes("ASCII");
         signature.update(securedInputBytes);
