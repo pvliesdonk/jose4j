@@ -16,7 +16,10 @@
 
 package org.jose4j.jws;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.JoseException;
 
@@ -27,6 +30,8 @@ import java.security.Key;
  */
 public class HmacShaTest extends TestCase
 {
+    Log log = LogFactory.getLog(this.getClass());
+
     Key KEY1 = new HmacKey(new byte[]{-41, -1, 60, 1, 1, 45, -92, -114, 8, -1, -60, 7, 54, -16, 16, 14, -20, -85, 56,
             103, 4, 10, -56, 120, 37, -48, 6, 9, 110, -96, 27, -4, 41, -99, 60, 91, 49, 70, -99, -14, -108, -81, 60,
             37, 104, -116, 106, 104, -2, -95, 56, 103, 64, 10, -56, 120, 37, -48, 6, 9, 110, -96, 27, -4});
@@ -114,4 +119,27 @@ public class HmacShaTest extends TestCase
         Key key = new HmacKey(new byte[63]);
         JwsTestSupport.testBadKeyOnVerify(compactSerialization, key);
     }
+
+    public void testVailidateKeySwitch() throws JoseException
+    {
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setPayload("whatever");
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jws.setKey(new HmacKey(new byte[] {1,2,5,-9,99,-99,0,40,21}));
+        jws.setDoKeyValidation(false);
+        String cs = jws.getCompactSerialization();
+        assertNotNull(cs);
+
+        try
+        {
+            jws.setDoKeyValidation(true);
+            jws.getCompactSerialization();
+            Assert.fail("Should have failed with some kind of invalid key message but got " + cs);
+        }
+        catch (JoseException e)
+        {
+            log.debug("Expected something like this: " + e);
+        }
+    }
+
 }

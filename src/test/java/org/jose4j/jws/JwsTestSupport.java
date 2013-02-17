@@ -96,7 +96,7 @@ public class JwsTestSupport
         }
         catch (JoseException e)
         {
-            log.debug("Expected: " + e);
+            log.debug("Expected something like this: " + e);
         }
     }
 
@@ -112,7 +112,7 @@ public class JwsTestSupport
         }
         catch (JoseException e)
         {
-            log.debug("Expected: " + e);
+            log.debug("Expected something like this: " + e);
         }
     }
 }
