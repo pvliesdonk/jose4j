@@ -74,7 +74,7 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
         The result of an ECDSA signature is the EC point (R, S), where R and S are unsigned (very large) integers.
         The JCA ECDSA signature implementation (sun.security.ec.ECDSASignature) produces and expects a DER encoding
         of R and S while JOSE/JWS wants R and S as a concatenated byte array. XML signatures (best I can tell) treats
-        ECDSA same way as JOSE and the code for the two methods that convert to and from DER and concatenated
+        ECDSA the same way as JOSE and the code for the two methods that convert to and from DER and concatenated
         R and S was originally taken from org.apache.xml.security.algorithms.implementations.SignatureECDSA in the
         (Apache 2 licensed) Apache Santuario XML Security library. Which seemed like a better idea than trying to
         write it myself or using sun.security.util.Der[Input/Output]Stream as sun.security.ec.ECDSASignature does.
