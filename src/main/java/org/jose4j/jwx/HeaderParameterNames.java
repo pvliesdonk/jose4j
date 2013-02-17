@@ -34,6 +34,6 @@ public class HeaderParameterNames
 
     public static final String X509_CERTIFICATE_THUMBPRINT = "x5t";
 
-    public static final String X509_URL_THUMBPRINT = "x5u";
+    public static final String X509_URL = "x5u";
     
 }
