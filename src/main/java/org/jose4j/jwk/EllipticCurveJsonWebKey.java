@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class EllipticCurveJsonWebKey extends JsonWebKey
 {
-    public static final String ALGORITHM_VALUE = "EC";
+    public static final String KEY_TYPE_VALUE = "EC";
 
     public static final String CURVE_MEMBER_NAME = "crv";
 
@@ -67,9 +67,9 @@ public class EllipticCurveJsonWebKey extends JsonWebKey
         return (ECPublicKey) publicKey;
     }
 
-    public String getAlgorithm()
+    public String getKeyType()
     {
-        return ALGORITHM_VALUE;
+        return KEY_TYPE_VALUE;
     }
 
     protected void fillTypeSpecificParams(Map<String, String> params)

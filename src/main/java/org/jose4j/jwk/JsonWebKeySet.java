@@ -27,46 +27,69 @@ public class JsonWebKeySet
 {
     public static final String JWK_SET_MEMBER_NAME = "keys";
 
-    private Collection<JsonWebKey> keys;
+    private List<JsonWebKey> keys;
 
     public JsonWebKeySet(String json) throws JoseException
     {
         Map<String,Object> parsed = JsonUtil.parseJson(json);
-        List<Map<String,String>> jwksList = (List<Map<String,String>>) parsed.get(JWK_SET_MEMBER_NAME);
+        List<Map<String,String>> jwkParamMapList = (List<Map<String,String>>) parsed.get(JWK_SET_MEMBER_NAME);
 
-        keys = new ArrayList<JsonWebKey>(jwksList.size());
-        for (Map<String,String> jwkParamsMap : jwksList)
+        keys = new ArrayList<JsonWebKey>(jwkParamMapList.size());
+        for (Map<String,String> jwkParamsMap : jwkParamMapList)
         {
             keys.add(JsonWebKey.Factory.newJwk(jwkParamsMap));
         }
     }
 
-    public JsonWebKeySet(Collection<JsonWebKey> keys)
+    public JsonWebKeySet(List<JsonWebKey> keys)
     {
         this.keys = keys;
     }
 
-    public Collection<JsonWebKey> getJsonWebKeys()
+    public List<JsonWebKey> getJsonWebKeys()
     {
         return keys;
     }
 
-    public JsonWebKey getKey(String keyId)
+    public JsonWebKey findJsonWebKey(String keyId, String use, String keyType, String algorithm)
     {
-        if (keyId == null)
-        {
-            return null;
-        }
+        List<JsonWebKey> found = findJsonWebKeys(keyId, use, keyType, algorithm);
+        return found.isEmpty() ? null : found.iterator().next();
+    }
 
-        for (JsonWebKey key : keys)
+    public List<JsonWebKey> findJsonWebKeys(String keyId, String keyType, String use, String algorithm)
+    {
+        List<JsonWebKey> found = new ArrayList<JsonWebKey>();
+        for (JsonWebKey jwk : keys)
         {
-            if (keyId.equals(key.getKeyId()))
+            boolean isMeetsCriteria = true;
+
+            if (keyId != null)
             {
-                return key;
+                isMeetsCriteria = keyId.equals(jwk.getKeyId());
+            }
+
+            if (use != null)
+            {
+                isMeetsCriteria &= use.equals(jwk.getUse());
+            }
+
+            if (keyType != null)
+            {
+                isMeetsCriteria &= keyType.equals(jwk.getKeyType());
+            }
+
+            if (algorithm != null)
+            {
+                isMeetsCriteria &= algorithm.equals(jwk.getAlgorithm());
+            }
+
+            if (isMeetsCriteria)
+            {
+                found.add(jwk);
             }
         }
-
-        return null;
+        return found;
     }
 
     public String toJson()

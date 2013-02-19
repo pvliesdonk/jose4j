@@ -17,15 +17,14 @@
 package org.jose4j.jwk;
 
 import junit.framework.TestCase;
+import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.JoseException;
 
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  */
@@ -64,17 +63,18 @@ public class JsonWebKeyTest extends TestCase
         assertTrue(iterator.next() instanceof EllipticCurveJsonWebKey);
         assertTrue(iterator.next() instanceof RsaJsonWebKey);
 
-        JsonWebKey webKey1 = jwkSet.getKey("1");
+        JsonWebKey webKey1 = jwkSet.findJsonWebKey("1", null, null, null);
         assertTrue(webKey1 instanceof EllipticCurveJsonWebKey);
+        assertEquals(Use.ENCRYPTION, webKey1.getUse());
         assertNotNull(webKey1.getPublicKey());
-        JsonWebKey webKey2011 = jwkSet.getKey("2011-04-29");
+        JsonWebKey webKey2011 = jwkSet.findJsonWebKey("2011-04-29", null, null, null);
         assertTrue(webKey2011 instanceof RsaJsonWebKey);
         assertNotNull(webKey2011.getPublicKey());
+        assertEquals(AlgorithmIdentifiers.RSA_USING_SHA256, webKey2011.getAlgorithm());
 
-        assertEquals(Use.ENCRYPTION, jwkSet.getKey("1").getUse());
+        assertEquals(Use.ENCRYPTION, jwkSet.findJsonWebKey("1", null, null, null).getUse());
 
-        assertNull(jwkSet.getKey(null));
-        assertNull(jwkSet.getKey("nope"));
+        assertNull(jwkSet.findJsonWebKey("nope", null, null, null));
 
         String json = jwkSet.toJson();
         assertNotNull(json);
@@ -95,8 +95,8 @@ public class JsonWebKeyTest extends TestCase
         JsonWebKeySet parsedJwkSet = new JsonWebKeySet(json);
         Collection<JsonWebKey> webKeyKeyObjects = parsedJwkSet.getJsonWebKeys();
         assertEquals(1, webKeyKeyObjects.size());
-        JsonWebKey jwk = parsedJwkSet.getKey(kid);
-        assertEquals(RsaJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm());
+        JsonWebKey jwk = parsedJwkSet.findJsonWebKey(kid, null, null, null);
+        assertEquals(RsaJsonWebKey.KEY_TYPE_VALUE, jwk.getKeyType());
         assertEquals(kid, jwk.getKeyId());
         assertEquals(Use.SIGNATURE, jwk.getUse());
 
@@ -115,7 +115,7 @@ public class JsonWebKeyTest extends TestCase
     {
         assertTrue(jwk instanceof RsaJsonWebKey);
         assertTrue(jwk.getPublicKey() instanceof RSAPublicKey);
-        assertEquals(RsaJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm());
+        assertEquals(RsaJsonWebKey.KEY_TYPE_VALUE, jwk.getKeyType());
     }
 
     public void testFromEcPublicKeyAndBack() throws JoseException
@@ -136,8 +136,8 @@ public class JsonWebKeyTest extends TestCase
             JsonWebKeySet parsedJwkSet = new JsonWebKeySet(json);
             Collection<JsonWebKey> webKeyKeyObjects = parsedJwkSet.getJsonWebKeys();
             assertEquals(1, webKeyKeyObjects.size());
-            JsonWebKey jwk = parsedJwkSet.getKey(kid);
-            assertEquals(EllipticCurveJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm());
+            JsonWebKey jwk = parsedJwkSet.findJsonWebKey(kid, null, null, null);
+            assertEquals(EllipticCurveJsonWebKey.KEY_TYPE_VALUE, jwk.getKeyType());
             assertEquals(kid, jwk.getKeyId());
             assertEquals(Use.ENCRYPTION, jwk.getUse());
 
@@ -161,7 +161,7 @@ public class JsonWebKeyTest extends TestCase
     {
         assertTrue(jwk.getPublicKey() instanceof ECPublicKey);
         assertTrue(jwk instanceof EllipticCurveJsonWebKey);
-        assertEquals(EllipticCurveJsonWebKey.ALGORITHM_VALUE, jwk.getAlgorithm());
+        assertEquals(EllipticCurveJsonWebKey.KEY_TYPE_VALUE, jwk.getKeyType());
     }
 
     public void testEcSingleJwkToAndFromJson() throws JoseException
@@ -202,6 +202,15 @@ public class JsonWebKeyTest extends TestCase
         JsonWebKey jwk2 = JsonWebKey.Factory.newJwk(jsonOut);
         assertIsRsa(jwk2); 
     }
+
+    public void testJwkSetGetKeys()
+    {
+        List<JsonWebKey> keys = new ArrayList<JsonWebKey>();
+        JsonWebKeySet jwkSet = new JsonWebKeySet(keys);
+
+
+    }
+
 
     // todo think we need a test some place for "The array representation MUST not be shortened to omit
     // any leading zero bytes contained in the value." from jwk/jwa 'cause I'm pretty sure we are (or would be) shortening now

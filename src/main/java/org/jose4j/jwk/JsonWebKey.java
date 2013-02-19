@@ -24,7 +24,6 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.List;
 import java.util.HashMap;
 
 /**
@@ -34,9 +33,11 @@ public abstract class JsonWebKey
     public static final String KEY_TYPE_MEMBER_NAME = "kty";
     public static final String USE_MEMBER_NAME = "use";
     public static final String KEY_ID_MEMBER_NAME = "kid";
+    public static final String ALGORITHM_MEMBER_NAME = "alg";
 
     private String use;
     private String keyId;
+    private String algorithm;
 
     protected PublicKey publicKey;
 
@@ -45,13 +46,14 @@ public abstract class JsonWebKey
         this.publicKey = publicKey;
     }
 
-    public JsonWebKey(Map<String, String> params)
+    protected JsonWebKey(Map<String, String> params)
     {
-        use = params.get(USE_MEMBER_NAME);
-        keyId = params.get(KEY_ID_MEMBER_NAME);
+        setUse(params.get(USE_MEMBER_NAME));
+        setKeyId(params.get(KEY_ID_MEMBER_NAME));
+        setAlgorithm(params.get(ALGORITHM_MEMBER_NAME));
     }
 
-    public abstract String getAlgorithm();
+    public abstract String getKeyType();
     protected abstract void fillTypeSpecificParams(Map<String,String> params);
 
     public String getUse()
@@ -74,6 +76,16 @@ public abstract class JsonWebKey
         this.keyId = keyId;
     }
 
+    public String getAlgorithm()
+    {
+        return algorithm;
+    }
+
+    public void setAlgorithm(String algorithm)
+    {
+        this.algorithm = algorithm;
+    }
+
     public PublicKey getPublicKey()
     {
         return publicKey;
@@ -82,9 +94,10 @@ public abstract class JsonWebKey
     public Map<String, String> toParams()
     {
         Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put(KEY_TYPE_MEMBER_NAME, getAlgorithm());
+        params.put(KEY_TYPE_MEMBER_NAME, getKeyType());
         putIfNotNull(USE_MEMBER_NAME, getUse(), params);
         putIfNotNull(KEY_ID_MEMBER_NAME, getKeyId(), params);
+        putIfNotNull(ALGORITHM_MEMBER_NAME, getAlgorithm(), params);
         fillTypeSpecificParams(params);
         return params;
     }
@@ -115,11 +128,11 @@ public abstract class JsonWebKey
         {
             String alg = params.get(KEY_TYPE_MEMBER_NAME);
 
-            if (RsaJsonWebKey.ALGORITHM_VALUE.equals(alg))
+            if (RsaJsonWebKey.KEY_TYPE_VALUE.equals(alg))
             {
                 return new RsaJsonWebKey(params);
             }
-            else if (EllipticCurveJsonWebKey.ALGORITHM_VALUE.equals(alg))
+            else if (EllipticCurveJsonWebKey.KEY_TYPE_VALUE.equals(alg))
             {
                 return new EllipticCurveJsonWebKey(params);
             }

@@ -31,7 +31,7 @@ public class RsaJsonWebKey extends JsonWebKey
     public static final String MODULUS_MEMBER_NAME = "n";
     public static final String EXPONENT_MEMBER_NAME = "e";
 
-    public static final String ALGORITHM_VALUE = "RSA";
+    public static final String KEY_TYPE_VALUE = "RSA";
 
     public RsaJsonWebKey(RSAPublicKey publicKey)
     {
@@ -51,9 +51,9 @@ public class RsaJsonWebKey extends JsonWebKey
         publicKey = rsaKeyUtil.publicKey(modulus, publicExponent);
     }
 
-    public String getAlgorithm()
+    public String getKeyType()
     {
-        return ALGORITHM_VALUE;
+        return KEY_TYPE_VALUE;
     }
 
     public RSAPublicKey getRSAPublicKey()
