@@ -32,10 +32,10 @@ public class JsonWebKeySet
     public JsonWebKeySet(String json) throws JoseException
     {
         Map<String,Object> parsed = JsonUtil.parseJson(json);
-        List<Map<String,String>> jwkParamMapList = (List<Map<String,String>>) parsed.get(JWK_SET_MEMBER_NAME);
+        List<Map<String,Object>> jwkParamMapList = (List<Map<String,Object>>) parsed.get(JWK_SET_MEMBER_NAME);
 
         keys = new ArrayList<JsonWebKey>(jwkParamMapList.size());
-        for (Map<String,String> jwkParamsMap : jwkParamMapList)
+        for (Map<String,Object> jwkParamsMap : jwkParamMapList)
         {
             keys.add(JsonWebKey.Factory.newJwk(jwkParamsMap));
         }
@@ -94,11 +94,11 @@ public class JsonWebKeySet
 
     public String toJson()
     {
-        LinkedList<Map<String, String>> keyList = new LinkedList<Map<String, String>>();
+        LinkedList<Map<String, Object>> keyList = new LinkedList<Map<String, Object>>();
 
         for (JsonWebKey key : keys)
         {
-            Map<String, String> params = key.toParams();
+            Map<String, Object> params = key.toParams();
             keyList.add(params);
         }
 

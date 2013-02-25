@@ -18,6 +18,7 @@ package org.jose4j.jwk;
 
 import org.jose4j.lang.JoseException;
 import org.jose4j.json.JsonUtil;
+import org.jose4j.lang.MapUtil;
 
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
@@ -30,10 +31,10 @@ import java.util.HashMap;
  */
 public abstract class JsonWebKey
 {
-    public static final String KEY_TYPE_MEMBER_NAME = "kty";
-    public static final String USE_MEMBER_NAME = "use";
-    public static final String KEY_ID_MEMBER_NAME = "kid";
-    public static final String ALGORITHM_MEMBER_NAME = "alg";
+    public static final String KEY_TYPE = "kty";
+    public static final String USE = "use";
+    public static final String KEY_ID = "kid";
+    public static final String ALGORITHM = "alg";
 
     private String use;
     private String keyId;
@@ -46,15 +47,15 @@ public abstract class JsonWebKey
         this.publicKey = publicKey;
     }
 
-    protected JsonWebKey(Map<String, String> params)
+    protected JsonWebKey(Map<String, Object> params)
     {
-        setUse(params.get(USE_MEMBER_NAME));
-        setKeyId(params.get(KEY_ID_MEMBER_NAME));
-        setAlgorithm(params.get(ALGORITHM_MEMBER_NAME));
+        setUse(MapUtil.getString(params, USE));
+        setKeyId(MapUtil.getString(params, KEY_ID));
+        setAlgorithm(MapUtil.getString(params, ALGORITHM));
     }
 
     public abstract String getKeyType();
-    protected abstract void fillTypeSpecificParams(Map<String,String> params);
+    protected abstract void fillTypeSpecificParams(Map<String,Object> params);
 
     public String getUse()
     {
@@ -91,20 +92,20 @@ public abstract class JsonWebKey
         return publicKey;
     }
 
-    public Map<String, String> toParams()
+    public Map<String, Object> toParams()
     {
-        Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put(KEY_TYPE_MEMBER_NAME, getKeyType());
-        putIfNotNull(USE_MEMBER_NAME, getUse(), params);
-        putIfNotNull(KEY_ID_MEMBER_NAME, getKeyId(), params);
-        putIfNotNull(ALGORITHM_MEMBER_NAME, getAlgorithm(), params);
+        Map<String, Object> params = new LinkedHashMap<String, Object>();
+        params.put(KEY_TYPE, getKeyType());
+        putIfNotNull(USE, getUse(), params);
+        putIfNotNull(KEY_ID, getKeyId(), params);
+        putIfNotNull(ALGORITHM, getAlgorithm(), params);
         fillTypeSpecificParams(params);
         return params;
     }
 
     public String toJson()
     {
-        Map<String, String> params = toParams();
+        Map<String, Object> params = toParams();
         return JsonUtil.toJson(params);
     }
 
@@ -114,7 +115,7 @@ public abstract class JsonWebKey
         return getClass().getName() + toParams();
     }
 
-    protected void putIfNotNull(String name, String value, Map<String, String> params)
+    protected void putIfNotNull(String name, String value, Map<String, Object> params)
     {
         if (value != null)
         {
@@ -124,9 +125,9 @@ public abstract class JsonWebKey
 
     public static class Factory
     {
-        public static JsonWebKey newJwk(Map<String,String> params) throws JoseException
+        public static JsonWebKey newJwk(Map<String,Object> params) throws JoseException
         {
-            String alg = params.get(KEY_TYPE_MEMBER_NAME);
+            String alg = MapUtil.getString(params, KEY_TYPE);
 
             if (RsaJsonWebKey.KEY_TYPE_VALUE.equals(alg))
             {
@@ -161,7 +162,7 @@ public abstract class JsonWebKey
         public static JsonWebKey newJwk(String json) throws JoseException
         {
             Map<String, Object> parsed = JsonUtil.parseJson(json);
-            Map<String, String> params = new HashMap<String,String>();
+            Map<String, Object> params = new HashMap<String,Object>();
             for (Map.Entry<String,Object> e : parsed.entrySet())
             {
                 if (String.class.isInstance(e.getValue()))

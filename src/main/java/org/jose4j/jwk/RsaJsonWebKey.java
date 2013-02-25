@@ -19,6 +19,7 @@ package org.jose4j.jwk;
 import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.RsaKeyUtil;
 import org.jose4j.lang.JoseException;
+import org.jose4j.lang.MapUtil;
 
 import java.math.BigInteger;
 import java.security.interfaces.RSAPublicKey;
@@ -38,13 +39,13 @@ public class RsaJsonWebKey extends JsonWebKey
         super(publicKey);
     }
 
-    public RsaJsonWebKey(Map<String, String> params) throws JoseException
+    public RsaJsonWebKey(Map<String, Object> params) throws JoseException
     {
         super(params);
-        String b64Modulus = params.get(MODULUS_MEMBER_NAME);
+        String b64Modulus = MapUtil.getString(params, MODULUS_MEMBER_NAME);
         BigInteger modulus = BigEndianBigInteger.fromBase64Url(b64Modulus);
 
-        String b64Exponent = params.get(EXPONENT_MEMBER_NAME);
+        String b64Exponent = MapUtil.getString(params, EXPONENT_MEMBER_NAME);
         BigInteger publicExponent = BigEndianBigInteger.fromBase64Url(b64Exponent);
 
         RsaKeyUtil rsaKeyUtil = new RsaKeyUtil();
@@ -61,7 +62,7 @@ public class RsaJsonWebKey extends JsonWebKey
         return (RSAPublicKey)publicKey;
     }
 
-    protected void fillTypeSpecificParams(Map<String, String> params)
+    protected void fillTypeSpecificParams(Map<String, Object> params)
     {
         RSAPublicKey rsaPublicKey = getRSAPublicKey();
         BigInteger modulus = rsaPublicKey.getModulus();
