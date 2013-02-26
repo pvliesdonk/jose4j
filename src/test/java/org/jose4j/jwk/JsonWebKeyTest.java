@@ -96,7 +96,7 @@ public class JsonWebKeyTest extends TestCase
         Collection<JsonWebKey> webKeyKeyObjects = parsedJwkSet.getJsonWebKeys();
         assertEquals(1, webKeyKeyObjects.size());
         JsonWebKey jwk = parsedJwkSet.findJsonWebKey(kid, null, null, null);
-        assertEquals(RsaJsonWebKey.KEY_TYPE_VALUE, jwk.getKeyType());
+        assertEquals(RsaJsonWebKey.KEY_TYPE, jwk.getKeyType());
         assertEquals(kid, jwk.getKeyId());
         assertEquals(Use.SIGNATURE, jwk.getUse());
 
@@ -115,7 +115,7 @@ public class JsonWebKeyTest extends TestCase
     {
         assertTrue(jwk instanceof RsaJsonWebKey);
         assertTrue(jwk.getPublicKey() instanceof RSAPublicKey);
-        assertEquals(RsaJsonWebKey.KEY_TYPE_VALUE, jwk.getKeyType());
+        assertEquals(RsaJsonWebKey.KEY_TYPE, jwk.getKeyType());
     }
 
     public void testFromEcPublicKeyAndBack() throws JoseException
@@ -137,7 +137,7 @@ public class JsonWebKeyTest extends TestCase
             Collection<JsonWebKey> webKeyKeyObjects = parsedJwkSet.getJsonWebKeys();
             assertEquals(1, webKeyKeyObjects.size());
             JsonWebKey jwk = parsedJwkSet.findJsonWebKey(kid, null, null, null);
-            assertEquals(EllipticCurveJsonWebKey.KEY_TYPE_VALUE, jwk.getKeyType());
+            assertEquals(EllipticCurveJsonWebKey.KEY_TYPE, jwk.getKeyType());
             assertEquals(kid, jwk.getKeyId());
             assertEquals(Use.ENCRYPTION, jwk.getUse());
 
@@ -161,7 +161,7 @@ public class JsonWebKeyTest extends TestCase
     {
         assertTrue(jwk.getPublicKey() instanceof ECPublicKey);
         assertTrue(jwk instanceof EllipticCurveJsonWebKey);
-        assertEquals(EllipticCurveJsonWebKey.KEY_TYPE_VALUE, jwk.getKeyType());
+        assertEquals(EllipticCurveJsonWebKey.KEY_TYPE, jwk.getKeyType());
     }
 
     public void testEcSingleJwkToAndFromJson() throws JoseException

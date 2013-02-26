@@ -44,7 +44,7 @@ public class RsaKeyUtil
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new IllegalStateException("Couldn't find "+ RSA + "KeyFactory!?!", e);
+            throw new IllegalStateException("Couldn't find "+ RSA + " KeyFactory and/or KeyPairGenerator!?!", e);
         }
     }
 

@@ -20,7 +20,7 @@ import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.EcKeyUtil;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.lang.JoseException;
-import org.jose4j.lang.MapUtil;
+import org.jose4j.lang.JsonHelp;
 
 import java.math.BigInteger;
 import java.security.interfaces.ECPublicKey;
@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class EllipticCurveJsonWebKey extends JsonWebKey
 {
-    public static final String KEY_TYPE_VALUE = "EC";
+    public static final String KEY_TYPE = "EC";
 
     public static final String CURVE_MEMBER_NAME = "crv";
 
@@ -49,13 +49,13 @@ public class EllipticCurveJsonWebKey extends JsonWebKey
     {
         super(params);
 
-        String curveName = MapUtil.getString(params, CURVE_MEMBER_NAME);
+        String curveName = JsonHelp.getString(params, CURVE_MEMBER_NAME);
         ECParameterSpec curve = EllipticCurves.getSpec(curveName);
 
-        String b64x = MapUtil.getString(params, X_MEMBER_NAME);
+        String b64x = JsonHelp.getString(params, X_MEMBER_NAME);
         BigInteger x = BigEndianBigInteger.fromBase64Url(b64x);
 
-        String b64y = MapUtil.getString(params, Y_MEMBER_NAME);
+        String b64y = JsonHelp.getString(params, Y_MEMBER_NAME);
         BigInteger y = BigEndianBigInteger.fromBase64Url(b64y);
 
         EcKeyUtil keyUtil = new EcKeyUtil();
@@ -70,7 +70,7 @@ public class EllipticCurveJsonWebKey extends JsonWebKey
 
     public String getKeyType()
     {
-        return KEY_TYPE_VALUE;
+        return KEY_TYPE;
     }
 
     protected void fillTypeSpecificParams(Map<String, Object> params)

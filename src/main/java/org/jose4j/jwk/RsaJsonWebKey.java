@@ -19,7 +19,7 @@ package org.jose4j.jwk;
 import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.RsaKeyUtil;
 import org.jose4j.lang.JoseException;
-import org.jose4j.lang.MapUtil;
+import org.jose4j.lang.JsonHelp;
 
 import java.math.BigInteger;
 import java.security.interfaces.RSAPublicKey;
@@ -32,7 +32,7 @@ public class RsaJsonWebKey extends JsonWebKey
     public static final String MODULUS_MEMBER_NAME = "n";
     public static final String EXPONENT_MEMBER_NAME = "e";
 
-    public static final String KEY_TYPE_VALUE = "RSA";
+    public static final String KEY_TYPE = "RSA";
 
     public RsaJsonWebKey(RSAPublicKey publicKey)
     {
@@ -42,10 +42,10 @@ public class RsaJsonWebKey extends JsonWebKey
     public RsaJsonWebKey(Map<String, Object> params) throws JoseException
     {
         super(params);
-        String b64Modulus = MapUtil.getString(params, MODULUS_MEMBER_NAME);
+        String b64Modulus = JsonHelp.getString(params, MODULUS_MEMBER_NAME);
         BigInteger modulus = BigEndianBigInteger.fromBase64Url(b64Modulus);
 
-        String b64Exponent = MapUtil.getString(params, EXPONENT_MEMBER_NAME);
+        String b64Exponent = JsonHelp.getString(params, EXPONENT_MEMBER_NAME);
         BigInteger publicExponent = BigEndianBigInteger.fromBase64Url(b64Exponent);
 
         RsaKeyUtil rsaKeyUtil = new RsaKeyUtil();
@@ -54,7 +54,7 @@ public class RsaJsonWebKey extends JsonWebKey
 
     public String getKeyType()
     {
-        return KEY_TYPE_VALUE;
+        return KEY_TYPE;
     }
 
     public RSAPublicKey getRSAPublicKey()

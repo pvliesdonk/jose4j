@@ -51,9 +51,9 @@ public class JsonWebKeySet
         return keys;
     }
 
-    public JsonWebKey findJsonWebKey(String keyId, String use, String keyType, String algorithm)
+    public JsonWebKey findJsonWebKey(String keyId, String keyType, String use, String algorithm)
     {
-        List<JsonWebKey> found = findJsonWebKeys(keyId, use, keyType, algorithm);
+        List<JsonWebKey> found = findJsonWebKeys(keyId, keyType, use, algorithm);
         return found.isEmpty() ? null : found.iterator().next();
     }
 

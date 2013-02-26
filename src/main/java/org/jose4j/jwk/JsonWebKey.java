@@ -18,7 +18,7 @@ package org.jose4j.jwk;
 
 import org.jose4j.lang.JoseException;
 import org.jose4j.json.JsonUtil;
-import org.jose4j.lang.MapUtil;
+import org.jose4j.lang.JsonHelp;
 
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
@@ -31,10 +31,10 @@ import java.util.HashMap;
  */
 public abstract class JsonWebKey
 {
-    public static final String KEY_TYPE = "kty";
-    public static final String USE = "use";
-    public static final String KEY_ID = "kid";
-    public static final String ALGORITHM = "alg";
+    public static final String KEY_TYPE_PARAMETER = "kty";
+    public static final String USE_PARAMETER = "use";
+    public static final String KEY_ID_PARAMETER = "kid";
+    public static final String ALGORITHM_PARAMETER = "alg";
 
     private String use;
     private String keyId;
@@ -49,9 +49,9 @@ public abstract class JsonWebKey
 
     protected JsonWebKey(Map<String, Object> params)
     {
-        setUse(MapUtil.getString(params, USE));
-        setKeyId(MapUtil.getString(params, KEY_ID));
-        setAlgorithm(MapUtil.getString(params, ALGORITHM));
+        setUse(JsonHelp.getString(params, USE_PARAMETER));
+        setKeyId(JsonHelp.getString(params, KEY_ID_PARAMETER));
+        setAlgorithm(JsonHelp.getString(params, ALGORITHM_PARAMETER));
     }
 
     public abstract String getKeyType();
@@ -95,10 +95,10 @@ public abstract class JsonWebKey
     public Map<String, Object> toParams()
     {
         Map<String, Object> params = new LinkedHashMap<String, Object>();
-        params.put(KEY_TYPE, getKeyType());
-        putIfNotNull(USE, getUse(), params);
-        putIfNotNull(KEY_ID, getKeyId(), params);
-        putIfNotNull(ALGORITHM, getAlgorithm(), params);
+        params.put(KEY_TYPE_PARAMETER, getKeyType());
+        putIfNotNull(USE_PARAMETER, getUse(), params);
+        putIfNotNull(KEY_ID_PARAMETER, getKeyId(), params);
+        putIfNotNull(ALGORITHM_PARAMETER, getAlgorithm(), params);
         fillTypeSpecificParams(params);
         return params;
     }
@@ -127,15 +127,19 @@ public abstract class JsonWebKey
     {
         public static JsonWebKey newJwk(Map<String,Object> params) throws JoseException
         {
-            String alg = MapUtil.getString(params, KEY_TYPE);
+            String alg = JsonHelp.getString(params, KEY_TYPE_PARAMETER);
 
-            if (RsaJsonWebKey.KEY_TYPE_VALUE.equals(alg))
+            if (RsaJsonWebKey.KEY_TYPE.equals(alg))
             {
                 return new RsaJsonWebKey(params);
             }
-            else if (EllipticCurveJsonWebKey.KEY_TYPE_VALUE.equals(alg))
+            else if (EllipticCurveJsonWebKey.KEY_TYPE.equals(alg))
             {
                 return new EllipticCurveJsonWebKey(params);
+            }
+            else  if (PkixJsonWebKey.KEY_TYPE.equals(alg))
+            {
+                return new PkixJsonWebKey(params);
             }
             else
             {
@@ -167,7 +171,7 @@ public abstract class JsonWebKey
             {
                 if (String.class.isInstance(e.getValue()))
                 {
-                    params.put(e.getKey(), (String) e.getValue());
+                    params.put(e.getKey(), e.getValue());
                 }
             }
             return newJwk(params);

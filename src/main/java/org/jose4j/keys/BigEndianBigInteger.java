@@ -61,7 +61,7 @@ public class BigEndianBigInteger
         return magnitude;
     }
 
-    public static String toBase64Url(BigInteger bigInteger) //throws JoseException
+    public static String toBase64Url(BigInteger bigInteger)
     {
         Base64Url base64Url = new Base64Url();
         byte[] bytes = toByteArray(bigInteger);
