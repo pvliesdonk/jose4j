@@ -31,4 +31,12 @@ public class X509UtilTest extends TestCase
         assertTrue(x509Certificate.getSubjectDN().toString().contains("Yang"));
     }
 
+    public void testFromGoogleEndpoint() throws JoseException
+    {
+        // took one from https://www.googleapis.com/oauth2/v1/certs
+        String bder = "MIICITCCAYqgAwIBAgIINulGhAa6BxUwDQYJKoZIhvcNAQEFBQAwNjE0MDIGA1UE\nAxMrZmVkZXJhdGVkLXNpZ25vbi5zeXN0ZW0uZ3NlcnZpY2VhY2NvdW50LmNvbTAe\nFw0xMzAyMjYwNTI4MzRaFw0xMzAyMjcxODI4MzRaMDYxNDAyBgNVBAMTK2ZlZGVy\nYXRlZC1zaWdub24uc3lzdGVtLmdzZXJ2aWNlYWNjb3VudC5jb20wgZ8wDQYJKoZI\nhvcNAQEBBQADgY0AMIGJAoGBAL9Q8ogQtQfHVzto3p1xiQjBXxcBceE/LTa9jxv4\nEEp0fkKP9bBz/uRlpGkNnP++qkPb6N6s4+mgF12JbTsyRxb4jfXGobfW2lx6HZkX\nRoCk4mAdu3axEVGlYQq0IIsgvNfFiks0Z2pRkovDshPqXBt0FUemM0M7bVODAsZn\ncE3xAgMBAAGjODA2MAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMBYGA1Ud\nJQEB/wQMMAoGCCsGAQUFBwMCMA0GCSqGSIb3DQEBBQUAA4GBAA38HHhl0cddqDEd\nswuGUcIvPE1QDqlyfYZUZyZPfZ2JSuYj34DdLm31aq8SOAxNRorpyel/n1bxDUfI\nFueGAkh5AySoPsH7wnj/ZigsidGct9yllIcsqeIvFYkOW53rVwpriU3wcEmh+RzI\nLUYyJkbYf3pY8XHeE56dZqzU+E8Y";
+        X509Util x5u = new X509Util();
+        X509Certificate x509Certificate = x5u.fromBase64Der(bder);
+        assertTrue(x509Certificate.getSubjectDN().toString().contains("federated-signon.system.gserviceaccount.com"));
+    }
 }
