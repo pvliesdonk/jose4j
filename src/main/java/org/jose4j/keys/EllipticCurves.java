@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Values for these curve parameters from FIPS PUB 186-3
+ * Values for these curve parameters taken from FIPS PUB 186-3
  * and http://www.nsa.gov/ia/_files/nist-routines.pdf
  */
 public class EllipticCurves
