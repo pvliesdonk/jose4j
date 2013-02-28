@@ -168,6 +168,19 @@ public class PkixJsonWebKeyTest extends TestCase
 
         String backToJson = backToPkixJsonWebKey.toJson();
         assertTrue(backToJson.contains("PKIX"));
-
     }
+
+    public void testSingleKeyFromJson() throws JoseException
+    {
+        String pkixJsonJwkWithEc = "{\"kty\":\"PKIX\",\"use\":\"sig\",\"kid\":\"d\",\"x5c\":[\"MIIBbjCCARKgAwIBAgIGAT0hoG\\/oMAwGCCqGSM49BAMCBQAwPDENMAsGA1UEBhMEbnVsbDErMCkGA1UEAxMiYXV0by1nZW5lcmF0ZWQgd3JhcHBlciBjZXJ0aWZpY2F0ZTAeFw0xMzAyMjgxNjI2MzVaFw0xNDAyMjgxNjI2MzVaMDwxDTALBgNVBAYTBG51bGwxKzApBgNVBAMTImF1dG8tZ2VuZXJhdGVkIHdyYXBwZXIgY2VydGlmaWNhdGUwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARIopZ+ZqdKMMBoDSUZ\\/oNNWXCdAW4+P6XeCVW5l7ZBGd7o5xUMRSJhHviM7fDvgM8uSbd0K\\/x\\/1FUcisfyACI4MAwGCCqGSM49BAMCBQADSAAwRQIgREUJILY6HvWwTrabywi5nshlyuNjMxOexVOZGmIgnPsCIQDEdBfjKVzuqa2DkgQp0PbdwSwwUsI4ypYtP3Bsl7vXnw==\"]}";
+        JsonWebKey pkix = JsonWebKey.Factory.newJwk(pkixJsonJwkWithEc);
+        assertEquals(PkixJsonWebKey.KEY_TYPE, pkix.getKeyType());
+
+        String ecJsonJwk = "{\"kty\":\"EC\",\"use\":\"sig\",\"kid\":\"d\",\"x\":\"SKKWfmanSjDAaA0lGf6DTVlwnQFuPj-l3glVuZe2QRk\",\"y\":\"3ujnFQxFImEe-Izt8O-Azy5Jt3Qr_H_UVRyKx_IAIjg\",\"crv\":\"P-256\"}";
+        JsonWebKey ec = JsonWebKey.Factory.newJwk(ecJsonJwk);
+        assertEquals(EllipticCurveJsonWebKey.KEY_TYPE, ec.getKeyType());
+
+        assertEquals(pkix.getPublicKey(), ec.getPublicKey());
+    }
+
 }

@@ -166,15 +166,7 @@ public abstract class JsonWebKey
         public static JsonWebKey newJwk(String json) throws JoseException
         {
             Map<String, Object> parsed = JsonUtil.parseJson(json);
-            Map<String, Object> params = new HashMap<String,Object>();
-            for (Map.Entry<String,Object> e : parsed.entrySet())
-            {
-                if (String.class.isInstance(e.getValue()))
-                {
-                    params.put(e.getKey(), e.getValue());
-                }
-            }
-            return newJwk(params);
+            return newJwk(parsed);
         }
     }
 }
