@@ -16,7 +16,7 @@
 
 package org.jose4j.jwa;
 
-import org.jose4j.keys.KeyType;
+import org.jose4j.keys.KeyPersuasion;
 
 /**
  */
@@ -24,6 +24,6 @@ public interface Algorithm
 {
     String getJavaAlgorithm();
     String getAlgorithmIdentifier();
-    KeyType getKeyType();
-    String getKeyAlgorithm();
+    KeyPersuasion getKeyPersuasion();
+    String getKeyType();
 }

@@ -18,7 +18,7 @@ package org.jose4j.jws;
 
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.HeaderParameterNames;
-import org.jose4j.keys.KeyType;
+import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 
@@ -33,7 +33,7 @@ public class PlaintextNoneAlgorithm extends AlgorithmInfo implements JsonWebSign
     public PlaintextNoneAlgorithm()
     {
         setAlgorithmIdentifier(AlgorithmIdentifiers.NONE);
-        setKeyType(KeyType.NONE);
+        setKeyPersuasion(KeyPersuasion.NONE);
     }
 
     public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException

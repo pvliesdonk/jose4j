@@ -51,6 +51,8 @@ public class EllipticCurves
 
     public static String getName(EllipticCurve curve)
     {
+        // TODO need to make sure this works with ec keys from outside my little world and
+        // that this lookup isn't working b/c of always using ECParameterSpec defined here
         return curveToName.get(curve);
     }
 

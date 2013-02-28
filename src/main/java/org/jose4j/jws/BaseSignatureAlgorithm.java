@@ -17,7 +17,7 @@
 package org.jose4j.jws;
 
 import org.jose4j.jwa.AlgorithmInfo;
-import org.jose4j.keys.KeyType;
+import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.JoseException;
 
 import java.security.*;
@@ -30,8 +30,8 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
     {
         setAlgorithmIdentifier(id);
         setJavaAlgorithm(javaAlgo);
-        setKeyType(KeyType.ASYMMETRIC);
-        setKeyAlgorithm(keyAlgo);
+        setKeyPersuasion(KeyPersuasion.ASYMMETRIC);
+        setKeyType(keyAlgo);
     }
 
     public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException

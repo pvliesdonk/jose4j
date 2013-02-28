@@ -207,11 +207,15 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
 
         String name = EllipticCurves.getName(curve);
 
-        if (!curveName.endsWith(name))
+        if (!curveName.equals(name))
         {
             throw new JoseException(getAlgorithmIdentifier() + "/" + getJavaAlgorithm() + " expects a key using " +
                     curveName + " but was " + name);
         }
+    }
 
+    public String getCurveName()
+    {
+        return curveName;
     }
 }

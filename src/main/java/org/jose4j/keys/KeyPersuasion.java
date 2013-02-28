@@ -18,7 +18,7 @@ package org.jose4j.keys;
 
 /**
  */
-public enum KeyType
+public enum KeyPersuasion
 {
     NONE, SYMMETRIC, ASYMMETRIC
 }

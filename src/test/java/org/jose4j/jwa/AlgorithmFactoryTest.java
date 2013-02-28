@@ -24,7 +24,7 @@ import org.jose4j.lang.JoseException;
  */
 public class AlgorithmFactoryTest extends TestCase
 {
-    public void testAllJwsKeyTypesNotNull() throws JoseException
+    public void testAllJwsKeyPersuasionsNotNull() throws JoseException
     {
         AlgorithmFactoryFactory algoFactoryFactory = AlgorithmFactoryFactory.getInstance();
         AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory = algoFactoryFactory.getJwsAlgorithmFactory();
@@ -32,7 +32,7 @@ public class AlgorithmFactoryTest extends TestCase
         for (String algo : jwsAlgorithmFactory.getSupportedAlgorithms())
         {
             JsonWebSignatureAlgorithm jsonWebSignatureAlgorithm = jwsAlgorithmFactory.getAlgorithm(algo);
-            assertNotNull(jsonWebSignatureAlgorithm.getKeyType());
+            assertNotNull(jsonWebSignatureAlgorithm.getKeyPersuasion());
         }
     }
 }

@@ -16,16 +16,16 @@
 
 package org.jose4j.jwa;
 
-import org.jose4j.keys.KeyType;
+import org.jose4j.keys.KeyPersuasion;
 
 /**
  */
-public abstract class AlgorithmInfo
+public abstract class AlgorithmInfo implements Algorithm
 {
     private String algorithmIdentifier;
     private String javaAlgorithm;
-    private KeyType keyType;
-    private String keyAlgorithm;
+    private KeyPersuasion keyPersuasion;
+    private String keyType;
 
     public void setAlgorithmIdentifier(String algorithmIdentifier)
     {
@@ -47,23 +47,23 @@ public abstract class AlgorithmInfo
         return algorithmIdentifier;
     }
 
-    public KeyType getKeyType()
+    public KeyPersuasion getKeyPersuasion()
+    {
+        return keyPersuasion;
+    }
+
+    public void setKeyPersuasion(KeyPersuasion keyPersuasion)
+    {
+        this.keyPersuasion = keyPersuasion;
+    }
+
+    public String getKeyType()
     {
         return keyType;
     }
 
-    public void setKeyType(KeyType keyType)
+    public void setKeyType(String keyType)
     {
         this.keyType = keyType;
-    }
-
-    public String getKeyAlgorithm()
-    {
-        return keyAlgorithm;
-    }
-
-    public void setKeyAlgorithm(String keyAlgorithm)
-    {
-        this.keyAlgorithm = keyAlgorithm;
     }
 }

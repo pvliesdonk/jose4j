@@ -40,16 +40,21 @@ public class EllipticCurveJsonWebKey extends JsonWebKey
     public static final String X_MEMBER_NAME = "x";
     public static final String Y_MEMBER_NAME = "y";
 
+    private String curveName;
+
     public EllipticCurveJsonWebKey(ECPublicKey publicKey)
     {
         super(publicKey);
+        ECParameterSpec spec = publicKey.getParams();
+        EllipticCurve curve = spec.getCurve();
+        curveName = EllipticCurves.getName(curve);
     }
 
     public EllipticCurveJsonWebKey(Map<String, Object> params) throws JoseException
     {
         super(params);
 
-        String curveName = JsonHelp.getString(params, CURVE_MEMBER_NAME);
+        curveName = JsonHelp.getString(params, CURVE_MEMBER_NAME);
         ECParameterSpec curve = EllipticCurves.getSpec(curveName);
 
         String b64x = JsonHelp.getString(params, X_MEMBER_NAME);
@@ -73,6 +78,11 @@ public class EllipticCurveJsonWebKey extends JsonWebKey
         return KEY_TYPE;
     }
 
+    public String getCurveName()
+    {
+        return curveName;
+    }
+
     protected void fillTypeSpecificParams(Map<String, Object> params)
     {
         ECPublicKey ecPublicKey = getECPublicKey();
@@ -87,9 +97,6 @@ public class EllipticCurveJsonWebKey extends JsonWebKey
         String b64y = BigEndianBigInteger.toBase64Url(y);
         params.put(Y_MEMBER_NAME, b64y);
 
-        ECParameterSpec spec = ecPublicKey.getParams();
-        EllipticCurve curve = spec.getCurve();
-        String name = EllipticCurves.getName(curve);
-        params.put(CURVE_MEMBER_NAME, name);
+        params.put(CURVE_MEMBER_NAME, curveName);
     }
 }

@@ -22,7 +22,7 @@ import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwx.CompactSerialization;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
-import org.jose4j.keys.KeyType;
+import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 
@@ -91,7 +91,7 @@ public class JsonWebSignature extends JsonWebStructure
         return algorithm.verifySignature(signatureBytes, verificationKey, inputBytes);
     }
 
-    private JsonWebSignatureAlgorithm getAlgorithm() throws JoseException
+    public JsonWebSignatureAlgorithm getAlgorithm() throws JoseException
     {
         String algo = getAlgorithmHeaderValue();
         if (algo == null)
@@ -135,9 +135,14 @@ public class JsonWebSignature extends JsonWebStructure
         this.payloadCharEncoding = payloadCharEncoding;
     }
 
-    public KeyType getKeyType() throws JoseException
+    public String getKeyType() throws JoseException
     {
         return getAlgorithm().getKeyType();
+    }
+
+    public KeyPersuasion getKeyPersuasion() throws JoseException
+    {
+        return getAlgorithm().getKeyPersuasion();
     }
 
     public boolean isDoKeyValidation()

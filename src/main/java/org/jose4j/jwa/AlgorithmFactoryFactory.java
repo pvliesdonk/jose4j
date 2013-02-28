@@ -18,7 +18,7 @@ package org.jose4j.jwa;
 
 import org.jose4j.jwe.*;
 import org.jose4j.jws.JsonWebSignatureAlgorithm;
-import org.jose4j.keys.KeyType;
+import org.jose4j.keys.KeyPersuasion;
 
 import java.security.Key;
 
@@ -73,12 +73,12 @@ public class AlgorithmFactoryFactory
                     return null;  //To change body of implemented methods use File | Settings | File Templates.
                 }
 
-                public KeyType getKeyType()
+                public KeyPersuasion getKeyPersuasion()
                 {
                     return null;  //To change body of implemented methods use File | Settings | File Templates.
                 }
 
-                public String getKeyAlgorithm()
+                public String getKeyType()
                 {
                     return null;  //To change body of implemented methods use File | Settings | File Templates.
                 }
