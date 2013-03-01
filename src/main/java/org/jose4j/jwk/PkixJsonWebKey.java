@@ -15,7 +15,7 @@ public class PkixJsonWebKey extends JsonWebKey
 
     public static final String KEY_TYPE = "PKIX";
 
-    private X509Util x509Util = new X509Util();
+    private transient X509Util x509Util = new X509Util();
 
     private List<X509Certificate> certificateChain;
     private List<String> x5cStrings;

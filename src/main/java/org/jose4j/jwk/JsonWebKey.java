@@ -20,6 +20,7 @@ import org.jose4j.lang.JoseException;
 import org.jose4j.json.JsonUtil;
 import org.jose4j.lang.JsonHelp;
 
+import java.io.Serializable;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -29,7 +30,7 @@ import java.util.HashMap;
 
 /**
  */
-public abstract class JsonWebKey
+public abstract class JsonWebKey implements Serializable
 {
     public static final String KEY_TYPE_PARAMETER = "kty";
     public static final String USE_PARAMETER = "use";
