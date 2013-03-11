@@ -95,7 +95,6 @@ public void testParseJwksAndVerifyJwsExample() throws JoseException
     // An example of signature verification using JSON Web Signature (JWS)
     // where the verification key is obtained from a JSON Web Key Set document.
     //
-    //
 
     // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a public key.
     // A JSON Web Key Set (JWK Set) document is a JSON data structure for representing one or more JSON Web Keys (JWK).
