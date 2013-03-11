@@ -41,6 +41,12 @@ public class JsonWebKeySet
         }
     }
 
+    public JsonWebKeySet(JsonWebKey... keys)
+    {
+        this(Arrays.asList(keys));
+    }
+
+
     public JsonWebKeySet(List<JsonWebKey> keys)
     {
         this.keys = keys;

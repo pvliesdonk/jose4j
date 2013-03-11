@@ -28,6 +28,9 @@ import org.jose4j.jws.EcdsaUsingShaAlgorithm;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.keys.BigEndianBigInteger;
+import org.jose4j.keys.EcKeyUtil;
+import org.jose4j.keys.EllipticCurves;
+import org.jose4j.keys.RsaKeyUtil;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.jwt.ReservedClaimNames;
@@ -63,82 +66,117 @@ public class App
 
     public static void main(String[] args) throws Exception
     {
-        String x509st = "-----BEGIN CERTIFICATE-----\n" +
-                "MIIDQjCCAiqgAwIBAgIGATz/FuLiMA0GCSqGSIb3DQEBBQUAMGIxCzAJBgNVBAYTAlVTMQswCQYD\n" +
-                "VQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRwwGgYDVQQKExNQaW5nIElkZW50aXR5IENvcnAuMRcw\n" +
-                "FQYDVQQDEw5CcmlhbiBDYW1wYmVsbDAeFw0xMzAyMjEyMzI5MTVaFw0xODA4MTQyMjI5MTVaMGIx\n" +
-                "CzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRwwGgYDVQQKExNQaW5n\n" +
-                "IElkZW50aXR5IENvcnAuMRcwFQYDVQQDEw5CcmlhbiBDYW1wYmVsbDCCASIwDQYJKoZIhvcNAQEB\n" +
-                "BQADggEPADCCAQoCggEBAL64zn8/QnHYMeZ0LncoXaEde1fiLm1jHjmQsF/449IYALM9if6amFtP\n" +
-                "Dy2yvz3YlRij66s5gyLCyO7ANuVRJx1NbgizcAblIgjtdf/u3WG7K+IiZhtELto/A7Fck9Ws6SQv\n" +
-                "zRvOE8uSirYbgmj6He4iO8NCyvaK0jIQRMMGQwsU1quGmFgHIXPLfnpnfajr1rVTAwtgV5LEZ4Ie\n" +
-                "l+W1GC8ugMhyr4/p1MtcIM42EA8BzE6ZQqC7VPqPvEjZ2dbZkaBhPbiZAS3YeYBRDWm1p1OZtWam\n" +
-                "T3cEvqqPpnjL1XyW+oyVVkaZdklLQp2Btgt9qr21m42f4wTw+Xrp6rCKNb0CAwEAATANBgkqhkiG\n" +
-                "9w0BAQUFAAOCAQEAh8zGlfSlcI0o3rYDPBB07aXNswb4ECNIKG0CETTUxmXl9KUL+9gGlqCz5iWL\n" +
-                "OgWsnrcKcY0vXPG9J1r9AqBNTqNgHq2G03X09266X5CpOe1zFo+Owb1zxtp3PehFdfQJ610CDLEa\n" +
-                "S9V9Rqp17hCyybEpOGVwe8fnk+fbEL2Bo3UPGrpsHzUoaGpDftmWssZkhpBJKVMJyf/RuP2SmmaI\n" +
-                "zmnw9JiSlYhzo4tpzd5rFXhjRbg4zW9C+2qok+2+qDM1iJ684gPHMIY8aLWrdgQTxkumGmTqgawR\n" +
-                "+N5MDtdPTEQ0XfIBc2cJEUyMTY5MPvACWpkA6SdS4xSvdXK3IVfOWA==\n" +
-                "-----END CERTIFICATE-----\n";
+        EcKeyUtil ecku = new EcKeyUtil();
 
-        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-        Collection<? extends Certificate> collection = certFactory.generateCertificates(new ByteArrayInputStream(x509st.getBytes()));
-        Certificate next = collection.iterator().next();
-        PublicKey publicKey = next.getPublicKey();
+        KeyPair keyPair = ecku.generateKeyPair(EllipticCurves.P256);
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(keyPair.getPublic());
+        jwk.setUse(Use.SIGNATURE);
+        jwk.setKeyId("the key");
 
-        JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk(publicKey);
-        jsonWebKey.setUse(Use.SIGNATURE);
-        jsonWebKey.setKeyId("1b94c");
-        JsonWebKeySet jwkset = new JsonWebKeySet(Arrays.asList(jsonWebKey));
+        KeyPair keyPair2 = ecku.generateKeyPair(EllipticCurves.P256);
+        JsonWebKey jwk2 = JsonWebKey.Factory.newJwk(keyPair2.getPublic());
+        jwk2.setUse(Use.SIGNATURE);
+        jwk2.setKeyId("other key");
 
-        System.out.println(jwkset.toJson());
+        JsonWebKeySet jwks = new JsonWebKeySet(jwk, jwk2);
+        System.out.println(jwks.toJson());
 
-        String keyset = "{\"keys\":[\n" +
-                " {\"kty\":\"RSA\",\n" +
-                "  \"use\":\"sig\",\n" +
-                "  \"kid\":\"1b94c\",\n" +
-                "  \"n\":\"vrjOfz9Ccdgx5nQudyhdoR17V-IubWMeOZCwX_jj0hgAsz2J_pqYW08PLbK_PdiVGKPrqzmDIsLI7sA25VEnHU1uCLNwBuUiCO11_-7dYbsr4iJmG0Qu2j8DsVyT1azpJC_NG84Ty5KKthuCaPod7iI7w0LK9orSMhBEwwZDCxTWq4aYWAchc8t-emd9qOvWtVMDC2BXksRngh6X5bUYLy6AyHKvj-nUy1wgzjYQDwHMTplCoLtU-o-8SNnZ1tmRoGE9uJkBLdh5gFENabWnU5m1ZqZPdwS-qo-meMvVfJb6jJVWRpl2SUtCnYG2C32qvbWbjZ_jBPD5eunqsIo1vQ\",\n" +
-                "  \"e\":\"AQAB\"},\n" +
-                " {\"kty\":\"PKIX\",\n" +
-                "  \"use\":\"sig\",\n" +
-                "  \"kid\":\"1b94c\",\n" +
-   "  \"x5c\":[\"MIIDQjCCAiqgAwIBAgIGATz/FuLiMA0GCSqGSIb3DQEBBQUAMGIxCzAJBgNVBAYTAlVTMQswCQYD\n" +
-                "VQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRwwGgYDVQQKExNQaW5nIElkZW50aXR5IENvcnAuMRcw\n" +
-                "FQYDVQQDEw5CcmlhbiBDYW1wYmVsbDAeFw0xMzAyMjEyMzI5MTVaFw0xODA4MTQyMjI5MTVaMGIx\n" +
-                "CzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRwwGgYDVQQKExNQaW5n\n" +
-                "IElkZW50aXR5IENvcnAuMRcwFQYDVQQDEw5CcmlhbiBDYW1wYmVsbDCCASIwDQYJKoZIhvcNAQEB\n" +
-                "BQADggEPADCCAQoCggEBAL64zn8/QnHYMeZ0LncoXaEde1fiLm1jHjmQsF/449IYALM9if6amFtP\n" +
-                "Dy2yvz3YlRij66s5gyLCyO7ANuVRJx1NbgizcAblIgjtdf/u3WG7K+IiZhtELto/A7Fck9Ws6SQv\n" +
-                "zRvOE8uSirYbgmj6He4iO8NCyvaK0jIQRMMGQwsU1quGmFgHIXPLfnpnfajr1rVTAwtgV5LEZ4Ie\n" +
-                "l+W1GC8ugMhyr4/p1MtcIM42EA8BzE6ZQqC7VPqPvEjZ2dbZkaBhPbiZAS3YeYBRDWm1p1OZtWam\n" +
-                "T3cEvqqPpnjL1XyW+oyVVkaZdklLQp2Btgt9qr21m42f4wTw+Xrp6rCKNb0CAwEAATANBgkqhkiG\n" +
-                "9w0BAQUFAAOCAQEAh8zGlfSlcI0o3rYDPBB07aXNswb4ECNIKG0CETTUxmXl9KUL+9gGlqCz5iWL\n" +
-                "OgWsnrcKcY0vXPG9J1r9AqBNTqNgHq2G03X09266X5CpOe1zFo+Owb1zxtp3PehFdfQJ610CDLEa\n" +
-                "S9V9Rqp17hCyybEpOGVwe8fnk+fbEL2Bo3UPGrpsHzUoaGpDftmWssZkhpBJKVMJyf/RuP2SmmaI\n" +
-                "zmnw9JiSlYhzo4tpzd5rFXhjRbg4zW9C+2qok+2+qDM1iJ684gPHMIY8aLWrdgQTxkumGmTqgawR\n" +
-                "+N5MDtdPTEQ0XfIBc2cJEUyMTY5MPvACWpkA6SdS4xSvdXK3IVfOWA==\"]}\n" +
-                "]}";
-        Map<String, Object> stringObjectMap = JsonUtil.parseJson(keyset);
-        System.out.println(stringObjectMap);
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
+        jws.setKeyIdHeaderValue("the key");
+        jws.setKey(keyPair.getPrivate());
+        jws.setPayload("PAYLOAD!");
 
-//        JsonWebSignature jws = new JsonWebSignature();
-//        Map payload =  new LinkedHashMap();
-//
-//        payload.put(ReservedClaimNames.ISSUER, "https://idp.example.com");
-//        IntDate date = IntDate.now();
-//        payload.put(ReservedClaimNames.EXPIRATION_TIME, date.getValue());
-//        payload.put(ReservedClaimNames.AUDIENCE, "https://sp.example.org");
-//        payload.put(ReservedClaimNames.JWT_ID, "tmYvYVU2x8LvN72B5Q_EacH._5A");
-//        payload.put("acr", "2");
-//        payload.put("sub", "Brian");
-//
-//        jws.setPayload(JSONObject.toJSONString(payload));
-//        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
-//        jws.setKey(ExampleEcKeysFromJws.PRIVATE_256);
-//        System.out.println(jws.getCompactSerialization());
-//        System.out.println(jws.getHeader() + "." + jws.getPayload() + ".<SIGNATURE>");
-//        System.out.println();
+        String compactSerialization = jws.getCompactSerialization();
+
+        System.out.println(compactSerialization);
+
     }
+
+//    public static void someJwksStuff()
+//    {
+//        String x509st = "-----BEGIN CERTIFICATE-----\n" +
+//                    "MIIDQjCCAiqgAwIBAgIGATz/FuLiMA0GCSqGSIb3DQEBBQUAMGIxCzAJBgNVBAYTAlVTMQswCQYD\n" +
+//                    "VQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRwwGgYDVQQKExNQaW5nIElkZW50aXR5IENvcnAuMRcw\n" +
+//                    "FQYDVQQDEw5CcmlhbiBDYW1wYmVsbDAeFw0xMzAyMjEyMzI5MTVaFw0xODA4MTQyMjI5MTVaMGIx\n" +
+//                    "CzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRwwGgYDVQQKExNQaW5n\n" +
+//                    "IElkZW50aXR5IENvcnAuMRcwFQYDVQQDEw5CcmlhbiBDYW1wYmVsbDCCASIwDQYJKoZIhvcNAQEB\n" +
+//                    "BQADggEPADCCAQoCggEBAL64zn8/QnHYMeZ0LncoXaEde1fiLm1jHjmQsF/449IYALM9if6amFtP\n" +
+//                    "Dy2yvz3YlRij66s5gyLCyO7ANuVRJx1NbgizcAblIgjtdf/u3WG7K+IiZhtELto/A7Fck9Ws6SQv\n" +
+//                    "zRvOE8uSirYbgmj6He4iO8NCyvaK0jIQRMMGQwsU1quGmFgHIXPLfnpnfajr1rVTAwtgV5LEZ4Ie\n" +
+//                    "l+W1GC8ugMhyr4/p1MtcIM42EA8BzE6ZQqC7VPqPvEjZ2dbZkaBhPbiZAS3YeYBRDWm1p1OZtWam\n" +
+//                    "T3cEvqqPpnjL1XyW+oyVVkaZdklLQp2Btgt9qr21m42f4wTw+Xrp6rCKNb0CAwEAATANBgkqhkiG\n" +
+//                    "9w0BAQUFAAOCAQEAh8zGlfSlcI0o3rYDPBB07aXNswb4ECNIKG0CETTUxmXl9KUL+9gGlqCz5iWL\n" +
+//                    "OgWsnrcKcY0vXPG9J1r9AqBNTqNgHq2G03X09266X5CpOe1zFo+Owb1zxtp3PehFdfQJ610CDLEa\n" +
+//                    "S9V9Rqp17hCyybEpOGVwe8fnk+fbEL2Bo3UPGrpsHzUoaGpDftmWssZkhpBJKVMJyf/RuP2SmmaI\n" +
+//                    "zmnw9JiSlYhzo4tpzd5rFXhjRbg4zW9C+2qok+2+qDM1iJ684gPHMIY8aLWrdgQTxkumGmTqgawR\n" +
+//                    "+N5MDtdPTEQ0XfIBc2cJEUyMTY5MPvACWpkA6SdS4xSvdXK3IVfOWA==\n" +
+//                    "-----END CERTIFICATE-----\n";
+//
+//            CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+//            Collection<? extends Certificate> collection = certFactory.generateCertificates(new ByteArrayInputStream(x509st.getBytes()));
+//            Certificate next = collection.iterator().next();
+//            PublicKey publicKey = next.getPublicKey();
+//
+//            JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk(publicKey);
+//            jsonWebKey.setUse(Use.SIGNATURE);
+//            jsonWebKey.setKeyId("1b94c");
+//            JsonWebKeySet jwkset = new JsonWebKeySet(Arrays.asList(jsonWebKey));
+//
+//            System.out.println(jwkset.toJson());
+//
+//            String keyset = "{\"keys\":[\n" +
+//                    " {\"kty\":\"RSA\",\n" +
+//                    "  \"use\":\"sig\",\n" +
+//                    "  \"kid\":\"1b94c\",\n" +
+//                    "  \"n\":\"vrjOfz9Ccdgx5nQudyhdoR17V-IubWMeOZCwX_jj0hgAsz2J_pqYW08PLbK_PdiVGKPrqzmDIsLI7sA25VEnHU1uCLNwBuUiCO11_-7dYbsr4iJmG0Qu2j8DsVyT1azpJC_NG84Ty5KKthuCaPod7iI7w0LK9orSMhBEwwZDCxTWq4aYWAchc8t-emd9qOvWtVMDC2BXksRngh6X5bUYLy6AyHKvj-nUy1wgzjYQDwHMTplCoLtU-o-8SNnZ1tmRoGE9uJkBLdh5gFENabWnU5m1ZqZPdwS-qo-meMvVfJb6jJVWRpl2SUtCnYG2C32qvbWbjZ_jBPD5eunqsIo1vQ\",\n" +
+//                    "  \"e\":\"AQAB\"},\n" +
+//                    " {\"kty\":\"PKIX\",\n" +
+//                    "  \"use\":\"sig\",\n" +
+//                    "  \"kid\":\"1b94c\",\n" +
+//                    "  \"x5c\":[\"MIIDQjCCAiqgAwIBAgIGATz/FuLiMA0GCSqGSIb3DQEBBQUAMGIxCzAJBgNVBAYTAlVTMQswCQYD\n" +
+//                    "VQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRwwGgYDVQQKExNQaW5nIElkZW50aXR5IENvcnAuMRcw\n" +
+//                    "FQYDVQQDEw5CcmlhbiBDYW1wYmVsbDAeFw0xMzAyMjEyMzI5MTVaFw0xODA4MTQyMjI5MTVaMGIx\n" +
+//                    "CzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRwwGgYDVQQKExNQaW5n\n" +
+//                    "IElkZW50aXR5IENvcnAuMRcwFQYDVQQDEw5CcmlhbiBDYW1wYmVsbDCCASIwDQYJKoZIhvcNAQEB\n" +
+//                    "BQADggEPADCCAQoCggEBAL64zn8/QnHYMeZ0LncoXaEde1fiLm1jHjmQsF/449IYALM9if6amFtP\n" +
+//                    "Dy2yvz3YlRij66s5gyLCyO7ANuVRJx1NbgizcAblIgjtdf/u3WG7K+IiZhtELto/A7Fck9Ws6SQv\n" +
+//                    "zRvOE8uSirYbgmj6He4iO8NCyvaK0jIQRMMGQwsU1quGmFgHIXPLfnpnfajr1rVTAwtgV5LEZ4Ie\n" +
+//                    "l+W1GC8ugMhyr4/p1MtcIM42EA8BzE6ZQqC7VPqPvEjZ2dbZkaBhPbiZAS3YeYBRDWm1p1OZtWam\n" +
+//                    "T3cEvqqPpnjL1XyW+oyVVkaZdklLQp2Btgt9qr21m42f4wTw+Xrp6rCKNb0CAwEAATANBgkqhkiG\n" +
+//                    "9w0BAQUFAAOCAQEAh8zGlfSlcI0o3rYDPBB07aXNswb4ECNIKG0CETTUxmXl9KUL+9gGlqCz5iWL\n" +
+//                    "OgWsnrcKcY0vXPG9J1r9AqBNTqNgHq2G03X09266X5CpOe1zFo+Owb1zxtp3PehFdfQJ610CDLEa\n" +
+//                    "S9V9Rqp17hCyybEpOGVwe8fnk+fbEL2Bo3UPGrpsHzUoaGpDftmWssZkhpBJKVMJyf/RuP2SmmaI\n" +
+//                    "zmnw9JiSlYhzo4tpzd5rFXhjRbg4zW9C+2qok+2+qDM1iJ684gPHMIY8aLWrdgQTxkumGmTqgawR\n" +
+//                    "+N5MDtdPTEQ0XfIBc2cJEUyMTY5MPvACWpkA6SdS4xSvdXK3IVfOWA==\"]}\n" +
+//                    "]}";
+//            Map<String, Object> stringObjectMap = JsonUtil.parseJson(keyset);
+//            System.out.println(stringObjectMap);
+//
+//    }
+
+
+//    public static void someExampleOrSomething()
+//    {
+        //        JsonWebSignature jws = new JsonWebSignature();
+        //        Map payload =  new LinkedHashMap();
+        //
+        //        payload.put(ReservedClaimNames.ISSUER, "https://idp.example.com");
+        //        IntDate date = IntDate.now();
+        //        payload.put(ReservedClaimNames.EXPIRATION_TIME, date.getValue());
+        //        payload.put(ReservedClaimNames.AUDIENCE, "https://sp.example.org");
+        //        payload.put(ReservedClaimNames.JWT_ID, "tmYvYVU2x8LvN72B5Q_EacH._5A");
+        //        payload.put("acr", "2");
+        //        payload.put("sub", "Brian");
+        //
+        //        jws.setPayload(JSONObject.toJSONString(payload));
+        //        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
+        //        jws.setKey(ExampleEcKeysFromJws.PRIVATE_256);
+        //        System.out.println(jws.getCompactSerialization());
+        //        System.out.println(jws.getHeader() + "." + jws.getPayload() + ".<SIGNATURE>");
+        //        System.out.println();
+//    }
+
 
 //
 //    public static void someECstuff() throws Exception
