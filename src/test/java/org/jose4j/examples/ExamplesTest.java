@@ -96,10 +96,11 @@ public void testParseJwksAndVerifyJwsExample() throws JoseException
     // where the verification key is obtained from a JSON Web Key Set document.
     //
 
-    // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a public key.
-    // A JSON Web Key Set (JWK Set) document is a JSON data structure for representing one or more JSON Web Keys (JWK).
-    // A JWK Set might, for example, be obtained from an HTTPS endpoint controlled by the signer but this example
-    // presumes the JWK Set JSON has already been acquired by some (secure/trusted) means.
+    // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents
+    // a public key. A JSON Web Key Set (JWK Set) document is a JSON data structure for
+    // representing one or more JSON Web Keys (JWK). A JWK Set might, for example, be obtained
+    // from an HTTPS endpoint controlled by the signer but this example presumes the JWK Set JSON
+    // has already been acquired by some (secure/trusted) means.
     String jsonWebKeySetJson = "{\"keys\":[" +
             "{\"kty\":\"EC\",\"use\":\"sig\"," +
              "\"kid\":\"the key\"," +
