@@ -62,7 +62,7 @@ public class JsonWebSignature extends JsonWebStructure
     public String getCompactSerialization() throws JoseException
     {
         this.sign();
-        return CompactSerialization.serialize(getSecuredInput(), getEncodedSignature());
+        return CompactSerialization.serialize(getSigningInput(), getEncodedSignature());
     }
 
     private void sign() throws JoseException
@@ -73,7 +73,7 @@ public class JsonWebSignature extends JsonWebStructure
         {
             algorithm.validateSigningKey(signingKey);
         }
-        byte[] inputBytes = getSecuredInputBytes();
+        byte[] inputBytes = getSigningInputBytes();
         byte[] signatureBytes = algorithm.sign(signingKey, inputBytes);
         setSignature(signatureBytes);
     }
@@ -87,7 +87,7 @@ public class JsonWebSignature extends JsonWebStructure
             algorithm.validateVerificationKey(verificationKey);
         }
         byte[] signatureBytes = getSignature();
-        byte[] inputBytes = getSecuredInputBytes();
+        byte[] inputBytes = getSigningInputBytes();
         return algorithm.verifySignature(signatureBytes, verificationKey, inputBytes);
     }
 
@@ -104,13 +104,13 @@ public class JsonWebSignature extends JsonWebStructure
         return jwsAlgorithmFactory.getAlgorithm(algo);
     }
 
-    private byte[] getSecuredInputBytes() throws JoseException
+    private byte[] getSigningInputBytes() throws JoseException
     {
-        String securedInput = getSecuredInput();
-        return StringUtil.getBytesUtf8(securedInput);
+        String signingInput = getSigningInput();
+        return StringUtil.getBytesAscii(signingInput);
     }
 
-    private String getSecuredInput() throws JoseException
+    private String getSigningInput() throws JoseException
     {
         return CompactSerialization.serialize(getEncodedHeader(), getEncodedPayload());
     }
