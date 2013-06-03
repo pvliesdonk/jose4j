@@ -16,12 +16,14 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.mac.MacUtil;
+
 /**
  */
 public class HmacUsingSha384Algorithm extends HmacUsingShaAlgorithm
 {
     public HmacUsingSha384Algorithm()
     {
-        super(AlgorithmIdentifiers.HMAC_SHA384, "HmacSHA384", 384);
+        super(AlgorithmIdentifiers.HMAC_SHA384, MacUtil.HMAC_SHA384, 384);
     }
 }

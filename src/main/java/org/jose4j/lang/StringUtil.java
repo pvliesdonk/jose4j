@@ -40,6 +40,11 @@ public class StringUtil
         return getBytesUnchecked(string, UTF_8);
     }
 
+    public static byte[] getBytesAscii(String string)
+    {
+        return getBytesUnchecked(string, CharEncoding.US_ASCII);
+    }
+
     public static byte[] getBytesUnchecked(String string, String charsetName)
     {
         return StringUtils.getBytesUnchecked(string, charsetName);

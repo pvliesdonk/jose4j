@@ -21,6 +21,7 @@ import org.jose4j.keys.HmacKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
+import org.jose4j.mac.MacUtil;
 
 import javax.crypto.Mac;
 import java.security.InvalidKeyException;
@@ -72,18 +73,7 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
 
     private Mac getMacInstance() throws JoseException
     {
-        Mac mac;
-
-        try
-        {
-            mac = Mac.getInstance(getJavaAlgorithm());
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new JoseException("Unable to get an implementation of algorithm name: " + getJavaAlgorithm(), e);
-        }
-
-        return /* of the */ mac;
+        return MacUtil.getMac(getJavaAlgorithm());
     }
 
     void validateKey(Key key) throws JoseException

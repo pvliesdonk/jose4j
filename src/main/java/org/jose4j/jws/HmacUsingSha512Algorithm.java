@@ -16,12 +16,14 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.mac.MacUtil;
+
 /**
  */
 public class HmacUsingSha512Algorithm extends HmacUsingShaAlgorithm
 {
     public HmacUsingSha512Algorithm()
     {
-        super(AlgorithmIdentifiers.HMAC_SHA512, "HmacSHA512", 512);
+        super(AlgorithmIdentifiers.HMAC_SHA512, MacUtil.HMAC_SHA512, 512);
     }
 }
