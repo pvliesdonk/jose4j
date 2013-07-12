@@ -17,6 +17,8 @@
 package org.jose4j.jws;
 
 import junit.framework.TestCase;
+import org.jose4j.base64url.Base64Url;
+import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
@@ -60,5 +62,16 @@ public class JwsUsingHmacSha256ExampleTest extends TestCase
         String compactSerialization = jws.getCompactSerialization();
 
         assertEquals("example jws value doesn't match calculated compact serialization", JWS, compactSerialization);
+    }
+
+    public void testKey11to12()
+    {
+        // draft 12 used a JWK encoding of the symmetric key where previously it was an octet sequence
+        // and this is just a sanity check that it didn't change and my stuff sees them as the same
+        // may want to redo some of this if/when symmetric key support gets added to this JWK impl
+        String k = "AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow";
+        Base64Url base64Url = new Base64Url();
+        String encodedKey = base64Url.base64UrlEncode(KEY_SIGNED_BYTES);
+        assertEquals(k, encodedKey);
     }
 }
