@@ -27,10 +27,7 @@ import org.jose4j.jwk.Use;
 import org.jose4j.jws.EcdsaUsingShaAlgorithm;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jws.AlgorithmIdentifiers;
-import org.jose4j.keys.BigEndianBigInteger;
-import org.jose4j.keys.EcKeyUtil;
-import org.jose4j.keys.EllipticCurves;
-import org.jose4j.keys.RsaKeyUtil;
+import org.jose4j.keys.*;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.jwt.ReservedClaimNames;
@@ -173,6 +170,41 @@ public class App
         MacUtil.getMac(MacUtil.HMAC_SHA256);
 
 
+    }
+
+    public static void mainForCISPreso(String... args) throws JoseException
+    {
+        String claims = "{\n\"iss\":\"https:\\/\\/idp.example.com\",\n" +
+                "\"exp\":1357255788,\n" +
+                "\"aud\":\"https:\\/\\/sp.example.org\",\n" +
+                "\"jti\":\"tmYvYVU2x8LvN72B5Q_EacH._5A\",\n" +
+                "\"acr\":\"2\",\n" +
+                "\"sub\":\"Brian\"\n}";
+
+        Map<String, Object> claimsMap = JsonUtil.parseJson(claims);
+
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setPayload((claims));
+        jws.setKeyIdHeaderValue("5");
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
+        jws.setKey(ExampleEcKeysFromJws.PRIVATE_256);
+
+        String compactSerialization = jws.getCompactSerialization();
+        System.out.println(compactSerialization);
+
+        System.out.println(jws.getHeader());
+        System.out.println(jws.getPayload());
+
+        EcKeyUtil ku = new EcKeyUtil();
+        JsonWebKey jwk4 = JsonWebKey.Factory.newJwk(ku.generateKeyPair(EllipticCurves.P256).getPublic());
+        jwk4.setKeyId("4");
+        JsonWebKey jwk5 = JsonWebKey.Factory.newJwk(ExampleEcKeysFromJws.PUBLIC_256);
+        jwk5.setKeyId("5");
+        JsonWebKey jwk6 = JsonWebKey.Factory.newJwk(ku.generateKeyPair(EllipticCurves.P256).getPublic());
+        jwk6.setKeyId("6");
+        JsonWebKeySet jwks = new JsonWebKeySet(jwk4, jwk5, jwk6);
+
+        System.out.println(jwks.toJson());
     }
 
     public static void someJwkEcJwsStuff()
