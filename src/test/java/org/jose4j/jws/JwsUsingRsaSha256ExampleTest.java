@@ -17,8 +17,14 @@
 package org.jose4j.jws;
 
 import junit.framework.TestCase;
+import org.jose4j.base64url.Base64Url;
+import org.jose4j.json.JsonUtil;
+import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.JoseException;
+
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  */
@@ -44,5 +50,35 @@ public class JwsUsingRsaSha256ExampleTest extends TestCase
         String compactSerialization = jws.getCompactSerialization();
 
         assertEquals("example jws value doesn't match calculated compact serialization", JWS, compactSerialization);
+    }
+
+    public void testKey11to12() throws Exception
+    {
+        // draft 12 used a JWK encoding of the key where previously it was octet sequences
+        // and this is just a sanity check that it didn't change and my stuff sees them as the same
+        // may want to redo some of the ExampleRsaKeyFromJws to just use the JWK serialization at some point
+        // if private key support is added
+        String jwkJson = "     {\"kty\":\"RSA\",\n" +
+                "      \"n\":\"ofgWCuLjybRlzo0tZWJjNiuSfb4p4fAkd_wWJcyQoTbji9k0l8W26mPddx\n" +
+                "           HmfHQp-Vaw-4qPCJrcS2mJPMEzP1Pt0Bm4d4QlL-yRT-SFd2lZS-pCgNMs\n" +
+                "           D1W_YpRPEwOWvG6b32690r2jZ47soMZo9wGzjb_7OMg0LOL-bSf63kpaSH\n" +
+                "           SXndS5z5rexMdbBYUsLA9e-KXBdQOS-UTo7WTBEMa2R2CapHg665xsmtdV\n" +
+                "           MTBQY4uDZlxvb3qCo5ZwKh9kG4LT6_I5IhlJH7aGhyxXFvUK-DWNmoudF8\n" +
+                "           NAco9_h9iaGNj8q2ethFkMLs91kzk2PAcDTW9gb54h4FRWyuXpoQ\",\n" +
+                "      \"e\":\"AQAB\",\n" +
+                "      \"d\":\"Eq5xpGnNCivDflJsRQBXHx1hdR1k6Ulwe2JZD50LpXyWPEAeP88vLNO97I\n" +
+                "           jlA7_GQ5sLKMgvfTeXZx9SE-7YwVol2NXOoAJe46sui395IW_GO-pWJ1O0\n" +
+                "           BkTGoVEn2bKVRUCgu-GjBVaYLU6f3l9kJfFNS3E0QbVdxzubSu3Mkqzjkn\n" +
+                "           439X0M_V51gfpRLI9JYanrC4D4qAdGcopV_0ZHHzQlBjudU2QvXt4ehNYT\n" +
+                "           CBr6XCLQUShb1juUO1ZdiYoFaFQT5Tw8bGUl_x_jTj3ccPDVZFD9pIuhLh\n" +
+                "           BOneufuBiB4cS98l2SR_RQyGWSeWjnczT0QU91p1DhOVRuOopznQ\"\n" +
+                "     }";
+        Map<String, Object> parsed = JsonUtil.parseJson(jwkJson);
+        JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk(parsed);
+        assertTrue(jsonWebKey.getPublicKey().equals(ExampleRsaKeyFromJws.PUBLIC_KEY));
+        String d = (String)parsed.get("d");
+        Base64Url base64Url = new Base64Url();
+        byte[] privateExp = base64Url.base64UrlDecode(d);
+        assertTrue(Arrays.equals(ExampleRsaKeyFromJws.D_SIGNED_BYTES, privateExp));
     }
 }
