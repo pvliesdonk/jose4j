@@ -138,10 +138,6 @@ public abstract class JsonWebKey implements Serializable
             {
                 return new EllipticCurveJsonWebKey(params);
             }
-            else  if (PkixJsonWebKey.KEY_TYPE.equals(alg))
-            {
-                return new PkixJsonWebKey(params);
-            }
             else
             {
                 throw new JoseException("Unknown key algorithm: " + alg);
