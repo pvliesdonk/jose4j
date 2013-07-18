@@ -75,7 +75,7 @@ public class JwsUsingRsaSha256ExampleTest extends TestCase
                 "     }";
         Map<String, Object> parsed = JsonUtil.parseJson(jwkJson);
         JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk(parsed);
-        assertTrue(jsonWebKey.getPublicKey().equals(ExampleRsaKeyFromJws.PUBLIC_KEY));
+        assertTrue(jsonWebKey.getKey().equals(ExampleRsaKeyFromJws.PUBLIC_KEY));
         String d = (String)parsed.get("d");
         Base64Url base64Url = new Base64Url();
         byte[] privateExp = base64Url.base64UrlDecode(d);

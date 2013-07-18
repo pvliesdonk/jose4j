@@ -73,5 +73,7 @@ public class JwsUsingHmacSha256ExampleTest extends TestCase
         Base64Url base64Url = new Base64Url();
         String encodedKey = base64Url.base64UrlEncode(KEY_SIGNED_BYTES);
         assertEquals(k, encodedKey);
+
+
     }
 }

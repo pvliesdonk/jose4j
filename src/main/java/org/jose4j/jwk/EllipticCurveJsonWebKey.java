@@ -31,7 +31,7 @@ import java.util.Map;
 
 /**
  */
-public class EllipticCurveJsonWebKey extends JsonWebKey
+public class EllipticCurveJsonWebKey extends PublicJsonWebKey
 {
     public static final String KEY_TYPE = "EC";
 
@@ -66,6 +66,7 @@ public class EllipticCurveJsonWebKey extends JsonWebKey
         EcKeyUtil keyUtil = new EcKeyUtil();
 
         publicKey = keyUtil.publicKey(x, y, curve);
+        key = publicKey;
     }
 
     public ECPublicKey getECPublicKey()

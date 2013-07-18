@@ -66,10 +66,10 @@ public class JsonWebKeyTest extends TestCase
         JsonWebKey webKey1 = jwkSet.findJsonWebKey("1", null, null, null);
         assertTrue(webKey1 instanceof EllipticCurveJsonWebKey);
         assertEquals(Use.ENCRYPTION, webKey1.getUse());
-        assertNotNull(webKey1.getPublicKey());
+        assertNotNull(webKey1.getKey());
         JsonWebKey webKey2011 = jwkSet.findJsonWebKey("2011-04-29", null, null, null);
         assertTrue(webKey2011 instanceof RsaJsonWebKey);
-        assertNotNull(webKey2011.getPublicKey());
+        assertNotNull(webKey2011.getKey());
         assertEquals(AlgorithmIdentifiers.RSA_USING_SHA256, webKey2011.getAlgorithm());
 
         assertEquals(Use.ENCRYPTION, jwkSet.findJsonWebKey("1", null, null, null).getUse());
@@ -114,7 +114,7 @@ public class JsonWebKeyTest extends TestCase
     private void assertIsRsa(JsonWebKey jwk)
     {
         assertTrue(jwk instanceof RsaJsonWebKey);
-        assertTrue(jwk.getPublicKey() instanceof RSAPublicKey);
+        assertTrue(jwk.getKey() instanceof RSAPublicKey);
         assertEquals(RsaJsonWebKey.KEY_TYPE, jwk.getKeyType());
     }
 
@@ -159,7 +159,7 @@ public class JsonWebKeyTest extends TestCase
 
     private void assertIsEllipticCurve(JsonWebKey jwk)
     {
-        assertTrue(jwk.getPublicKey() instanceof ECPublicKey);
+        assertTrue(jwk.getKey() instanceof ECPublicKey);
         assertTrue(jwk instanceof EllipticCurveJsonWebKey);
         assertEquals(EllipticCurveJsonWebKey.KEY_TYPE, jwk.getKeyType());
     }

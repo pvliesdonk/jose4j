@@ -27,7 +27,7 @@ import java.util.Map;
 
 /**
  */
-public class RsaJsonWebKey extends JsonWebKey
+public class RsaJsonWebKey extends PublicJsonWebKey
 {
     public static final String MODULUS_MEMBER_NAME = "n";
     public static final String EXPONENT_MEMBER_NAME = "e";
@@ -50,6 +50,7 @@ public class RsaJsonWebKey extends JsonWebKey
 
         RsaKeyUtil rsaKeyUtil = new RsaKeyUtil();
         publicKey = rsaKeyUtil.publicKey(modulus, publicExponent);
+        key = publicKey;
     }
 
     public String getKeyType()

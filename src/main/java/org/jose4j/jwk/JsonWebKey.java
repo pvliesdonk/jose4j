@@ -21,12 +21,12 @@ import org.jose4j.json.JsonUtil;
 import org.jose4j.lang.JsonHelp;
 
 import java.io.Serializable;
+import java.security.Key;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  */
@@ -41,11 +41,11 @@ public abstract class JsonWebKey implements Serializable
     private String keyId;
     private String algorithm;
 
-    protected PublicKey publicKey;
+    protected Key key;
 
-    protected JsonWebKey(PublicKey publicKey)
+    protected JsonWebKey(Key key)
     {
-        this.publicKey = publicKey;
+        this.key = key;
     }
 
     protected JsonWebKey(Map<String, Object> params)
@@ -57,6 +57,26 @@ public abstract class JsonWebKey implements Serializable
 
     public abstract String getKeyType();
     protected abstract void fillTypeSpecificParams(Map<String,Object> params);
+
+    /**
+     * @deprecated deprecated in favor of getKey() or getPublicKey() on PublicJsonWebKey
+     */
+    public PublicKey getPublicKey()
+    {
+        try
+        {
+            return (PublicKey) key;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    public Key getKey()
+    {
+        return key;
+    }
 
     public String getUse()
     {
@@ -86,11 +106,6 @@ public abstract class JsonWebKey implements Serializable
     public void setAlgorithm(String algorithm)
     {
         this.algorithm = algorithm;
-    }
-
-    public PublicKey getPublicKey()
-    {
-        return publicKey;
     }
 
     public Map<String, Object> toParams()
@@ -128,35 +143,43 @@ public abstract class JsonWebKey implements Serializable
     {
         public static JsonWebKey newJwk(Map<String,Object> params) throws JoseException
         {
-            String alg = JsonHelp.getString(params, KEY_TYPE_PARAMETER);
+            String kty = JsonHelp.getString(params, KEY_TYPE_PARAMETER);
 
-            if (RsaJsonWebKey.KEY_TYPE.equals(alg))
+            if (RsaJsonWebKey.KEY_TYPE.equals(kty))
             {
                 return new RsaJsonWebKey(params);
             }
-            else if (EllipticCurveJsonWebKey.KEY_TYPE.equals(alg))
+            else if (EllipticCurveJsonWebKey.KEY_TYPE.equals(kty))
             {
                 return new EllipticCurveJsonWebKey(params);
             }
+            else if (OctetSequenceJsonWebKey.KEY_TYPE.equals(kty))
+            {
+                return new OctetSequenceJsonWebKey(params);
+            }
             else
             {
-                throw new JoseException("Unknown key algorithm: " + alg);
+                throw new JoseException("Unknown key algorithm: " + kty);
             }
         }
 
-        public static JsonWebKey newJwk(PublicKey publicKey) throws JoseException
+        public static JsonWebKey newJwk(Key key) throws JoseException
         {
-            if (RSAPublicKey.class.isInstance(publicKey))
+            if (RSAPublicKey.class.isInstance(key))
             {
-                return new RsaJsonWebKey((RSAPublicKey)publicKey);
+                return new RsaJsonWebKey((RSAPublicKey)key);
             }
-            else if (ECPublicKey.class.isInstance(publicKey))
+            else if (ECPublicKey.class.isInstance(key))
             {
-                return new EllipticCurveJsonWebKey((ECPublicKey)publicKey);
+                return new EllipticCurveJsonWebKey((ECPublicKey)key);
+            }
+            else if (PublicKey.class.isInstance(key))
+            {
+                throw new JoseException("Unsupported or unknown public key " + key);
             }
             else
             {
-                throw new JoseException("Unsupported or unknown public key " + publicKey);
+                return new OctetSequenceJsonWebKey(key);
             }
         }
 

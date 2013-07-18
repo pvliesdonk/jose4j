@@ -46,7 +46,6 @@ public class JsonWebKeySet
         this(Arrays.asList(keys));
     }
 
-
     public JsonWebKeySet(List<JsonWebKey> keys)
     {
         this.keys = keys;

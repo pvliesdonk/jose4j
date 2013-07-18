@@ -96,11 +96,11 @@ public void testParseJwksAndVerifyJwsExample() throws JoseException
     // where the verification key is obtained from a JSON Web Key Set document.
     //
 
-    // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents
-    // a public key. A JSON Web Key Set (JWK Set) document is a JSON data structure for
-    // representing one or more JSON Web Keys (JWK). A JWK Set might, for example, be obtained
-    // from an HTTPS endpoint controlled by the signer but this example presumes the JWK Set JSON
-    // has already been acquired by some (secure/trusted) means.
+    // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a
+    // cryptographic key (often but not always a public key). A JSON Web Key Set (JWK Set) document
+    // is a JSON data structure for representing one or more JSON Web Keys (JWK). A JWK Set might,
+    // for example, be obtained from an HTTPS endpoint controlled by the signer but this example
+    // presumes the JWK Set JSONhas already been acquired by some secure/trusted means.
     String jsonWebKeySetJson = "{\"keys\":[" +
             "{\"kty\":\"EC\",\"use\":\"sig\"," +
              "\"kid\":\"the key\"," +
@@ -128,7 +128,7 @@ public void testParseJwksAndVerifyJwsExample() throws JoseException
 
     // The JWS header contains a Key ID, which  is a hint indicating which key
     // was used to secure the JWS. In this case (as will hopefully often be the case) the JWS Key ID
-    // corresponds directly to the Key ID in the JWK Set.
+    // corresponds directly to   the Key ID in the JWK Set.
     String keyId = jws.getKeyIdHeaderValue();
 
 
@@ -137,7 +137,7 @@ public void testParseJwksAndVerifyJwsExample() throws JoseException
     JsonWebKey jwk = jsonWebKeySet.findJsonWebKey(keyId, jws.getKeyType(), Use.SIGNATURE, null);
 
     // The verification key on the JWS is the public key from the JWK we pulled from the JWK Set.
-    jws.setKey(jwk.getPublicKey());
+    jws.setKey(jwk.getKey());
 
     // Check the signature
     boolean signatureVerified = jws.verifySignature();
