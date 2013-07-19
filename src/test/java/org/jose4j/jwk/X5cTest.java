@@ -151,6 +151,12 @@ public class X5cTest extends TestCase
         assertEquals(parsedJwk.getKey(), publicKey);
         assertNotNull(parsedJwk.getLeafCertificate());
         assertEquals(chain.size(), parsedJwk.getCertificateChain().size());
+
+
+        PublicJsonWebKey jwkJustOneCert = PublicJsonWebKey.Factory.newPublicJwk(publicKey);
+        jwkJustOneCert.setCertificateChain(x509Certificate);
+
+        assertEquals(jwkJustOneCert.getKey(), jwk.getKey());
     }
 }
 

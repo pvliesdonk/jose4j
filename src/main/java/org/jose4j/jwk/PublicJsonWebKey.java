@@ -110,7 +110,6 @@ public abstract class PublicJsonWebKey extends JsonWebKey
         return (certificateChain != null && !certificateChain.isEmpty()) ? certificateChain.get(0) : null;
     }
 
-
     public void setCertificateChain(List<X509Certificate> certificateChain)
     {
         checkForBareKeyCertMismatch();
@@ -120,17 +119,13 @@ public abstract class PublicJsonWebKey extends JsonWebKey
 
     void checkForBareKeyCertMismatch()
     {
-        if (certAndBareKeyMismatch())
-        {
-            throw new IllegalArgumentException( "The key in the first certificate MUST match the bare " +
-                        "public key represented by other members of the JWK.");
-        }
-    }
-
-    boolean certAndBareKeyMismatch()
-    {
         X509Certificate leafCertificate = getLeafCertificate();
-        return leafCertificate != null && !leafCertificate.getPublicKey().equals(getPublicKey());
+        boolean certAndBareKeyMismatch = leafCertificate != null && !leafCertificate.getPublicKey().equals(getPublicKey());
+        if (certAndBareKeyMismatch)
+        {
+            throw new IllegalArgumentException( "The key in the first certificate MUST match the bare public key " +
+                "represented by other members of the JWK. Public key = " + getPublicKey() + " cert = " + leafCertificate);
+        }
     }
 
     public void setCertificateChain(X509Certificate... certificates)
