@@ -85,7 +85,7 @@ public class EcKeyUtil
         }
         catch (InvalidAlgorithmParameterException e)
         {
-            throw new JoseException("Unable to create keypair", e);
+            throw new JoseException("Unable to create EC key pair with spec " + spec, e);
         }
     }
 }
