@@ -112,8 +112,8 @@ public abstract class JsonWebKey implements Serializable
     {
         Map<String, Object> params = new LinkedHashMap<String, Object>();
         params.put(KEY_TYPE_PARAMETER, getKeyType());
-        putIfNotNull(USE_PARAMETER, getUse(), params);
         putIfNotNull(KEY_ID_PARAMETER, getKeyId(), params);
+        putIfNotNull(USE_PARAMETER, getUse(), params);
         putIfNotNull(ALGORITHM_PARAMETER, getAlgorithm(), params);
         fillTypeSpecificParams(params);
         return params;

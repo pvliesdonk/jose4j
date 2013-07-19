@@ -22,6 +22,7 @@ import org.jose4j.lang.JoseException;
 import org.jose4j.lang.JsonHelp;
 
 import java.math.BigInteger;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Map;
 
@@ -31,6 +32,8 @@ public class RsaJsonWebKey extends PublicJsonWebKey
 {
     public static final String MODULUS_MEMBER_NAME = "n";
     public static final String EXPONENT_MEMBER_NAME = "e";
+
+    public static final String PRIVATE_EXPONENT_MEMBER_NAME = "d";
 
     public static final String KEY_TYPE = "RSA";
 
@@ -51,6 +54,13 @@ public class RsaJsonWebKey extends PublicJsonWebKey
         RsaKeyUtil rsaKeyUtil = new RsaKeyUtil();
         publicKey = rsaKeyUtil.publicKey(modulus, publicExponent);
         key = publicKey;
+
+        if (params.containsKey(PRIVATE_EXPONENT_MEMBER_NAME))
+        {
+            String b64d = JsonHelp.getString(params, PRIVATE_EXPONENT_MEMBER_NAME);
+            BigInteger d = BigEndianBigInteger.fromBase64Url(b64d);
+            privateKey = rsaKeyUtil.privateKey(modulus, d);
+        }
     }
 
     public String getKeyType()
@@ -63,6 +73,11 @@ public class RsaJsonWebKey extends PublicJsonWebKey
         return (RSAPublicKey)publicKey;
     }
 
+    public RSAPrivateKey getRsaPrivateKey()
+    {
+        return (RSAPrivateKey) privateKey;
+    }
+
     protected void fillTypeSpecificParams(Map<String, Object> params)
     {
         RSAPublicKey rsaPublicKey = getRSAPublicKey();
@@ -73,5 +88,13 @@ public class RsaJsonWebKey extends PublicJsonWebKey
         BigInteger publicExponent = rsaPublicKey.getPublicExponent();
         String b64Exponent = BigEndianBigInteger.toBase64Url(publicExponent);
         params.put(EXPONENT_MEMBER_NAME, b64Exponent);
+
+        if (writeOutPrivateKeyToJson)
+        {
+            RSAPrivateKey rsaPrivateKey = getRsaPrivateKey();
+            BigInteger privateExponent = rsaPrivateKey.getPrivateExponent();
+            String b64PrivateExponent = BigEndianBigInteger.toBase64Url(privateExponent);
+            params.put(PRIVATE_EXPONENT_MEMBER_NAME, b64PrivateExponent);
+        }
     }
 }

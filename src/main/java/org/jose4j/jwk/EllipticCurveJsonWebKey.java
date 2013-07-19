@@ -23,6 +23,7 @@ import org.jose4j.lang.JoseException;
 import org.jose4j.lang.JsonHelp;
 
 import java.math.BigInteger;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
@@ -39,6 +40,8 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
 
     public static final String X_MEMBER_NAME = "x";
     public static final String Y_MEMBER_NAME = "y";
+
+    public static final String PRIVATE_KEY_MEMBER_NAME = "d";
 
     private String curveName;
 
@@ -67,11 +70,23 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
 
         publicKey = keyUtil.publicKey(x, y, curve);
         key = publicKey;
+
+        if (params.containsKey(PRIVATE_KEY_MEMBER_NAME))
+        {
+            String b64d = JsonHelp.getString(params, PRIVATE_KEY_MEMBER_NAME);
+            BigInteger d = BigEndianBigInteger.fromBase64Url(b64d);
+            privateKey = keyUtil.privateKey(d, curve);
+        }
     }
 
     public ECPublicKey getECPublicKey()
     {
         return (ECPublicKey) publicKey;
+    }
+
+    public ECPrivateKey getEcPrivateKey()
+    {
+        return (ECPrivateKey) privateKey;
     }
 
     public String getKeyType()
@@ -98,6 +113,14 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
         String b64y = BigEndianBigInteger.toBase64Url(y);
         params.put(Y_MEMBER_NAME, b64y);
 
-        params.put(CURVE_MEMBER_NAME, curveName);
+        params.put(CURVE_MEMBER_NAME, getCurveName());
+
+        if (writeOutPrivateKeyToJson)
+        {
+            ECPrivateKey ecPrivateKey = getEcPrivateKey();
+            BigInteger s = ecPrivateKey.getS();
+            String b64s = BigEndianBigInteger.toBase64Url(s);
+            params.put(PRIVATE_KEY_MEMBER_NAME, b64s);
+        }
     }
 }
