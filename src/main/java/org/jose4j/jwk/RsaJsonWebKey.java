@@ -52,8 +52,8 @@ public class RsaJsonWebKey extends PublicJsonWebKey
         BigInteger publicExponent = BigEndianBigInteger.fromBase64Url(b64Exponent);
 
         RsaKeyUtil rsaKeyUtil = new RsaKeyUtil();
-        publicKey = rsaKeyUtil.publicKey(modulus, publicExponent);
-        key = publicKey;
+        key = rsaKeyUtil.publicKey(modulus, publicExponent);
+        checkForBareKeyCertMismatch();
 
         if (params.containsKey(PRIVATE_EXPONENT_MEMBER_NAME))
         {
@@ -70,7 +70,7 @@ public class RsaJsonWebKey extends PublicJsonWebKey
 
     public RSAPublicKey getRSAPublicKey()
     {
-        return (RSAPublicKey)publicKey;
+        return (RSAPublicKey) key;
     }
 
     public RSAPrivateKey getRsaPrivateKey()
@@ -78,7 +78,7 @@ public class RsaJsonWebKey extends PublicJsonWebKey
         return (RSAPrivateKey) privateKey;
     }
 
-    protected void fillTypeSpecificParams(Map<String, Object> params)
+    protected void fillPublicTypeSpecificParams(Map<String,Object> params)
     {
         RSAPublicKey rsaPublicKey = getRSAPublicKey();
         BigInteger modulus = rsaPublicKey.getModulus();
@@ -88,13 +88,13 @@ public class RsaJsonWebKey extends PublicJsonWebKey
         BigInteger publicExponent = rsaPublicKey.getPublicExponent();
         String b64Exponent = BigEndianBigInteger.toBase64Url(publicExponent);
         params.put(EXPONENT_MEMBER_NAME, b64Exponent);
+    }
 
-        if (writeOutPrivateKeyToJson)
-        {
-            RSAPrivateKey rsaPrivateKey = getRsaPrivateKey();
-            BigInteger privateExponent = rsaPrivateKey.getPrivateExponent();
-            String b64PrivateExponent = BigEndianBigInteger.toBase64Url(privateExponent);
-            params.put(PRIVATE_EXPONENT_MEMBER_NAME, b64PrivateExponent);
-        }
+    protected void fillPrivateTypeSpecificParams(Map<String,Object> params)
+    {
+        RSAPrivateKey rsaPrivateKey = getRsaPrivateKey();
+        BigInteger privateExponent = rsaPrivateKey.getPrivateExponent();
+        String b64PrivateExponent = BigEndianBigInteger.toBase64Url(privateExponent);
+        params.put(PRIVATE_EXPONENT_MEMBER_NAME, b64PrivateExponent);
     }
 }

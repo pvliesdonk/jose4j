@@ -67,9 +67,8 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
         BigInteger y = BigEndianBigInteger.fromBase64Url(b64y);
 
         EcKeyUtil keyUtil = new EcKeyUtil();
-
-        publicKey = keyUtil.publicKey(x, y, curve);
-        key = publicKey;
+        key = keyUtil.publicKey(x, y, curve);
+        checkForBareKeyCertMismatch();
 
         if (params.containsKey(PRIVATE_KEY_MEMBER_NAME))
         {
@@ -81,7 +80,7 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
 
     public ECPublicKey getECPublicKey()
     {
-        return (ECPublicKey) publicKey;
+        return (ECPublicKey) key;
     }
 
     public ECPrivateKey getEcPrivateKey()
@@ -99,7 +98,7 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
         return curveName;
     }
 
-    protected void fillTypeSpecificParams(Map<String, Object> params)
+    protected void fillPublicTypeSpecificParams(Map<String,Object> params)
     {
         ECPublicKey ecPublicKey = getECPublicKey();
 
@@ -114,13 +113,13 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
         params.put(Y_MEMBER_NAME, b64y);
 
         params.put(CURVE_MEMBER_NAME, getCurveName());
+    }
 
-        if (writeOutPrivateKeyToJson)
-        {
-            ECPrivateKey ecPrivateKey = getEcPrivateKey();
-            BigInteger s = ecPrivateKey.getS();
-            String b64s = BigEndianBigInteger.toBase64Url(s);
-            params.put(PRIVATE_KEY_MEMBER_NAME, b64s);
-        }
+    protected void fillPrivateTypeSpecificParams(Map<String,Object> params)
+    {
+        ECPrivateKey ecPrivateKey = getEcPrivateKey();
+        BigInteger s = ecPrivateKey.getS();
+        String b64s = BigEndianBigInteger.toBase64Url(s);
+        params.put(PRIVATE_KEY_MEMBER_NAME, b64s);
     }
 }
