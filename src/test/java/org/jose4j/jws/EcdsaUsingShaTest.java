@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Brian Campbell
+ * Copyright 2012-2013 Brian Campbell
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ public class EcdsaUsingShaTest extends TestCase
         KeyPair keyPair = keyUtil.generateKeyPair(EllipticCurves.P521);
         PrivateKey priv2 = keyPair.getPrivate();
         PublicKey pub2 = keyPair.getPublic();
-        JwsTestSupport.testBasicRoundTrip("touchŽ", algo, priv1, pub1, priv2, pub2);
+        JwsTestSupport.testBasicRoundTrip("touchï¿½", algo, priv1, pub1, priv2, pub2);
     }
 
     public void testBadKeys() throws JoseException
