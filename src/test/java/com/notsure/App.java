@@ -20,10 +20,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.binary.StringUtils;
 import org.jose4j.base64url.Base64Url;
-import org.jose4j.jwk.JsonWebKey;
-import org.jose4j.jwk.JsonWebKeySet;
-import org.jose4j.jwk.RsaJsonWebKey;
-import org.jose4j.jwk.Use;
+import org.jose4j.jwk.*;
 import org.jose4j.jws.EcdsaUsingShaAlgorithm;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jws.AlgorithmIdentifiers;
@@ -81,39 +78,27 @@ public class App
         String encodedHeader = b64.base64UrlEncodeUtf8ByteRepresentation(jweHeaderString);
         System.out.println(encodedHeader.equals("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"));
 
-        byte[] contentEncryptionKeyBytes = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{4, 211, 31, 197, 84, 157, 252, 254, 11, 100, 157, 250, 63, 170, 106,
-                206, 107, 124, 212, 45, 111, 107, 9, 219, 200, 177, 0, 240, 143, 156, 44, 207});
-        byte[] n = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{177, 119, 33, 13, 164, 30, 108, 121, 207, 136, 107,
-                242, 12, 224, 19, 226, 198, 134, 17, 71, 173, 75, 42,
-                61, 48, 162, 206, 161, 97, 108, 185, 234, 226, 219,
-                118, 206, 118, 5, 169, 224, 60, 181, 90, 85, 51, 123,
-                6, 224, 4, 122, 29, 230, 151, 12, 244, 127, 121, 25,
-                4, 85, 220, 144, 215, 110, 130, 17, 68, 228, 129,
-                138, 7, 130, 231, 40, 212, 214, 17, 179, 28, 124,
-                151, 178, 207, 20, 14, 154, 222, 113, 176, 24, 198,
-                73, 211, 113, 9, 33, 178, 80, 13, 25, 21, 25, 153,
-                212, 206, 67, 154, 147, 70, 194, 192, 183, 160, 83,
-                98, 236, 175, 85, 23, 97, 75, 199, 177, 73, 145, 50,
-                253, 206, 32, 179, 254, 236, 190, 82, 73, 67, 129,
-                253, 252, 220, 108, 136, 138, 11, 192, 1, 36, 239,
-                228, 55, 81, 113, 17, 25, 140, 63, 239, 146, 3, 172,
-                96, 60, 227, 233, 64, 255, 224, 173, 225, 228, 229,
-                92, 112, 72, 99, 97, 26, 87, 187, 123, 46, 50, 90,
-                202, 117, 73, 10, 153, 47, 224, 178, 163, 77, 48, 46,
-                154, 33, 148, 34, 228, 33, 172, 216, 89, 46, 225,
-                127, 68, 146, 234, 30, 147, 54, 146, 5, 133, 45, 78,
-                254, 85, 55, 75, 213, 86, 194, 218, 215, 163, 189,
-                194, 54, 6, 83, 36, 18, 153, 53, 7, 48, 89, 35, 66,
-                144, 7, 65, 154, 13, 97, 75, 55, 230, 132, 3, 13,
-                239, 71});
+        PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk("{\"kty\":\"RSA\",\n" +
+                "      \"n\":\"sXchDaQebHnPiGvyDOAT4saGEUetSyo9MKLOoWFsueri23bOdgWp4Dy1Wl\n" +
+                "           UzewbgBHod5pcM9H95GQRV3JDXboIRROSBigeC5yjU1hGzHHyXss8UDpre\n" +
+                "           cbAYxknTcQkhslANGRUZmdTOQ5qTRsLAt6BTYuyvVRdhS8exSZEy_c4gs_\n" +
+                "           7svlJJQ4H9_NxsiIoLwAEk7-Q3UXERGYw_75IDrGA84-lA_-Ct4eTlXHBI\n" +
+                "           Y2EaV7t7LjJaynVJCpkv4LKjTTAumiGUIuQhrNhZLuF_RJLqHpM2kgWFLU\n" +
+                "           7-VTdL1VbC2tejvcI2BlMkEpk1BzBZI0KQB0GaDWFLN-aEAw3vRw\",\n" +
+                "      \"e\":\"AQAB\",\n" +
+                "      \"d\":\"VFCWOqXr8nvZNyaaJLXdnNPXZKRaWCjkU5Q2egQQpTBMwhprMzWzpR8Sxq\n" +
+                "           1OPThh_J6MUD8Z35wky9b8eEO0pwNS8xlh1lOFRRBoNqDIKVOku0aZb-ry\n" +
+                "           nq8cxjDTLZQ6Fz7jSjR1Klop-YKaUHc9GsEofQqYruPhzSA-QgajZGPbE_\n" +
+                "           0ZaVDJHfyd7UUBUKunFMScbflYAAOYJqVIVwaYR5zWEEceUjNnTNo_CVSj\n" +
+                "           -VvXLO5VZfCUAVLgW4dpf1SrtZjSt34YLsRarSb127reG_DUwg9Ch-Kyvj\n" +
+                "           T1SkHgUWRVGcyly7uvVGRSDwsXypdrNinPA4jlhoNdizK2zF2CWQ\"\n" +
+                "     }");
 
-        byte[] e = new byte[] {1, 0, 1};
-
-        RsaKeyUtil rsaKeyUtil = new RsaKeyUtil();
-        RSAPublicKey rsaPublicKey = rsaKeyUtil.publicKey(BigEndianBigInteger.fromBytes(n), BigEndianBigInteger.fromBytes(e));
 
         Cipher rsa15cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        rsa15cipher.init(Cipher.WRAP_MODE, rsaPublicKey);
+        rsa15cipher.init(Cipher.WRAP_MODE, jwk.getPublicKey());
+
+        byte[] contentEncryptionKeyBytes = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{4, 211, 31, 197, 84, 157, 252, 254, 11, 100, 157, 250, 63, 170, 106, 206, 107, 124, 212, 45, 111, 107, 9, 219, 200, 177, 0, 240, 143, 156, 44, 207});
         SecretKeySpec contentEncryptionKey = new SecretKeySpec(contentEncryptionKeyBytes, "AES");
         byte[] encryptedCekBytes = rsa15cipher.wrap(contentEncryptionKey);
         System.out.println("encrypted key bytes " + Arrays.toString(encryptedCekBytes));
@@ -166,6 +151,7 @@ public class App
 
 
         byte[] aad = StringUtil.getBytesAscii(encodedHeader);
+        System.out.println(Arrays.toString(aad));
 
         MacUtil.getMac(MacUtil.HMAC_SHA256);
 
@@ -243,6 +229,7 @@ public class App
 //                    "MIIDQjCCAiqgAwIBAgIGATz/FuLiMA0GCSqGSIb3DQEBBQUAMGIxCzAJBgNVBAYTAlVTMQswCQYD\n" +
 //                    "VQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRwwGgYDVQQKExNQaW5nIElkZW50aXR5IENvcnAuMRcw\n" +
 //                    "FQYDVQQDEw5CcmlhbiBDYW1wYmVsbDAeFw0xMzAyMjEyMzI5MTVaFw0xODA4MTQyMjI5MTVaMGIx\n" +
+
 //                    "CzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRwwGgYDVQQKExNQaW5n\n" +
 //                    "IElkZW50aXR5IENvcnAuMRcwFQYDVQQDEw5CcmlhbiBDYW1wYmVsbDCCASIwDQYJKoZIhvcNAQEB\n" +
 //                    "BQADggEPADCCAQoCggEBAL64zn8/QnHYMeZ0LncoXaEde1fiLm1jHjmQsF/449IYALM9if6amFtP\n" +

@@ -16,12 +16,31 @@
 
 package org.jose4j.jwe;
 
+import org.jose4j.jwa.Algorithm;
+
 /**
  */
-public class SymmetricEncryptionAlgorithmIdentifiers
+public interface JsonWebEncryptionEncryptionMethodAlgorithm extends Algorithm
 {
-    public static final String A128CBC = "A128CBC";
-    public static final String A256CBC = "A256CBC";
-    public static final String A128GCM = "A128GCM";
-    public static final String A256GCM = "A256GCM";
+    int getKeySize();
+
+    boolean isAead();
+
+    Result encrypt(byte[] plaintext, byte[] key);
+
+    public static class Result
+    {
+        private byte[] iv;
+        private byte[] ciphertext;
+
+        public byte[] getIv()
+        {
+            return iv;
+        }
+
+        public byte[] getCiphertext()
+        {
+            return ciphertext;
+        }
+    }
 }

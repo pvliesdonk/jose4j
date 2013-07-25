@@ -25,11 +25,11 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  */
-public class Aes128CbcSymmetricEncryptionAlgorithm extends AlgorithmInfo implements SymmetricEncryptionAlgorithm
+public class Aes128CbcJsonWebEncryptionEncryptionAlgorithm extends AlgorithmInfo implements JsonWebEncryptionEncryptionMethodAlgorithm
 {
-    public Aes128CbcSymmetricEncryptionAlgorithm()
+    public Aes128CbcJsonWebEncryptionEncryptionAlgorithm()
     {
-        setAlgorithmIdentifier(SymmetricEncryptionAlgorithmIdentifiers.A128CBC);
+        setAlgorithmIdentifier(EncryptionMethodAlgorithmIdentifiers.A128CBC);
         setJavaAlgorithm("AES/CBC/PKCS5Padding");
     }
 

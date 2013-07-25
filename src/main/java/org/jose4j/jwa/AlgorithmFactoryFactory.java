@@ -29,15 +29,15 @@ public class AlgorithmFactoryFactory
     private static final AlgorithmFactoryFactory factoryFactory = new AlgorithmFactoryFactory();
 
     private final AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory;
-    private AlgorithmFactory<KeyEncryptionAlgorithm> jweKeyEncAlgorithmFactory;
-    private AlgorithmFactory<SymmetricEncryptionAlgorithm> jweSymmEncAlgorithmFactory;
+    private AlgorithmFactory<JsonWebEncryptionKeyManagementModeAlgorithm> jweKeyMgmtModeAlgorithmFactory;
+    private AlgorithmFactory<JsonWebEncryptionEncryptionMethodAlgorithm> jweEncMethodAlgorithmFactory;
 
 
     private AlgorithmFactoryFactory()
     {
         jwsAlgorithmFactory = new AlgorithmFactory<JsonWebSignatureAlgorithm>("jws-algorithms.properties"); // todo change name
-        jweKeyEncAlgorithmFactory = new AlgorithmFactory<KeyEncryptionAlgorithm>("todo.properties");
-        jweSymmEncAlgorithmFactory = new AlgorithmFactory<SymmetricEncryptionAlgorithm>("todo.properties");
+        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<JsonWebEncryptionKeyManagementModeAlgorithm>("todo.properties");
+        jweEncMethodAlgorithmFactory = new AlgorithmFactory<JsonWebEncryptionEncryptionMethodAlgorithm>("todo.properties");
 
     }
 
@@ -51,12 +51,12 @@ public class AlgorithmFactoryFactory
         return jwsAlgorithmFactory;
     }
 
-    public KeyEncryptionAlgorithm getKeyEncryptionAlgorithm(String algo)
+    public JsonWebEncryptionKeyManagementModeAlgorithm getKeyManagementModeAlgorithm(String algo)
     {
         // TODO
-        if (KeyEncryptionAlgorithmIdentifiers.RSA1_5.equals(algo))
+        if (KeyManagementModeAlgorithmIdentifiers.RSA1_5.equals(algo))
         {
-            return new KeyEncryptionAlgorithm()
+            return new JsonWebEncryptionKeyManagementModeAlgorithm()
             {
                 public byte[] encrypt(Key key, byte[] contentMasterKey)
                 {
@@ -88,12 +88,12 @@ public class AlgorithmFactoryFactory
         return null;
     }
 
-    public SymmetricEncryptionAlgorithm getSymmetricEncryptionAlgorithm(String algo)
+    public JsonWebEncryptionEncryptionMethodAlgorithm getSymmetricEncryptionAlgorithm(String algo)
     {
-        if (!algo.equals(SymmetricEncryptionAlgorithmIdentifiers.A128CBC))
+        if (!algo.equals(EncryptionMethodAlgorithmIdentifiers.A128CBC))
         {
             return null;
         }
-        return new Aes128CbcSymmetricEncryptionAlgorithm();
+        return new Aes128CbcJsonWebEncryptionEncryptionAlgorithm();
     }
 }
