@@ -24,6 +24,23 @@ import java.util.Arrays;
  */
 public class ByteUtilTest extends TestCase
 {
+    public void testGetBytesLong()
+    {
+        // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-13#appendix-B.3
+        long value = 408;
+        byte[] bytes = ByteUtil.getBytes(value);
+        int[] integers = ByteUtil.convertSignedTwosCompToUnsigned(bytes);
+        assertEquals(8, integers.length);
+        for (int i = 0 ; i < 6 ; i++)
+        {
+            assertEquals(0, integers[i]);
+        }
+
+        assertEquals(1, integers[6]);
+        assertEquals(152, integers[7]);
+    }
+
+
     public void testConcat1()
     {
         byte[] first = new byte[2];

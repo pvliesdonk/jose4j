@@ -62,6 +62,13 @@ public class ByteUtil
         return byteBuffer.array();
     }
 
+    public static byte[] getBytes(long intValue)
+     {
+         ByteBuffer byteBuffer = ByteBuffer.allocate(8);
+         byteBuffer.putLong(intValue);
+         return byteBuffer.array();
+     }
+
     public static int getInt(byte b)
     {
         return (b >= 0) ? (int) b : 256 - (~(b - 1));
