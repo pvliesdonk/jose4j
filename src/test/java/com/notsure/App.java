@@ -122,7 +122,7 @@ public class App
 //        4.  The octet string AL is equal to the number of bits in A expressed
 //            as a 64-bit unsigned integer in network byte order.
 
-        long alvalue = aad.length * 8;
+        long alvalue = ByteUtil.bitLength(aad);
         byte[] al = ByteUtil.getBytes(alvalue);
 
 
@@ -207,7 +207,7 @@ public class App
 //                the octets of the ASCII representation of the Encoded JWE Header
 //                value.
         byte[] aad = StringUtil.getBytesAscii(encodedHeader);
-        long numAadBits = 8 * aad.length;
+        long numAadBits = ByteUtil.bitLength(aad);
         byte[] al = ByteUtil.getBytes(numAadBits);
 
         byte[] authenticationTagInput = ByteUtil.concat(aad, iv, cipherText, al);

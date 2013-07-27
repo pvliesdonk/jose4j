@@ -58,7 +58,7 @@ public class SimpleSha256ConcatKeyDerivationFunctionTest extends TestCase
         ShaConcatKeyDerivationFunction kdf1 = new Sha256ConcatKeyDerivationFunction();
         byte[] secret = {1, 62, 3, 4, 9, 83, 123, 12, 111, 1, 1, 0, -1, 8, 7 , 12, 45, 118, 99, 9};
         byte[] keyBytes1 = kdf1.kdf(secret, keydatalen, INTEGRITY_LABEL);
-        assertEquals(keydatalen, keyBytes1.length * 8);
+        assertEquals(keydatalen, ByteUtil.bitLength(keyBytes1));
 
         ShaConcatKeyDerivationFunction kdf2 = new Sha256ConcatKeyDerivationFunction();
         byte[] keyBytes2 = kdf2.kdf(secret, keydatalen, INTEGRITY_LABEL);

@@ -78,7 +78,7 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
 
     void validateKey(Key key) throws JoseException
     {
-        int length = key.getEncoded().length * 8;
+        int length = ByteUtil.bitLength(key.getEncoded());
         if (length < minimumKeyLength)
         {
             throw new JoseException("A key of the same size as the hash output (i.e. "+minimumKeyLength+

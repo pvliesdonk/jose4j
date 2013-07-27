@@ -128,4 +128,10 @@ public class ByteUtil
         int half = inputBytes.length / 2;
         return subArray(inputBytes, half, half);
     }
+
+    public static int bitLength(byte[] bytes)
+    {
+        return bytes.length * 8;
+    }
+
 }
