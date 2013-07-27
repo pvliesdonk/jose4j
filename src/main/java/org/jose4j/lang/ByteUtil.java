@@ -20,6 +20,7 @@ package org.jose4j.lang;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class ByteUtil
 {
@@ -108,5 +109,23 @@ public class ByteUtil
         {
             throw new IllegalStateException("IOEx from ByteArrayOutputStream?!", e);
         }
+    }
+
+    public static byte[] subArray(byte[] inputBytes, int startPos, int length)
+    {
+        byte[] subArray = new byte[length];
+        System.arraycopy(inputBytes, startPos, subArray, 0, subArray.length);
+        return subArray;
+    }
+
+    public static byte[] leftHalf(byte[] inputBytes)
+    {
+        return subArray(inputBytes, 0, (inputBytes.length / 2));
+    }
+
+    public static byte[] rightHalf(byte[] inputBytes)
+    {
+        int half = inputBytes.length / 2;
+        return subArray(inputBytes, half, half);
     }
 }

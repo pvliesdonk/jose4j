@@ -24,6 +24,20 @@ import java.util.Arrays;
  */
 public class ByteUtilTest extends TestCase
 {
+    public void testLeftRight()
+    {
+        byte[] fullCekBytes = new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        byte[] hmacKeyBytes = new byte[fullCekBytes.length/2];
+        byte[] encKeyBytes = new byte[fullCekBytes.length/2];
+        System.arraycopy(fullCekBytes, 0, hmacKeyBytes, 0, hmacKeyBytes.length);
+        System.arraycopy(fullCekBytes, hmacKeyBytes.length, encKeyBytes, 0, encKeyBytes.length);
+
+        byte[] left = ByteUtil.leftHalf(fullCekBytes);
+        byte[] right = ByteUtil.rightHalf(fullCekBytes);
+        assertTrue(Arrays.equals(hmacKeyBytes, left));
+        assertTrue(Arrays.equals(encKeyBytes, right));
+    }
+
     public void testGetBytesLong()
     {
         // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-13#appendix-B.3
