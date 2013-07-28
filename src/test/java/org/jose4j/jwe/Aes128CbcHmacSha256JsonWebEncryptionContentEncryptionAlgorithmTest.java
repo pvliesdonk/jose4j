@@ -36,7 +36,37 @@ public class Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithmTest 
         byte[] authenticationTag = encryptionResult.getAuthenticationTag();
         String encodedAuthenticationTag = "9hH0vgRfYgPnAHOd8stkvw";
         assertEquals(encodedAuthenticationTag, base64Url.base64UrlEncode(authenticationTag));
-
     }
+
+    public void testExampleDecryptFromJweAppendix2() throws JoseException
+    {
+        int[] ints = {4, 211, 31, 197, 84, 157, 252, 254, 11, 100, 157, 250, 63, 170, 106, 206, 107, 124, 212, 45, 111, 107, 9, 219, 200, 177, 0, 240, 143, 156, 44, 207};
+        byte[] contentEncryptionKeyBytes = ByteUtil.convertUnsignedToSignedTwosComp(ints);
+
+        Base64Url b = new Base64Url();
+
+        byte[] header = StringUtil.getBytesUtf8("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0");
+        byte[] iv = b.base64UrlDecode("AxY8DCtDaGlsbGljb3RoZQ");
+        byte[] ciphertext = b.base64UrlDecode("KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY");
+        byte[] tag = b.base64UrlDecode("9hH0vgRfYgPnAHOd8stkvw");
+
+        Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithm();
+        byte[] plaintextBytes = jweContentEncryptionAlg.decrypt(ciphertext, iv, header, tag, contentEncryptionKeyBytes);
+        assertEquals("Live long and prosper.", StringUtil.newStringUtf8(plaintextBytes));
+    }
+
+    public void testRoundTrip() throws JoseException
+    {
+        String text = "I'm writing this test on a flight to Zurich";
+        byte[] aad = StringUtil.getBytesUtf8("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0");
+        byte[] plaintext = StringUtil.getBytesUtf8(text);
+        Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithm();
+        byte[] key = ByteUtil.randomBytes(jweContentEncryptionAlg.getKeySize()/8);
+        JsonWebEncryptionContentEncryptionAlgorithm.EncryptionResult encrypt = jweContentEncryptionAlg.encrypt(plaintext, aad, key);
+
+        byte[] decrypt = jweContentEncryptionAlg.decrypt(encrypt.getCiphertext(), encrypt.getIv(), aad, encrypt.getAuthenticationTag(), key);
+        assertEquals(text, StringUtil.newStringUtf8(decrypt));
+    }
+
 
 }

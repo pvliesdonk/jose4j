@@ -1,5 +1,6 @@
 package org.jose4j.jwe;
 
+import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.HmacKey;
@@ -119,10 +120,14 @@ public class GenericAesCbcHmacSha2JsonWebEncryptionContentEncryptionAlgorithm ex
         Key hmacKey = new HmacKey(ByteUtil.leftHalf(key));
         Mac mac = MacUtil.getInitializedMac(getHmacJavaAlgorithm(), hmacKey);
         byte[] calculatedAuthenticationTag = mac.doFinal(authenticationTagInput);
+        calculatedAuthenticationTag = ByteUtil.subArray(calculatedAuthenticationTag, 0, getTagTruncationLength()); // truncate it
         boolean tagMatch = ByteUtil.secureEquals(tag, calculatedAuthenticationTag);
         if (!tagMatch)
         {
-            throw new JoseException("... special symbol FAIL that indicates that the inputs are not authentic ...");
+            Base64Url base64Url = new Base64Url();
+            String encTag = base64Url.base64UrlEncode(tag);
+            String calcEncTag = base64Url.base64UrlEncode(calculatedAuthenticationTag);
+            throw new JoseException("Authentication tag failed. Message=" + encTag + " calculated=" + calcEncTag);
         }
 
         Key encryptionKey = new AesKey(ByteUtil.rightHalf(key));
@@ -140,6 +145,7 @@ public class GenericAesCbcHmacSha2JsonWebEncryptionContentEncryptionAlgorithm ex
         {
             throw new JoseException(e.toString(), e);
         }
+
         try
         {
             return cipher.doFinal(cipherText);
