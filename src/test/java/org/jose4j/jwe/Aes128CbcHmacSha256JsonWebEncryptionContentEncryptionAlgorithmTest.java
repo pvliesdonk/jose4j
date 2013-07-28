@@ -16,7 +16,7 @@ public class Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithmTest 
         String plainTextText = "Live long and prosper.";
         byte[] plainText = StringUtil.getBytesUtf8(plainTextText);
 
-        String encodedHeader = "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ";
+        String encodedHeader = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0";
         byte[] aad = StringUtil.getBytesAscii(encodedHeader);
 
         int[] ints = {4, 211, 31, 197, 84, 157, 252, 254, 11, 100, 157, 250, 63, 170, 106, 206, 107, 124, 212, 45, 111, 107, 9, 219, 200, 177, 0, 240, 143, 156, 44, 207};
@@ -31,7 +31,12 @@ public class Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithmTest 
 
         byte[] ciphertext = encryptionResult.getCiphertext();
         String encodedJweCiphertext = "KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY";
-        assertEquals(base64Url.base64UrlEncode(ciphertext), encodedJweCiphertext);
+        assertEquals(encodedJweCiphertext, base64Url.base64UrlEncode(ciphertext));
+
+        byte[] authenticationTag = encryptionResult.getAuthenticationTag();
+        String encodedAuthenticationTag = "9hH0vgRfYgPnAHOd8stkvw";
+        assertEquals(encodedAuthenticationTag, base64Url.base64UrlEncode(authenticationTag));
+
     }
 
 }
