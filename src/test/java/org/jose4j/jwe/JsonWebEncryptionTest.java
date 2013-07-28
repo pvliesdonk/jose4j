@@ -32,7 +32,7 @@ public class JsonWebEncryptionTest extends TestCase
         jwe.setPlaintext(plaintext);
         jwe.setAlgorithmHeaderValue(KeyManagementModeAlgorithmIdentifiers.RSA1_5);
         jwe.setKey(ExampleRsaKeyFromJws.PUBLIC_KEY);
-        jwe.setHeader(HeaderParameterNames.ENCRYPTION_METHOD, EncryptionMethodAlgorithmIdentifiers.A128CBC);
+        jwe.setHeader(HeaderParameterNames.ENCRYPTION_METHOD, EncryptionMethodAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
 
         String jweCompactSerialization = jwe.getCompactSerialization();
     }

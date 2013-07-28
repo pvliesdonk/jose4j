@@ -30,14 +30,14 @@ public class AlgorithmFactoryFactory
 
     private final AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory;
     private AlgorithmFactory<JsonWebEncryptionKeyManagementModeAlgorithm> jweKeyMgmtModeAlgorithmFactory;
-    private AlgorithmFactory<JsonWebEncryptionEncryptionMethodAlgorithm> jweEncMethodAlgorithmFactory;
+    private AlgorithmFactory<JsonWebEncryptionContentEncryptionAlgorithm> jweEncMethodAlgorithmFactory;
 
 
     private AlgorithmFactoryFactory()
     {
         jwsAlgorithmFactory = new AlgorithmFactory<JsonWebSignatureAlgorithm>("jws-algorithms.properties"); // todo change name
         jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<JsonWebEncryptionKeyManagementModeAlgorithm>("todo.properties");
-        jweEncMethodAlgorithmFactory = new AlgorithmFactory<JsonWebEncryptionEncryptionMethodAlgorithm>("todo.properties");
+        jweEncMethodAlgorithmFactory = new AlgorithmFactory<JsonWebEncryptionContentEncryptionAlgorithm>("todo.properties");
 
     }
 
@@ -88,12 +88,12 @@ public class AlgorithmFactoryFactory
         return null;
     }
 
-    public JsonWebEncryptionEncryptionMethodAlgorithm getSymmetricEncryptionAlgorithm(String algo)
+    public JsonWebEncryptionContentEncryptionAlgorithm getSymmetricEncryptionAlgorithm(String algo)
     {
-        if (!algo.equals(EncryptionMethodAlgorithmIdentifiers.A128CBC))
+        if (!algo.equals(EncryptionMethodAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256))
         {
             return null;
         }
-        return new Aes128CbcJsonWebEncryptionEncryptionAlgorithm();
+        return new Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithm();
     }
 }

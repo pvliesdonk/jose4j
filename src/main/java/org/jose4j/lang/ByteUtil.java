@@ -134,4 +134,10 @@ public class ByteUtil
         return bytes.length * 8;
     }
 
+    public static byte[] randomBytes(int length)
+    {
+        ByteGenerator gen = new DefaultByteGenerator();
+        return gen.randomBytes(length);
+    }
+
 }

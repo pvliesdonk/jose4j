@@ -24,9 +24,7 @@ import org.jose4j.lang.JoseException;
 import org.jose4j.mac.MacUtil;
 
 import javax.crypto.Mac;
-import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 
 /**
  */
@@ -45,8 +43,7 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
 
     public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException
     {
-        Mac mac = getMacInstance();
-        initMacWithKey(mac, key);
+        Mac mac = getMacInstance(key);
         byte[] calculatedSigature = mac.doFinal(securedInputBytes);
 
         return ByteUtil.secureEquals(signatureBytes, calculatedSigature);
@@ -54,26 +51,13 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
 
     public byte[] sign(Key key, byte[] securedInputBytes) throws JoseException
     {
-        Mac mac = getMacInstance();
-        initMacWithKey(mac, key);
+        Mac mac = getMacInstance(key);
         return mac.doFinal(securedInputBytes);
     }
 
-    private void initMacWithKey(Mac mac, Key key) throws JoseException
+    private Mac getMacInstance(Key key) throws JoseException
     {
-        try
-        {
-            mac.init(key);
-        }
-        catch (InvalidKeyException e)
-        {
-            throw new JoseException("Key is not valid for " + getJavaAlgorithm(), e);
-        }
-    }
-
-    private Mac getMacInstance() throws JoseException
-    {
-        return MacUtil.getMac(getJavaAlgorithm());
+        return MacUtil.getInitializedMac(getJavaAlgorithm(), key);
     }
 
     void validateKey(Key key) throws JoseException

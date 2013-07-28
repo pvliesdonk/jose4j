@@ -17,21 +17,29 @@
 package org.jose4j.jwe;
 
 import org.jose4j.jwa.Algorithm;
+import org.jose4j.lang.JoseException;
 
 /**
  */
-public interface JsonWebEncryptionEncryptionMethodAlgorithm extends Algorithm
+public interface JsonWebEncryptionContentEncryptionAlgorithm extends Algorithm
 {
     int getKeySize();
 
-    boolean isAead();
+    EncryptionResult encrypt(byte[] plaintext, byte[] aad, byte[] key) throws JoseException;
+    byte[] decrypt(byte[] cipherText, byte[] iv, byte[] aad, byte[] tag, byte[] key) throws JoseException;
 
-    Result encrypt(byte[] plaintext, byte[] key);
-
-    public static class Result
+    public static class EncryptionResult
     {
         private byte[] iv;
         private byte[] ciphertext;
+        private byte[] authenticationTag;
+
+        public EncryptionResult(byte[] iv, byte[] ciphertext, byte[] authenticationTag)
+        {
+            this.iv = iv;
+            this.ciphertext = ciphertext;
+            this.authenticationTag = authenticationTag;
+        }
 
         public byte[] getIv()
         {
@@ -41,6 +49,11 @@ public interface JsonWebEncryptionEncryptionMethodAlgorithm extends Algorithm
         public byte[] getCiphertext()
         {
             return ciphertext;
+        }
+
+        public byte[] getAuthenticationTag()
+        {
+            return authenticationTag;
         }
     }
 }

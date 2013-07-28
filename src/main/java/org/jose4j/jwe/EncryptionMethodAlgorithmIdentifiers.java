@@ -20,8 +20,8 @@ package org.jose4j.jwe;
  */
 public class EncryptionMethodAlgorithmIdentifiers
 {
-    public static final String A128CBC = "A128CBC";
-    public static final String A256CBC = "A256CBC";
-    public static final String A128GCM = "A128GCM";
-    public static final String A256GCM = "A256GCM";
+    public static final String AES_128_CBC_HMAC_SHA_256 = "A128CBC-HS256";
+    public static final String AES_256_CBC_HMAC_SHA_512 = "A256CBC-HS512";
+    public static final String AES_128_GCM = "A128GCM";
+    public static final String AES_256_GCM = "A256GCM";
 }

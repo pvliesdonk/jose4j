@@ -67,7 +67,7 @@ public class JsonWebEncryption extends JsonWebStructure
     }
 
 
-    private JsonWebEncryptionEncryptionMethodAlgorithm getEncryptionMethodAlgorithm() throws JoseException
+    private JsonWebEncryptionContentEncryptionAlgorithm getEncryptionMethodAlgorithm() throws JoseException
     {
         String algo = getHeader(HeaderParameterNames.ENCRYPTION_METHOD);
         if (algo == null)

@@ -71,13 +71,13 @@ public class App
         byte[] plainTextBytes = StringUtil.getBytesUtf8(plainText);
         int[] plainTextUnsignedBytesFromExample = new int[] {76, 105, 118, 101, 32, 108, 111, 110, 103, 32, 97, 110, 100, 32,
            112, 114, 111, 115, 112, 101, 114, 46};
-        System.out.println(Arrays.equals(plainTextBytes, ByteUtil.convertUnsignedToSignedTwosComp(plainTextUnsignedBytesFromExample)));
+        System.out.println("plaintext bytes equal " + Arrays.equals(plainTextBytes, ByteUtil.convertUnsignedToSignedTwosComp(plainTextUnsignedBytesFromExample)));
 
         String jweHeaderString = "{\"alg\":\"RSA1_5\",\"enc\":\"A128CBC-HS256\"}";
 
         Base64Url b64 = new Base64Url();
         String encodedHeader = b64.base64UrlEncodeUtf8ByteRepresentation(jweHeaderString);
-        System.out.println(encodedHeader.equals("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"));
+        System.out.println("encodedHeader.equals"+encodedHeader.equals("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"));
 
         Cipher rsa15cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         rsa15cipher.init(Cipher.WRAP_MODE, ExampleRsaJwksFromJwe.APPENDIX_A_2.getPublicKey());
@@ -105,10 +105,12 @@ public class App
         System.out.println(Arrays.toString(contentEncryptionKeyBytes));
         System.out.println(Arrays.toString(ByteUtil.concat(hmacKeyBytes, encKeyBytes)));
 
-
-        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(encKeyBytes, "AES"));
-        byte[] iv = cipher.getIV();
+        byte[] iv = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104, 101});
         System.out.println("iv " + iv.length);
+        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(encKeyBytes, "AES"), new IvParameterSpec(iv));
+        byte[] iv2 = cipher.getIV();
+        System.out.println("ivs eq " +Arrays.equals(iv, iv2));
+        System.out.println("iv2 " + iv2.length);
         String encodedJweInitializationVector = b64.base64UrlEncode(iv);
         byte[] cipherText = cipher.doFinal(StringUtil.getBytesUtf8(plainText));
 
@@ -116,8 +118,7 @@ public class App
         byte[] aad = StringUtil.getBytesAscii(encodedHeader);
         System.out.println(Arrays.toString(aad));
 
-        Mac mac = MacUtil.getMac(MacUtil.HMAC_SHA256);
-        mac.init(new HmacKey(hmacKeyBytes));
+        Mac mac = MacUtil.getInitializedMac(MacUtil.HMAC_SHA256, new HmacKey(hmacKeyBytes));
 
 //        4.  The octet string AL is equal to the number of bits in A expressed
 //            as a 64-bit unsigned integer in network byte order.
@@ -147,6 +148,10 @@ public class App
 
         String encodedAuthenticationTag = b64.base64UrlEncode(truncatedAuthenticationTag);
         String encodedCipherText = b64.base64UrlEncode(cipherText);
+
+        System.out.println("encodedCipherText.equals " + encodedCipherText.equals("KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY"));
+        System.out.println("encodedAuthenticationTag.equals " + encodedAuthenticationTag.equals("9hH0vgRfYgPnAHOd8stkvw"));
+
 
         String cs = CompactSerialization.serialize(encodedHeader, encodedJweEncryptedKey, encodedJweInitializationVector, encodedCipherText, encodedAuthenticationTag);
 
