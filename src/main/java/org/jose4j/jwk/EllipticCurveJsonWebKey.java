@@ -60,11 +60,9 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
         curveName = JsonHelp.getString(params, CURVE_MEMBER_NAME);
         ECParameterSpec curve = EllipticCurves.getSpec(curveName);
 
-        String b64x = JsonHelp.getString(params, X_MEMBER_NAME);
-        BigInteger x = BigEndianBigInteger.fromBase64Url(b64x);
+        BigInteger x = getBigIntFromBase64UrlEncodedParam(params, X_MEMBER_NAME);
 
-        String b64y = JsonHelp.getString(params, Y_MEMBER_NAME);
-        BigInteger y = BigEndianBigInteger.fromBase64Url(b64y);
+        BigInteger y =  getBigIntFromBase64UrlEncodedParam(params, Y_MEMBER_NAME);
 
         EcKeyUtil keyUtil = new EcKeyUtil();
         key = keyUtil.publicKey(x, y, curve);
@@ -72,8 +70,7 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
 
         if (params.containsKey(PRIVATE_KEY_MEMBER_NAME))
         {
-            String b64d = JsonHelp.getString(params, PRIVATE_KEY_MEMBER_NAME);
-            BigInteger d = BigEndianBigInteger.fromBase64Url(b64d);
+            BigInteger d = getBigIntFromBase64UrlEncodedParam(params, PRIVATE_KEY_MEMBER_NAME);
             privateKey = keyUtil.privateKey(d, curve);
         }
     }
@@ -101,25 +98,15 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
     protected void fillPublicTypeSpecificParams(Map<String,Object> params)
     {
         ECPublicKey ecPublicKey = getECPublicKey();
-
         ECPoint w = ecPublicKey.getW();
-
-        BigInteger x = w.getAffineX();
-        String b64x = BigEndianBigInteger.toBase64Url(x);
-        params.put(X_MEMBER_NAME, b64x);
-
-        BigInteger y = w.getAffineY();
-        String b64y = BigEndianBigInteger.toBase64Url(y);
-        params.put(Y_MEMBER_NAME, b64y);
-
+        putBigIntAsBase64UrlEncodedParam(params, X_MEMBER_NAME, w.getAffineX());
+        putBigIntAsBase64UrlEncodedParam(params, Y_MEMBER_NAME, w.getAffineY());
         params.put(CURVE_MEMBER_NAME, getCurveName());
     }
 
     protected void fillPrivateTypeSpecificParams(Map<String,Object> params)
     {
         ECPrivateKey ecPrivateKey = getEcPrivateKey();
-        BigInteger s = ecPrivateKey.getS();
-        String b64s = BigEndianBigInteger.toBase64Url(s);
-        params.put(PRIVATE_KEY_MEMBER_NAME, b64s);
+        putBigIntAsBase64UrlEncodedParam(params, PRIVATE_KEY_MEMBER_NAME, ecPrivateKey.getS());
     }
 }

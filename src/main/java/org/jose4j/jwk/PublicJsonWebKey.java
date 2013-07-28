@@ -17,10 +17,12 @@
 package org.jose4j.jwk;
 
 import org.jose4j.json.JsonUtil;
+import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.X509Util;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.JsonHelp;
 
+import java.math.BigInteger;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -147,6 +149,18 @@ public abstract class PublicJsonWebKey extends JsonWebKey
     public void setCertificateChain(X509Certificate... certificates)
     {
         setCertificateChain(Arrays.asList(certificates));
+    }
+
+    BigInteger getBigIntFromBase64UrlEncodedParam(Map<String, Object> params, String parameterName)
+    {
+        String base64UrlValue = JsonHelp.getString(params, parameterName);
+        return BigEndianBigInteger.fromBase64Url(base64UrlValue);
+    }
+
+    void putBigIntAsBase64UrlEncodedParam(Map<String,Object> params, String parameterName, BigInteger value)
+    {
+        String base64UrlValue = BigEndianBigInteger.toBase64Url(value);
+        params.put(parameterName, base64UrlValue);
     }
 
     public static class Factory
