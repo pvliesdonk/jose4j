@@ -37,8 +37,10 @@ import java.util.Map;
  */
 public abstract class PublicJsonWebKey extends JsonWebKey
 {
-    // todo x5c etc, fun
+
     public static final String X509_CERTIFICATE_CHAIN_PARAMETER = "x5c";
+
+    // todo x5others
     public static final String X509_THUMBPRINT_PARAMETER = "x5t";
     public static final String X509_URL_PARAMETER = "x5u";
 
