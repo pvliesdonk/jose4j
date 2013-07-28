@@ -59,16 +59,21 @@ public class GenericAesCbcHmacSha2JsonWebEncryptionContentEncryptionAlgorithm ex
         this.tagTruncationLength = tagTruncationLength;
     }
 
-    public JsonWebEncryptionContentEncryptionAlgorithm.EncryptionResult encrypt(byte[] plaintext, byte[] aad, byte[] key) throws JoseException
+    public EncryptionResult encrypt(byte[] plaintext, byte[] aad, byte[] key) throws JoseException
+    {
+        // The Initialization Vector (IV) used is a 128 bit value generated
+        //       randomly or pseudorandomly for use in the cipher.
+        byte[] iv = ByteUtil.randomBytes(16);
+        return encrypt(plaintext, aad, key, iv);
+    }
+
+    JsonWebEncryptionContentEncryptionAlgorithm.EncryptionResult encrypt(byte[] plaintext, byte[] aad, byte[] key, byte[] iv) throws JoseException
     {
         Key hmacKey = new HmacKey(ByteUtil.leftHalf(key));
         Key encryptionKey = new AesKey(ByteUtil.rightHalf(key));
 
         Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm());
 
-        // The Initialization Vector (IV) used is a 128 bit value generated
-        //       randomly or pseudorandomly for use in the cipher.
-        byte[] iv = ByteUtil.randomBytes(16);
         try
         {
             cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, new IvParameterSpec(iv));
