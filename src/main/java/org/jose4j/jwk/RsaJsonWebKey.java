@@ -22,6 +22,7 @@ import org.jose4j.lang.JoseException;
 import org.jose4j.lang.JsonHelp;
 
 import java.math.BigInteger;
+import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Map;
@@ -35,6 +36,17 @@ public class RsaJsonWebKey extends PublicJsonWebKey
 
     public static final String PRIVATE_EXPONENT_MEMBER_NAME = "d";
 
+    public static final String FIRST_PRIME_FACTOR_MEMBER_NAME = "p";
+    public static final String SECOND_PRIME_FACTOR_MEMBER_NAME = "q";
+    public static final String FIRST_FACTOR_CRT_EXPONENT_MEMBER_NAME = "dp";
+    public static final String SECOND_FACTOR_CRT_EXPONENT_MEMBER_NAME = "dq";
+    public static final String FIRST_CRT_COEFFICIENT_MEMBER_NAME = "qi";
+
+    public static final String OTHER_PRIMES_INFO_MEMBER_NAME = "oth";
+    public static final String PRIME_FACTOR_OTHER_MEMBER_NAME = "r";
+    public static final String FACTOR_CRT_EXPONENT_OTHER_MEMBER_NAME = "d";
+    public static final String FACTOR_CRT_COEFFICIENT = "t";
+
     public static final String KEY_TYPE = "RSA";
 
     public RsaJsonWebKey(RSAPublicKey publicKey)
@@ -45,11 +57,10 @@ public class RsaJsonWebKey extends PublicJsonWebKey
     public RsaJsonWebKey(Map<String, Object> params) throws JoseException
     {
         super(params);
-        String b64Modulus = JsonHelp.getString(params, MODULUS_MEMBER_NAME);
-        BigInteger modulus = BigEndianBigInteger.fromBase64Url(b64Modulus);
 
-        String b64Exponent = JsonHelp.getString(params, EXPONENT_MEMBER_NAME);
-        BigInteger publicExponent = BigEndianBigInteger.fromBase64Url(b64Exponent);
+        BigInteger modulus = getBigIntFromBase64UrlEncodedParam(params, MODULUS_MEMBER_NAME);
+
+        BigInteger publicExponent = getBigIntFromBase64UrlEncodedParam(params, EXPONENT_MEMBER_NAME);
 
         RsaKeyUtil rsaKeyUtil = new RsaKeyUtil();
         key = rsaKeyUtil.publicKey(modulus, publicExponent);
@@ -59,7 +70,20 @@ public class RsaJsonWebKey extends PublicJsonWebKey
         {
             String b64d = JsonHelp.getString(params, PRIVATE_EXPONENT_MEMBER_NAME);
             BigInteger d = BigEndianBigInteger.fromBase64Url(b64d);
-            privateKey = rsaKeyUtil.privateKey(modulus, d);
+
+            if (params.containsKey(FIRST_PRIME_FACTOR_MEMBER_NAME))
+            {
+                BigInteger p = getBigIntFromBase64UrlEncodedParam(params, FIRST_PRIME_FACTOR_MEMBER_NAME);
+                BigInteger q = getBigIntFromBase64UrlEncodedParam(params, SECOND_PRIME_FACTOR_MEMBER_NAME);
+                BigInteger dp = getBigIntFromBase64UrlEncodedParam(params, FIRST_FACTOR_CRT_EXPONENT_MEMBER_NAME);
+                BigInteger dq = getBigIntFromBase64UrlEncodedParam(params, SECOND_FACTOR_CRT_EXPONENT_MEMBER_NAME);
+                BigInteger qi = getBigIntFromBase64UrlEncodedParam(params, FIRST_CRT_COEFFICIENT_MEMBER_NAME);
+                privateKey = rsaKeyUtil.privateKey(modulus, publicExponent, d, p, q, dp, dq, qi);
+            }
+            else
+            {
+                privateKey = rsaKeyUtil.privateKey(modulus, d);
+            }
         }
     }
 
@@ -81,20 +105,23 @@ public class RsaJsonWebKey extends PublicJsonWebKey
     protected void fillPublicTypeSpecificParams(Map<String,Object> params)
     {
         RSAPublicKey rsaPublicKey = getRSAPublicKey();
-        BigInteger modulus = rsaPublicKey.getModulus();
-        String b64Modulus = BigEndianBigInteger.toBase64Url(modulus);
-        params.put(MODULUS_MEMBER_NAME, b64Modulus);
-
-        BigInteger publicExponent = rsaPublicKey.getPublicExponent();
-        String b64Exponent = BigEndianBigInteger.toBase64Url(publicExponent);
-        params.put(EXPONENT_MEMBER_NAME, b64Exponent);
+        putBigIntAsBase64UrlEncodedParam(params, MODULUS_MEMBER_NAME, rsaPublicKey.getModulus());
+        putBigIntAsBase64UrlEncodedParam(params, EXPONENT_MEMBER_NAME, rsaPublicKey.getPublicExponent());
     }
 
     protected void fillPrivateTypeSpecificParams(Map<String,Object> params)
     {
         RSAPrivateKey rsaPrivateKey = getRsaPrivateKey();
-        BigInteger privateExponent = rsaPrivateKey.getPrivateExponent();
-        String b64PrivateExponent = BigEndianBigInteger.toBase64Url(privateExponent);
-        params.put(PRIVATE_EXPONENT_MEMBER_NAME, b64PrivateExponent);
+        putBigIntAsBase64UrlEncodedParam(params, PRIVATE_EXPONENT_MEMBER_NAME, rsaPrivateKey.getPrivateExponent());
+
+        if (rsaPrivateKey instanceof RSAPrivateCrtKey)
+        {
+            RSAPrivateCrtKey crt = (RSAPrivateCrtKey) rsaPrivateKey;
+            putBigIntAsBase64UrlEncodedParam(params, FIRST_PRIME_FACTOR_MEMBER_NAME, crt.getPrimeP());
+            putBigIntAsBase64UrlEncodedParam(params, SECOND_PRIME_FACTOR_MEMBER_NAME, crt.getPrimeQ());
+            putBigIntAsBase64UrlEncodedParam(params, FIRST_FACTOR_CRT_EXPONENT_MEMBER_NAME, crt.getPrimeExponentP());
+            putBigIntAsBase64UrlEncodedParam(params, SECOND_FACTOR_CRT_EXPONENT_MEMBER_NAME, crt.getPrimeExponentQ());
+            putBigIntAsBase64UrlEncodedParam(params, FIRST_CRT_COEFFICIENT_MEMBER_NAME, crt.getCrtCoefficient());
+        }
     }
 }

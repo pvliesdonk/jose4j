@@ -23,6 +23,7 @@ import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 
@@ -65,6 +66,20 @@ public class RsaKeyUtil
     public RSAPrivateKey privateKey(BigInteger modulus, BigInteger privateExponent) throws JoseException
     {
         RSAPrivateKeySpec keySpec = new RSAPrivateKeySpec(modulus, privateExponent);
+        return getRsaPrivateKey(keySpec);
+    }
+
+    public RSAPrivateKey privateKey(BigInteger modulus, BigInteger publicExponent, BigInteger privateExponent, BigInteger primeP,
+                                    BigInteger primeQ, BigInteger primeExponentP, BigInteger primeExponentQ,
+                                    BigInteger crtCoefficient) throws JoseException
+    {
+        RSAPrivateCrtKeySpec keySpec = new RSAPrivateCrtKeySpec(modulus,
+                publicExponent, privateExponent, primeP, primeQ, primeExponentP, primeExponentQ, crtCoefficient);
+        return getRsaPrivateKey(keySpec);
+    }
+
+    public RSAPrivateKey getRsaPrivateKey(RSAPrivateKeySpec keySpec) throws JoseException
+    {
         try
         {
             PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
