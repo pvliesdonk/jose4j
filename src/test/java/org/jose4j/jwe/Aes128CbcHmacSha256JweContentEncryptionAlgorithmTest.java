@@ -8,7 +8,7 @@ import org.jose4j.lang.StringUtil;
 
 /**
  */
-public class Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithmTest extends TestCase
+public class Aes128CbcHmacSha256JweContentEncryptionAlgorithmTest extends TestCase
 {
     public void testExampleEncryptFromJweAppendix2() throws JoseException
     {
@@ -24,7 +24,7 @@ public class Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithmTest 
 
         byte[] iv = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104, 101});
 
-        Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithm();
+        Aes128CbcHmacSha256JweContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256JweContentEncryptionAlgorithm();
         JsonWebEncryptionContentEncryptionAlgorithm.EncryptionResult encryptionResult = jweContentEncryptionAlg.encrypt(plainText, aad, contentEncryptionKeyBytes, iv);
 
         Base64Url base64Url = new Base64Url();
@@ -50,7 +50,7 @@ public class Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithmTest 
         byte[] ciphertext = b.base64UrlDecode("KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY");
         byte[] tag = b.base64UrlDecode("9hH0vgRfYgPnAHOd8stkvw");
 
-        Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithm();
+        Aes128CbcHmacSha256JweContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256JweContentEncryptionAlgorithm();
         byte[] plaintextBytes = jweContentEncryptionAlg.decrypt(ciphertext, iv, header, tag, contentEncryptionKeyBytes);
         assertEquals("Live long and prosper.", StringUtil.newStringUtf8(plaintextBytes));
     }
@@ -60,7 +60,7 @@ public class Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithmTest 
         String text = "I'm writing this test on a flight to Zurich";
         byte[] aad = StringUtil.getBytesUtf8("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0");
         byte[] plaintext = StringUtil.getBytesUtf8(text);
-        Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithm();
+        Aes128CbcHmacSha256JweContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256JweContentEncryptionAlgorithm();
         byte[] key = ByteUtil.randomBytes(jweContentEncryptionAlg.getKeySize()/8);
         JsonWebEncryptionContentEncryptionAlgorithm.EncryptionResult encrypt = jweContentEncryptionAlg.encrypt(plaintext, aad, key);
 

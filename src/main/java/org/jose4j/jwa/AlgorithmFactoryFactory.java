@@ -94,6 +94,6 @@ public class AlgorithmFactoryFactory
         {
             return null;
         }
-        return new Aes128CbcHmacSha256JsonWebEncryptionContentEncryptionAlgorithm();
+        return new Aes128CbcHmacSha256JweContentEncryptionAlgorithm();
     }
 }
