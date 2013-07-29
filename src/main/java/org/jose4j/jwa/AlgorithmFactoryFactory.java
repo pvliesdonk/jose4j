@@ -29,15 +29,15 @@ public class AlgorithmFactoryFactory
     private static final AlgorithmFactoryFactory factoryFactory = new AlgorithmFactoryFactory();
 
     private final AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory;
-    private AlgorithmFactory<JsonWebEncryptionKeyManagementModeAlgorithm> jweKeyMgmtModeAlgorithmFactory;
-    private AlgorithmFactory<JsonWebEncryptionContentEncryptionAlgorithm> jweEncMethodAlgorithmFactory;
+    private AlgorithmFactory<KeyManagementModeAlgorithm> jweKeyMgmtModeAlgorithmFactory;
+    private AlgorithmFactory<ContentEncryptionAlgorithm> jweEncMethodAlgorithmFactory;
 
 
     private AlgorithmFactoryFactory()
     {
         jwsAlgorithmFactory = new AlgorithmFactory<JsonWebSignatureAlgorithm>("jws-algorithms.properties"); // todo change name
-        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<JsonWebEncryptionKeyManagementModeAlgorithm>("todo.properties");
-        jweEncMethodAlgorithmFactory = new AlgorithmFactory<JsonWebEncryptionContentEncryptionAlgorithm>("todo.properties");
+        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<KeyManagementModeAlgorithm>("todo.properties");
+        jweEncMethodAlgorithmFactory = new AlgorithmFactory<ContentEncryptionAlgorithm>("todo.properties");
 
     }
 
@@ -51,12 +51,12 @@ public class AlgorithmFactoryFactory
         return jwsAlgorithmFactory;
     }
 
-    public JsonWebEncryptionKeyManagementModeAlgorithm getKeyManagementModeAlgorithm(String algo)
+    public KeyManagementModeAlgorithm getKeyManagementModeAlgorithm(String algo)
     {
         // TODO
         if (KeyManagementModeAlgorithmIdentifiers.RSA1_5.equals(algo))
         {
-            return new JsonWebEncryptionKeyManagementModeAlgorithm()
+            return new KeyManagementModeAlgorithm()
             {
                 public byte[] encrypt(Key key, byte[] contentMasterKey)
                 {
@@ -88,12 +88,12 @@ public class AlgorithmFactoryFactory
         return null;
     }
 
-    public JsonWebEncryptionContentEncryptionAlgorithm getSymmetricEncryptionAlgorithm(String algo)
+    public ContentEncryptionAlgorithm getSymmetricEncryptionAlgorithm(String algo)
     {
         if (!algo.equals(EncryptionMethodAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256))
         {
             return null;
         }
-        return new Aes128CbcHmacSha256JweContentEncryptionAlgorithm();
+        return new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
     }
 }

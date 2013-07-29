@@ -67,7 +67,7 @@ public class JsonWebEncryption extends JsonWebStructure
     }
 
 
-    private JsonWebEncryptionContentEncryptionAlgorithm getEncryptionMethodAlgorithm() throws JoseException
+    private ContentEncryptionAlgorithm getEncryptionMethodAlgorithm() throws JoseException
     {
         String algo = getHeader(HeaderParameterNames.ENCRYPTION_METHOD);
         if (algo == null)
@@ -78,7 +78,7 @@ public class JsonWebEncryption extends JsonWebStructure
         return factoryFactory.getSymmetricEncryptionAlgorithm(algo);
     }
 
-    private JsonWebEncryptionKeyManagementModeAlgorithm getKeyManagementModeAlgorithm() throws JoseException
+    private KeyManagementModeAlgorithm getKeyManagementModeAlgorithm() throws JoseException
     {
         String algo = getAlgorithmHeaderValue();
         if (algo == null)

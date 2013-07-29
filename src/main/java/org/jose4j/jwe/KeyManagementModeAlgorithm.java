@@ -22,6 +22,6 @@ import java.security.Key;
 
 /**
  */
-public interface JsonWebEncryptionKeyManagementModeAlgorithm extends Algorithm
+public interface KeyManagementModeAlgorithm extends Algorithm
 {
 }

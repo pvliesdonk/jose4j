@@ -19,13 +19,13 @@ import java.security.Key;
 
 /**
  */
-public class GenericAesCbcHmacSha2JweContentEncryptionAlgorithm extends AlgorithmInfo implements JsonWebEncryptionContentEncryptionAlgorithm
+public class GenericAesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo implements ContentEncryptionAlgorithm
 {
     private String hmacJavaAlgorithm;
     private int tagTruncationLength;
     private int keySize;
 
-    public GenericAesCbcHmacSha2JweContentEncryptionAlgorithm()
+    public GenericAesCbcHmacSha2ContentEncryptionAlgorithm()
     {
         setJavaAlgorithm("AES/CBC/PKCS5Padding");
     }
@@ -68,7 +68,7 @@ public class GenericAesCbcHmacSha2JweContentEncryptionAlgorithm extends Algorith
         return encrypt(plaintext, aad, key, iv);
     }
 
-    JsonWebEncryptionContentEncryptionAlgorithm.EncryptionResult encrypt(byte[] plaintext, byte[] aad, byte[] key, byte[] iv) throws JoseException
+    ContentEncryptionAlgorithm.EncryptionResult encrypt(byte[] plaintext, byte[] aad, byte[] key, byte[] iv) throws JoseException
     {
         Key hmacKey = new HmacKey(ByteUtil.leftHalf(key));
         Key encryptionKey = new AesKey(ByteUtil.rightHalf(key));
@@ -110,7 +110,7 @@ public class GenericAesCbcHmacSha2JweContentEncryptionAlgorithm extends Algorith
         byte[] authenticationTag = mac.doFinal(authenticationTagInput);
         authenticationTag = ByteUtil.subArray(authenticationTag, 0, getTagTruncationLength()); // truncate it
 
-        return new JsonWebEncryptionContentEncryptionAlgorithm.EncryptionResult(iv, cipherText, authenticationTag);
+        return new ContentEncryptionAlgorithm.EncryptionResult(iv, cipherText, authenticationTag);
     }
 
     public byte[] decrypt(byte[] cipherText, byte[] iv, byte[] aad, byte[] tag, byte[] key) throws JoseException

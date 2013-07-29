@@ -21,7 +21,7 @@ import org.jose4j.lang.JoseException;
 
 /**
  */
-public interface JsonWebEncryptionContentEncryptionAlgorithm extends Algorithm
+public interface ContentEncryptionAlgorithm extends Algorithm
 {
     /**
      * Gets the key size.

@@ -22,17 +22,17 @@ import org.jose4j.mac.MacUtil;
 
 /**
  */
-public class Aes256CbcHmacSha512JweContentEncryptionAlgorithm
-        extends GenericAesCbcHmacSha2JweContentEncryptionAlgorithm
-        implements JsonWebEncryptionContentEncryptionAlgorithm
+public class Aes128CbcHmacSha256ContentEncryptionAlgorithm
+        extends GenericAesCbcHmacSha2ContentEncryptionAlgorithm
+        implements ContentEncryptionAlgorithm
 {
-    public Aes256CbcHmacSha512JweContentEncryptionAlgorithm()
+    public Aes128CbcHmacSha256ContentEncryptionAlgorithm()
     {
         super();
         setAlgorithmIdentifier(EncryptionMethodAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
-        setKeySize(64); // ENC_KEY_LEN is 32 octets & MAC_KEY_LEN is 32 octets.
-        setHmacJavaAlgorithm(MacUtil.HMAC_SHA512);
-        setTagTruncationLength(32); // The HMAC SHA-512 value is truncated to T_LEN=32 octets instead of 16 octets.
+        setKeySize(32); // 16 octets for MAC_KEY_LEN + 16 octets for ENC_KEY_LEN
+        setHmacJavaAlgorithm(MacUtil.HMAC_SHA256);
+        setTagTruncationLength(16); // The HMAC-SHA-256 output is truncated to T_LEN=16 octets
         this.setKeyPersuasion(KeyPersuasion.SYMMETRIC);
         this.setKeyType(AesKey.ALGORITHM);
     }
