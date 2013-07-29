@@ -23,6 +23,11 @@ import org.jose4j.lang.JoseException;
  */
 public interface JsonWebEncryptionContentEncryptionAlgorithm extends Algorithm
 {
+    /**
+     * Gets the key size.
+     *
+     * @return the length, in bytes, of the key used by this algorithm
+     */
     int getKeySize();
 
     EncryptionResult encrypt(byte[] plaintext, byte[] aad, byte[] key) throws JoseException;
