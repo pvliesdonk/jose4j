@@ -25,7 +25,7 @@ public class Aes128CbcHmacSha256JweContentEncryptionAlgorithmTest extends TestCa
         byte[] iv = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104, 101});
 
         Aes128CbcHmacSha256ContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
-        ContentEncryptionAlgorithm.ContentEncryptionParts contentEncryptionParts = jweContentEncryptionAlg.encrypt(plainText, aad, contentEncryptionKeyBytes, iv);
+        ContentEncryptionParts contentEncryptionParts = jweContentEncryptionAlg.encrypt(plainText, aad, contentEncryptionKeyBytes, iv);
 
         Base64Url base64Url = new Base64Url();
 
@@ -51,7 +51,7 @@ public class Aes128CbcHmacSha256JweContentEncryptionAlgorithmTest extends TestCa
         byte[] tag = b.base64UrlDecode("9hH0vgRfYgPnAHOd8stkvw");
 
         Aes128CbcHmacSha256ContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
-        ContentEncryptionAlgorithm.ContentEncryptionParts encryptionParts = new ContentEncryptionAlgorithm.ContentEncryptionParts(iv, ciphertext, tag);
+        ContentEncryptionParts encryptionParts = new ContentEncryptionParts(iv, ciphertext, tag);
         byte[] plaintextBytes = jweContentEncryptionAlg.decrypt(encryptionParts, header, contentEncryptionKeyBytes);
 
         assertEquals("Live long and prosper.", StringUtil.newStringUtf8(plaintextBytes));
@@ -64,7 +64,7 @@ public class Aes128CbcHmacSha256JweContentEncryptionAlgorithmTest extends TestCa
         byte[] plaintext = StringUtil.getBytesUtf8(text);
         Aes128CbcHmacSha256ContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
         byte[] cek = ByteUtil.randomBytes(jweContentEncryptionAlg.getContentEncryptionKeyByteLength());
-        ContentEncryptionAlgorithm.ContentEncryptionParts encryptionParts = jweContentEncryptionAlg.encrypt(plaintext, aad, cek);
+        ContentEncryptionParts encryptionParts = jweContentEncryptionAlg.encrypt(plaintext, aad, cek);
 
         byte[] decrypt = jweContentEncryptionAlg.decrypt(encryptionParts, aad, cek);
         assertEquals(text, StringUtil.newStringUtf8(decrypt));
