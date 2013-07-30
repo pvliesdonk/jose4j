@@ -25,15 +25,15 @@ public class Aes128CbcHmacSha256JweContentEncryptionAlgorithmTest extends TestCa
         byte[] iv = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104, 101});
 
         Aes128CbcHmacSha256ContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
-        ContentEncryptionAlgorithm.EncryptionResult encryptionResult = jweContentEncryptionAlg.encrypt(plainText, aad, contentEncryptionKeyBytes, iv);
+        ContentEncryptionAlgorithm.ContentEncryptionParts contentEncryptionParts = jweContentEncryptionAlg.encrypt(plainText, aad, contentEncryptionKeyBytes, iv);
 
         Base64Url base64Url = new Base64Url();
 
-        byte[] ciphertext = encryptionResult.getCiphertext();
+        byte[] ciphertext = contentEncryptionParts.getCiphertext();
         String encodedJweCiphertext = "KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY";
         assertEquals(encodedJweCiphertext, base64Url.base64UrlEncode(ciphertext));
 
-        byte[] authenticationTag = encryptionResult.getAuthenticationTag();
+        byte[] authenticationTag = contentEncryptionParts.getAuthenticationTag();
         String encodedAuthenticationTag = "9hH0vgRfYgPnAHOd8stkvw";
         assertEquals(encodedAuthenticationTag, base64Url.base64UrlEncode(authenticationTag));
     }
@@ -51,7 +51,9 @@ public class Aes128CbcHmacSha256JweContentEncryptionAlgorithmTest extends TestCa
         byte[] tag = b.base64UrlDecode("9hH0vgRfYgPnAHOd8stkvw");
 
         Aes128CbcHmacSha256ContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
-        byte[] plaintextBytes = jweContentEncryptionAlg.decrypt(ciphertext, iv, header, tag, contentEncryptionKeyBytes);
+        ContentEncryptionAlgorithm.ContentEncryptionParts encryptionParts = new ContentEncryptionAlgorithm.ContentEncryptionParts(iv, ciphertext, tag);
+        byte[] plaintextBytes = jweContentEncryptionAlg.decrypt(encryptionParts, header, contentEncryptionKeyBytes);
+
         assertEquals("Live long and prosper.", StringUtil.newStringUtf8(plaintextBytes));
     }
 
@@ -61,10 +63,10 @@ public class Aes128CbcHmacSha256JweContentEncryptionAlgorithmTest extends TestCa
         byte[] aad = StringUtil.getBytesUtf8("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0");
         byte[] plaintext = StringUtil.getBytesUtf8(text);
         Aes128CbcHmacSha256ContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
-        byte[] key = ByteUtil.randomBytes(jweContentEncryptionAlg.getContentEncryptionKeyByteLength());
-        ContentEncryptionAlgorithm.EncryptionResult encrypt = jweContentEncryptionAlg.encrypt(plaintext, aad, key);
+        byte[] cek = ByteUtil.randomBytes(jweContentEncryptionAlg.getContentEncryptionKeyByteLength());
+        ContentEncryptionAlgorithm.ContentEncryptionParts encryptionParts = jweContentEncryptionAlg.encrypt(plaintext, aad, cek);
 
-        byte[] decrypt = jweContentEncryptionAlg.decrypt(encrypt.getCiphertext(), encrypt.getIv(), aad, encrypt.getAuthenticationTag(), key);
+        byte[] decrypt = jweContentEncryptionAlg.decrypt(encryptionParts, aad, cek);
         assertEquals(text, StringUtil.newStringUtf8(decrypt));
     }
 

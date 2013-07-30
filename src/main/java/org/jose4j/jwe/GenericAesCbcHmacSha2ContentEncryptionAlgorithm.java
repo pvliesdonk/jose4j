@@ -60,7 +60,7 @@ public class GenericAesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmIn
         this.tagTruncationLength = tagTruncationLength;
     }
 
-    public EncryptionResult encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey) throws JoseException
+    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey) throws JoseException
     {
         // The Initialization Vector (IV) used is a 128 bit value generated
         //       randomly or pseudorandomly for use in the cipher.
@@ -68,7 +68,7 @@ public class GenericAesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmIn
         return encrypt(plaintext, aad, contentEncryptionKey, iv);
     }
 
-    ContentEncryptionAlgorithm.EncryptionResult encrypt(byte[] plaintext, byte[] aad, byte[] key, byte[] iv) throws JoseException
+    ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] key, byte[] iv) throws JoseException
     {
         Key hmacKey = new HmacKey(ByteUtil.leftHalf(key));
         Key encryptionKey = new AesKey(ByteUtil.rightHalf(key));
@@ -110,22 +110,26 @@ public class GenericAesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmIn
         byte[] authenticationTag = mac.doFinal(authenticationTagInput);
         authenticationTag = ByteUtil.subArray(authenticationTag, 0, getTagTruncationLength()); // truncate it
 
-        return new ContentEncryptionAlgorithm.EncryptionResult(iv, cipherText, authenticationTag);
+        return new ContentEncryptionParts(iv, cipherText, authenticationTag);
     }
 
-    public byte[] decrypt(byte[] cipherText, byte[] iv, byte[] aad, byte[] tag, byte[] contentEncryptionKey) throws JoseException
+
+    public byte[] decrypt(ContentEncryptionParts contentEncryptionParts, byte[] aad, byte[] contentEncryptionKey) throws JoseException
     {
+        byte[] iv = contentEncryptionParts.getIv();
+        byte[] ciphertext = contentEncryptionParts.getCiphertext();
+        byte[] authenticationTag = contentEncryptionParts.getAuthenticationTag();
         byte[] al = getAdditionalAuthenticatedDataLengthBytes(aad);
-        byte[] authenticationTagInput = ByteUtil.concat(aad, iv, cipherText, al);
+        byte[] authenticationTagInput = ByteUtil.concat(aad, iv, ciphertext, al);
         Key hmacKey = new HmacKey(ByteUtil.leftHalf(contentEncryptionKey));
         Mac mac = MacUtil.getInitializedMac(getHmacJavaAlgorithm(), hmacKey);
         byte[] calculatedAuthenticationTag = mac.doFinal(authenticationTagInput);
         calculatedAuthenticationTag = ByteUtil.subArray(calculatedAuthenticationTag, 0, getTagTruncationLength()); // truncate it
-        boolean tagMatch = ByteUtil.secureEquals(tag, calculatedAuthenticationTag);
+        boolean tagMatch = ByteUtil.secureEquals(authenticationTag, calculatedAuthenticationTag);
         if (!tagMatch)
         {
             Base64Url base64Url = new Base64Url();
-            String encTag = base64Url.base64UrlEncode(tag);
+            String encTag = base64Url.base64UrlEncode(authenticationTag);
             String calcEncTag = base64Url.base64UrlEncode(calculatedAuthenticationTag);
             throw new JoseException("Authentication tag failed. Message=" + encTag + " calculated=" + calcEncTag);
         }
@@ -148,7 +152,7 @@ public class GenericAesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmIn
 
         try
         {
-            return cipher.doFinal(cipherText);
+            return cipher.doFinal(ciphertext);
         }
         catch (IllegalBlockSizeException e)
         {

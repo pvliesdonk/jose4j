@@ -30,16 +30,16 @@ public interface ContentEncryptionAlgorithm extends Algorithm
      */
     int getContentEncryptionKeyByteLength();
 
-    EncryptionResult encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey) throws JoseException;
-    byte[] decrypt(byte[] cipherText, byte[] iv, byte[] aad, byte[] tag, byte[] contentEncryptionKey) throws JoseException;
+    ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey) throws JoseException;
+    byte[] decrypt(ContentEncryptionParts contentEncryptionParts, byte[] aad, byte[] contentEncryptionKey) throws JoseException;
 
-    public static class EncryptionResult
+    public static class ContentEncryptionParts
     {
         private byte[] iv;
         private byte[] ciphertext;
         private byte[] authenticationTag;
 
-        public EncryptionResult(byte[] iv, byte[] ciphertext, byte[] authenticationTag)
+        public ContentEncryptionParts(byte[] iv, byte[] ciphertext, byte[] authenticationTag)
         {
             this.iv = iv;
             this.ciphertext = ciphertext;
