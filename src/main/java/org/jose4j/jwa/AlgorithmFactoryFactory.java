@@ -56,33 +56,7 @@ public class AlgorithmFactoryFactory
         // TODO
         if (KeyManagementModeAlgorithmIdentifiers.RSA1_5.equals(algo))
         {
-            return new KeyManagementModeAlgorithm()
-            {
-                public byte[] encrypt(Key key, byte[] contentMasterKey)
-                {
-                    return contentMasterKey; // TODO
-                }
-
-                public String getJavaAlgorithm()
-                {
-                    return null;  //To change body of implemented methods use File | Settings | File Templates.
-                }
-
-                public String getAlgorithmIdentifier()
-                {
-                    return null;  //To change body of implemented methods use File | Settings | File Templates.
-                }
-
-                public KeyPersuasion getKeyPersuasion()
-                {
-                    return null;  //To change body of implemented methods use File | Settings | File Templates.
-                }
-
-                public String getKeyType()
-                {
-                    return null;  //To change body of implemented methods use File | Settings | File Templates.
-                }
-            };
+            return new Rsa1_5KeyManagementModeAlgorithm();
         }
 
         return null;

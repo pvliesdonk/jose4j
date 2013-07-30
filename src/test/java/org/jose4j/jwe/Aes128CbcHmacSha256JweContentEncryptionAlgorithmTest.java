@@ -62,11 +62,12 @@ public class Aes128CbcHmacSha256JweContentEncryptionAlgorithmTest extends TestCa
         String text = "I'm writing this test on a flight to Zurich";
         byte[] aad = StringUtil.getBytesUtf8("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0");
         byte[] plaintext = StringUtil.getBytesUtf8(text);
-        Aes128CbcHmacSha256ContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
-        byte[] cek = ByteUtil.randomBytes(jweContentEncryptionAlg.getContentEncryptionKeyByteLength());
-        ContentEncryptionParts encryptionParts = jweContentEncryptionAlg.encrypt(plaintext, aad, cek);
+        Aes128CbcHmacSha256ContentEncryptionAlgorithm contentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
+        ContentEncryptionKeyDescriptor cekDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
+        byte[] cek = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength());
+        ContentEncryptionParts encryptionParts = contentEncryptionAlg.encrypt(plaintext, aad, cek);
 
-        byte[] decrypt = jweContentEncryptionAlg.decrypt(encryptionParts, aad, cek);
+        byte[] decrypt = contentEncryptionAlg.decrypt(encryptionParts, aad, cek);
         assertEquals(text, StringUtil.newStringUtf8(decrypt));
     }
 

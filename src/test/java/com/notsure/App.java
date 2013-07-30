@@ -80,7 +80,7 @@ public class App
         System.out.println("encodedHeader.equals"+encodedHeader.equals("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"));
 
         Cipher rsa15cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        rsa15cipher.init(Cipher.WRAP_MODE, ExampleRsaJwksFromJwe.APPENDIX_A_2.getPublicKey());
+        rsa15cipher.init(Cipher.WRAP_MODE, ExampleRsaJwksFromJwe.APPENDIX_A_2.getPublicKey());  // wrap or encrypt? does it matter?
 
         byte[] contentEncryptionKeyBytes = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{4, 211, 31, 197, 84, 157, 252, 254, 11, 100, 157, 250, 63, 170, 106, 206, 107, 124, 212, 45, 111, 107, 9, 219, 200, 177, 0, 240, 143, 156, 44, 207});
         System.out.println("contentEncryptionKeyBytes bytes " + Arrays.toString(contentEncryptionKeyBytes));
@@ -192,7 +192,7 @@ public class App
         byte[] encryptedKeyBytes = base64Url.base64UrlDecode(encodedJweEncryptedKey);
         System.out.println("encodedJweEncryptedKey: " +encodedJweEncryptedKey);
 
-        Key key = rsa15cipher.unwrap(encryptedKeyBytes, "AES", Cipher.SECRET_KEY);
+        Key key = rsa15cipher.unwrap(encryptedKeyBytes, AesKey.ALGORITHM, Cipher.SECRET_KEY);
         byte[] contentEncryptionKeyBytes = key.getEncoded();
         System.out.println("contentEncryptionKeyBytes getFormat() " + key.getFormat() + " getAlgorithm() " + key.getAlgorithm());
 
@@ -223,7 +223,7 @@ public class App
         System.out.println(tagMatch);
 
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(encKeyBytes, "AES"), new IvParameterSpec(iv));
+        cipher.init(Cipher.DECRYPT_MODE, new AesKey(encKeyBytes), new IvParameterSpec(iv));
 
         byte[] bytes = cipher.doFinal(cipherText);
         String plainText = StringUtil.newStringUtf8(bytes);

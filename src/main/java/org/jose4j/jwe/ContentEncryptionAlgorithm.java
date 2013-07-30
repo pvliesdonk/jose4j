@@ -23,13 +23,9 @@ import org.jose4j.lang.JoseException;
  */
 public interface ContentEncryptionAlgorithm extends Algorithm
 {
-    /**
-     * Gets the key size.
-     *
-     * @return the length, in bytes, of the key used by this algorithm
-     */
-    int getContentEncryptionKeyByteLength();
+    ContentEncryptionKeyDescriptor getContentEncryptionKeyDescriptor();
 
+    // todo - additional header parameters (none of the current algs use them anyway...)
     ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey) throws JoseException;
     byte[] decrypt(ContentEncryptionParts contentEncryptionParts, byte[] aad, byte[] contentEncryptionKey) throws JoseException;
 

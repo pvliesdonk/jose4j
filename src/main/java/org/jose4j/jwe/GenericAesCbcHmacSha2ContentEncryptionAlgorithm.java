@@ -23,21 +23,11 @@ public class GenericAesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmIn
 {
     private String hmacJavaAlgorithm;
     private int tagTruncationLength;
-    private int contentEncryptionKeyByteLength;
+    private ContentEncryptionKeyDescriptor contentEncryptionKeyDescriptor;
 
     public GenericAesCbcHmacSha2ContentEncryptionAlgorithm()
     {
         setJavaAlgorithm("AES/CBC/PKCS5Padding");
-    }
-
-    public int getContentEncryptionKeyByteLength()
-    {
-        return contentEncryptionKeyByteLength;
-    }
-
-    public void setContentEncryptionKeyByteLength(int contentEncryptionKeyByteLength)
-    {
-        this.contentEncryptionKeyByteLength = contentEncryptionKeyByteLength;
     }
 
     public String getHmacJavaAlgorithm()
@@ -45,7 +35,7 @@ public class GenericAesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmIn
         return hmacJavaAlgorithm;
     }
 
-    public void setHmacJavaAlgorithm(String hmacJavaAlgorithm)
+    void setHmacJavaAlgorithm(String hmacJavaAlgorithm)
     {
         this.hmacJavaAlgorithm = hmacJavaAlgorithm;
     }
@@ -55,9 +45,19 @@ public class GenericAesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmIn
         return tagTruncationLength;
     }
 
-    public void setTagTruncationLength(int tagTruncationLength)
+    void setTagTruncationLength(int tagTruncationLength)
     {
         this.tagTruncationLength = tagTruncationLength;
+    }
+
+    public ContentEncryptionKeyDescriptor getContentEncryptionKeyDescriptor()
+    {
+        return contentEncryptionKeyDescriptor;
+    }
+
+    void setContentEncryptionKeyByteLength(int cekByteLenght)
+    {
+        this.contentEncryptionKeyDescriptor = new ContentEncryptionKeyDescriptor(cekByteLenght, AesKey.ALGORITHM);
     }
 
     public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey) throws JoseException

@@ -17,6 +17,7 @@
 package org.jose4j.jws;
 
 
+import org.jose4j.jwk.EllipticCurveJsonWebKey;
 import org.jose4j.keys.EcKeyUtil;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.lang.JoseException;
@@ -38,7 +39,7 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
 
     public EcdsaUsingShaAlgorithm(String id, String javaAlgo, String curveName)
     {
-        super(id, javaAlgo, EcKeyUtil.EC);
+        super(id, javaAlgo, EllipticCurveJsonWebKey.KEY_TYPE);
         this.curveName = curveName;
     }
 
