@@ -28,10 +28,10 @@ public interface ContentEncryptionAlgorithm extends Algorithm
      *
      * @return the length, in bytes, of the key used by this algorithm
      */
-    int getKeySize();
+    int getContentEncryptionKeyByteLength();
 
-    EncryptionResult encrypt(byte[] plaintext, byte[] aad, byte[] key) throws JoseException;
-    byte[] decrypt(byte[] cipherText, byte[] iv, byte[] aad, byte[] tag, byte[] key) throws JoseException;
+    EncryptionResult encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey) throws JoseException;
+    byte[] decrypt(byte[] cipherText, byte[] iv, byte[] aad, byte[] tag, byte[] contentEncryptionKey) throws JoseException;
 
     public static class EncryptionResult
     {

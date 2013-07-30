@@ -61,7 +61,7 @@ public class Aes128CbcHmacSha256JweContentEncryptionAlgorithmTest extends TestCa
         byte[] aad = StringUtil.getBytesUtf8("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0");
         byte[] plaintext = StringUtil.getBytesUtf8(text);
         Aes128CbcHmacSha256ContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
-        byte[] key = ByteUtil.randomBytes(jweContentEncryptionAlg.getKeySize());
+        byte[] key = ByteUtil.randomBytes(jweContentEncryptionAlg.getContentEncryptionKeyByteLength());
         ContentEncryptionAlgorithm.EncryptionResult encrypt = jweContentEncryptionAlg.encrypt(plaintext, aad, key);
 
         byte[] decrypt = jweContentEncryptionAlg.decrypt(encrypt.getCiphertext(), encrypt.getIv(), aad, encrypt.getAuthenticationTag(), key);
