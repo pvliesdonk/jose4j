@@ -16,17 +16,13 @@
 
 package org.jose4j.jwe;
 
-import org.jose4j.jwa.Algorithm;
-import org.jose4j.lang.JoseException;
-
-import java.security.Key;
-
 /**
  */
-public interface KeyManagementModeAlgorithm extends Algorithm
+public class ContentEncryptionAlgorithmIdentifiers
 {
-    // todo - additional header parameters (in and out) ...
-    ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc) throws JoseException;
-    Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc) throws JoseException;
-
+    public static final String AES_128_CBC_HMAC_SHA_256 = "A128CBC-HS256";
+    public static final String AES_192_CBC_HMAC_SHA_384 = "A192CBC-HS384";
+    public static final String AES_256_CBC_HMAC_SHA_512 = "A256CBC-HS512";
+    public static final String AES_128_GCM = "A128GCM";
+    public static final String AES_256_GCM = "A256GCM";
 }

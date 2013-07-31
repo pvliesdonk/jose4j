@@ -52,7 +52,6 @@ public class AlgorithmFactory<A extends Algorithm>
         {
             log.error("Could not load algorithm implementations from " + resourceName, e);
         }
-
     }
 
     private void processPropsFile(URL url)

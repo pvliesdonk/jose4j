@@ -18,9 +18,6 @@ package org.jose4j.jwa;
 
 import org.jose4j.jwe.*;
 import org.jose4j.jws.JsonWebSignatureAlgorithm;
-import org.jose4j.keys.KeyPersuasion;
-
-import java.security.Key;
 
 /**
  */
@@ -29,14 +26,14 @@ public class AlgorithmFactoryFactory
     private static final AlgorithmFactoryFactory factoryFactory = new AlgorithmFactoryFactory();
 
     private final AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory;
-    private AlgorithmFactory<KeyManagementModeAlgorithm> jweKeyMgmtModeAlgorithmFactory;
+    private AlgorithmFactory<KeyManagementAlgorithm> jweKeyMgmtModeAlgorithmFactory;
     private AlgorithmFactory<ContentEncryptionAlgorithm> jweEncMethodAlgorithmFactory;
 
 
     private AlgorithmFactoryFactory()
     {
         jwsAlgorithmFactory = new AlgorithmFactory<JsonWebSignatureAlgorithm>("jws-algorithms.properties"); // todo change name
-        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<KeyManagementModeAlgorithm>("todo.properties");
+        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<KeyManagementAlgorithm>("todo.properties");
         jweEncMethodAlgorithmFactory = new AlgorithmFactory<ContentEncryptionAlgorithm>("todo.properties");
 
     }
@@ -51,20 +48,20 @@ public class AlgorithmFactoryFactory
         return jwsAlgorithmFactory;
     }
 
-    public KeyManagementModeAlgorithm getKeyManagementModeAlgorithm(String algo)
+    public KeyManagementAlgorithm getKeyManagementAlgorithm(String algo)
     {
         // TODO
-        if (KeyManagementModeAlgorithmIdentifiers.RSA1_5.equals(algo))
+        if (KeyManagementAlgorithmIdentifiers.RSA1_5.equals(algo))
         {
-            return new Rsa1_5KeyManagementModeAlgorithm();
+            return new Rsa1_5KeyManagementAlgorithm();
         }
 
         return null;
     }
 
-    public ContentEncryptionAlgorithm getSymmetricEncryptionAlgorithm(String algo)
+    public ContentEncryptionAlgorithm getContentEncryptionAlgorithm(String algo)
     {
-        if (!algo.equals(EncryptionMethodAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256))
+        if (!algo.equals(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256))
         {
             return null;
         }

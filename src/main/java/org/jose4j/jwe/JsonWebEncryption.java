@@ -68,10 +68,10 @@ public class JsonWebEncryption extends JsonWebStructure
             throw new JoseException(HeaderParameterNames.ENCRYPTION_METHOD + " header not set.");
         }
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
-        return factoryFactory.getSymmetricEncryptionAlgorithm(algo);
+        return factoryFactory.getContentEncryptionAlgorithm(algo);
     }
 
-    private KeyManagementModeAlgorithm getKeyManagementModeAlgorithm() throws JoseException
+    private KeyManagementAlgorithm getKeyManagementModeAlgorithm() throws JoseException
     {
         String algo = getAlgorithmHeaderValue();
         if (algo == null)
@@ -79,13 +79,13 @@ public class JsonWebEncryption extends JsonWebStructure
             throw new JoseException(HeaderParameterNames.ALGORITHM + " header not set.");
         }
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
-        return factoryFactory.getKeyManagementModeAlgorithm(algo);
+        return factoryFactory.getKeyManagementAlgorithm(algo);
     }
 
 
     public String getCompactSerialization() throws JoseException
     {
-        KeyManagementModeAlgorithm keyManagementModeAlg = getKeyManagementModeAlgorithm();
+        KeyManagementAlgorithm keyManagementModeAlg = getKeyManagementModeAlgorithm();
         ContentEncryptionAlgorithm contentEncryptionAlg = getContentEncryptionAlgorithm();
 
         ContentEncryptionKeyDescriptor contentEncryptionKeyDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();

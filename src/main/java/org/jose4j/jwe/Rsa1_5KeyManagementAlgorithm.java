@@ -14,12 +14,12 @@ import java.security.Key;
 
 /**
  */
-public class Rsa1_5KeyManagementModeAlgorithm extends AlgorithmInfo implements KeyManagementModeAlgorithm
+public class Rsa1_5KeyManagementAlgorithm extends AlgorithmInfo implements KeyManagementAlgorithm
 {
-    public Rsa1_5KeyManagementModeAlgorithm()
+    public Rsa1_5KeyManagementAlgorithm()
     {
         setJavaAlgorithm("RSA/ECB/PKCS1Padding");
-        setAlgorithmIdentifier(KeyManagementModeAlgorithmIdentifiers.RSA1_5);
+        setAlgorithmIdentifier(KeyManagementAlgorithmIdentifiers.RSA1_5);
         setKeyType(RsaJsonWebKey.KEY_TYPE);
         setKeyPersuasion(KeyPersuasion.ASYMMETRIC);
     }

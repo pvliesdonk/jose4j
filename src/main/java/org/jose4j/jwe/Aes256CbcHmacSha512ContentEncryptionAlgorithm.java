@@ -29,7 +29,7 @@ public class Aes256CbcHmacSha512ContentEncryptionAlgorithm
     public Aes256CbcHmacSha512ContentEncryptionAlgorithm()
     {
         super();
-        setAlgorithmIdentifier(EncryptionMethodAlgorithmIdentifiers.AES_256_CBC_HMAC_SHA_512);
+        setAlgorithmIdentifier(ContentEncryptionAlgorithmIdentifiers.AES_256_CBC_HMAC_SHA_512);
         setContentEncryptionKeyByteLength(64); // ENC_KEY_LEN is 32 octets & MAC_KEY_LEN is 32 octets.
         setHmacJavaAlgorithm(MacUtil.HMAC_SHA512);
         setTagTruncationLength(32); // The HMAC SHA-512 value is truncated to T_LEN=32 octets instead of 16 octets.

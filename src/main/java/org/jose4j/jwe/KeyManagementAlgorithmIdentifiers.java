@@ -18,7 +18,7 @@ package org.jose4j.jwe;
 
 /**
  */
-public class KeyManagementModeAlgorithmIdentifiers
+public class KeyManagementAlgorithmIdentifiers
 {
     public static final String RSA1_5 = "RSA1_5";
     public static final String RSA_OAEP = "RSA-OAEP";

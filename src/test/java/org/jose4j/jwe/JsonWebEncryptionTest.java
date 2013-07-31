@@ -30,9 +30,9 @@ public class JsonWebEncryptionTest extends TestCase
         String plaintext = "{\"plain\":\"text\",\"a key\":\"with some value\",\"some:claim\":true}";
         JsonWebEncryption jwe = new JsonWebEncryption();        
         jwe.setPlaintext(plaintext);
-        jwe.setAlgorithmHeaderValue(KeyManagementModeAlgorithmIdentifiers.RSA1_5);
+        jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.RSA1_5);
         jwe.setKey(ExampleRsaKeyFromJws.PUBLIC_KEY);
-        jwe.setHeader(HeaderParameterNames.ENCRYPTION_METHOD, EncryptionMethodAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+        jwe.setHeader(HeaderParameterNames.ENCRYPTION_METHOD, ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
 
         String jweCompactSerialization = jwe.getCompactSerialization();
     }
