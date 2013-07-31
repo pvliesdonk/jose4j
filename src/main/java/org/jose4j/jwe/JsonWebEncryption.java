@@ -18,12 +18,13 @@ package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
+import org.jose4j.jwx.CompactSerialization;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
-import org.jose4j.lang.ByteGenerator;
-import org.jose4j.lang.DefaultByteGenerator;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
+
+import java.security.Key;
 
 /**
  */
@@ -33,13 +34,6 @@ public class JsonWebEncryption extends JsonWebStructure
     
     private String plaintextCharEncoding = StringUtil.UTF_8;
     private byte[] plaintext;
-
-    private ByteGenerator byteGenerator = new DefaultByteGenerator();
-
-    public void setByteGenerator(ByteGenerator byteGenerator)
-    {
-        this.byteGenerator = byteGenerator;
-    }
 
     public void setPlainTextCharEncoding(String plaintextCharEncoding)
     {
@@ -66,8 +60,7 @@ public class JsonWebEncryption extends JsonWebStructure
         return plaintext;
     }
 
-
-    private ContentEncryptionAlgorithm getEncryptionMethodAlgorithm() throws JoseException
+    private ContentEncryptionAlgorithm getContentEncryptionAlgorithm() throws JoseException
     {
         String algo = getHeader(HeaderParameterNames.ENCRYPTION_METHOD);
         if (algo == null)
@@ -92,8 +85,27 @@ public class JsonWebEncryption extends JsonWebStructure
 
     public String getCompactSerialization() throws JoseException
     {
+        KeyManagementModeAlgorithm keyManagementModeAlg = getKeyManagementModeAlgorithm();
+        ContentEncryptionAlgorithm contentEncryptionAlg = getContentEncryptionAlgorithm();
 
-        return "todo.getthis.working.ok";
+        ContentEncryptionKeyDescriptor contentEncryptionKeyDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
+        Key managementKey = getKey();
+        ContentEncryptionKeys contentEncryptionKeys = keyManagementModeAlg.manageForEncrypt(managementKey, contentEncryptionKeyDesc);
+
+        String encodedHeader = getEncodedHeader();
+        byte[] aad = StringUtil.getBytesAscii(encodedHeader);
+        byte[] contentEncryptionKey = contentEncryptionKeys.getContentEncryptionKey();
+        ContentEncryptionParts contentEncryptionParts = contentEncryptionAlg.encrypt(getPlaintextBytes(), aad, contentEncryptionKey);
+
+        String encodedIv = base64url.base64UrlEncode(contentEncryptionParts.getIv());
+        String encodedCiphertext = base64url.base64UrlEncode(contentEncryptionParts.getCiphertext());
+        String encodedTag = base64url.base64UrlEncode(contentEncryptionParts.getAuthenticationTag());
+
+        byte[] encryptedKey = contentEncryptionKeys.getEncryptedKey();
+        String encodedEncryptedKey = base64url.base64UrlEncode(encryptedKey);
+
+        return CompactSerialization.serialize(encodedHeader, encodedEncryptedKey, encodedIv, encodedCiphertext, encodedTag);
     }
+
 
 }

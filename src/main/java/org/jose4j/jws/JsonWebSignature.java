@@ -16,7 +16,6 @@
 
 package org.jose4j.jws;
 
-import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwa.AlgorithmFactory;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwx.CompactSerialization;
@@ -33,8 +32,6 @@ import java.security.Key;
 public class JsonWebSignature extends JsonWebStructure
 {
     public static final short COMPACT_SERIALIZATION_PARTS = 3;
-
-    private Base64Url base64url = new Base64Url();
 
     private String payload;
     private String payloadCharEncoding = StringUtil.UTF_8;
@@ -113,11 +110,6 @@ public class JsonWebSignature extends JsonWebStructure
     private String getSigningInput() throws JoseException
     {
         return CompactSerialization.serialize(getEncodedHeader(), getEncodedPayload());
-    }
-
-    private String getEncodedHeader()
-    {
-        return base64url.base64UrlEncodeUtf8ByteRepresentation(getHeader());
     }
 
     public String getPayload()

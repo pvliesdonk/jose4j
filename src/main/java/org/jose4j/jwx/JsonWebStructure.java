@@ -16,6 +16,7 @@
 
 package org.jose4j.jwx;
 
+import org.jose4j.base64url.Base64Url;
 import org.jose4j.json.JsonHeaderUtil;
 import org.jose4j.lang.JoseException;
 
@@ -26,7 +27,9 @@ import java.util.Map;
 /**
  */
 public abstract class JsonWebStructure
-{    
+{
+    protected Base64Url base64url = new Base64Url();
+
     private Map<String,String> headerMap = new LinkedHashMap<String,String>();
     private String header;
 
@@ -43,6 +46,11 @@ public abstract class JsonWebStructure
             header = JsonHeaderUtil.toJson(headerMap);
         }
         return header;
+    }
+
+    protected String getEncodedHeader()
+    {
+        return base64url.base64UrlEncodeUtf8ByteRepresentation(getHeader());
     }
 
     public void setHeader(String name, String value)
