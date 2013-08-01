@@ -19,7 +19,7 @@
 
   <groupId>org.jose4j</groupId>
   <artifactId>jose4j</artifactId>
-  <version>0.2.8-SNAPSHOT</version>
+  <version>0.3.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>JOSE (JWS, JWE, JWK, JWA) for Java + a touch of JWT</name>
 
