@@ -4,6 +4,7 @@ import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.HmacKey;
+import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.mac.MacUtil;
@@ -25,9 +26,15 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
     private int tagTruncationLength;
     private ContentEncryptionKeyDescriptor contentEncryptionKeyDescriptor;
 
-    public AesCbcHmacSha2ContentEncryptionAlgorithm()
+    public AesCbcHmacSha2ContentEncryptionAlgorithm(String alg, int cekByteLen, String javaHmacAlg, int tagTruncationLength)
     {
+        setAlgorithmIdentifier(alg);
+        setContentEncryptionKeyByteLength(cekByteLen);
+        setHmacJavaAlgorithm(javaHmacAlg);
+        setTagTruncationLength(tagTruncationLength);
         setJavaAlgorithm("AES/CBC/PKCS5Padding");
+        setKeyPersuasion(KeyPersuasion.SYMMETRIC);
+        setKeyType(AesKey.ALGORITHM);
     }
 
     public String getHmacJavaAlgorithm()

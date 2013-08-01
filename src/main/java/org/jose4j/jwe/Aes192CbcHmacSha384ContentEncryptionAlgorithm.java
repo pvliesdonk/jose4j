@@ -28,12 +28,8 @@ public class Aes192CbcHmacSha384ContentEncryptionAlgorithm
 {
     public Aes192CbcHmacSha384ContentEncryptionAlgorithm()
     {
-        super();
-        setAlgorithmIdentifier(ContentEncryptionAlgorithmIdentifiers.AES_192_CBC_HMAC_SHA_384);
-        setContentEncryptionKeyByteLength(48); // 24 octets for MAC_KEY_LEN + 24 octets for ENC_KEY_LEN
-        setHmacJavaAlgorithm(MacUtil.HMAC_SHA384);
-        setTagTruncationLength(24); // The HMAC-SHA-256 output is truncated to T_LEN=24 octets
-        this.setKeyPersuasion(KeyPersuasion.SYMMETRIC);
-        this.setKeyType(AesKey.ALGORITHM);
+        // 24 octets for MAC_KEY_LEN + 24 octets for ENC_KEY_LEN
+        // The HMAC-SHA-256 output is truncated to T_LEN=24 octets
+        super(ContentEncryptionAlgorithmIdentifiers.AES_192_CBC_HMAC_SHA_384, 48, MacUtil.HMAC_SHA384, 24);
     }
 }
