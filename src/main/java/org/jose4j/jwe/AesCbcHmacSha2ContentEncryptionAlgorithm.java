@@ -19,13 +19,13 @@ import java.security.Key;
 
 /**
  */
-public class GenericAesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo implements ContentEncryptionAlgorithm
+public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo implements ContentEncryptionAlgorithm
 {
     private String hmacJavaAlgorithm;
     private int tagTruncationLength;
     private ContentEncryptionKeyDescriptor contentEncryptionKeyDescriptor;
 
-    public GenericAesCbcHmacSha2ContentEncryptionAlgorithm()
+    public AesCbcHmacSha2ContentEncryptionAlgorithm()
     {
         setJavaAlgorithm("AES/CBC/PKCS5Padding");
     }

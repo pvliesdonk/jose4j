@@ -23,7 +23,7 @@ import org.jose4j.mac.MacUtil;
 /**
  */
 public class Aes128CbcHmacSha256ContentEncryptionAlgorithm
-        extends GenericAesCbcHmacSha2ContentEncryptionAlgorithm
+        extends AesCbcHmacSha2ContentEncryptionAlgorithm
         implements ContentEncryptionAlgorithm
 {
     public Aes128CbcHmacSha256ContentEncryptionAlgorithm()
