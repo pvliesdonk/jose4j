@@ -35,6 +35,10 @@ public class JsonWebEncryption extends JsonWebStructure
     private String plaintextCharEncoding = StringUtil.UTF_8;
     private byte[] plaintext;
 
+    byte[] encryptedKey;
+    byte[] iv;
+    byte[] ciphertext;
+
     public void setPlainTextCharEncoding(String plaintextCharEncoding)
     {
         this.plaintextCharEncoding = plaintextCharEncoding;
@@ -50,25 +54,39 @@ public class JsonWebEncryption extends JsonWebStructure
         this.plaintext = StringUtil.getBytesUnchecked(plaintext, plaintextCharEncoding);
     }
 
-    public String getPlaintextString()
+    public String getPlaintextString() throws JoseException
     {
-        return StringUtil.newString(plaintext, plaintextCharEncoding);
+        return StringUtil.newString(getPlaintextBytes(), plaintextCharEncoding);
     }
 
-    public byte[] getPlaintextBytes()
+    public byte[] getPlaintextBytes() throws JoseException
     {
+        if (plaintext == null)
+        {
+            this.decrypt();
+        }
         return plaintext;
+    }
+
+    void setEncryptionMethodHeaderParameter(String enc)
+    {
+        setHeader(HeaderParameterNames.ENCRYPTION_METHOD, enc);
+    }
+
+    String getEncryptionMethodHeaderParameter()
+    {
+        return getHeader(HeaderParameterNames.ENCRYPTION_METHOD);
     }
 
     private ContentEncryptionAlgorithm getContentEncryptionAlgorithm() throws JoseException
     {
-        String algo = getHeader(HeaderParameterNames.ENCRYPTION_METHOD);
-        if (algo == null)
+        String encValue = getEncryptionMethodHeaderParameter();
+        if (encValue == null)
         {
             throw new JoseException(HeaderParameterNames.ENCRYPTION_METHOD + " header not set.");
         }
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
-        return factoryFactory.getContentEncryptionAlgorithm(algo);
+        return factoryFactory.getContentEncryptionAlgorithm(encValue);
     }
 
     private KeyManagementAlgorithm getKeyManagementModeAlgorithm() throws JoseException
@@ -82,6 +100,38 @@ public class JsonWebEncryption extends JsonWebStructure
         return factoryFactory.getKeyManagementAlgorithm(algo);
     }
 
+    public void setCompactSerialization(String compactSerialization) throws JoseException
+    {
+        String[] parts = CompactSerialization.deserialize(compactSerialization);
+        setEncodedHeader(parts[0]);
+        encryptedKey = base64url.base64UrlDecode(parts[1]);
+        iv = base64url.base64UrlDecode(parts[2]);
+        ciphertext = base64url.base64UrlDecode(parts[3]);
+        byte[] tag = base64url.base64UrlDecode(parts[4]);
+        setIntegrity(tag);
+    }
+
+    private void decrypt() throws JoseException
+    {
+         // not sure where to do this... but probably not here todo
+        KeyManagementAlgorithm keyManagementModeAlg = getKeyManagementModeAlgorithm();
+        ContentEncryptionAlgorithm contentEncryptionAlg = getContentEncryptionAlgorithm();
+
+        ContentEncryptionKeyDescriptor contentEncryptionKeyDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
+
+        Key cek = keyManagementModeAlg.manageForDecrypt(getKey(), encryptedKey, contentEncryptionKeyDesc);
+
+        ContentEncryptionParts contentEncryptionParts = new ContentEncryptionParts(iv, ciphertext, getIntegrity());
+        byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();
+        byte[] decrypted = contentEncryptionAlg.decrypt(contentEncryptionParts, aad, cek.getEncoded());
+        setPlaintext(decrypted);
+    }
+
+    byte[] getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData()
+    {
+        String encodedHeader = getEncodedHeader();
+        return StringUtil.getBytesAscii(encodedHeader);
+    }
 
     public String getCompactSerialization() throws JoseException
     {
@@ -92,8 +142,7 @@ public class JsonWebEncryption extends JsonWebStructure
         Key managementKey = getKey();
         ContentEncryptionKeys contentEncryptionKeys = keyManagementModeAlg.manageForEncrypt(managementKey, contentEncryptionKeyDesc);
 
-        String encodedHeader = getEncodedHeader();
-        byte[] aad = StringUtil.getBytesAscii(encodedHeader);
+        byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();
         byte[] contentEncryptionKey = contentEncryptionKeys.getContentEncryptionKey();
         ContentEncryptionParts contentEncryptionParts = contentEncryptionAlg.encrypt(getPlaintextBytes(), aad, contentEncryptionKey);
 
@@ -101,10 +150,11 @@ public class JsonWebEncryption extends JsonWebStructure
         String encodedCiphertext = base64url.base64UrlEncode(contentEncryptionParts.getCiphertext());
         String encodedTag = base64url.base64UrlEncode(contentEncryptionParts.getAuthenticationTag());
 
+
         byte[] encryptedKey = contentEncryptionKeys.getEncryptedKey();
         String encodedEncryptedKey = base64url.base64UrlEncode(encryptedKey);
 
-        return CompactSerialization.serialize(encodedHeader, encodedEncryptedKey, encodedIv, encodedCiphertext, encodedTag);
+        return CompactSerialization.serialize(getEncodedHeader(), encodedEncryptedKey, encodedIv, encodedCiphertext, encodedTag);
     }
 
 

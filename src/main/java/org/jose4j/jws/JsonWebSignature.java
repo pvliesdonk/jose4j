@@ -51,8 +51,8 @@ public class JsonWebSignature extends JsonWebStructure
             throw new JoseException("A JWS Compact Serialization must have exactly 3 parts separated by period ('.') characters");
         }
 
-        setHeaderAsString(base64url.base64UrlDecodeToUtf8String(parts[0]));
-        payload = base64url.base64UrlDecodeToString(parts[1], payloadCharEncoding);
+        setEncodedHeader(parts[0]);
+        setPayload(base64url.base64UrlDecodeToString(parts[1], payloadCharEncoding));
         setSignature(base64url.base64UrlDecode(parts[2]));
     }
 

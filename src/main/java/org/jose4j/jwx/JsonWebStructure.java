@@ -32,6 +32,7 @@ public abstract class JsonWebStructure
 
     private Map<String,String> headerMap = new LinkedHashMap<String,String>();
     private String header;
+    private String encodedHeader;
 
     private byte[] integrity;
 
@@ -50,7 +51,11 @@ public abstract class JsonWebStructure
 
     protected String getEncodedHeader()
     {
-        return base64url.base64UrlEncodeUtf8ByteRepresentation(getHeader());
+        if (encodedHeader == null)
+        {
+            encodedHeader = base64url.base64UrlEncodeUtf8ByteRepresentation(getHeader());
+        }
+        return encodedHeader;
     }
 
     public void setHeader(String name, String value)
@@ -63,6 +68,12 @@ public abstract class JsonWebStructure
     {
         this.header = header;
         headerMap = JsonHeaderUtil.parseJson(header);
+    }
+
+    public void setEncodedHeader(String encodedHeader) throws JoseException
+    {
+        this.encodedHeader = encodedHeader;
+        setHeaderAsString(base64url.base64UrlDecodeToUtf8String(this.encodedHeader));
     }
 
     public String getHeader(String name)
