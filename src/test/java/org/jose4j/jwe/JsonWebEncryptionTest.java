@@ -97,7 +97,6 @@ public class JsonWebEncryptionTest extends TestCase
         jweForEncrypt.setKey(key);
 
         String compactSerialization = jweForEncrypt.getCompactSerialization();
-        System.out.println(compactSerialization);
 
         JsonWebEncryption jweForDecrypt = new JsonWebEncryption();
         jweForDecrypt.setCompactSerialization(compactSerialization);
