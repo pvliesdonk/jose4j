@@ -16,43 +16,25 @@
 
 package com.notsure;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.binary.StringUtils;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwk.*;
-import org.jose4j.jws.EcdsaUsingShaAlgorithm;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jws.AlgorithmIdentifiers;
-import org.jose4j.jwx.CompactSerialization;
+import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.keys.*;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
-import org.jose4j.jwt.ReservedClaimNames;
-import org.jose4j.jwt.IntDate;
 import org.jose4j.json.JsonUtil;
 import org.jose4j.lang.StringUtil;
 import org.jose4j.mac.MacUtil;
-import org.json.simple.JSONObject;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.ByteArrayInputStream;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.security.*;
-import java.security.cert.*;
-import java.security.cert.Certificate;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.security.spec.RSAPrivateKeySpec;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
-import java.util.LinkedHashMap;
 
 
 /**
@@ -153,7 +135,7 @@ public class App
         System.out.println("encodedAuthenticationTag.equals " + encodedAuthenticationTag.equals("9hH0vgRfYgPnAHOd8stkvw"));
 
 
-        String cs = CompactSerialization.serialize(encodedHeader, encodedJweEncryptedKey, encodedJweInitializationVector, encodedCipherText, encodedAuthenticationTag);
+        String cs = CompactSerializer.serialize(encodedHeader, encodedJweEncryptedKey, encodedJweInitializationVector, encodedCipherText, encodedAuthenticationTag);
 
         decJweAppA2(cs);
 
@@ -178,7 +160,7 @@ public class App
         System.out.println("++++ decrypt +++++");
         System.out.println(cs);
 
-        String[] deserialized = CompactSerialization.deserialize(cs);
+        String[] deserialized = CompactSerializer.deserialize(cs);
         String encodedHeader = deserialized[0];
         String encodedJweEncryptedKey = deserialized[1];
         String encodedJweInitializationVector = deserialized[2];

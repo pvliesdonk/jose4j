@@ -20,7 +20,7 @@ import org.jose4j.lang.JoseException;
 
 /**
  */
-public class CompactSerialization
+public class CompactSerializer
 {
     private static final String PERIOD_SEPARATOR = ".";
     private static final String PERIOD_SEPARATOR_REGEX = "\\.";
@@ -32,14 +32,6 @@ public class CompactSerialization
     public static String[] deserialize(String compactSerialization) throws JoseException
     {
         String[] parts = compactSerialization.split(PERIOD_SEPARATOR_REGEX);
-
-        for (String part : parts)
-        {
-            if (EMPTY_STRING.equals(part))
-            {
-                throw new JoseException(NO_EMPTY_PARTS_MSG);
-            }
-        }
 
         if (compactSerialization.endsWith(PERIOD_SEPARATOR))
         {
@@ -61,10 +53,10 @@ public class CompactSerialization
             sb.append(part);
             if (i != parts.length - 1)
             {
-                if (EMPTY_STRING.equals(part))
-                {
-                    throw new JoseException(NO_EMPTY_PARTS_MSG);
-                }
+//                if (EMPTY_STRING.equals(part))
+//                {
+//                    throw new JoseException(NO_EMPTY_PARTS_MSG);
+//                }
                 sb.append(PERIOD_SEPARATOR);
             }
         }

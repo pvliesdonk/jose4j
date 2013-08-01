@@ -18,6 +18,7 @@ package org.jose4j.jwa;
 
 import org.jose4j.jwe.*;
 import org.jose4j.jws.JsonWebSignatureAlgorithm;
+import org.jose4j.lang.JoseException;
 
 /**
  */
@@ -27,14 +28,14 @@ public class AlgorithmFactoryFactory
 
     private final AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory;
     private AlgorithmFactory<KeyManagementAlgorithm> jweKeyMgmtModeAlgorithmFactory;
-    private AlgorithmFactory<ContentEncryptionAlgorithm> jweEncMethodAlgorithmFactory;
+    private AlgorithmFactory<ContentEncryptionAlgorithm> jweContentEncryptionAlgorithmFactory;
 
 
     private AlgorithmFactoryFactory()
     {
-        jwsAlgorithmFactory = new AlgorithmFactory<JsonWebSignatureAlgorithm>("jws-algorithms.properties"); // todo change name
-        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<KeyManagementAlgorithm>("todo.properties");
-        jweEncMethodAlgorithmFactory = new AlgorithmFactory<ContentEncryptionAlgorithm>("todo.properties");
+        jwsAlgorithmFactory = new AlgorithmFactory<JsonWebSignatureAlgorithm>("jws-algorithms.properties"); // todo change name (not sure why the todo was put here?)
+        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<KeyManagementAlgorithm>("jwe-key-management-algorithms.properties");
+        jweContentEncryptionAlgorithmFactory = new AlgorithmFactory<ContentEncryptionAlgorithm>("jwe-content-encryption-algorithms.properties");
 
     }
 
@@ -48,23 +49,13 @@ public class AlgorithmFactoryFactory
         return jwsAlgorithmFactory;
     }
 
-    public KeyManagementAlgorithm getKeyManagementAlgorithm(String algo)
+    public AlgorithmFactory<KeyManagementAlgorithm> getKeyManagementAlgorithmFactory()
     {
-        // TODO
-        if (KeyManagementAlgorithmIdentifiers.RSA1_5.equals(algo))
-        {
-            return new Rsa1_5KeyManagementAlgorithm();
-        }
-
-        return null;
+        return jweKeyMgmtModeAlgorithmFactory;
     }
 
-    public ContentEncryptionAlgorithm getContentEncryptionAlgorithm(String algo)
+    public AlgorithmFactory<ContentEncryptionAlgorithm> getJweContentEncryptionAlgorithmFactory()
     {
-        if (!algo.equals(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256))
-        {
-            return null;
-        }
-        return new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
+        return jweContentEncryptionAlgorithmFactory;
     }
 }

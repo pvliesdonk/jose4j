@@ -17,8 +17,9 @@
 package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwa.AlgorithmFactory;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
-import org.jose4j.jwx.CompactSerialization;
+import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.JoseException;
@@ -78,7 +79,7 @@ public class JsonWebEncryption extends JsonWebStructure
         return getHeader(HeaderParameterNames.ENCRYPTION_METHOD);
     }
 
-    private ContentEncryptionAlgorithm getContentEncryptionAlgorithm() throws JoseException
+    public ContentEncryptionAlgorithm getContentEncryptionAlgorithm() throws JoseException
     {
         String encValue = getEncryptionMethodHeaderParameter();
         if (encValue == null)
@@ -86,10 +87,11 @@ public class JsonWebEncryption extends JsonWebStructure
             throw new JoseException(HeaderParameterNames.ENCRYPTION_METHOD + " header not set.");
         }
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
-        return factoryFactory.getContentEncryptionAlgorithm(encValue);
+        AlgorithmFactory<ContentEncryptionAlgorithm> factory = factoryFactory.getJweContentEncryptionAlgorithmFactory();
+        return factory.getAlgorithm(encValue);
     }
 
-    private KeyManagementAlgorithm getKeyManagementModeAlgorithm() throws JoseException
+    public KeyManagementAlgorithm getKeyManagementModeAlgorithm() throws JoseException
     {
         String algo = getAlgorithmHeaderValue();
         if (algo == null)
@@ -97,17 +99,22 @@ public class JsonWebEncryption extends JsonWebStructure
             throw new JoseException(HeaderParameterNames.ALGORITHM + " header not set.");
         }
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
-        return factoryFactory.getKeyManagementAlgorithm(algo);
+        AlgorithmFactory<KeyManagementAlgorithm> factory = factoryFactory.getKeyManagementAlgorithmFactory();
+        return factory.getAlgorithm(algo);
     }
 
     public void setCompactSerialization(String compactSerialization) throws JoseException
     {
-        String[] parts = CompactSerialization.deserialize(compactSerialization);
+        String[] parts = CompactSerializer.deserialize(compactSerialization);
         setEncodedHeader(parts[0]);
         encryptedKey = base64url.base64UrlDecode(parts[1]);
         iv = base64url.base64UrlDecode(parts[2]);
-        ciphertext = base64url.base64UrlDecode(parts[3]);
-        byte[] tag = base64url.base64UrlDecode(parts[4]);
+        String encodedCiphertext = parts[3];
+        checkNotEmptyPart(encodedCiphertext, "Encoded JWE Ciphertext");
+        ciphertext = base64url.base64UrlDecode(encodedCiphertext);
+        String encodedAuthenticationTag = parts[4];
+        checkNotEmptyPart(encodedAuthenticationTag, "Encoded JWE Authentication Tag");
+        byte[] tag = base64url.base64UrlDecode(encodedAuthenticationTag);
         setIntegrity(tag);
     }
 
@@ -154,7 +161,7 @@ public class JsonWebEncryption extends JsonWebStructure
         byte[] encryptedKey = contentEncryptionKeys.getEncryptedKey();
         String encodedEncryptedKey = base64url.base64UrlEncode(encryptedKey);
 
-        return CompactSerialization.serialize(getEncodedHeader(), encodedEncryptedKey, encodedIv, encodedCiphertext, encodedTag);
+        return CompactSerializer.serialize(getEncodedHeader(), encodedEncryptedKey, encodedIv, encodedCiphertext, encodedTag);
     }
 
 

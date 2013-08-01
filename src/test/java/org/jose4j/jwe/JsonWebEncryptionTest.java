@@ -20,7 +20,11 @@ import junit.framework.TestCase;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
+import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
+
+import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
 
 /**
  */
@@ -36,6 +40,7 @@ public class JsonWebEncryptionTest extends TestCase
         jwe.setHeader(HeaderParameterNames.ENCRYPTION_METHOD, ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
 
         String jweCompactSerialization = jwe.getCompactSerialization();
+        assertFalse(jweCompactSerialization.contains("with some value"));
     }
 
     public void testJweExampleA2() throws JoseException
@@ -59,7 +64,7 @@ public class JsonWebEncryptionTest extends TestCase
         assertEquals("Live long and prosper.", plaintextString);
     }
 
-    public void testRoundTrip() throws JoseException
+    public void testHappyRoundTripRsa1_5AndAesCbc128() throws JoseException
     {
         JsonWebEncryption jweForEncrypt = new JsonWebEncryption();
         String plaintext = "Some text that's on double secret probation";
@@ -73,6 +78,30 @@ public class JsonWebEncryptionTest extends TestCase
         JsonWebEncryption jweForDecrypt = new JsonWebEncryption();
         jweForDecrypt.setCompactSerialization(compactSerialization);
         jweForDecrypt.setKey(ExampleRsaJwksFromJwe.APPENDIX_A_2.getPrivateKey());
+
+        assertEquals(plaintext, jweForDecrypt.getPlaintextString());
+    }
+
+
+    public void testHappyRoundTripDirectAndAesCbc128() throws JoseException
+    {
+        JsonWebEncryption jweForEncrypt = new JsonWebEncryption();
+        String plaintext = "Some sensitive info";
+        jweForEncrypt.setPlaintext(plaintext);
+        jweForEncrypt.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.DIRECT);
+        jweForEncrypt.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+        ContentEncryptionAlgorithm contentEncryptionAlgorithm = jweForEncrypt.getContentEncryptionAlgorithm();
+        ContentEncryptionKeyDescriptor cekDesc = contentEncryptionAlgorithm.getContentEncryptionKeyDescriptor();
+        byte[] cekBytes = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength() * 2);
+        Key key = new SecretKeySpec(cekBytes, cekDesc.getContentEncryptionKeyAlgorithm());
+        jweForEncrypt.setKey(key);
+
+        String compactSerialization = jweForEncrypt.getCompactSerialization();
+        System.out.println(compactSerialization);
+
+        JsonWebEncryption jweForDecrypt = new JsonWebEncryption();
+        jweForDecrypt.setCompactSerialization(compactSerialization);
+        jweForDecrypt.setKey(key);
 
         assertEquals(plaintext, jweForDecrypt.getPlaintextString());
     }

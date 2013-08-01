@@ -72,8 +72,18 @@ public abstract class JsonWebStructure
 
     public void setEncodedHeader(String encodedHeader) throws JoseException
     {
+
+        checkNotEmptyPart(encodedHeader, "Encoded Header");
         this.encodedHeader = encodedHeader;
         setHeaderAsString(base64url.base64UrlDecodeToUtf8String(this.encodedHeader));
+    }
+
+    protected void checkNotEmptyPart(String encodedPart, String partName) throws JoseException
+    {
+        if (encodedPart == null || encodedPart.length() == 0)
+        {
+            throw new JoseException("The "+ partName +" cannot be empty.");
+        }
     }
 
     public String getHeader(String name)

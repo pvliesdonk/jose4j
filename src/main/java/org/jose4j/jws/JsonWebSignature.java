@@ -18,7 +18,7 @@ package org.jose4j.jws;
 
 import org.jose4j.jwa.AlgorithmFactory;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
-import org.jose4j.jwx.CompactSerialization;
+import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.keys.KeyPersuasion;
@@ -45,21 +45,23 @@ public class JsonWebSignature extends JsonWebStructure
 
     public void setCompactSerialization(String compactSerialization) throws JoseException
     {
-        String[] parts = CompactSerialization.deserialize(compactSerialization);
+        String[] parts = CompactSerializer.deserialize(compactSerialization);
         if (parts.length != COMPACT_SERIALIZATION_PARTS)
         {
             throw new JoseException("A JWS Compact Serialization must have exactly 3 parts separated by period ('.') characters");
         }
 
         setEncodedHeader(parts[0]);
-        setPayload(base64url.base64UrlDecodeToString(parts[1], payloadCharEncoding));
+        String encodedPayload = parts[1];
+        checkNotEmptyPart(encodedPayload, "Encoded JWS Payload");
+        setPayload(base64url.base64UrlDecodeToString(encodedPayload, payloadCharEncoding));
         setSignature(base64url.base64UrlDecode(parts[2]));
     }
 
     public String getCompactSerialization() throws JoseException
     {
         this.sign();
-        return CompactSerialization.serialize(getSigningInput(), getEncodedSignature());
+        return CompactSerializer.serialize(getSigningInput(), getEncodedSignature());
     }
 
     private void sign() throws JoseException
@@ -109,7 +111,7 @@ public class JsonWebSignature extends JsonWebStructure
 
     private String getSigningInput() throws JoseException
     {
-        return CompactSerialization.serialize(getEncodedHeader(), getEncodedPayload());
+        return CompactSerializer.serialize(getEncodedHeader(), getEncodedPayload());
     }
 
     public String getPayload()

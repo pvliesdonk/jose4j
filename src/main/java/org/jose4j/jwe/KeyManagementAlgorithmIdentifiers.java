@@ -28,4 +28,6 @@ public class KeyManagementAlgorithmIdentifiers
     public static final String A512KW = "A512KW";
     public static final String A128GCM = "A128GCM";
     public static final String A256GCM = "A256GCM";
+
+    public static final String DIRECT = "dir";
 }

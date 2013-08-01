@@ -19,7 +19,7 @@ package org.jose4j.jws;
 import junit.framework.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jose4j.jwx.CompactSerialization;
+import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
@@ -79,7 +79,7 @@ public class JwsTestSupport
     {
         Assert.assertNotNull(compactSerialization);
         Assert.assertEquals(compactSerialization.trim(), compactSerialization);
-        String[] parts = CompactSerialization.deserialize(compactSerialization);
+        String[] parts = CompactSerializer.deserialize(compactSerialization);
         Assert.assertEquals(JsonWebSignature.COMPACT_SERIALIZATION_PARTS, parts.length);
     }
 
