@@ -16,11 +16,12 @@
 
 package org.jose4j.jwe.kdf;
 
-import org.apache.commons.codec.CharEncoding;
+import org.jose4j.base64url.Base64Url;
 import org.jose4j.lang.ByteUtil;
-import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
+import org.jose4j.lang.UncheckedJoseException;
 
+import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -28,48 +29,80 @@ import java.security.NoSuchAlgorithmException;
  */
 class ShaConcatKeyDerivationFunction
 {
-    private static final double MAX_REPS = Math.pow(2, 32) - 1;
-
     private int digestLenght;
     private String digestMethod;
-
-    public static final byte[] ENCRYPTION_LABEL = StringUtil.getBytesUnchecked("Encryption", CharEncoding.US_ASCII);
-    public static final byte[] INTEGRITY_LABEL = StringUtil.getBytesUnchecked("Integrity", CharEncoding.US_ASCII);
+    private Base64Url base64Url;
 
     public ShaConcatKeyDerivationFunction(int digestLenght)
     {
         this.digestLenght = digestLenght;
         this.digestMethod = "SHA-" + digestLenght;
+        this.base64Url = new Base64Url();
     }
 
-    public byte[] kdf(byte[] sharedSecret, int keydatalen, byte[] label) throws JoseException
+    byte[] getDatalenDataFormat(String encodedValue)
     {
+        byte[] data = base64Url.base64UrlDecode(encodedValue);
+        return prependDatalen(data);
+    }
+
+    byte[] prependDatalen(byte[] data)
+    {
+        if (data == null)
+        {
+            data = ByteUtil.EMPTY_BYTES;
+        }
+        byte[] datalen = ByteUtil.getBytes(data.length);
+        return ByteUtil.concat(datalen, data);
+    }
+
+    public byte[] kdf(byte[] sharedSecret, int keydatalen, String algorithmId, String partyUInfo, String partyVInfo)
+    {
+        byte[] algorithmIdBytes = StringUtil.getBytesUtf8(algorithmId);
+        byte[] partyUInfoBytes = getDatalenDataFormat(partyUInfo);
+        byte[] partyVInfoBytes = getDatalenDataFormat(partyVInfo);
+        byte[] suppPubInfo = ByteUtil.getBytes(keydatalen);
+        byte[] suppPrivInfo =  ByteUtil.EMPTY_BYTES; // or prependDatalen(null);     ?!?!
+        return kdf(sharedSecret, keydatalen, algorithmIdBytes, partyUInfoBytes, partyVInfoBytes, suppPubInfo, suppPrivInfo);
+    }
+
+    public byte[] kdf(byte[] sharedSecret, int keydatalen, byte[] algorithmId, byte[] partyUInfo, byte[] partyVInfo, byte[] suppPubInfo, byte[] suppPrivInfo)
+    {
+        byte[] otherInfo = ByteUtil.concat(algorithmId, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo);
         long reps = getReps(keydatalen);
-        MessageDigest digester = getDigester();
+        MessageDigest messageDigest = getMessageDigest();
 
-        byte[] derivedKeyingMaterial = new byte[0];
-
+        ByteArrayOutputStream derivedByteOutputStream = new ByteArrayOutputStream();
         for (int i = 1; i <= reps; i++)
         {
             byte[] counterBytes = ByteUtil.getBytes(i);
-            byte[] input = ByteUtil.concat(counterBytes, sharedSecret, label);
-            byte[] digest = digester.digest(input);
-
-            derivedKeyingMaterial = ByteUtil.concat(derivedKeyingMaterial, digest); 
+            messageDigest.update(counterBytes);
+            messageDigest.update(sharedSecret);
+            messageDigest.update(otherInfo);
+            byte[] digest = messageDigest.digest();
+            derivedByteOutputStream.write(digest, 0, digest.length);
         }
-                                                                                                            
-        int keyDateLenInBytes = keydatalen / 8;
-        if (derivedKeyingMaterial.length != keyDateLenInBytes)
+
+        int keyDateLenInBytes = ByteUtil.getNumberOfBytes(keydatalen);
+        byte[] derivedKeyMaterial = derivedByteOutputStream.toByteArray();
+        if (derivedKeyMaterial.length != keyDateLenInBytes)
         {
             byte[] newKeyMaterial = new byte[keyDateLenInBytes];
-            System.arraycopy(derivedKeyingMaterial, 0, newKeyMaterial, 0, keyDateLenInBytes);
-            derivedKeyingMaterial = newKeyMaterial;
+            System.arraycopy(derivedKeyMaterial, 0, newKeyMaterial, 0, keyDateLenInBytes);
+            derivedKeyMaterial = newKeyMaterial;
         }
 
-        return derivedKeyingMaterial;
+        return derivedKeyMaterial;
     }
 
-    private MessageDigest getDigester() throws JoseException
+    long getReps(int keydatalen)
+    {
+        double repsD = (float) keydatalen / (float) digestLenght;
+        repsD = Math.ceil(repsD);
+        return Math.round(repsD);
+    }
+
+    private MessageDigest getMessageDigest()
     {
         try
         {
@@ -77,22 +110,7 @@ class ShaConcatKeyDerivationFunction
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new JoseException("Must have " + digestMethod, e);
+            throw new UncheckedJoseException("Must have " + digestMethod + " but don't.", e);
         }
-    }
-
-    long getReps(int keydatalen) throws JoseException
-    {
-        double repsD = (float) keydatalen / (float) digestLenght;
-        repsD = Math.ceil(repsD);
-        long reps = Math.round(repsD);
-
-        if (reps > MAX_REPS)
-        {
-            String msg = keydatalen + " key length gives reps > (2^32 - 1), so ABORTING: outputing an error indicator and stoping.";
-            throw new JoseException(msg);
-        }
-
-        return reps;
     }
 }

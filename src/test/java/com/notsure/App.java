@@ -17,6 +17,7 @@
 package com.notsure;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwe.kdf.Sha256ConcatKeyDerivationFunction;
 import org.jose4j.jwk.*;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jws.AlgorithmIdentifiers;
@@ -29,7 +30,9 @@ import org.jose4j.lang.StringUtil;
 import org.jose4j.mac.MacUtil;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyAgreement;
 import javax.crypto.Mac;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
@@ -47,6 +50,94 @@ public class App
     static String newline = new String(new char[]{0x0d, 0x0a});
 
     public static void main(String[] args) throws Exception
+    {
+        // um... trying to verify example ECDH-ES with KDF example from JWA -14
+        // but the values don't match...
+
+        PublicJsonWebKey receiverJwk = PublicJsonWebKey.Factory.newPublicJwk("\t\t{\"kty\":\"EC\",\t\n" +
+                "\t\t\t\"crv\":\"P-256\",\t\n" +
+                "\t\t\t\"x\":\"weNJy2HscCSM6AEDTDg04biOvhFhyyWvOHQfeF_PxMQ\",\t\n" +
+                "\t\t\t\"y\":\"e8lnCO-AlStT-NJVX-crhB7QRYhiix03illJOVAOyck\",\t\n" +
+                "\t\t\t\"d\":\"VEmDZpDXXK8p8N0Cndsxs924q6nS1RXFASRl6BfUqdw\"\t\n" +
+                "\t\t\t}");
+
+        PublicJsonWebKey ephemeralJwk = PublicJsonWebKey.Factory.newPublicJwk(" {\"kty\":\"EC\",\t\n" +
+                "\t\t\t\"crv\":\"P-256\",\t\n" +
+                "\t\t\t\"x\":\"gI0GAILBdu7T53akrFmMyGcsF3n5dO7MmwNBHKW5SV0\",\t\n" +
+                "\t\t\t\"y\":\"SLW_xSffzlPWrHEVI30DHM_4egVwt3NQqeUD7nMFpps\",\t\n" +
+                "\t\t\t\"d\":\"0_NxaRPUMQoAJt50Gz8YiTr8gRTwyEaCumd-MToTmIo\"\t\n" +
+                "\t\t\t}");
+
+        KeyAgreement senderKa = KeyAgreement.getInstance("ECDH");
+        senderKa.init(ephemeralJwk.getPrivateKey());
+        senderKa.doPhase(receiverJwk.getPublicKey(), true);
+        byte[] z = senderKa.generateSecret();
+        System.out.println(Arrays.toString(z));
+        System.out.println(z.length);
+
+        KeyAgreement receiverKa = KeyAgreement.getInstance("ECDH");
+        receiverKa.init(receiverJwk.getPrivateKey());
+        receiverKa.doPhase(ephemeralJwk.getPublicKey(), true);
+        byte[] otherZ = senderKa.generateSecret();
+        System.out.println(Arrays.toString(otherZ));
+        System.out.println(otherZ.length);
+
+        System.out.println(Arrays.equals(z, otherZ));
+
+        Base64Url base64Url = new Base64Url();
+        String s = base64Url.base64UrlEncode(z);
+        System.out.println(s);
+
+
+        // KDF
+        String algorithmId = "A128GCM";
+        int keydatalen = 128;
+
+        String apu = "QWxpY2U";
+    
+        String apv = "Qm9i";
+        
+        Sha256ConcatKeyDerivationFunction wtkdf = new Sha256ConcatKeyDerivationFunction();
+        byte[] derivedKey = wtkdf.kdf(z, keydatalen, algorithmId, apu, apv);
+        System.out.println(Arrays.toString(derivedKey));
+        String encodedDerivedKey = base64Url.base64UrlEncode(derivedKey);
+        String exampleDerivedKey = "jSNmj9QK9ZGQJ2xg5_TJpA";
+        System.out.println(encodedDerivedKey);
+        System.out.println(exampleDerivedKey);
+        System.out.println(encodedDerivedKey.equals(exampleDerivedKey));
+
+        System.out.println("before 0000 for supppriv usEpwFIC_qrmBExntFwxMA");
+        System.out.println("after 0000 for supppriv  WcWiaSNXE4GCm5lntFhzkQ");
+    }
+
+
+    public static void mainECDH(String[] args) throws Exception
+    {   //
+        EcKeyUtil u = new EcKeyUtil();
+        KeyPair receiverKeypair = u.generateKeyPair(EllipticCurves.P256);
+
+        KeyPair ephemeralKey = u.generateKeyPair(EllipticCurves.P256);
+
+        KeyAgreement senderKa = KeyAgreement.getInstance("ECDH");
+        senderKa.init(ephemeralKey.getPrivate());
+        senderKa.doPhase(receiverKeypair.getPublic(), true);
+        byte[] bytes = senderKa.generateSecret();
+        System.out.println(Arrays.toString(bytes));
+        System.out.println(bytes.length);
+
+        KeyAgreement receiverKa = KeyAgreement.getInstance("ECDH");
+        receiverKa.init(receiverKeypair.getPrivate());
+        receiverKa.doPhase(ephemeralKey.getPublic(), true);
+        byte[] otherbytes = senderKa.generateSecret();
+        System.out.println(Arrays.toString(otherbytes));
+        System.out.println(otherbytes.length);
+
+        System.out.println(Arrays.equals(bytes, otherbytes));
+
+    }
+
+
+    public static void mainshowingjweexample(String[] args) throws Exception
     {
         // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-11#appendix-A.2
         String plainText = "Live long and prosper.";
