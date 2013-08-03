@@ -9,6 +9,7 @@ import org.jose4j.lang.JoseException;
 
 import java.security.Key;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Arrays;
 
 /**
@@ -40,4 +41,19 @@ public class RsaOaepKeyManagementAlgorithmTest extends TestCase
         assertTrue(Arrays.toString(encoded), Arrays.equals(cekBytes, encoded));
     }
 
+    public void testRoundTrip() throws JoseException
+    {
+        RsaOaepKeyManagementAlgorithm oaep = new RsaOaepKeyManagementAlgorithm();
+        ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(128, AesKey.ALGORITHM);
+        PublicKey publicKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPublicKey();
+        ContentEncryptionKeys contentEncryptionKeys = oaep.manageForEncrypt(publicKey, cekDesc, null);
+
+        byte[] encryptedKey = contentEncryptionKeys.getEncryptedKey();
+
+        PrivateKey privateKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPrivateKey();
+        Key key = oaep.manageForDecrypt(privateKey, encryptedKey, cekDesc, null);
+
+        byte[] cek = contentEncryptionKeys.getContentEncryptionKey();
+        assertTrue(Arrays.equals(cek, key.getEncoded()));
+    }
 }
