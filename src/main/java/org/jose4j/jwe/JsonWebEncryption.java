@@ -120,7 +120,6 @@ public class JsonWebEncryption extends JsonWebStructure
 
     private void decrypt() throws JoseException
     {
-         // not sure where to do this... but probably not here todo
         KeyManagementAlgorithm keyManagementModeAlg = getKeyManagementModeAlgorithm();
         ContentEncryptionAlgorithm contentEncryptionAlg = getContentEncryptionAlgorithm();
 

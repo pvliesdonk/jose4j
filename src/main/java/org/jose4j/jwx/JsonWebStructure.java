@@ -72,7 +72,6 @@ public abstract class JsonWebStructure
 
     public void setEncodedHeader(String encodedHeader) throws JoseException
     {
-
         checkNotEmptyPart(encodedHeader, "Encoded Header");
         this.encodedHeader = encodedHeader;
         setHeaderAsString(base64url.base64UrlDecodeToUtf8String(this.encodedHeader));
