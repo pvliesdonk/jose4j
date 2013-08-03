@@ -125,11 +125,11 @@ public class JsonWebEncryption extends JsonWebStructure
 
         ContentEncryptionKeyDescriptor contentEncryptionKeyDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
 
-        Key cek = keyManagementModeAlg.manageForDecrypt(getKey(), encryptedKey, contentEncryptionKeyDesc);
+        Key cek = keyManagementModeAlg.manageForDecrypt(getKey(), encryptedKey, contentEncryptionKeyDesc, getHeaders());
 
         ContentEncryptionParts contentEncryptionParts = new ContentEncryptionParts(iv, ciphertext, getIntegrity());
         byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();
-        byte[] decrypted = contentEncryptionAlg.decrypt(contentEncryptionParts, aad, cek.getEncoded());
+        byte[] decrypted = contentEncryptionAlg.decrypt(contentEncryptionParts, aad, cek.getEncoded(), getHeaders());
         setPlaintext(decrypted);
     }
 
@@ -146,11 +146,11 @@ public class JsonWebEncryption extends JsonWebStructure
 
         ContentEncryptionKeyDescriptor contentEncryptionKeyDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
         Key managementKey = getKey();
-        ContentEncryptionKeys contentEncryptionKeys = keyManagementModeAlg.manageForEncrypt(managementKey, contentEncryptionKeyDesc);
+        ContentEncryptionKeys contentEncryptionKeys = keyManagementModeAlg.manageForEncrypt(managementKey, contentEncryptionKeyDesc, getHeaders());
 
         byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();
         byte[] contentEncryptionKey = contentEncryptionKeys.getContentEncryptionKey();
-        ContentEncryptionParts contentEncryptionParts = contentEncryptionAlg.encrypt(getPlaintextBytes(), aad, contentEncryptionKey);
+        ContentEncryptionParts contentEncryptionParts = contentEncryptionAlg.encrypt(getPlaintextBytes(), aad, contentEncryptionKey, getHeaders());
 
         String encodedIv = base64url.base64UrlEncode(contentEncryptionParts.getIv());
         String encodedCiphertext = base64url.base64UrlEncode(contentEncryptionParts.getCiphertext());

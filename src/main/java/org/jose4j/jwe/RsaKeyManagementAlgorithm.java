@@ -2,6 +2,7 @@ package org.jose4j.jwe;
 
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwk.RsaJsonWebKey;
+import org.jose4j.jwx.Headers;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
@@ -24,7 +25,7 @@ public class RsaKeyManagementAlgorithm extends AlgorithmInfo implements KeyManag
         setKeyPersuasion(KeyPersuasion.ASYMMETRIC);
     }
 
-    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc) throws JoseException
+    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
     {
         Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm());
         byte[] contentEncryptionKey = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength());
@@ -46,7 +47,7 @@ public class RsaKeyManagementAlgorithm extends AlgorithmInfo implements KeyManag
         }
     }
 
-    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc) throws JoseException
+    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
     {
         Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm());
 

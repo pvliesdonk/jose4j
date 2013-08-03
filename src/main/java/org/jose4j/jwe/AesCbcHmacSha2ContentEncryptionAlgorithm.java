@@ -2,6 +2,7 @@ package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwa.AlgorithmInfo;
+import org.jose4j.jwx.Headers;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.keys.KeyPersuasion;
@@ -67,7 +68,7 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         this.contentEncryptionKeyDescriptor = new ContentEncryptionKeyDescriptor(cekByteLenght, AesKey.ALGORITHM);
     }
 
-    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey) throws JoseException
+    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers) throws JoseException
     {
         // The Initialization Vector (IV) used is a 128 bit value generated
         //       randomly or pseudorandomly for use in the cipher.
@@ -121,7 +122,7 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
     }
 
 
-    public byte[] decrypt(ContentEncryptionParts contentEncryptionParts, byte[] aad, byte[] contentEncryptionKey) throws JoseException
+    public byte[] decrypt(ContentEncryptionParts contentEncryptionParts, byte[] aad, byte[] contentEncryptionKey, Headers headers) throws JoseException
     {
         byte[] iv = contentEncryptionParts.getIv();
         byte[] ciphertext = contentEncryptionParts.getCiphertext();

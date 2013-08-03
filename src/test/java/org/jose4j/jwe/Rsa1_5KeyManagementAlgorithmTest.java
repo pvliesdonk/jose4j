@@ -30,7 +30,7 @@ public class Rsa1_5KeyManagementAlgorithmTest extends TestCase
         PrivateKey privateKey = ExampleRsaJwksFromJwe.APPENDIX_A_2.getPrivateKey();
         ContentEncryptionAlgorithm contentEncryptionAlgorithm = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
         ContentEncryptionKeyDescriptor cekDesc = contentEncryptionAlgorithm.getContentEncryptionKeyDescriptor();
-        Key key = keyManagementAlgorithm.manageForDecrypt(privateKey, encryptedKey, cekDesc);
+        Key key = keyManagementAlgorithm.manageForDecrypt(privateKey, encryptedKey, cekDesc, null);
 
         byte[] cekBytes = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{4, 211, 31, 197, 84, 157, 252, 254, 11, 100, 157, 250, 63, 170, 106,
                 206, 107, 124, 212, 45, 111, 107, 9, 219, 200, 177, 0, 240, 143, 156,

@@ -2,13 +2,14 @@ package org.jose4j.jwe;
 
 import junit.framework.TestCase;
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwx.Headers;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 
 /**
  */
-public class Aes128CbcHmacSha256JweContentEncryptionAlgorithmTest extends TestCase
+public class Aes128CbcHmacSha256ContentEncryptionAlgorithmTest extends TestCase
 {
     public void testExampleEncryptFromJweAppendix2() throws JoseException
     {
@@ -52,7 +53,7 @@ public class Aes128CbcHmacSha256JweContentEncryptionAlgorithmTest extends TestCa
 
         Aes128CbcHmacSha256ContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
         ContentEncryptionParts encryptionParts = new ContentEncryptionParts(iv, ciphertext, tag);
-        byte[] plaintextBytes = jweContentEncryptionAlg.decrypt(encryptionParts, header, contentEncryptionKeyBytes);
+        byte[] plaintextBytes = jweContentEncryptionAlg.decrypt(encryptionParts, header, contentEncryptionKeyBytes, null);
 
         assertEquals("Live long and prosper.", StringUtil.newStringUtf8(plaintextBytes));
     }
@@ -65,9 +66,9 @@ public class Aes128CbcHmacSha256JweContentEncryptionAlgorithmTest extends TestCa
         Aes128CbcHmacSha256ContentEncryptionAlgorithm contentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
         ContentEncryptionKeyDescriptor cekDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
         byte[] cek = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength());
-        ContentEncryptionParts encryptionParts = contentEncryptionAlg.encrypt(plaintext, aad, cek);
+        ContentEncryptionParts encryptionParts = contentEncryptionAlg.encrypt(plaintext, aad, cek, (Headers)null);
 
-        byte[] decrypt = contentEncryptionAlg.decrypt(encryptionParts, aad, cek);
+        byte[] decrypt = contentEncryptionAlg.decrypt(encryptionParts, aad, cek, null);
         assertEquals(text, StringUtil.newStringUtf8(decrypt));
     }
 

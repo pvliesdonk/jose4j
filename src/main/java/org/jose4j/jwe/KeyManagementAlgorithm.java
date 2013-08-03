@@ -17,6 +17,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.jwa.Algorithm;
+import org.jose4j.jwx.Headers;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
@@ -25,8 +26,6 @@ import java.security.Key;
  */
 public interface KeyManagementAlgorithm extends Algorithm
 {
-    // todo - additional header parameters (in and out) ...
-    ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc) throws JoseException;
-    Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc) throws JoseException;
-
+    ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException;
+    Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException;
 }
