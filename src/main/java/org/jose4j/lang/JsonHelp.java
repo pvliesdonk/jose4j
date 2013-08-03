@@ -16,6 +16,8 @@
 
 package org.jose4j.lang;
 
+import org.jose4j.jwt.IntDate;
+
 import java.util.List;
 import java.util.Map;
 
@@ -35,5 +37,9 @@ public class JsonHelp
         return (List<String>) object;
     }
 
-
+    public static IntDate getIntDate(Map<String, Object> map, String name)
+    {
+        long l = (Long)map.get(name);
+        return IntDate.fromSeconds(l);
+    }
 }
