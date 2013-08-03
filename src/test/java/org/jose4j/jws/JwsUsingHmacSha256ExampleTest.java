@@ -46,7 +46,7 @@ public class JwsUsingHmacSha256ExampleTest extends TestCase
 
         JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk(JWK);
         jws.setKey(jsonWebKey.getKey());
-        jws.setHeaderAsString("{\"typ\":\"JWT\",\r\n \"alg\":\"HS256\"}");
+        jws.getHeaders().setHeaderAsString("{\"typ\":\"JWT\",\r\n \"alg\":\"HS256\"}");
 
         String compactSerialization = jws.getCompactSerialization();
 

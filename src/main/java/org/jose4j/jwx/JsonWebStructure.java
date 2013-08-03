@@ -17,12 +17,9 @@
 package org.jose4j.jwx;
 
 import org.jose4j.base64url.Base64Url;
-import org.jose4j.json.JsonHeaderUtil;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  */
@@ -30,51 +27,34 @@ public abstract class JsonWebStructure
 {
     protected Base64Url base64url = new Base64Url();
 
-    private Map<String,String> headerMap = new LinkedHashMap<String,String>();
-    private String header;
-    private String encodedHeader;
+    protected Headers headers = new Headers();
 
     private byte[] integrity;
 
     private Key key;
 
     abstract public String getCompactSerialization() throws JoseException;
-
-    public String getHeader()
-    {
-        if (header == null)
-        {
-            header = JsonHeaderUtil.toJson(headerMap);
-        }
-        return header;
-    }
+    abstract public void setCompactSerialization(String cs) throws JoseException;
 
     protected String getEncodedHeader()
     {
-        if (encodedHeader == null)
-        {
-            encodedHeader = base64url.base64UrlEncodeUtf8ByteRepresentation(getHeader());
-        }
-        return encodedHeader;
+        return headers.getEncodedHeader();
     }
 
     public void setHeader(String name, String value)
     {
-        headerMap.put(name, value);
-        this.header = null;
+        headers.setHeaderValue(name, value);
     }
 
-    public void setHeaderAsString(String header) throws JoseException
-    {
-        this.header = header;
-        headerMap = JsonHeaderUtil.parseJson(header);
-    }
-
-    public void setEncodedHeader(String encodedHeader) throws JoseException
+    protected void setEncodedHeader(String encodedHeader) throws JoseException
     {
         checkNotEmptyPart(encodedHeader, "Encoded Header");
-        this.encodedHeader = encodedHeader;
-        setHeaderAsString(base64url.base64UrlDecodeToUtf8String(this.encodedHeader));
+        headers.setEncodedHeader(encodedHeader);
+    }
+
+    public Headers getHeaders()
+    {
+        return headers;
     }
 
     protected void checkNotEmptyPart(String encodedPart, String partName) throws JoseException
@@ -87,7 +67,7 @@ public abstract class JsonWebStructure
 
     public String getHeader(String name)
     {
-        return headerMap.get(name);
+        return headers.getHeaderValue(name);
     }
 
     public void setAlgorithmHeaderValue(String alg)

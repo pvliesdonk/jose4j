@@ -325,7 +325,7 @@ public class App
         String compactSerialization = jws.getCompactSerialization();
         System.out.println(compactSerialization);
 
-        System.out.println(jws.getHeader());
+        System.out.println(jws.getHeaders().getHeaderAsString());
         System.out.println(jws.getPayload());
 
         EcKeyUtil ku = new EcKeyUtil();
