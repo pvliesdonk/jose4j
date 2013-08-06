@@ -17,7 +17,9 @@
 package org.jose4j.jwe;
 
 import junit.framework.TestCase;
+import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwx.HeaderParameterNames;
+import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.ByteUtil;
@@ -30,23 +32,34 @@ import java.security.Key;
  */
 public class JsonWebEncryptionTest extends TestCase
 {
-    public void testTesting() throws JoseException
+    public void testJweExampleA3() throws JoseException
     {
-        String plaintext = "{\"plain\":\"text\",\"a key\":\"with some value\",\"some:claim\":true}";
-        JsonWebEncryption jwe = new JsonWebEncryption();        
-        jwe.setPlaintext(plaintext);
-        jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.RSA1_5);
-        jwe.setKey(ExampleRsaKeyFromJws.PUBLIC_KEY);
-        jwe.setHeader(HeaderParameterNames.ENCRYPTION_METHOD, ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+        // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#appendix-A.3
+        String jweCsFromAppdxA3 = "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." +
+                "6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ." +
+                "AxY8DCtDaGlsbGljb3RoZQ." +
+                "KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY." +
+                "U0m_YmjN04DJvceFICbCVQ";
 
-        String jweCompactSerialization = jwe.getCompactSerialization();
-        assertFalse(jweCompactSerialization.contains("with some value"));
+        JsonWebEncryption jwe = new JsonWebEncryption();
+        JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk("\n" +
+                "{\"kty\":\"oct\",\n" +
+                " \"k\":\"GawgguFyGrWKav7AX4VKUg\"\n" +
+                "}");
+
+        jwe.setCompactSerialization(jweCsFromAppdxA3);
+        jwe.setKey(new AesKey(jsonWebKey.getKey().getEncoded()));
+
+        String plaintextString = jwe.getPlaintextString();
+
+        assertEquals("Live long and prosper.", plaintextString);
+
     }
 
     public void testJweExampleA2() throws JoseException
     {
         // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#appendix-A.2
-        String jwsCsFromAppendixA2 = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." +
+        String jweCsFromAppendixA2 = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." +
                 "UGhIOguC7IuEvf_NPVaXsGMoLOmwvc1GyqlIKOK1nN94nHPoltGRhWhw7Zx0-kFm" +
                 "1NJn8LE9XShH59_i8J0PH5ZZyNfGy2xGdULU7sHNF6Gp2vPLgNZ__deLKxGHZ7Pc" +
                 "HALUzoOegEI-8E66jX2E4zyJKx-YxzZIItRzC5hlRirb6Y5Cl_p-ko3YvkkysZIF" +
@@ -59,7 +72,7 @@ public class JsonWebEncryptionTest extends TestCase
 
         JsonWebEncryption jwe = new JsonWebEncryption();
         jwe.setKey(ExampleRsaJwksFromJwe.APPENDIX_A_2.getPrivateKey());
-        jwe.setCompactSerialization(jwsCsFromAppendixA2);
+        jwe.setCompactSerialization(jweCsFromAppendixA2);
         String plaintextString = jwe.getPlaintextString();
         assertEquals("Live long and prosper.", plaintextString);
     }

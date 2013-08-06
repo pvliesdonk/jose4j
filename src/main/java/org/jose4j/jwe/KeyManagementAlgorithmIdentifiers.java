@@ -24,9 +24,10 @@ public class KeyManagementAlgorithmIdentifiers
     public static final String RSA_OAEP = "RSA-OAEP";
     public static final String ECDH_ES = "ECDH-ES";
     public static final String A128KW = "A128KW";
+    public static final String A192KW = "A192KW";
     public static final String A256KW = "A256KW";
-    public static final String A512KW = "A512KW";
     public static final String A128GCM = "A128GCM";
+    public static final String A192GCM = "A192GCM";
     public static final String A256GCM = "A256GCM";
 
     public static final String DIRECT = "dir";
