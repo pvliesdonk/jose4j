@@ -86,7 +86,7 @@ public class App
 
         Base64Url base64Url = new Base64Url();
         String s = base64Url.base64UrlEncode(z);
-        System.out.println(s);
+        System.out.println("z: " + s);
 
 
         // KDF
@@ -106,17 +106,17 @@ public class App
         System.out.println(exampleDerivedKey);
         System.out.println(encodedDerivedKey.equals(exampleDerivedKey));
 
-        System.out.println("before 0000 for supppriv usEpwFIC_qrmBExntFwxMA");
+        System.out.println("\n\nbefore 0000 for supppriv usEpwFIC_qrmBExntFwxMA");
         System.out.println("after 0000 for supppriv  WcWiaSNXE4GCm5lntFhzkQ");
     }
 
 
-    public static void mainECDH(String[] args) throws Exception
+    public static void mainxx(String[] args) throws Exception
     {   //
         EcKeyUtil u = new EcKeyUtil();
-        KeyPair receiverKeypair = u.generateKeyPair(EllipticCurves.P256);
+        KeyPair receiverKeypair = u.generateKeyPair(EllipticCurves.P521);
 
-        KeyPair ephemeralKey = u.generateKeyPair(EllipticCurves.P256);
+        KeyPair ephemeralKey = u.generateKeyPair(EllipticCurves.P521);
 
         KeyAgreement senderKa = KeyAgreement.getInstance("ECDH");
         senderKa.init(ephemeralKey.getPrivate());
@@ -243,7 +243,6 @@ public class App
                 "9hH0vgRfYgPnAHOd8stkvw";
 
         decJweAppA2(csFromAppendixA2);
-
     }
 
     public static void decJweAppA2(String cs) throws JoseException, Exception
