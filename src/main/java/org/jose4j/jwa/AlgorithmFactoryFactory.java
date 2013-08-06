@@ -17,8 +17,7 @@
 package org.jose4j.jwa;
 
 import org.jose4j.jwe.*;
-import org.jose4j.jws.JsonWebSignatureAlgorithm;
-import org.jose4j.lang.JoseException;
+import org.jose4j.jws.*;
 
 /**
  */
@@ -30,13 +29,32 @@ public class AlgorithmFactoryFactory
     private AlgorithmFactory<KeyManagementAlgorithm> jweKeyMgmtModeAlgorithmFactory;
     private AlgorithmFactory<ContentEncryptionAlgorithm> jweContentEncryptionAlgorithmFactory;
 
-
     private AlgorithmFactoryFactory()
     {
-        jwsAlgorithmFactory = new AlgorithmFactory<JsonWebSignatureAlgorithm>("jws-algorithms.properties"); // todo change name (not sure why the todo was put here?)
-        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<KeyManagementAlgorithm>("jwe-key-management-algorithms.properties");
-        jweContentEncryptionAlgorithmFactory = new AlgorithmFactory<ContentEncryptionAlgorithm>("jwe-content-encryption-algorithms.properties");
+        jwsAlgorithmFactory = new AlgorithmFactory<JsonWebSignatureAlgorithm>();
+        jwsAlgorithmFactory.registerAlgorithm(new PlaintextNoneAlgorithm());
+        jwsAlgorithmFactory.registerAlgorithm(new HmacUsingSha256Algorithm());
+        jwsAlgorithmFactory.registerAlgorithm(new HmacUsingSha384Algorithm());
+        jwsAlgorithmFactory.registerAlgorithm(new HmacUsingSha512Algorithm());
+        jwsAlgorithmFactory.registerAlgorithm(new EcdsaP256UsingSha256Algorithm());
+        jwsAlgorithmFactory.registerAlgorithm(new EcdsaP384UsingSha384Algorithm());
+        jwsAlgorithmFactory.registerAlgorithm(new EcdsaP521UsingSha512Algorithm());
+        jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha256Algorithm());
+        jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha384Algorithm());
+        jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha512Algorithm());
 
+        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<KeyManagementAlgorithm>();
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Rsa1_5KeyManagementAlgorithm());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new RsaOaepKeyManagementAlgorithm());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new DirectKeyManagementAlgorithm());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Aes128KeyWrapManagementAlgorithm());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Aes192KeyWrapManagementAlgorithm());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Aes256KeyWrapManagementAlgorithm());
+
+        jweContentEncryptionAlgorithmFactory = new AlgorithmFactory<ContentEncryptionAlgorithm>();
+        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes128CbcHmacSha256ContentEncryptionAlgorithm());
+        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes192CbcHmacSha384ContentEncryptionAlgorithm());
+        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes128CbcHmacSha256ContentEncryptionAlgorithm());
     }
 
     public static AlgorithmFactoryFactory getInstance()

@@ -30,7 +30,7 @@ import java.util.Map;
 
 /**
  */
-public abstract class JsonWebKey implements Serializable
+public abstract class   JsonWebKey implements Serializable
 {
     public static final String KEY_TYPE_PARAMETER = "kty";
     public static final String USE_PARAMETER = "use";
