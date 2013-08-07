@@ -105,7 +105,10 @@ public class App
         System.out.println(encodedDerivedKey);
         System.out.println(exampleDerivedKey);
         System.out.println(encodedDerivedKey.equals(exampleDerivedKey));
-
+        String edmundsResult = "usEpwFIC_qrmBExntFwxMA";
+        // double check match with Edmund Jay's result
+        // http://lists.openid.net/pipermail/openid-specs-ab/Week-of-Mon-20130805/003869.html
+        System.out.println("Matches Edmund's: " + edmundsResult.equals(encodedDerivedKey));
         System.out.println("\n\nbefore 0000 for supppriv usEpwFIC_qrmBExntFwxMA");
         System.out.println("after 0000 for supppriv  WcWiaSNXE4GCm5lntFhzkQ");
     }
