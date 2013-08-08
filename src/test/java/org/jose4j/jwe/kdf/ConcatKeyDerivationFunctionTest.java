@@ -23,11 +23,11 @@ import java.util.Arrays;
 
 /**
  */
-public class SimpleSha256ConcatKeyDerivationFunctionTest extends TestCase
+public class ConcatKeyDerivationFunctionTest extends TestCase
 {
     public void testGetReps()
     {
-        ShaConcatKeyDerivationFunction kdf = new Sha256ConcatKeyDerivationFunction();
+        ConcatKeyDerivationFunction kdf = new ConcatKeyDerivationFunction("SHA-256");
         assertEquals(1, kdf.getReps(256));
         assertEquals(2, kdf.getReps(384));
         assertEquals(2, kdf.getReps(512));
@@ -35,39 +35,18 @@ public class SimpleSha256ConcatKeyDerivationFunctionTest extends TestCase
         assertEquals(5, kdf.getReps(1025));
     }
 
-    public void testSizeEtc256()
-    {
-        testKdfSizeAndOtherStuff(256);
-    }
-
-    public void testSizeEtc384()
-    {
-        testKdfSizeAndOtherStuff(384);
-    }
-
-    public void testSizeEtc512()
-    {
-        testKdfSizeAndOtherStuff(512);
-    }
-
     public void testGetDatalenData()
     {
         String apu = "QWxpY2U";
-        ShaConcatKeyDerivationFunction kdf = new Sha256ConcatKeyDerivationFunction();
-        byte[] apuDatalenData = kdf.getDatalenDataFormat(apu);
+        KdfUtil kdfUtil = new KdfUtil();
+        byte[] apuDatalenData = kdfUtil.getDatalenDataFormat(apu);
         assertTrue(Arrays.equals(apuDatalenData, new byte[] {0, 0, 0, 5, 65, 108, 105, 99, 101}));
 
         String apv = "Qm9i";
-        byte[] apvDatalenData = kdf.getDatalenDataFormat(apv);
+        byte[] apvDatalenData = kdfUtil.getDatalenDataFormat(apv);
         assertTrue(Arrays.equals(apvDatalenData, new byte[] {0, 0, 0, 3, 'B', 'o', 'b'}));
 
-        assertTrue(Arrays.equals(kdf.prependDatalen(new byte[]{}), new byte[] {0, 0, 0, 0}));
-        assertTrue(Arrays.equals(kdf.prependDatalen(null), new byte[] {0, 0, 0, 0}));
-    }
-
-    public void testKdfSizeAndOtherStuff(int keydatalen)
-    {
-        ShaConcatKeyDerivationFunction kdf1 = new Sha256ConcatKeyDerivationFunction();
-        byte[] secret = {1, 62, 3, 4, 9, 83, 123, 12, 111, 1, 1, 0, -1, 8, 7 , 12, 45, 118, 99, 9};
+        assertTrue(Arrays.equals(kdfUtil.prependDatalen(new byte[]{}), new byte[] {0, 0, 0, 0}));
+        assertTrue(Arrays.equals(kdfUtil.prependDatalen(null), new byte[] {0, 0, 0, 0}));
     }
 }

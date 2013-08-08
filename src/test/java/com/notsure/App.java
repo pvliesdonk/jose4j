@@ -17,7 +17,7 @@
 package com.notsure;
 
 import org.jose4j.base64url.Base64Url;
-import org.jose4j.jwe.kdf.Sha256ConcatKeyDerivationFunction;
+import org.jose4j.jwe.kdf.KdfUtil;
 import org.jose4j.jwk.*;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jws.AlgorithmIdentifiers;
@@ -32,7 +32,6 @@ import org.jose4j.mac.MacUtil;
 import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
 import javax.crypto.Mac;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
@@ -92,12 +91,10 @@ public class App
         // KDF
         String algorithmId = "A128GCM";
         int keydatalen = 128;
-
         String apu = "QWxpY2U";
-    
         String apv = "Qm9i";
-        
-        Sha256ConcatKeyDerivationFunction wtkdf = new Sha256ConcatKeyDerivationFunction();
+
+        KdfUtil wtkdf = new KdfUtil();
         byte[] derivedKey = wtkdf.kdf(z, keydatalen, algorithmId, apu, apv);
         System.out.println(Arrays.toString(derivedKey));
         String encodedDerivedKey = base64Url.base64UrlEncode(derivedKey);

@@ -131,7 +131,12 @@ public class ByteUtil
 
     public static int bitLength(byte[] bytes)
     {
-        return bytes.length * 8;
+        return bitLength(bytes.length);
+    }
+
+    public static int bitLength(int byteLength)
+    {
+        return byteLength * 8;
     }
 
     public static int getNumberOfBytes(int numberOfBits)
