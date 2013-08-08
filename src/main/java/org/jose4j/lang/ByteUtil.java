@@ -141,7 +141,7 @@ public class ByteUtil
         return byteLength * 8;
     }
 
-    public static int getNumberOfBytes(int numberOfBits)
+    public static int byteLength(int numberOfBits)
     {
         return numberOfBits / 8;
     }

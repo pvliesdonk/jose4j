@@ -43,7 +43,7 @@ public class JsonHeaderUtil
         }
     };
 
-    public static Map<String,String> parseJson(String jsonString) throws JoseException
+    public static Map<String,Object> parseJson(String jsonString) throws JoseException
     {
         try
         {
@@ -60,15 +60,15 @@ public class JsonHeaderUtil
         }
     }
 
-    public static String toJson(Map<String,String> map)
+    public static String toJson(Map<String,?> map)
     {
         return JSONValue.toJSONString(map);
     }
 
-    static class DupeKeyDisallowingLinkedHashMap extends LinkedHashMap<String,String>
+    static class DupeKeyDisallowingLinkedHashMap extends LinkedHashMap<String,Object>
     {
         @Override
-        public String put(String key, String value) 
+        public Object put(String key, Object value)
         {
             if (this.containsKey(key))
             {

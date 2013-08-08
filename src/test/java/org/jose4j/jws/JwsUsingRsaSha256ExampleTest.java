@@ -44,7 +44,7 @@ public class JwsUsingRsaSha256ExampleTest extends TestCase
     {
         JsonWebSignature jws = new JsonWebSignature();
         jws.setPayload("{\"iss\":\"joe\",\r\n \"exp\":1300819380,\r\n \"http://example.com/is_root\":true}");
-        jws.getHeaders().setHeaderAsString("{\"alg\":\"RS256\"}");
+        jws.getHeaders().setFullHeaderAsJsonString("{\"alg\":\"RS256\"}");
         jws.setKey(ExampleRsaKeyFromJws.PRIVATE_KEY);
 
         String compactSerialization = jws.getCompactSerialization();

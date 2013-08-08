@@ -35,5 +35,10 @@ public class HeaderParameterNames
     public static final String X509_CERTIFICATE_THUMBPRINT = "x5t";
 
     public static final String X509_URL = "x5u";
-    
+
+    public static final String EPHEMERAL_PUBLIC_KEY = "epk";
+
+    public static final String AGREEMENT_PARTY_U_INFO = "apu";
+    public static final String AGREEMENT_PARTY_V_INFO = "apv";
+
 }

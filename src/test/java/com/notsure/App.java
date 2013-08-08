@@ -37,6 +37,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
+import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ public class App
 
     static String newline = new String(new char[]{0x0d, 0x0a});
 
-    public static void main(String[] args) throws Exception
+    public static void mainx(String[] args) throws Exception
     {
         // um... trying to verify example ECDH-ES with KDF example from JWA -14
         // but the values don't match...
@@ -114,16 +115,17 @@ public class App
     }
 
 
-    public static void mainxx(String[] args) throws Exception
-    {   //
+    public static void main(String[] args) throws Exception
+    {
         EcKeyUtil u = new EcKeyUtil();
-        KeyPair receiverKeypair = u.generateKeyPair(EllipticCurves.P521);
+        KeyPair receiverKeypair = u.generateKeyPair(EllipticCurves.P256);
 
-        KeyPair ephemeralKey = u.generateKeyPair(EllipticCurves.P521);
+        ECPublicKey receiverPublic = (ECPublicKey) receiverKeypair.getPublic();
+        KeyPair ephemeralKey = u.generateKeyPair(receiverPublic.getParams());
 
         KeyAgreement senderKa = KeyAgreement.getInstance("ECDH");
         senderKa.init(ephemeralKey.getPrivate());
-        senderKa.doPhase(receiverKeypair.getPublic(), true);
+        senderKa.doPhase(receiverPublic, true);
         byte[] bytes = senderKa.generateSecret();
         System.out.println(Arrays.toString(bytes));
         System.out.println(bytes.length);
@@ -327,7 +329,7 @@ public class App
         String compactSerialization = jws.getCompactSerialization();
         System.out.println(compactSerialization);
 
-        System.out.println(jws.getHeaders().getHeaderAsString());
+        System.out.println(jws.getHeaders().getFullHeaderAsJsonString());
         System.out.println(jws.getPayload());
 
         EcKeyUtil ku = new EcKeyUtil();

@@ -43,7 +43,7 @@ public abstract class JsonWebStructure
 
     public void setHeader(String name, String value)
     {
-        headers.setHeaderValue(name, value);
+        headers.setStringHeaderValue(name, value);
     }
 
     protected void setEncodedHeader(String encodedHeader) throws JoseException
@@ -67,7 +67,7 @@ public abstract class JsonWebStructure
 
     public String getHeader(String name)
     {
-        return headers.getHeaderValue(name);
+        return headers.getStringHeaderValue(name);
     }
 
     public void setAlgorithmHeaderValue(String alg)

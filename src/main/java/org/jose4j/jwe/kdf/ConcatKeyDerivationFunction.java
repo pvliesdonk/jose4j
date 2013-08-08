@@ -63,7 +63,7 @@ public class ConcatKeyDerivationFunction
             derivedByteOutputStream.write(digest, 0, digest.length);
         }
 
-        int keyDateLenInBytes = ByteUtil.getNumberOfBytes(keydatalen);
+        int keyDateLenInBytes = ByteUtil.byteLength(keydatalen);
         byte[] derivedKeyMaterial = derivedByteOutputStream.toByteArray();
         log.debug("derived key material: " + ByteUtil.toDebugString(derivedKeyMaterial));
         if (derivedKeyMaterial.length != keyDateLenInBytes)

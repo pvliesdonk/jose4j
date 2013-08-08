@@ -28,7 +28,7 @@ public class JsonHeaderUtilTest extends TestCase
     public void testParseJson1() throws JoseException
     {
         String basic = "{\"key\":\"value\"}";
-        Map<String,String> map = JsonHeaderUtil.parseJson(basic);
+        Map<String,?> map = JsonHeaderUtil.parseJson(basic);
         assertEquals(1, map.size());
         assertEquals("value", map.get("key"));
     }
@@ -39,7 +39,7 @@ public class JsonHeaderUtilTest extends TestCase
 
         try
         {
-            Map<String,String> map = JsonHeaderUtil.parseJson(basic);
+            Map<String,?> map = JsonHeaderUtil.parseJson(basic);
             fail("parsing of " + basic + " should fail because the same member name occurs multiple times but returned: " + map);
         }
         catch (JoseException e)
@@ -54,7 +54,7 @@ public class JsonHeaderUtilTest extends TestCase
 
         try
         {
-            Map<String,String> map = JsonHeaderUtil.parseJson(basic);
+            Map<String,?> map = JsonHeaderUtil.parseJson(basic);
             fail("parsing of " + basic + " should fail because of array but returned: " + map);
         }
         catch (JoseException e)

@@ -11,8 +11,6 @@ import java.security.Key;
  */
 public class DirectKeyManagementAlgorithm extends AlgorithmInfo implements KeyManagementAlgorithm
 {
-    private static final byte[] EMPTY_OCTET_SEQUENCE = new byte[]{};
-
     public DirectKeyManagementAlgorithm()
     {
         setAlgorithmIdentifier(KeyManagementAlgorithmIdentifiers.DIRECT);
@@ -23,7 +21,7 @@ public class DirectKeyManagementAlgorithm extends AlgorithmInfo implements KeyMa
     {
         // todo check managementKey against cekDesc... ?
         byte[] cekBytes = managementKey.getEncoded();
-        return new ContentEncryptionKeys(cekBytes, EMPTY_OCTET_SEQUENCE);
+        return new ContentEncryptionKeys(cekBytes, null);
     }
 
     public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
