@@ -17,6 +17,8 @@
 package org.jose4j.lang;
 
 
+import org.jose4j.base64url.Base64Url;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -148,6 +150,14 @@ public class ByteUtil
     {
         ByteGenerator gen = new DefaultByteGenerator();
         return gen.randomBytes(length);
+    }
+
+    public static String toDebugString(byte[] bytes)
+    {
+        Base64Url base64Url = new Base64Url();
+        String s = base64Url.base64UrlEncode(bytes);
+        int[] ints = convertSignedTwosCompToUnsigned(bytes);
+        return Arrays.toString(ints) + "("+ints.length+"bytes/"+bitLength(ints.length)+"bits) | base64url encoded: " + s;
     }
 
 }

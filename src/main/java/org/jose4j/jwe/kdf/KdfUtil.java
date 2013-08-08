@@ -19,7 +19,7 @@ public class KdfUtil
 
     public byte[] kdf(byte[] sharedSecret, int keydatalen, String algorithmId, String partyUInfo, String partyVInfo)
     {
-        byte[] algorithmIdBytes = StringUtil.getBytesUtf8(algorithmId);
+        byte[] algorithmIdBytes = StringUtil.getBytesUtf8(algorithmId); // and why not lead this with data len?
         byte[] partyUInfoBytes = getDatalenDataFormat(partyUInfo);
         byte[] partyVInfoBytes = getDatalenDataFormat(partyVInfo);
         byte[] suppPubInfo = ByteUtil.getBytes(keydatalen);

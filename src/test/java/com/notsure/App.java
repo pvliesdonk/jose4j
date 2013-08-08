@@ -16,6 +16,8 @@
 
 package com.notsure;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwe.kdf.KdfUtil;
 import org.jose4j.jwk.*;
@@ -53,40 +55,43 @@ public class App
         // um... trying to verify example ECDH-ES with KDF example from JWA -14
         // but the values don't match...
 
-        PublicJsonWebKey receiverJwk = PublicJsonWebKey.Factory.newPublicJwk("\t\t{\"kty\":\"EC\",\t\n" +
-                "\t\t\t\"crv\":\"P-256\",\t\n" +
-                "\t\t\t\"x\":\"weNJy2HscCSM6AEDTDg04biOvhFhyyWvOHQfeF_PxMQ\",\t\n" +
-                "\t\t\t\"y\":\"e8lnCO-AlStT-NJVX-crhB7QRYhiix03illJOVAOyck\",\t\n" +
-                "\t\t\t\"d\":\"VEmDZpDXXK8p8N0Cndsxs924q6nS1RXFASRl6BfUqdw\"\t\n" +
-                "\t\t\t}");
+        // but Edmund Jay's result did match
+        // http://lists.openid.net/pipermail/openid-specs-ab/Week-of-Mon-20130805/003869.html
 
-        PublicJsonWebKey ephemeralJwk = PublicJsonWebKey.Factory.newPublicJwk(" {\"kty\":\"EC\",\t\n" +
-                "\t\t\t\"crv\":\"P-256\",\t\n" +
-                "\t\t\t\"x\":\"gI0GAILBdu7T53akrFmMyGcsF3n5dO7MmwNBHKW5SV0\",\t\n" +
-                "\t\t\t\"y\":\"SLW_xSffzlPWrHEVI30DHM_4egVwt3NQqeUD7nMFpps\",\t\n" +
-                "\t\t\t\"d\":\"0_NxaRPUMQoAJt50Gz8YiTr8gRTwyEaCumd-MToTmIo\"\t\n" +
-                "\t\t\t}");
+        // getting a bunch of debug for Mike
+
+        Log log = LogFactory.getLog("ECDH w/ JWA -14 KDF example");
+
+        String receiverJwkJson = "\n{\"kty\":\"EC\",\n" +
+                " \"crv\":\"P-256\",\n" +
+                " \"x\":\"weNJy2HscCSM6AEDTDg04biOvhFhyyWvOHQfeF_PxMQ\",\n" +
+                " \"y\":\"e8lnCO-AlStT-NJVX-crhB7QRYhiix03illJOVAOyck\",\n" +
+                " \"d\":\"VEmDZpDXXK8p8N0Cndsxs924q6nS1RXFASRl6BfUqdw\"\n" +
+                "}";
+        log.debug("Receiver JWK: " + receiverJwkJson);
+        PublicJsonWebKey receiverJwk = PublicJsonWebKey.Factory.newPublicJwk(receiverJwkJson);
+
+        String ephemeralJwkJson = "\n{\"kty\":\"EC\",\n" +
+                " \"crv\":\"P-256\",\n" +
+                " \"x\":\"gI0GAILBdu7T53akrFmMyGcsF3n5dO7MmwNBHKW5SV0\",\n" +
+                " \"y\":\"SLW_xSffzlPWrHEVI30DHM_4egVwt3NQqeUD7nMFpps\",\n" +
+                " \"d\":\"0_NxaRPUMQoAJt50Gz8YiTr8gRTwyEaCumd-MToTmIo\"\n" +
+                "}";
+        log.debug("Ephemeral JWK: " + receiverJwkJson);
+        PublicJsonWebKey ephemeralJwk = PublicJsonWebKey.Factory.newPublicJwk(ephemeralJwkJson);
 
         KeyAgreement senderKa = KeyAgreement.getInstance("ECDH");
         senderKa.init(ephemeralJwk.getPrivateKey());
         senderKa.doPhase(receiverJwk.getPublicKey(), true);
         byte[] z = senderKa.generateSecret();
-        System.out.println(Arrays.toString(z));
-        System.out.println(z.length);
 
         KeyAgreement receiverKa = KeyAgreement.getInstance("ECDH");
         receiverKa.init(receiverJwk.getPrivateKey());
         receiverKa.doPhase(ephemeralJwk.getPublicKey(), true);
         byte[] otherZ = senderKa.generateSecret();
-        System.out.println(Arrays.toString(otherZ));
-        System.out.println(otherZ.length);
 
-        System.out.println(Arrays.equals(z, otherZ));
-
-        Base64Url base64Url = new Base64Url();
-        String s = base64Url.base64UrlEncode(z);
-        System.out.println("z: " + s);
-
+        log.debug("Output of sender's ECDH (z): " + ByteUtil.toDebugString(otherZ));
+        log.debug("Output of receiver ECDH (z): " + ByteUtil.toDebugString(z));
 
         // KDF
         String algorithmId = "A128GCM";
@@ -94,20 +99,18 @@ public class App
         String apu = "QWxpY2U";
         String apv = "Qm9i";
 
+        Base64Url base64Url = new Base64Url();
+        log.debug("keydatalen: " + keydatalen);
+        log.debug("algorithmId: " + algorithmId);
+        log.debug("apu: " + apu + " | decoded: " + base64Url.base64UrlDecodeToUtf8String(apu));
+        log.debug("apv: " + apv +" | decoded: " + base64Url.base64UrlDecodeToUtf8String(apv));
+
         KdfUtil wtkdf = new KdfUtil();
         byte[] derivedKey = wtkdf.kdf(z, keydatalen, algorithmId, apu, apv);
-        System.out.println(Arrays.toString(derivedKey));
-        String encodedDerivedKey = base64Url.base64UrlEncode(derivedKey);
-        String exampleDerivedKey = "jSNmj9QK9ZGQJ2xg5_TJpA";
-        System.out.println(encodedDerivedKey);
-        System.out.println(exampleDerivedKey);
-        System.out.println(encodedDerivedKey.equals(exampleDerivedKey));
-        String edmundsResult = "usEpwFIC_qrmBExntFwxMA";
-        // double check match with Edmund Jay's result
-        // http://lists.openid.net/pipermail/openid-specs-ab/Week-of-Mon-20130805/003869.html
-        System.out.println("Matches Edmund's: " + edmundsResult.equals(encodedDerivedKey));
-        System.out.println("\n\nbefore 0000 for supppriv usEpwFIC_qrmBExntFwxMA");
-        System.out.println("after 0000 for supppriv  WcWiaSNXE4GCm5lntFhzkQ");
+        log.debug("Derived Key from KDF:" + ByteUtil.toDebugString(derivedKey));
+
+
+
     }
 
 
