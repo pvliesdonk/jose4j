@@ -22,12 +22,20 @@ import java.security.interfaces.ECPublicKey;
  */
 public class EcdhKeyAgreementAlgorithm extends AlgorithmInfo implements KeyManagementAlgorithm
 {
+    String algorithmIdHeaderName = HeaderParameterNames.ENCRYPTION_METHOD;
+
     public EcdhKeyAgreementAlgorithm()
     {
         setAlgorithmIdentifier(KeyManagementAlgorithmIdentifiers.ECDH_ES);
         setJavaAlgorithm("ECDH");
         setKeyType(EllipticCurveJsonWebKey.KEY_TYPE);
         setKeyPersuasion(KeyPersuasion.ASYMMETRIC);
+    }
+
+    public EcdhKeyAgreementAlgorithm(String algorithmIdHeaderName)
+    {
+        this();
+        this.algorithmIdHeaderName = algorithmIdHeaderName;
     }
 
     public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
@@ -65,7 +73,7 @@ public class EcdhKeyAgreementAlgorithm extends AlgorithmInfo implements KeyManag
           value.  In the Key Agreement with Key Wrapping case, this is set
           to the octets of the UTF-8 representation of the "alg" header
           parameter value.*/
-        String algorithmID = headers.getStringHeaderValue(HeaderParameterNames.ENCRYPTION_METHOD);
+        String algorithmID = headers.getStringHeaderValue(algorithmIdHeaderName);
         String partyUInfo = headers.getStringHeaderValue(HeaderParameterNames.AGREEMENT_PARTY_U_INFO);
         String partyVInfo = headers.getStringHeaderValue(HeaderParameterNames.AGREEMENT_PARTY_V_INFO);
         return kdf.kdf(z, keydatalen, algorithmID, partyUInfo, partyVInfo);

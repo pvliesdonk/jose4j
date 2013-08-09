@@ -23,6 +23,9 @@ public class KeyManagementAlgorithmIdentifiers
     public static final String RSA1_5 = "RSA1_5";
     public static final String RSA_OAEP = "RSA-OAEP";
     public static final String ECDH_ES = "ECDH-ES";
+    public static final String ECDH_ES_A128KW = "ECDH-ES+A128KW";
+    public static final String ECDH_ES_A192KW = "ECDH-ES+A192KW";
+    public static final String ECDH_ES_A256KW = "ECDH-ES+A256KW";
     public static final String A128KW = "A128KW";
     public static final String A192KW = "A192KW";
     public static final String A256KW = "A256KW";

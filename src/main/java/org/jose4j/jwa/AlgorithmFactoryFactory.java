@@ -51,11 +51,14 @@ public class AlgorithmFactoryFactory
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Aes192KeyWrapManagementAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Aes256KeyWrapManagementAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementAlgorithm());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes128KeyWrapAlgorithm());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes192KeyWrapAlgorithm());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes256KeyWrapAlgorithm());
 
         jweContentEncryptionAlgorithmFactory = new AlgorithmFactory<ContentEncryptionAlgorithm>();
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes128CbcHmacSha256ContentEncryptionAlgorithm());
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes192CbcHmacSha384ContentEncryptionAlgorithm());
-        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes128CbcHmacSha256ContentEncryptionAlgorithm());
+        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes256CbcHmacSha512ContentEncryptionAlgorithm());
     }
 
     public static AlgorithmFactoryFactory getInstance()
