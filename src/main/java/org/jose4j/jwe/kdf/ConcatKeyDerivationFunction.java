@@ -51,7 +51,7 @@ public class ConcatKeyDerivationFunction
         {
             log.debug("rep " + i + " hashing ");
             byte[] counterBytes = ByteUtil.getBytes(i);
-            log.debug(" counter: " + ByteUtil.toDebugString(otherInfo));
+            log.debug(" counter: " + ByteUtil.toDebugString(counterBytes));
             log.debug(" z: " + ByteUtil.toDebugString(sharedSecret));
             log.debug(" otherInfo: " + ByteUtil.toDebugString(otherInfo));
 
