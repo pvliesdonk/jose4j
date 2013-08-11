@@ -138,6 +138,7 @@ public class JsonWebEncryption extends JsonWebStructure
         String encodedHeader = getEncodedHeader();
         return StringUtil.getBytesAscii(encodedHeader);
     }
+    // todo need zip/unzip support http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#section-4.1.3
 
     public String getCompactSerialization() throws JoseException
     {
