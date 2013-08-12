@@ -21,9 +21,11 @@ import org.jose4j.jwa.AlgorithmFactory;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.jwx.HeaderParameterNames;
+import org.jose4j.jwx.Headers;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
+import org.jose4j.zip.DeflateRFC1951;
 
 import java.security.Key;
 
@@ -130,6 +132,12 @@ public class JsonWebEncryption extends JsonWebStructure
         ContentEncryptionParts contentEncryptionParts = new ContentEncryptionParts(iv, ciphertext, getIntegrity());
         byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();
         byte[] decrypted = contentEncryptionAlg.decrypt(contentEncryptionParts, aad, cek.getEncoded(), getHeaders());
+
+        if (doZip(getHeaders()))
+        {
+            decrypted = DeflateRFC1951.decompress(decrypted);
+        }
+
         setPlaintext(decrypted);
     }
 
@@ -138,7 +146,26 @@ public class JsonWebEncryption extends JsonWebStructure
         String encodedHeader = getEncodedHeader();
         return StringUtil.getBytesAscii(encodedHeader);
     }
-    // todo need zip/unzip support http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#section-4.1.3
+
+    static boolean doZip(Headers headers) throws JoseException
+    {
+        // seems like zip should be more flexible,
+        // and it may go there with http://trac.tools.ietf.org/wg/jose/trac/ticket/39 , but for now this will do...
+        String zipHeaderValue = headers.getStringHeaderValue(HeaderParameterNames.ZIP);
+        if (zipHeaderValue != null)
+        {
+            if ("DEF".equals(zipHeaderValue))
+            {
+                return true;
+            }
+            else
+            {
+                throw new JoseException("If present, the value of the \"zip\" header " +
+                                        " parameter MUST be the case sensitive string \"DEF\"");
+            }
+        }
+        return false;
+    }
 
     public String getCompactSerialization() throws JoseException
     {
@@ -151,7 +178,15 @@ public class JsonWebEncryption extends JsonWebStructure
 
         byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();
         byte[] contentEncryptionKey = contentEncryptionKeys.getContentEncryptionKey();
-        ContentEncryptionParts contentEncryptionParts = contentEncryptionAlg.encrypt(getPlaintextBytes(), aad, contentEncryptionKey, getHeaders());
+
+
+        byte[] plaintextBytes = getPlaintextBytes();
+        if (doZip(getHeaders()))
+        {
+            plaintextBytes = DeflateRFC1951.compress(plaintextBytes);
+        }
+
+        ContentEncryptionParts contentEncryptionParts = contentEncryptionAlg.encrypt(plaintextBytes, aad, contentEncryptionKey, getHeaders());
 
         String encodedIv = base64url.base64UrlEncode(contentEncryptionParts.getIv());
         String encodedCiphertext = base64url.base64UrlEncode(contentEncryptionParts.getCiphertext());
@@ -163,6 +198,4 @@ public class JsonWebEncryption extends JsonWebStructure
 
         return CompactSerializer.serialize(getEncodedHeader(), encodedEncryptedKey, encodedIv, encodedCiphertext, encodedTag);
     }
-
-
 }

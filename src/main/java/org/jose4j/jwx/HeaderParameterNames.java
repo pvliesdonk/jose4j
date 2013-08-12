@@ -41,4 +41,6 @@ public class HeaderParameterNames
     public static final String AGREEMENT_PARTY_U_INFO = "apu";
     public static final String AGREEMENT_PARTY_V_INFO = "apv";
 
+    public static final String ZIP = "zip";
+
 }
