@@ -26,6 +26,7 @@ import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 import org.jose4j.zip.DeflateRFC1951;
+import org.jose4j.zip.ZipAlgorithmIdentifiers;
 
 import java.security.Key;
 
@@ -154,7 +155,7 @@ public class JsonWebEncryption extends JsonWebStructure
         String zipHeaderValue = headers.getStringHeaderValue(HeaderParameterNames.ZIP);
         if (zipHeaderValue != null)
         {
-            if ("DEF".equals(zipHeaderValue))
+            if (ZipAlgorithmIdentifiers.DEFLATE.equals(zipHeaderValue))
             {
                 return true;
             }

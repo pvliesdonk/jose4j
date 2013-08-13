@@ -7,6 +7,7 @@ import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.keys.AesKey;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
+import org.jose4j.zip.ZipAlgorithmIdentifiers;
 
 /**
  */
@@ -21,7 +22,7 @@ public class ZipTest extends TestCase
         jwe.setPlaintext(plaintext);
         AesKey key = new AesKey(ByteUtil.randomBytes(32));
         jwe.setKey(key);
-        jwe.setHeader(HeaderParameterNames.ZIP, "DEF");
+        jwe.setHeader(HeaderParameterNames.ZIP, ZipAlgorithmIdentifiers.DEFLATE);
         jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.DIRECT);
         jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
 
