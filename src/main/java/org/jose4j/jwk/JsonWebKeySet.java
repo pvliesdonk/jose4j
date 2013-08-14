@@ -34,7 +34,7 @@ public class JsonWebKeySet
         Map<String,Object> parsed = JsonUtil.parseJson(json);
         List<Map<String,Object>> jwkParamMapList = (List<Map<String,Object>>) parsed.get(JWK_SET_MEMBER_NAME);
 
-        keys = new ArrayList<JsonWebKey>(jwkParamMapList.size());
+        keys = new ArrayList<>(jwkParamMapList.size());
         for (Map<String,Object> jwkParamsMap : jwkParamMapList)
         {
             keys.add(JsonWebKey.Factory.newJwk(jwkParamsMap));
@@ -43,12 +43,16 @@ public class JsonWebKeySet
 
     public JsonWebKeySet(JsonWebKey... keys)
     {
-        this(Arrays.asList(keys));
+        this.keys = Arrays.asList(keys);
     }
 
-    public JsonWebKeySet(List<JsonWebKey> keys)
+    public JsonWebKeySet(List<? extends JsonWebKey> keys)
     {
-        this.keys = keys;
+        this.keys = new ArrayList<>(keys.size());
+        for (JsonWebKey jwk : keys)
+        {
+            this.keys.add(jwk);
+        }
     }
 
     public List<JsonWebKey> getJsonWebKeys()
