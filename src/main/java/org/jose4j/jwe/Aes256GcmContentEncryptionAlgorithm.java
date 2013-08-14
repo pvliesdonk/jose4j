@@ -66,11 +66,7 @@ public class Aes256GcmContentEncryptionAlgorithm extends AlgorithmInfo implement
         {
             cipherOutput = cipher.doFinal(plaintext);
         }
-        catch (IllegalBlockSizeException e)
-        {
-            throw new JoseException(e.toString(), e);
-        }
-        catch (BadPaddingException e)
+        catch (IllegalBlockSizeException | BadPaddingException e)
         {
             throw new JoseException(e.toString(), e);
         }

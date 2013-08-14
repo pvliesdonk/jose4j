@@ -42,11 +42,7 @@ public class WrappingKeyManagementAlgorithm extends AlgorithmInfo implements Key
             byte[] encryptedKey = cipher.wrap(new SecretKeySpec(contentEncryptionKey, contentEncryptionKeyAlgorithm));
             return new ContentEncryptionKeys(contentEncryptionKey, encryptedKey);
         }
-        catch (IllegalBlockSizeException e)
-        {
-            throw new JoseException("Unable to encrypt the Content Encryption Key", e);
-        }
-        catch (InvalidKeyException e)
+        catch (IllegalBlockSizeException | InvalidKeyException e)
         {
             throw new JoseException("Unable to encrypt the Content Encryption Key", e);
         }

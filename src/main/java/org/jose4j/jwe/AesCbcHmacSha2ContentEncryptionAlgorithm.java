@@ -101,11 +101,7 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         {
             cipherText = cipher.doFinal(plaintext);
         }
-        catch (IllegalBlockSizeException e)
-        {
-            throw new JoseException(e.toString(), e);
-        }
-        catch (BadPaddingException e)
+        catch (IllegalBlockSizeException | BadPaddingException e)
         {
             throw new JoseException(e.toString(), e);
         }
