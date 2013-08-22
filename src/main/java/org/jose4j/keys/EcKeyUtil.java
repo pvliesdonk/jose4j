@@ -28,22 +28,7 @@ import java.security.spec.*;
  */
 public class EcKeyUtil
 {
-    private KeyFactory keyFactory;
-    private KeyPairGenerator keyGenerator;
     public static final String EC = "EC";
-
-    public EcKeyUtil()
-    {
-        try
-        {
-            keyFactory = KeyFactory.getInstance(EC);
-            keyGenerator = KeyPairGenerator.getInstance(EC);
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new IllegalStateException("Couldn't find "+ EC + " KeyFactory or KeyPairGenerator!", e);
-        }
-    }
 
     public ECPublicKey publicKey(BigInteger x, BigInteger y, ECParameterSpec spec) throws JoseException
     {
@@ -52,7 +37,7 @@ public class EcKeyUtil
 
         try
         {
-            PublicKey publicKey = keyFactory.generatePublic(ecPublicKeySpec);
+            PublicKey publicKey = getKeyFactory().generatePublic(ecPublicKeySpec);
             return (ECPublicKey) publicKey;
         }
         catch (InvalidKeySpecException e)
@@ -67,7 +52,7 @@ public class EcKeyUtil
 
         try
         {
-            PrivateKey privateKey = keyFactory.generatePrivate(ecPrivateKeySpec);
+            PrivateKey privateKey = getKeyFactory().generatePrivate(ecPrivateKeySpec);
             return (ECPrivateKey) privateKey;
         }
         catch (InvalidKeySpecException e)
@@ -78,6 +63,8 @@ public class EcKeyUtil
 
     public KeyPair generateKeyPair(ECParameterSpec spec) throws JoseException
     {
+        KeyPairGenerator keyGenerator = getKeyPairGenerator();
+
         try
         {
             keyGenerator.initialize(spec);
@@ -88,4 +75,29 @@ public class EcKeyUtil
             throw new JoseException("Unable to create EC key pair with spec " + spec, e);
         }
     }
+
+    private KeyPairGenerator getKeyPairGenerator() throws JoseException
+    {
+        try
+        {
+            return KeyPairGenerator.getInstance(EC);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new JoseException("Couldn't find "+ EC + " KeyPairGenerator!", e);
+        }
+    }
+
+    private KeyFactory getKeyFactory() throws JoseException
+    {
+        try
+        {
+            return KeyFactory.getInstance(EC);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new JoseException("Couldn't find "+ EC + " KeyFactory!", e);
+        }
+    }
+
 }

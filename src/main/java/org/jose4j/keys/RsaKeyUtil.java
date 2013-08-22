@@ -31,30 +31,14 @@ import java.security.spec.RSAPublicKeySpec;
  */
 public class RsaKeyUtil
 {
-    private KeyFactory keyFactory;
-    private KeyPairGenerator keyGenerator;
-
     public static final String RSA = "RSA";
-
-    public RsaKeyUtil()
-    {
-        try
-        {
-            keyFactory = KeyFactory.getInstance(RSA);
-            keyGenerator = KeyPairGenerator.getInstance(RSA);
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new IllegalStateException("Couldn't find "+ RSA + " KeyFactory and/or KeyPairGenerator!?!", e);
-        }
-    }
 
     public RSAPublicKey publicKey(BigInteger modulus, BigInteger publicExponent) throws JoseException
     {
         RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus, publicExponent);
         try
         {
-            PublicKey publicKey = keyFactory.generatePublic(rsaPublicKeySpec);
+            PublicKey publicKey = getKeyFactory().generatePublic(rsaPublicKeySpec);
             return (RSAPublicKey) publicKey;
         }
         catch (InvalidKeySpecException e)
@@ -82,7 +66,7 @@ public class RsaKeyUtil
     {
         try
         {
-            PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
+            PrivateKey privateKey = getKeyFactory().generatePrivate(keySpec);
             return (RSAPrivateKey) privateKey;
         }
         catch (InvalidKeySpecException e)
@@ -91,9 +75,35 @@ public class RsaKeyUtil
         }
     }
 
-    public KeyPair generateKeyPair(int bits)
+    public KeyPair generateKeyPair(int bits) throws JoseException
     {
+        KeyPairGenerator keyGenerator = getKeyGenerator();
         keyGenerator.initialize(bits);
         return keyGenerator.generateKeyPair();
+    }
+
+    private KeyFactory getKeyFactory() throws JoseException
+    {
+        try
+        {
+           return KeyFactory.getInstance(RSA);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+           throw new JoseException("Couldn't find "+ RSA + " KeyFactory!?!", e);
+        }
+    }
+
+    private KeyPairGenerator getKeyGenerator() throws JoseException
+    {
+        try
+        {
+
+           return KeyPairGenerator.getInstance(RSA);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+           throw new JoseException("Couldn't find "+ RSA + " KeyPairGenerator!?!", e);
+        }
     }
 }
