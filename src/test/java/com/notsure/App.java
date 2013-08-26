@@ -51,7 +51,7 @@ public class App
 
     static String newline = new String(new char[]{0x0d, 0x0a});
 
-    public static void mainx(String[] args) throws Exception
+    public static void main(String[] args) throws Exception
     {
         // um... trying to verify example ECDH-ES with KDF example from JWA -14
         // but the values don't match...
@@ -78,7 +78,7 @@ public class App
                 " \"y\":\"SLW_xSffzlPWrHEVI30DHM_4egVwt3NQqeUD7nMFpps\",\n" +
                 " \"d\":\"0_NxaRPUMQoAJt50Gz8YiTr8gRTwyEaCumd-MToTmIo\"\n" +
                 "}";
-        log.debug("Ephemeral JWK: " + receiverJwkJson);
+        log.debug("Ephemeral JWK: " + ephemeralJwkJson);
         PublicJsonWebKey ephemeralJwk = PublicJsonWebKey.Factory.newPublicJwk(ephemeralJwkJson);
 
         KeyAgreement senderKa = KeyAgreement.getInstance("ECDH");
@@ -115,7 +115,7 @@ public class App
     }
 
 
-    public static void main(String[] args) throws Exception
+    public static void mainx(String[] args) throws Exception
     {
         EcKeyUtil u = new EcKeyUtil();
         KeyPair receiverKeypair = u.generateKeyPair(EllipticCurves.P256);
