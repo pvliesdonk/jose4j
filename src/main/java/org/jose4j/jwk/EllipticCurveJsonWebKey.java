@@ -16,7 +16,6 @@
 
 package org.jose4j.jwk;
 
-import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.EcKeyUtil;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.lang.JoseException;
