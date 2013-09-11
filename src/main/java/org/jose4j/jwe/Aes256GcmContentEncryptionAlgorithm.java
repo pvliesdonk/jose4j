@@ -10,9 +10,13 @@ import org.jose4j.lang.JoseException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.GCMParameterSpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 /**
  */
@@ -48,7 +52,10 @@ public class Aes256GcmContentEncryptionAlgorithm extends AlgorithmInfo implement
 
         try
         {
-            cipher.init(Cipher.ENCRYPT_MODE, new AesKey(contentEncryptionKey), new IvParameterSpec(iv));
+            // GCMParameterSpec   doesn't seem to work either
+            // GCMParameterSpec parameterSpec = new GCMParameterSpec(ByteUtil.bitLength(TAG_BYTE_LENGTH), iv);
+            IvParameterSpec parameterSpec = new IvParameterSpec(iv);
+            cipher.init(Cipher.ENCRYPT_MODE, new AesKey(contentEncryptionKey), parameterSpec);
         }
         catch (InvalidKeyException e)
         {

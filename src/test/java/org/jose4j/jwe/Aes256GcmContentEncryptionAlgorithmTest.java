@@ -6,6 +6,8 @@ import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 
+import java.security.Security;
+
 /**
  */
 public class Aes256GcmContentEncryptionAlgorithmTest extends TestCase
@@ -15,6 +17,9 @@ public class Aes256GcmContentEncryptionAlgorithmTest extends TestCase
         // seems that maybe "AES/GCM/NoPadding" isn't supported with the standard JCE with the Java 7
         // so skipping this test for now...
         if (true) return;
+
+        // and BC supports GCM but maybe not via the standard JCE interfaces
+        //Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
         // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#appendix-A.1
         String plaintextText = "The true sign of intelligence is not knowledge but imagination.";
