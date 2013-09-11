@@ -72,12 +72,12 @@ public class JsonWebEncryption extends JsonWebStructure
         return plaintext;
     }
 
-    void setEncryptionMethodHeaderParameter(String enc)
+    public void setEncryptionMethodHeaderParameter(String enc)
     {
         setHeader(HeaderParameterNames.ENCRYPTION_METHOD, enc);
     }
 
-    String getEncryptionMethodHeaderParameter()
+    public String getEncryptionMethodHeaderParameter()
     {
         return getHeader(HeaderParameterNames.ENCRYPTION_METHOD);
     }
