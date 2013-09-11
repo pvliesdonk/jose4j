@@ -31,7 +31,7 @@ public class AlgorithmFactoryFactory
 
     private AlgorithmFactoryFactory()
     {
-        jwsAlgorithmFactory = new AlgorithmFactory<JsonWebSignatureAlgorithm>();
+        jwsAlgorithmFactory = new AlgorithmFactory<>();
         jwsAlgorithmFactory.registerAlgorithm(new PlaintextNoneAlgorithm());
         jwsAlgorithmFactory.registerAlgorithm(new HmacUsingSha256Algorithm());
         jwsAlgorithmFactory.registerAlgorithm(new HmacUsingSha384Algorithm());
@@ -43,7 +43,7 @@ public class AlgorithmFactoryFactory
         jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha384Algorithm());
         jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha512Algorithm());
 
-        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<KeyManagementAlgorithm>();
+        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<>();
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Rsa1_5KeyManagementAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new RsaOaepKeyManagementAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new DirectKeyManagementAlgorithm());
@@ -55,7 +55,7 @@ public class AlgorithmFactoryFactory
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes192KeyWrapAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes256KeyWrapAlgorithm());
 
-        jweContentEncryptionAlgorithmFactory = new AlgorithmFactory<ContentEncryptionAlgorithm>();
+        jweContentEncryptionAlgorithmFactory = new AlgorithmFactory<>();
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes128CbcHmacSha256ContentEncryptionAlgorithm());
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes192CbcHmacSha384ContentEncryptionAlgorithm());
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes256CbcHmacSha512ContentEncryptionAlgorithm());
