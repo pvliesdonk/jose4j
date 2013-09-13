@@ -17,6 +17,7 @@
 package org.jose4j.jwk;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.keys.AesKey;
 import org.jose4j.lang.JsonHelp;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -30,9 +31,12 @@ public class OctetSequenceJsonWebKey extends JsonWebKey
     public static final String KEY_TYPE = "oct";
     public static final String KEY_VALUE_MEMBER_NAME = "k";
 
+    private byte[] octetSequence;
+
     public OctetSequenceJsonWebKey(Key key)
     {
         super(key);
+        octetSequence = key.getEncoded();
     }
 
     public OctetSequenceJsonWebKey(Map<String, Object> params)
@@ -40,8 +44,13 @@ public class OctetSequenceJsonWebKey extends JsonWebKey
         super(params);
         Base64Url base64Url = new Base64Url();
         String b64KeyBytes = JsonHelp.getString(params, KEY_VALUE_MEMBER_NAME);
-        byte[] bytes = base64Url.base64UrlDecode(b64KeyBytes);
-        key = new SecretKeySpec(bytes, ""); // um... how could I know the alg?
+        octetSequence = base64Url.base64UrlDecode(b64KeyBytes);
+        // um... how could I know the alg? I don't see a reliable way to know.
+        // Maybe infer from the alg parameter but it's optional.
+        // Currently it's really either AES or HMAC and only the AES algorithm
+        // implementations seem to actually care.  So I'm gonna just go w/ AES for now.
+        String alg = AesKey.ALGORITHM;
+        key = new SecretKeySpec(octetSequence, alg);
     }
 
     @Override
@@ -50,12 +59,16 @@ public class OctetSequenceJsonWebKey extends JsonWebKey
         return KEY_TYPE;
     }
 
+    public byte[] getOctetSequence()
+    {
+        return octetSequence;
+    }
+
     @Override
     protected void fillTypeSpecificParams(Map<String, Object> params)
     {
         Base64Url base64Url = new Base64Url();
-        byte[] keyBytes = key.getEncoded();
-        String encodedBytes = base64Url.base64UrlEncode(keyBytes);
+        String encodedBytes = base64Url.base64UrlEncode(octetSequence);
         params.put(KEY_VALUE_MEMBER_NAME, encodedBytes);
     }
 }
