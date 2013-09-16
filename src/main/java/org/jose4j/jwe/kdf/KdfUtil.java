@@ -19,11 +19,11 @@ public class KdfUtil
 
     public byte[] kdf(byte[] sharedSecret, int keydatalen, String algorithmId, String partyUInfo, String partyVInfo)
     {
-        byte[] algorithmIdBytes = StringUtil.getBytesUtf8(algorithmId); // and why not lead this with data len?
+        byte[] algorithmIdBytes = prependDatalen(StringUtil.getBytesUtf8(algorithmId));
         byte[] partyUInfoBytes = getDatalenDataFormat(partyUInfo);
         byte[] partyVInfoBytes = getDatalenDataFormat(partyVInfo);
         byte[] suppPubInfo = ByteUtil.getBytes(keydatalen);
-        byte[] suppPrivInfo =  ByteUtil.EMPTY_BYTES; // or prependDatalen(null);     ?!?!
+        byte[] suppPrivInfo =  ByteUtil.EMPTY_BYTES;
 
         return kdf.kdf(sharedSecret, keydatalen, algorithmIdBytes, partyUInfoBytes, partyVInfoBytes, suppPubInfo, suppPrivInfo);
     }

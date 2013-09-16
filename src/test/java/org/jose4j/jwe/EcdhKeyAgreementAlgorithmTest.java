@@ -59,12 +59,12 @@ public class EcdhKeyAgreementAlgorithmTest extends TestCase
 
         assertTrue(contentEncryptionKeys.getEncryptedKey().length == 0);
         Base64Url base64Url = new Base64Url();
-        assertEquals("usEpwFIC_qrmBExntFwxMA", base64Url.base64UrlEncode(contentEncryptionKeys.getContentEncryptionKey()));
+        assertEquals("VqqN6vgjbSBcIijNcacQGg", base64Url.base64UrlEncode(contentEncryptionKeys.getContentEncryptionKey()));
 
         Headers receivedHeaders = new Headers();
         receivedHeaders.setFullHeaderAsJsonString(headers.getFullHeaderAsJsonString());
 
         Key key = ecdhKeyAgreementAlgorithm.manageForDecrypt(receiverJwk.getPrivateKey(), null, cekDesc, receivedHeaders);
-        assertEquals("usEpwFIC_qrmBExntFwxMA", base64Url.base64UrlEncode(key.getEncoded()));
+        assertEquals("VqqN6vgjbSBcIijNcacQGg", base64Url.base64UrlEncode(key.getEncoded()));
     }
 }
