@@ -216,7 +216,7 @@ public void testJweRoundTripExample() throws JoseException
     String compactSerialization = senderJwe.getCompactSerialization();
 
     // Do something with the JWE. Like send it to some other party over the clouds
-    // and thought the interwebs.
+    // and through the interwebs.
     System.out.println("JWE compact serialization: " + compactSerialization);
 
     // That other party, the receiver, can then use JsonWebEncryption to decrypt the message.
