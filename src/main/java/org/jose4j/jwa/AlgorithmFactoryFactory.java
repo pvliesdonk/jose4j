@@ -18,6 +18,9 @@ package org.jose4j.jwa;
 
 import org.jose4j.jwe.*;
 import org.jose4j.jws.*;
+import org.jose4j.jwx.HeaderParameterNames;
+import org.jose4j.zip.CompressionAlgorithm;
+import org.jose4j.zip.DeflateRFC1951CompressionAlgorithm;
 
 /**
  */
@@ -28,10 +31,11 @@ public class AlgorithmFactoryFactory
     private final AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory;
     private AlgorithmFactory<KeyManagementAlgorithm> jweKeyMgmtModeAlgorithmFactory;
     private AlgorithmFactory<ContentEncryptionAlgorithm> jweContentEncryptionAlgorithmFactory;
+    private AlgorithmFactory<CompressionAlgorithm> compressionAlgorithmFactory;
 
     private AlgorithmFactoryFactory()
     {
-        jwsAlgorithmFactory = new AlgorithmFactory<>();
+        jwsAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ALGORITHM);
         jwsAlgorithmFactory.registerAlgorithm(new PlaintextNoneAlgorithm());
         jwsAlgorithmFactory.registerAlgorithm(new HmacUsingSha256Algorithm());
         jwsAlgorithmFactory.registerAlgorithm(new HmacUsingSha384Algorithm());
@@ -43,7 +47,7 @@ public class AlgorithmFactoryFactory
         jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha384Algorithm());
         jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha512Algorithm());
 
-        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<>();
+        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ALGORITHM);
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Rsa1_5KeyManagementAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new RsaOaepKeyManagementAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new DirectKeyManagementAlgorithm());
@@ -55,10 +59,13 @@ public class AlgorithmFactoryFactory
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes192KeyWrapAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes256KeyWrapAlgorithm());
 
-        jweContentEncryptionAlgorithmFactory = new AlgorithmFactory<>();
+        jweContentEncryptionAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ENCRYPTION_METHOD);
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes128CbcHmacSha256ContentEncryptionAlgorithm());
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes192CbcHmacSha384ContentEncryptionAlgorithm());
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes256CbcHmacSha512ContentEncryptionAlgorithm());
+
+        compressionAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ZIP);
+        compressionAlgorithmFactory.registerAlgorithm(new DeflateRFC1951CompressionAlgorithm());
     }
 
     public static AlgorithmFactoryFactory getInstance()
@@ -79,5 +86,10 @@ public class AlgorithmFactoryFactory
     public AlgorithmFactory<ContentEncryptionAlgorithm> getJweContentEncryptionAlgorithmFactory()
     {
         return jweContentEncryptionAlgorithmFactory;
+    }
+
+    public AlgorithmFactory<CompressionAlgorithm> getCompressionAlgorithmFactory()
+    {
+        return compressionAlgorithmFactory;
     }
 }

@@ -16,6 +16,7 @@
 
 package org.jose4j.zip;
 
+import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.UncheckedJoseException;
 
@@ -29,11 +30,9 @@ import java.util.zip.InflaterInputStream;
 
 /**
  */
-public class DeflateRFC1951
+public class DeflateRFC1951CompressionAlgorithm implements CompressionAlgorithm
 {
-
-
-    public static byte[] compress(byte[] data)
+    public byte[] compress(byte[] data)
     {
         Deflater deflater = new Deflater(Deflater.DEFLATED, true);
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -49,7 +48,7 @@ public class DeflateRFC1951
         }
     }
 
-    public static byte[] decompress(byte[] compressedData) throws JoseException
+    public byte[] decompress(byte[] compressedData) throws JoseException
     {
         Inflater inflater = new Inflater(true);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -67,7 +66,33 @@ public class DeflateRFC1951
         }
         catch (IOException e)
         {
-            throw new JoseException("Problem compressing data.", e);
+            throw new JoseException("Problem decompressing data.", e);
         }
+    }
+
+    @Override
+    public String getJavaAlgorithm()
+    {
+        return null;
+    }
+
+
+    @Override
+    public String getAlgorithmIdentifier()
+    {
+        return CompressionAlgorithmIdentifiers.DEFLATE;
+    }
+
+    @Override
+    public KeyPersuasion getKeyPersuasion()
+    {
+        return KeyPersuasion.NONE;
+    }
+
+    @Override
+    public String getKeyType()
+    {
+        return null;
+
     }
 }

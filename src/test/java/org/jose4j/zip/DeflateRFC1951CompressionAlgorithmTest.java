@@ -7,15 +7,16 @@ import org.jose4j.lang.StringUtil;
 
 /**
  */
-public class DeflateRFC1951Test extends TestCase
+public class DeflateRFC1951CompressionAlgorithmTest extends TestCase
 {
     public void testRoundTrip() throws JoseException
     {
         String dataString = "test test test test test test test test test test test test test test test test and stuff";
         byte[] data = StringUtil.getBytesUtf8(dataString);
-        byte[] compressed = DeflateRFC1951.compress(data);
+        CompressionAlgorithm ca = new DeflateRFC1951CompressionAlgorithm();
+        byte[] compressed = ca.compress(data);
         assertTrue(data.length > compressed.length);
-        byte[] decompress = DeflateRFC1951.decompress(compressed);
+        byte[] decompress = ca.decompress(compressed);
         String decompressedString = StringUtil.newStringUtf8(decompress);
         assertEquals(dataString, decompressedString);
     }
@@ -26,7 +27,8 @@ public class DeflateRFC1951Test extends TestCase
                 "H6ckqyQSqKMmNLIsMCzWqsPAp8zM3cjINjHdNTPbQizd1BClKTC4CKjICMYtLk4BMp6LMxDylWi4A";
         Base64 base64 = new Base64();
         byte[] decoded = base64.decode(s);
-        byte[] decompress = DeflateRFC1951.decompress(decoded);
+        CompressionAlgorithm ca = new DeflateRFC1951CompressionAlgorithm();
+        byte[] decompress = ca.decompress(decoded);
         String decompedString = StringUtil.newStringUtf8(decompress);
 
         String expected = "{\"iss\":\"https:\\/\\/idp.example.com\",\n" +
@@ -42,7 +44,8 @@ public class DeflateRFC1951Test extends TestCase
     public void testSomeMoreDataCompressedElsewhere() throws JoseException
     {
         byte[] compressed = new byte[]{-13,72,-51,-55,-55,87,40,-49,47,-54,73,81,84,-16,-96,38,7,0};
-        byte[] decompress = DeflateRFC1951.decompress(compressed);
+        CompressionAlgorithm ca = new DeflateRFC1951CompressionAlgorithm();
+        byte[] decompress = ca.decompress(compressed);
         String decompedString = StringUtil.newStringUtf8(decompress);
         assertTrue(decompedString.contains("Hello world!"));
     }

@@ -29,7 +29,14 @@ import java.util.*;
  */
 public class AlgorithmFactory<A extends Algorithm>
 {
+    private String parameterName;
+
     private final Map<String,A> algorithms = new LinkedHashMap<String, A>();
+
+    public AlgorithmFactory(String parameterName)
+    {
+        this.parameterName = parameterName;
+    }
 
     public A getAlgorithm(String algorithmIdentifier) throws JoseException
     {
@@ -37,7 +44,7 @@ public class AlgorithmFactory<A extends Algorithm>
         
         if (algo == null)
         {
-            throw new JoseException(algorithmIdentifier + " is an unknown or unsupported algorithm (not one of " + getSupportedAlgorithms() + ").");
+            throw new JoseException(algorithmIdentifier + " is an unknown or unsupported "+parameterName+" algorithm (not one of " + getSupportedAlgorithms() + ").");
         }
         
         return algo;

@@ -18,7 +18,7 @@ package org.jose4j.zip;
 
 /**
  */
-public class ZipAlgorithmIdentifiers
+public class CompressionAlgorithmIdentifiers
 {
     public static final String DEFLATE = "DEF";
 }

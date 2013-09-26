@@ -25,8 +25,9 @@ import org.jose4j.jwx.Headers;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
-import org.jose4j.zip.DeflateRFC1951;
-import org.jose4j.zip.ZipAlgorithmIdentifiers;
+import org.jose4j.zip.CompressionAlgorithm;
+import org.jose4j.zip.CompressionAlgorithmIdentifiers;
+import org.jose4j.zip.DeflateRFC1951CompressionAlgorithm;
 
 import java.security.Key;
 
@@ -134,10 +135,7 @@ public class JsonWebEncryption extends JsonWebStructure
         byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();
         byte[] decrypted = contentEncryptionAlg.decrypt(contentEncryptionParts, aad, cek.getEncoded(), getHeaders());
 
-        if (doZip(getHeaders()))
-        {
-            decrypted = DeflateRFC1951.decompress(decrypted);
-        }
+        decrypted = decompress(getHeaders(), decrypted);
 
         setPlaintext(decrypted);
     }
@@ -148,24 +146,30 @@ public class JsonWebEncryption extends JsonWebStructure
         return StringUtil.getBytesAscii(encodedHeader);
     }
 
-    static boolean doZip(Headers headers) throws JoseException
+    byte[] decompress(Headers headers, byte[] data) throws JoseException
     {
-        // seems like zip should be more flexible,
-        // and it may go there with http://trac.tools.ietf.org/wg/jose/trac/ticket/39 , but for now this will do...
         String zipHeaderValue = headers.getStringHeaderValue(HeaderParameterNames.ZIP);
         if (zipHeaderValue != null)
         {
-            if (ZipAlgorithmIdentifiers.DEFLATE.equals(zipHeaderValue))
-            {
-                return true;
-            }
-            else
-            {
-                throw new JoseException("If present, the value of the \"zip\" header " +
-                                        " parameter MUST be the case sensitive string \"DEF\"");
-            }
+            AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
+            AlgorithmFactory<CompressionAlgorithm> zipAlgFactory = factoryFactory.getCompressionAlgorithmFactory();
+            CompressionAlgorithm compressionAlgorithm = zipAlgFactory.getAlgorithm(zipHeaderValue);
+            data = compressionAlgorithm.decompress(data);
         }
-        return false;
+        return data;
+    }
+
+    byte[] compress(Headers headers, byte[] data) throws JoseException
+    {
+        String zipHeaderValue = headers.getStringHeaderValue(HeaderParameterNames.ZIP);
+        if (zipHeaderValue != null)
+        {
+            AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
+            AlgorithmFactory<CompressionAlgorithm> zipAlgFactory = factoryFactory.getCompressionAlgorithmFactory();
+            CompressionAlgorithm compressionAlgorithm = zipAlgFactory.getAlgorithm(zipHeaderValue);
+            data = compressionAlgorithm.compress(data);
+        }
+        return data;
     }
 
     public String getCompactSerialization() throws JoseException
@@ -180,12 +184,9 @@ public class JsonWebEncryption extends JsonWebStructure
         byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();
         byte[] contentEncryptionKey = contentEncryptionKeys.getContentEncryptionKey();
 
-
         byte[] plaintextBytes = getPlaintextBytes();
-        if (doZip(getHeaders()))
-        {
-            plaintextBytes = DeflateRFC1951.compress(plaintextBytes);
-        }
+
+        plaintextBytes = compress(getHeaders(), plaintextBytes);
 
         ContentEncryptionParts contentEncryptionParts = contentEncryptionAlg.encrypt(plaintextBytes, aad, contentEncryptionKey, getHeaders());
 
