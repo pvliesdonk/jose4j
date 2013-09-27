@@ -90,7 +90,7 @@ public abstract class JsonWebStructure
         return getHeader(HeaderParameterNames.KEY_ID);
     }
 
-    public Key getKey()
+    protected Key getKey()
     {
         return key;
     }
