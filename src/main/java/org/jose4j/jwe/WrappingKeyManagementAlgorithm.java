@@ -44,7 +44,7 @@ public class WrappingKeyManagementAlgorithm extends AlgorithmInfo implements Key
         }
         catch (IllegalBlockSizeException | InvalidKeyException e)
         {
-            throw new JoseException("Unable to encrypt the Content Encryption Key", e);
+            throw new JoseException("Unable to encrypt the Content Encryption Key: " + e, e);
         }
     }
 
