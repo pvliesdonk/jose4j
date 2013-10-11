@@ -99,6 +99,6 @@ public class Aes256GcmContentEncryptionAlgorithm extends AlgorithmInfo implement
 
     public byte[] decrypt(ContentEncryptionParts contentEncryptionParts, byte[] aad, byte[] contentEncryptionKey, Headers headers) throws JoseException
     {
-        return new byte[0];  // todo
+        return new byte[0]; // come back to this someday
     }
 }
