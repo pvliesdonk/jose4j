@@ -237,6 +237,17 @@ public class NegativeJweKeyTest extends TestCase
         expectBadKeyFailOnConsume(cs, aesKey(65));
     }
 
+    public void testUnexpectedEncryptedKey() throws JoseException
+    {
+        String cs = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." +   // dir
+                "F6EJj1gzyuttczguncypZOk31wMnVajr1IpS-ZnXMeW72QqurUKlBA." + // should not have an encrypted key part
+                "SzF11wzK9JfHTsfPbPgixw." +
+                "7wGWU2oy1fPXf_HoGGfuqCwMLwkvOOjgFF4YA_iwzUUqkwLX5tEOUq76Qgk7LSg6cgc8VK-4ZEqaaFLwwnQ9gw." +
+                "3C7wAt7-OSgD6QMkccW48A";
+
+        expectBadKeyFailOnConsume(cs, aesKey(32));
+    }
+
     private void expectBadKeyFailOnConsume(String cs, Key key) throws JoseException
     {
         JsonWebEncryption jwe = new JsonWebEncryption();

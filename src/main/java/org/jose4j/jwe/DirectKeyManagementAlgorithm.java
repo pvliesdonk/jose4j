@@ -20,15 +20,17 @@ public class DirectKeyManagementAlgorithm extends AlgorithmInfo implements KeyMa
 
     public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
     {
-        // todo check managementKey against cekDesc... ?
         byte[] cekBytes = managementKey.getEncoded();
-        return new ContentEncryptionKeys(cekBytes, null);
+        return new ContentEncryptionKeys(cekBytes, ByteUtil.EMPTY_BYTES);
     }
 
     public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
     {
-        // todo check encryptedKey is empty
-        // todo check cekDesc against managment key
+        if (encryptedKey.length != 0)
+        {
+            throw new JoseException("An empty octet sequence is used as the JWE Encrypted Key value when utilizing " +
+                    "direct encryption but this JWE has " + encryptedKey.length + " octets in the encrypted key part.");
+        }
         return managementKey;
     }
 
