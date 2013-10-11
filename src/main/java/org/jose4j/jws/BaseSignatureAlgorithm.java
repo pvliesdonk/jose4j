@@ -118,7 +118,7 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
         }
         catch (ClassCastException e)
         {
-            throw new JoseException(getBadKeyMessage(key) + "(not a private key or is the wrong type of key) for " + getJavaAlgorithm() + "/" + getAlgorithmIdentifier() + " " +  e);
+            throw new JoseException(getBadKeyMessage(key) + "(not a private key or is the wrong type of key) for " + getJavaAlgorithm() + " / " + getAlgorithmIdentifier() + " " +  e);
         }
     }
 

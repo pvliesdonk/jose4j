@@ -19,12 +19,18 @@ package org.jose4j.jwe;
 import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jose4j.jwk.RsaJsonWebKey;
+import org.jose4j.jwk.RsaJwkGenerator;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
+import org.jose4j.keys.RsaKeyUtil;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.*;
 import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.*;
@@ -124,6 +130,12 @@ public class NegativeJweKeyTest extends TestCase
         expectBadKeyFailOnProduce(DIRECT, AES_256_CBC_HMAC_SHA_512, ExampleRsaJwksFromJwe.APPENDIX_A_2.getPublicKey());
         expectBadKeyFailOnProduce(DIRECT, AES_256_CBC_HMAC_SHA_512, ExampleEcKeysFromJws.PRIVATE_521);
         expectBadKeyFailOnProduce(DIRECT, AES_256_CBC_HMAC_SHA_512, ExampleEcKeysFromJws.PUBLIC_521);
+    }
+
+    public void testNullAesKey()
+    {
+        expectBadKeyFailOnProduce(A128KW, AES_128_CBC_HMAC_SHA_256, null);
+        expectBadKeyFailOnProduce(DIRECT, AES_256_CBC_HMAC_SHA_512, null);
     }
 
     public void testConsumeKeySizeMismatch1() throws JoseException
@@ -248,6 +260,50 @@ public class NegativeJweKeyTest extends TestCase
         expectBadKeyFailOnConsume(cs, aesKey(32));
     }
 
+    public void testRsaTooSmall() throws JoseException
+    {
+        RsaJsonWebKey rsaJsonWebKey = (RsaJsonWebKey) RsaJsonWebKey.Factory.newPublicJwk("{\"kty\":\"RSA\"," +
+                "\"n\":\"hIOFEUa93kqVnqoaA1r5qj3tLhnSyQ9njLrlcJrynwt2LYfIhntUZPfS2fiHhLGzww7GamLAXwDfGZo0dY6V3cglENl6yro" +
+                "BWhYu15IgHVAeP1V_5m1gJ9hiWNUR3i5zhNNUR1Ewdo0E52amiRb1-xXRcxhcRlybfRcEMJEgm0c\"," +
+                "\"e\":\"AQAB\",\"d\":\"RhNK7jzrsT7d6n7nrLiSaM3AvG1Zg4vK5af8J1U5UpP8Fc3FZCCaG57WeQAtoiVa-563nJDGTDcow-BB" +
+                "N52EcG_7SRJtXc6Zk5og330nqIy0OoP2GRPJKOg6zB45RsDQmxklezrlWCMdwZIzjxyB_vDMx59uXK_i66iVXjFoqZk\"," +
+                "\"p\":\"7aIngX0swanIMJk-GpmJVxL7vF6Zx0RfmimOE6BJKi7COHR7ectpQtfmYhLMBtMpHF1qnuaa4vlM3S9xLHGlIw\"," +
+                "\"q\":\"jsF0PrAmuixIUgCinmh2-FYmBySG8B8Kv_Llj81kKRiNM35Pv_W_zrkb_oxyEMzOc9Z2_gkqhEfYZulnBVCtjQ\"," +
+                "\"dp\":\"ab1f6uSyR7Ku28E0u01aqZ5O2fEWaG7qQ4T-LYmDRPvtfIWIdBepTQ8Y-sb2dor7nh2LVg2zGhBovXtg1q_zFQ\"," +
+                "\"dq\":\"GPpaZ5mUvSCAavC3g3YN0vfn4XoPrjYQQHO0nQu4CcTE-AyS0aijLf2Pm2NhlfTv7q7I1TwvV0Pm5mLSZsiuBQ\"," +
+                "\"qi\":\"gVD_SEwVbiHvZAm3aqynOfMnObl8bBe1qDDNThVO3yUL8tghkKizEu1Ey_sYal-luDu9zcEFUkbrV-7jTqFUVg\"}\n");
+
+        expectBadKeyFailOnProduce(RSA_OAEP, AES_128_CBC_HMAC_SHA_256, rsaJsonWebKey.getPublicKey());
+        expectBadKeyFailOnProduce(RSA1_5, AES_128_CBC_HMAC_SHA_256, rsaJsonWebKey.getPublicKey());
+
+        expectBadKeyFailOnConsume("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhDQkMtSFMyNTYifQ." +
+                "Ti9oxDdTy9hk3j5XOu0lPuus3pC6ZPsBY4LubTOKS6kX1XAR16u2yvcf5csZpB-3CK3UL5JQl1kye2QVytWH79FLg2R3Zfjpd21AF" +
+                "kjxkkI6Cl9UQjPJCO7oiYnKkBdbMiSwcdGl2z6OHpZNcqHH6jQ4BVk-zDPbg3Vj25X19vE." +
+                "pZyCrX1Aae9kvKEyCvUTfA.H7qnqcNKWAVhd-xAVdAgkw.kDaHS6qIiKxAH4Z316EJ6w", rsaJsonWebKey.getPrivateKey());
+    }
+
+    public void testNullRsaKey() throws JoseException
+    {
+        expectBadKeyFailOnProduce(RSA_OAEP, AES_128_CBC_HMAC_SHA_256, null);
+
+        expectBadKeyFailOnConsume("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhDQkMtSFMyNTYifQ." +
+                "Ti9oxDdTy9hk3j5XOu0lPuus3pC6ZPsBY4LubTOKS6kX1XAR16u2yvcf5csZpB-3CK3UL5JQl1kye2QVytWH79FLg2R3Zfjpd21AF" +
+                "kjxkkI6Cl9UQjPJCO7oiYnKkBdbMiSwcdGl2z6OHpZNcqHH6jQ4BVk-zDPbg3Vj25X19vE." +
+                "pZyCrX1Aae9kvKEyCvUTfA.H7qnqcNKWAVhd-xAVdAgkw.kDaHS6qIiKxAH4Z316EJ6w", null);
+    }
+
+    public void testRsaPubPriMixup() throws JoseException
+    {
+        PrivateKey pk = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPrivateKey();
+        expectBadKeyFailOnProduce(RSA_OAEP, AES_128_CBC_HMAC_SHA_256, pk);
+
+        PublicKey publicKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPublicKey();
+        expectBadKeyFailOnConsume("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhDQkMtSFMyNTYifQ." +
+                "Ti9oxDdTy9hk3j5XOu0lPuus3pC6ZPsBY4LubTOKS6kX1XAR16u2yvcf5csZpB-3CK3UL5JQl1kye2QVytWH79FLg2R3Zfjpd21AF" +
+                "kjxkkI6Cl9UQjPJCO7oiYnKkBdbMiSwcdGl2z6OHpZNcqHH6jQ4BVk-zDPbg3Vj25X19vE." +
+                "pZyCrX1Aae9kvKEyCvUTfA.H7qnqcNKWAVhd-xAVdAgkw.kDaHS6qIiKxAH4Z316EJ6w", publicKey);
+    }
+
     private void expectBadKeyFailOnConsume(String cs, Key key) throws JoseException
     {
         JsonWebEncryption jwe = new JsonWebEncryption();
@@ -277,7 +333,7 @@ public class NegativeJweKeyTest extends TestCase
         try
         {
             String cs = jwe.getCompactSerialization();
-            fail("getCompactSerialization w/ "+alg +"/"+enc+" should have failed due to bad key ("+key+") but gave " + cs);
+            fail("getCompactSerialization w/ " + alg + "/" + enc + " should have failed due to bad key (" + key + ") but gave " + cs);
         }
         catch (JoseException e)
         {

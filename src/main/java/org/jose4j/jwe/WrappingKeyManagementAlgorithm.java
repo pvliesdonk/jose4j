@@ -15,7 +15,7 @@ import java.security.Key;
 
 /**
  */
-public class WrappingKeyManagementAlgorithm extends AlgorithmInfo implements KeyManagementAlgorithm
+public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo implements KeyManagementAlgorithm
 {
     private final Log log = LogFactory.getLog(this.getClass());
 
@@ -88,17 +88,5 @@ public class WrappingKeyManagementAlgorithm extends AlgorithmInfo implements Key
             byte[] bytes = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength());
             return new SecretKeySpec(bytes, cekAlg);
         }
-    }
-
-    @Override
-    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
-    {
-        // todo
-    }
-
-    @Override
-    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
-    {
-        // todo
     }
 }

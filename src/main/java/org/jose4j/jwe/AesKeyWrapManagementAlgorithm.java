@@ -56,6 +56,10 @@ public class AesKeyWrapManagementAlgorithm extends WrappingKeyManagementAlgorith
 
     void validateKey(Key managementKey) throws JoseException
     {
+        if (managementKey == null)
+        {
+            throw new JoseException("The key must not be null.");
+        }
 
         String alg = managementKey.getAlgorithm();
 

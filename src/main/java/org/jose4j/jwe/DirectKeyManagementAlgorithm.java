@@ -42,6 +42,11 @@ public class DirectKeyManagementAlgorithm extends AlgorithmInfo implements KeyMa
 
     private void validateKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
     {
+        if (managementKey == null)
+        {
+            throw new JoseException("The key must not be null.");
+        }
+
         int managementKeyByteLength = managementKey.getEncoded().length;
         int expectedByteLength = contentEncryptionAlg.getContentEncryptionKeyDescriptor().getContentEncryptionKeyByteLength();
         if (expectedByteLength != managementKeyByteLength)
