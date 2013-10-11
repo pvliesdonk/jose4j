@@ -17,7 +17,6 @@
 package org.jose4j.jws;
 
 import org.jose4j.jwk.RsaJsonWebKey;
-import org.jose4j.keys.RsaKeyUtil;
 import org.jose4j.lang.JoseException;
 
 import java.security.PrivateKey;

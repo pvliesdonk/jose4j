@@ -18,7 +18,6 @@ package org.jose4j.jws;
 
 
 import org.jose4j.jwk.EllipticCurveJsonWebKey;
-import org.jose4j.keys.EcKeyUtil;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.lang.JoseException;
 

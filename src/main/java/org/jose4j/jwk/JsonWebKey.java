@@ -16,8 +16,8 @@
 
 package org.jose4j.jwk;
 
-import org.jose4j.lang.JoseException;
 import org.jose4j.json.JsonUtil;
+import org.jose4j.lang.JoseException;
 import org.jose4j.lang.JsonHelp;
 
 import java.io.Serializable;

@@ -17,14 +17,12 @@
 package org.jose4j.jwk;
 
 import junit.framework.TestCase;
-import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.JoseException;
 
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.*;
 
 /**
  */
