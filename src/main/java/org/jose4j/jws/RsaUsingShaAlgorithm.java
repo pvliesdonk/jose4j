@@ -21,6 +21,7 @@ import org.jose4j.lang.JoseException;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 /**
@@ -37,15 +38,21 @@ public class RsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Json
     public void validatePublicKey(PublicKey key) throws JoseException
     {
         int size = ((RSAPublicKey) key).getModulus().bitLength();
-        if  (size < MIN_RSA_KEY_LENGTH)
-        {
-            throw new JoseException("A key of size "+MIN_RSA_KEY_LENGTH+
-                    " bits or larger MUST be used with the RSA digital signature algorithms (given key was only "+size+ " bits).");
-        }
+        checkKeySize(size);
     }
 
     public void validatePrivateKey(PrivateKey privateKey) throws JoseException
     {
-        // todo
+        int size = ((RSAPrivateKey) privateKey).getModulus().bitLength();
+        checkKeySize(size);
+    }
+
+    private void checkKeySize(int size) throws JoseException
+    {
+        if  (size < MIN_RSA_KEY_LENGTH)
+        {
+            throw new JoseException("A key of size "+MIN_RSA_KEY_LENGTH+
+                " bits or larger MUST be used with the RSA digital signature algorithms (given key was only "+size+ " bits).");
+        }
     }
 }
