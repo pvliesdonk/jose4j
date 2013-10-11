@@ -105,7 +105,7 @@ public class JsonWebEncryptionTest extends TestCase
         jweForEncrypt.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
         ContentEncryptionAlgorithm contentEncryptionAlgorithm = jweForEncrypt.getContentEncryptionAlgorithm();
         ContentEncryptionKeyDescriptor cekDesc = contentEncryptionAlgorithm.getContentEncryptionKeyDescriptor();
-        byte[] cekBytes = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength() * 2);
+        byte[] cekBytes = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength());
         Key key = new SecretKeySpec(cekBytes, cekDesc.getContentEncryptionKeyAlgorithm());
         jweForEncrypt.setKey(key);
 

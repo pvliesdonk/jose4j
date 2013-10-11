@@ -26,8 +26,6 @@ import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 import org.jose4j.zip.CompressionAlgorithm;
-import org.jose4j.zip.CompressionAlgorithmIdentifiers;
-import org.jose4j.zip.DeflateRFC1951CompressionAlgorithm;
 
 import java.security.Key;
 
@@ -129,6 +127,8 @@ public class JsonWebEncryption extends JsonWebStructure
 
         ContentEncryptionKeyDescriptor contentEncryptionKeyDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
 
+        keyManagementModeAlg.validateDecryptionKey(getKey(), contentEncryptionAlg);
+
         Key cek = keyManagementModeAlg.manageForDecrypt(getKey(), encryptedKey, contentEncryptionKeyDesc, getHeaders());
 
         ContentEncryptionParts contentEncryptionParts = new ContentEncryptionParts(iv, ciphertext, getIntegrity());
@@ -179,6 +179,7 @@ public class JsonWebEncryption extends JsonWebStructure
 
         ContentEncryptionKeyDescriptor contentEncryptionKeyDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
         Key managementKey = getKey();
+        keyManagementModeAlg.validateEncryptionKey(getKey(), contentEncryptionAlg);
         ContentEncryptionKeys contentEncryptionKeys = keyManagementModeAlg.manageForEncrypt(managementKey, contentEncryptionKeyDesc, getHeaders());
 
         byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();

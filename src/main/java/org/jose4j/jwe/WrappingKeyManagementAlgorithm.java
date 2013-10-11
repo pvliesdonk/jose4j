@@ -89,4 +89,16 @@ public class WrappingKeyManagementAlgorithm extends AlgorithmInfo implements Key
             return new SecretKeySpec(bytes, cekAlg);
         }
     }
+
+    @Override
+    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    {
+        // todo
+    }
+
+    @Override
+    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    {
+        // todo
+    }
 }

@@ -108,4 +108,16 @@ public class EcdhKeyAgreementAlgorithm extends AlgorithmInfo implements KeyManag
 
         return keyAgreement.generateSecret();
     }
+
+    @Override
+    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    {
+        // todo
+    }
+
+    @Override
+    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    {
+        // todo
+    }
 }

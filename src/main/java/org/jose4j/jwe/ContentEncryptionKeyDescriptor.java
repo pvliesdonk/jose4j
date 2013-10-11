@@ -5,12 +5,12 @@ package org.jose4j.jwe;
 public class ContentEncryptionKeyDescriptor
 {
     private final int contentEncryptionKeyByteLength;
-    private final String ContentEncryptionKeyAlgorithm;
+    private final String contentEncryptionKeyAlgorithm;
 
     public ContentEncryptionKeyDescriptor(int contentEncryptionKeyByteLength, String contentEncryptionKeyAlgorithm)
     {
         this.contentEncryptionKeyByteLength = contentEncryptionKeyByteLength;
-        ContentEncryptionKeyAlgorithm = contentEncryptionKeyAlgorithm;
+        this.contentEncryptionKeyAlgorithm = contentEncryptionKeyAlgorithm;
     }
 
     /**
@@ -25,6 +25,6 @@ public class ContentEncryptionKeyDescriptor
 
     public String getContentEncryptionKeyAlgorithm()
     {
-        return ContentEncryptionKeyAlgorithm;
+        return contentEncryptionKeyAlgorithm;
     }
 }

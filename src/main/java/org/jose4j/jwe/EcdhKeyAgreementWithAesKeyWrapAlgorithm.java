@@ -48,4 +48,16 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithm extends AlgorithmInfo imple
         Key agreedKey = ecdh.manageForDecrypt(managementKey, ByteUtil.EMPTY_BYTES, keyWrapKeyDescriptor, headers);
         return keyWrap.manageForDecrypt(agreedKey, encryptedKey, cekDesc, headers);
     }
+
+    @Override
+    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    {
+        // todo
+    }
+
+    @Override
+    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    {
+        // todo
+    }
 }
