@@ -127,7 +127,10 @@ public class JsonWebEncryption extends JsonWebStructure
 
         ContentEncryptionKeyDescriptor contentEncryptionKeyDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
 
-        keyManagementModeAlg.validateDecryptionKey(getKey(), contentEncryptionAlg);
+        if (isDoKeyValidation())
+        {
+            keyManagementModeAlg.validateDecryptionKey(getKey(), contentEncryptionAlg);
+        }
 
         Key cek = keyManagementModeAlg.manageForDecrypt(getKey(), encryptedKey, contentEncryptionKeyDesc, getHeaders());
 
@@ -179,7 +182,11 @@ public class JsonWebEncryption extends JsonWebStructure
 
         ContentEncryptionKeyDescriptor contentEncryptionKeyDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
         Key managementKey = getKey();
-        keyManagementModeAlg.validateEncryptionKey(getKey(), contentEncryptionAlg);
+        if (isDoKeyValidation())
+        {
+            keyManagementModeAlg.validateEncryptionKey(getKey(), contentEncryptionAlg);
+        }
+
         ContentEncryptionKeys contentEncryptionKeys = keyManagementModeAlg.manageForEncrypt(managementKey, contentEncryptionKeyDesc, getHeaders());
 
         byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();

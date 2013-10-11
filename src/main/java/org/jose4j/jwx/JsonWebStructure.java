@@ -33,6 +33,8 @@ public abstract class JsonWebStructure
 
     private Key key;
 
+    protected boolean doKeyValidation = true;
+
     abstract public String getCompactSerialization() throws JoseException;
     abstract public void setCompactSerialization(String cs) throws JoseException;
 
@@ -108,5 +110,15 @@ public abstract class JsonWebStructure
     protected void setIntegrity(byte[] integrity)
     {
         this.integrity = integrity;
+    }
+
+    public boolean isDoKeyValidation()
+    {
+        return doKeyValidation;
+    }
+
+    public void setDoKeyValidation(boolean doKeyValidation)
+    {
+        this.doKeyValidation = doKeyValidation;
     }
 }
