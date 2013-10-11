@@ -28,6 +28,11 @@ public class KeyValidationSupport
 
     public static <K extends Key> K castKey(Key key, Class<K> type) throws JoseException
     {
+        if (key == null)
+        {
+            throw new JoseException("The key must not be null.");
+        }
+
         try
         {
             return type.cast(key);

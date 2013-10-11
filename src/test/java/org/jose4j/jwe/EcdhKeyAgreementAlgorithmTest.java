@@ -18,11 +18,7 @@ public class EcdhKeyAgreementAlgorithmTest extends TestCase
 {
     public void testExampleJwaAppendixD() throws JoseException
     {
-        // testing http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-14#appendix-D
-        // but the output doesn't match
-        // though a different implementer got the same result as me
-        // http://lists.openid.net/pipermail/openid-specs-ab/Week-of-Mon-20130805/003869.html
-        // and that's what this is testing for now
+        // testing http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-17#appendix-D
         String receiverJwkJson = "\n{\"kty\":\"EC\",\n" +
                 " \"crv\":\"P-256\",\n" +
                 " \"x\":\"weNJy2HscCSM6AEDTDg04biOvhFhyyWvOHQfeF_PxMQ\",\n" +
