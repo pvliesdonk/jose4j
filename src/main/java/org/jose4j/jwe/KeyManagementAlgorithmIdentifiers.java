@@ -29,9 +29,6 @@ public class KeyManagementAlgorithmIdentifiers
     public static final String A128KW = "A128KW";
     public static final String A192KW = "A192KW";
     public static final String A256KW = "A256KW";
-    public static final String A128GCM = "A128GCM";
-    public static final String A192GCM = "A192GCM";
-    public static final String A256GCM = "A256GCM";
 
     public static final String DIRECT = "dir";
 }

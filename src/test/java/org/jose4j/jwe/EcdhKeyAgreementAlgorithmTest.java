@@ -39,7 +39,7 @@ public class EcdhKeyAgreementAlgorithmTest extends TestCase
         Headers headers = new Headers();
 
         headers.setStringHeaderValue(HeaderParameterNames.ALGORITHM, KeyManagementAlgorithmIdentifiers.ECDH_ES);
-        headers.setStringHeaderValue(HeaderParameterNames.ENCRYPTION_METHOD, ContentEncryptionAlgorithmIdentifiers.AES_128_GCM);
+        headers.setStringHeaderValue(HeaderParameterNames.ENCRYPTION_METHOD, "A128GCM");
 
         headers.setStringHeaderValue(HeaderParameterNames.AGREEMENT_PARTY_U_INFO, "QWxpY2U");
         headers.setStringHeaderValue(HeaderParameterNames.AGREEMENT_PARTY_V_INFO, "Qm9i");
