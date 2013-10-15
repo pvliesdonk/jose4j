@@ -51,7 +51,7 @@ public class Headers
 
     public void setJwkHeaderValue(String name, JsonWebKey jwk)
     {
-        Map<String, Object> jwkParams = jwk.toParams();
+        Map<String, Object> jwkParams = jwk.toParams(JsonWebKey.OutputControl.PUBLIC_ONLY);
         setObjectHeaderValue(name, jwkParams);
     }
 

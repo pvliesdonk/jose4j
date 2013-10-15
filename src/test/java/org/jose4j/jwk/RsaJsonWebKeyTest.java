@@ -22,6 +22,10 @@ import org.jose4j.lang.JoseException;
 
 import java.security.interfaces.RSAPrivateCrtKey;
 
+import static org.jose4j.jwk.JsonWebKey.OutputControl.INCLUDE_PRIVATE;
+import static org.jose4j.jwk.JsonWebKey.OutputControl.INCLUDE_SYMMETRIC;
+import static org.jose4j.jwk.JsonWebKey.OutputControl.PUBLIC_ONLY;
+
 /**
  */
 public class RsaJsonWebKeyTest extends TestCase
@@ -62,8 +66,7 @@ public class RsaJsonWebKeyTest extends TestCase
         assertFalse(jwk.toJson().contains(dKey));
         assertEquals(jsonNoPrivateKey, jwk.toJson());
 
-        jwk.setWriteOutPrivateKeyToJson(true);
-        assertTrue(jwk.toJson().contains(dKey));
+        assertTrue(jwk.toJson(INCLUDE_PRIVATE).contains(dKey));
     }
 
     public void testFromKeyWithCrtPrivateAndBackAndAgain() throws JoseException
@@ -103,9 +106,31 @@ public class RsaJsonWebKeyTest extends TestCase
 
         assertTrue(jwk.getPrivateKey() instanceof RSAPrivateCrtKey);
 
-        jwk.setWriteOutPrivateKeyToJson(true);
+        String jsonOut = jwk.toJson(PUBLIC_ONLY);
+        assertFalse(jsonOut.contains("\"d\""));
+        assertFalse(jsonOut.contains("\"p\""));
+        assertFalse(jsonOut.contains("\"q\""));
+        assertFalse(jsonOut.contains("\"dp\""));
+        assertFalse(jsonOut.contains("\"dq\""));
+        assertFalse(jsonOut.contains("\"qi\""));
 
-        String jsonOut = jwk.toJson();
+        jsonOut = jwk.toJson();
+        assertFalse(jsonOut.contains("\"d\""));
+        assertFalse(jsonOut.contains("\"p\""));
+        assertFalse(jsonOut.contains("\"q\""));
+        assertFalse(jsonOut.contains("\"dp\""));
+        assertFalse(jsonOut.contains("\"dq\""));
+        assertFalse(jsonOut.contains("\"qi\""));
+
+        jsonOut = jwk.toJson(INCLUDE_SYMMETRIC);
+        assertFalse(jsonOut.contains("\"d\""));
+        assertFalse(jsonOut.contains("\"p\""));
+        assertFalse(jsonOut.contains("\"q\""));
+        assertFalse(jsonOut.contains("\"dp\""));
+        assertFalse(jsonOut.contains("\"dq\""));
+        assertFalse(jsonOut.contains("\"qi\""));
+
+        jsonOut = jwk.toJson(INCLUDE_PRIVATE);
         assertTrue(jsonOut.contains("\"d\""));
         assertTrue(jsonOut.contains("\"p\""));
         assertTrue(jsonOut.contains("\"q\""));

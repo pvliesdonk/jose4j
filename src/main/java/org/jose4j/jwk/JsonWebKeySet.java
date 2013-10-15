@@ -103,16 +103,21 @@ public class JsonWebKeySet
 
     public String toJson()
     {
+        return toJson(JsonWebKey.OutputControl.PUBLIC_ONLY);
+    }
+
+    public String toJson(JsonWebKey.OutputControl outputControl)
+    {
         LinkedList<Map<String, Object>> keyList = new LinkedList<Map<String, Object>>();
 
         for (JsonWebKey key : keys)
         {
-            Map<String, Object> params = key.toParams();
+            Map<String, Object> params = key.toParams(outputControl);
             keyList.add(params);
         }
 
-        Map<String,Object> jwk = new LinkedHashMap<String,Object>();
-        jwk.put(JWK_SET_MEMBER_NAME, keyList);
-        return JsonUtil.toJson(jwk);
+        Map<String,Object> jwks = new LinkedHashMap<String,Object>();
+        jwks.put(JWK_SET_MEMBER_NAME, keyList);
+        return JsonUtil.toJson(jwks);
     }
 }
