@@ -1,6 +1,7 @@
 package org.jose4j.jwk;
 
 import junit.framework.TestCase;
+import org.jose4j.lang.ByteUtil;
 
 import javax.crypto.SecretKey;
 
@@ -15,6 +16,7 @@ public class OctJwkGeneratorTest extends TestCase
             OctetSequenceJsonWebKey jsonWebKey = OctJwkGenerator.generateJwk(size);
             assertNotNull(jsonWebKey.getKey());
             assertTrue(jsonWebKey.getKey() instanceof SecretKey);
+            assertEquals(ByteUtil.byteLength(size), jsonWebKey.getOctetSequence().length);
         }
     }
 }
