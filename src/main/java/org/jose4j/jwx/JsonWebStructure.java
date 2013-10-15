@@ -129,4 +129,6 @@ public abstract class JsonWebStructure
     {
         this.doKeyValidation = doKeyValidation;
     }
+
+    // todo consider make this base class more useful/consistent to client code that might want to to treat JWS and JWE similarly
 }
