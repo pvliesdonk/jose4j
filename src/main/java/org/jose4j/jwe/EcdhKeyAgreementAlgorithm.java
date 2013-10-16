@@ -1,5 +1,6 @@
 package org.jose4j.jwe;
 
+import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwe.kdf.KdfUtil;
 import org.jose4j.jwk.EcJwkGenerator;
@@ -126,6 +127,6 @@ public class EcdhKeyAgreementAlgorithm extends AlgorithmInfo implements KeyManag
     @Override
     public boolean isAvailable()
     {
-        return true; // todo need to check that EC is available and ...
+        return AlgorithmAvailability.isAvailable("KeyAgreement", getJavaAlgorithm());
     }
 }
