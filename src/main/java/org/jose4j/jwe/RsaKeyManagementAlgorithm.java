@@ -33,4 +33,10 @@ public class RsaKeyManagementAlgorithm extends WrappingKeyManagementAlgorithm im
         RSAPrivateKey rsaPrivateKey = KeyValidationSupport.castKey(managementKey, RSAPrivateKey.class);
         KeyValidationSupport.checkRsaKeySize(rsaPrivateKey);
     }
+
+    @Override
+    public boolean isAvailable()
+    {
+        return true; // todo maybe check about RSA though it's probably always there...
+    }
 }

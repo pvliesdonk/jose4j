@@ -60,4 +60,10 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithm extends AlgorithmInfo imple
     {
         ecdh.validateDecryptionKey(managementKey, contentEncryptionAlg);
     }
+
+    @Override
+    public boolean isAvailable()
+    {
+        return ecdh.isAvailable() && keyWrap.isAvailable();
+    }
 }

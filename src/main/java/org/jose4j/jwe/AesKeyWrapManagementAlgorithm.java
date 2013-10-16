@@ -21,7 +21,9 @@ import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 
+import javax.crypto.Cipher;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 
 /**
  */
@@ -76,5 +78,12 @@ public class AesKeyWrapManagementAlgorithm extends WrappingKeyManagementAlgorith
                    + ByteUtil.bitLength(getKeyByteLength())+ " bit key but a "
                    + ByteUtil.bitLength(managementKeyByteLength) + " bit key was provided.");
         }
+    }
+
+    @Override
+    public boolean isAvailable()
+    {
+        int aesByteKeyLength = getKeyByteLength();
+        return CipherStrengthSupport.isAvailable(getJavaAlgorithm(), aesByteKeyLength);
     }
 }

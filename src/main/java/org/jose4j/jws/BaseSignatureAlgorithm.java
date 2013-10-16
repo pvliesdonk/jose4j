@@ -145,4 +145,10 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
             throw new JoseException("Key cannot be null");
         }
     }
+
+    @Override
+    public boolean isAvailable()
+    {
+        return true; // todo for now...
+    }
 }

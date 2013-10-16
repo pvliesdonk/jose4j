@@ -63,4 +63,10 @@ public class DirectKeyManagementAlgorithm extends AlgorithmInfo implements KeyMa
     {
         validateKey(managementKey, contentEncryptionAlg);
     }
+
+    @Override
+    public boolean isAvailable()
+    {
+        return true;
+    }
 }

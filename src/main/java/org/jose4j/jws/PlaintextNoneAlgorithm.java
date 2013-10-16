@@ -67,4 +67,10 @@ public class PlaintextNoneAlgorithm extends AlgorithmInfo implements JsonWebSign
             throw new JoseException(CANNOT_HAVE_KEY_MESSAGE);
         }
     }
+
+    @Override
+    public boolean isAvailable()
+    {
+        return true;
+    }
 }

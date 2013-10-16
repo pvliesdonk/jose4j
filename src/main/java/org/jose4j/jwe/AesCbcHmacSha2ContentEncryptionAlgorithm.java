@@ -34,6 +34,7 @@ import javax.crypto.spec.IvParameterSpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 
 /**
  */
@@ -171,5 +172,13 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         //       as a 64-bit unsigned integer in network byte order.
         long aadLength = ByteUtil.bitLength(additionalAuthenticatedData);
         return ByteUtil.getBytes(aadLength);
+    }
+
+    @Override
+    public boolean isAvailable()
+    {
+        int contentEncryptionKeyByteLength = getContentEncryptionKeyDescriptor().getContentEncryptionKeyByteLength();
+        int aesByteKeyLength = contentEncryptionKeyByteLength / 2;
+        return CipherStrengthSupport.isAvailable(getJavaAlgorithm(), aesByteKeyLength);
     }
 }

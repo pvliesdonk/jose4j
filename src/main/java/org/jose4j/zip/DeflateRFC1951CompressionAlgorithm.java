@@ -93,6 +93,11 @@ public class DeflateRFC1951CompressionAlgorithm implements CompressionAlgorithm
     public String getKeyType()
     {
         return null;
+    }
 
+    @Override
+    public boolean isAvailable()
+    {
+        return true;
     }
 }

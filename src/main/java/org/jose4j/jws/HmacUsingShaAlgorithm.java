@@ -80,4 +80,10 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
     {
         validateKey(key);
     }
+
+    @Override
+    public boolean isAvailable()
+    {
+        return true;
+    }
 }

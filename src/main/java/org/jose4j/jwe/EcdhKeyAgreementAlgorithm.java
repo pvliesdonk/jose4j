@@ -122,4 +122,10 @@ public class EcdhKeyAgreementAlgorithm extends AlgorithmInfo implements KeyManag
     {
         KeyValidationSupport.castKey(managementKey, ECPrivateKey.class);
     }
+
+    @Override
+    public boolean isAvailable()
+    {
+        return true; // todo need to check that EC is available and ...
+    }
 }

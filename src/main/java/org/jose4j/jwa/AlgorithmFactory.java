@@ -16,6 +16,8 @@
 
 package org.jose4j.jwa;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jose4j.lang.JoseException;
 
 import java.util.Collections;
@@ -27,6 +29,8 @@ import java.util.Set;
  */
 public class AlgorithmFactory<A extends Algorithm>
 {
+    private final Log log = LogFactory.getLog(this.getClass());
+
     private String parameterName;
 
     private final Map<String,A> algorithms = new LinkedHashMap<String, A>();
@@ -55,7 +59,14 @@ public class AlgorithmFactory<A extends Algorithm>
 
     public void registerAlgorithm(A algorithm)
     {
-        algorithms.put(algorithm.getAlgorithmIdentifier(), algorithm);
+        if (algorithm.isAvailable())
+        {
+            algorithms.put(algorithm.getAlgorithmIdentifier(), algorithm);
+        }
+        else
+        {
+            log.info(algorithm.getAlgorithmIdentifier() + " is unavailable so will not be registered.");
+        }
     }
 
     public void unregisterAlgorithm(String algorithmIdentifier)

@@ -101,4 +101,10 @@ public class Aes256GcmContentEncryptionAlgorithm extends AlgorithmInfo implement
     {
         return new byte[0]; // come back to this someday
     }
+
+    @Override
+    public boolean isAvailable()
+    {
+        return false;  // nope
+    }
 }
