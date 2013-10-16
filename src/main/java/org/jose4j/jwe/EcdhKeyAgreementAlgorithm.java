@@ -10,6 +10,7 @@ import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
 import org.jose4j.jwx.KeyValidationSupport;
+import org.jose4j.keys.EcKeyUtil;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
@@ -127,6 +128,7 @@ public class EcdhKeyAgreementAlgorithm extends AlgorithmInfo implements KeyManag
     @Override
     public boolean isAvailable()
     {
-        return AlgorithmAvailability.isAvailable("KeyAgreement", getJavaAlgorithm());
+        EcKeyUtil ecKeyUtil = new EcKeyUtil();
+        return ecKeyUtil.isAvailable() && AlgorithmAvailability.isAvailable("KeyAgreement", getJavaAlgorithm());
     }
 }
