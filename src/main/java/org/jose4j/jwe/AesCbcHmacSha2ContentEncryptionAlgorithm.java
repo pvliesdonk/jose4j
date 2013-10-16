@@ -39,16 +39,16 @@ import java.security.Key;
  */
 public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo implements ContentEncryptionAlgorithm
 {
-    private String hmacJavaAlgorithm;
-    private int tagTruncationLength;
-    private ContentEncryptionKeyDescriptor contentEncryptionKeyDescriptor;
+    private final String hmacJavaAlgorithm;
+    private final int tagTruncationLength;
+    private final ContentEncryptionKeyDescriptor contentEncryptionKeyDescriptor;
 
     public AesCbcHmacSha2ContentEncryptionAlgorithm(String alg, int cekByteLen, String javaHmacAlg, int tagTruncationLength)
     {
         setAlgorithmIdentifier(alg);
-        setContentEncryptionKeyByteLength(cekByteLen);
-        setHmacJavaAlgorithm(javaHmacAlg);
-        setTagTruncationLength(tagTruncationLength);
+        contentEncryptionKeyDescriptor = new ContentEncryptionKeyDescriptor(cekByteLen, AesKey.ALGORITHM);
+        this.hmacJavaAlgorithm = javaHmacAlg;
+        this.tagTruncationLength = tagTruncationLength;
         setJavaAlgorithm("AES/CBC/PKCS5Padding");
         setKeyPersuasion(KeyPersuasion.SYMMETRIC);
         setKeyType(AesKey.ALGORITHM);
@@ -59,29 +59,14 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         return hmacJavaAlgorithm;
     }
 
-    void setHmacJavaAlgorithm(String hmacJavaAlgorithm)
-    {
-        this.hmacJavaAlgorithm = hmacJavaAlgorithm;
-    }
-
     public int getTagTruncationLength()
     {
         return tagTruncationLength;
     }
 
-    void setTagTruncationLength(int tagTruncationLength)
-    {
-        this.tagTruncationLength = tagTruncationLength;
-    }
-
     public ContentEncryptionKeyDescriptor getContentEncryptionKeyDescriptor()
     {
         return contentEncryptionKeyDescriptor;
-    }
-
-    void setContentEncryptionKeyByteLength(int cekByteLenght)
-    {
-        this.contentEncryptionKeyDescriptor = new ContentEncryptionKeyDescriptor(cekByteLenght, AesKey.ALGORITHM);
     }
 
     public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers) throws JoseException
@@ -174,11 +159,7 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         {
             return cipher.doFinal(ciphertext);
         }
-        catch (IllegalBlockSizeException e)
-        {
-            throw new JoseException(e.toString(), e);
-        }
-        catch (BadPaddingException e)
+        catch (IllegalBlockSizeException | BadPaddingException e)
         {
             throw new JoseException(e.toString(), e);
         }
