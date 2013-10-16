@@ -101,7 +101,7 @@ public class JsonWebEncryption extends JsonWebStructure
             throw new JoseException(HeaderParameterNames.ALGORITHM + " header not set.");
         }
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
-        AlgorithmFactory<KeyManagementAlgorithm> factory = factoryFactory.getKeyManagementAlgorithmFactory();
+        AlgorithmFactory<KeyManagementAlgorithm> factory = factoryFactory.getJweKeyManagementAlgorithmFactory();
         return factory.getAlgorithm(algo);
     }
 

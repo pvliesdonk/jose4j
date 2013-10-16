@@ -20,7 +20,7 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithmTest extends TestCase
     {
         AlgorithmFactoryFactory aff = AlgorithmFactoryFactory.getInstance();
         AlgorithmFactory<ContentEncryptionAlgorithm> encAlgFactory = aff.getJweContentEncryptionAlgorithmFactory();
-        AlgorithmFactory<KeyManagementAlgorithm> algAlgFactory = aff.getKeyManagementAlgorithmFactory();
+        AlgorithmFactory<KeyManagementAlgorithm> algAlgFactory = aff.getJweKeyManagementAlgorithmFactory();
         Set<String> supportedAlgAlgorithms = algAlgFactory.getSupportedAlgorithms();
         Set<String> supportedEncAlgorithms = encAlgFactory.getSupportedAlgorithms();
 

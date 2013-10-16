@@ -78,7 +78,7 @@ public class AlgorithmFactoryFactory
         return jwsAlgorithmFactory;
     }
 
-    public AlgorithmFactory<KeyManagementAlgorithm> getKeyManagementAlgorithmFactory() // todo change name to have jwe
+    public AlgorithmFactory<KeyManagementAlgorithm> getJweKeyManagementAlgorithmFactory() // todo change name to have jwe
     {
         return jweKeyMgmtModeAlgorithmFactory;
     }
