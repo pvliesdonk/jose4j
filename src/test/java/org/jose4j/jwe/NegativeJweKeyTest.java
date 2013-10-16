@@ -308,36 +308,41 @@ public class NegativeJweKeyTest extends TestCase
         expectBadKeyFailOnProduce(RSA_OAEP, AES_128_CBC_HMAC_SHA_256, ExampleEcKeysFromJws.PRIVATE_256);
     }
 
-
-    public void testNullEcKey() throws JoseException
+    public void testEcWithWrongTypeAndNull() throws JoseException
     {
-        expectBadKeyFailOnProduce(ECDH_ES, AES_128_CBC_HMAC_SHA_256, null);
-        expectBadKeyFailOnConsume("eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImVwayI6eyJrdHkiOiJFQyIsIngiO" +
-                "iI5YlNnNjhoM1hmemJsbUJyeURhdWlySzd2YmNkRFpIajZqcFktdkU4MUhnIiwieSI6IndrbDhpWUlZeTJoSFpuLWxyS1c1Y1JI" +
-                "Vzl4cDlac1RrZVR3MEZjLW4xS2MiLCJjcnYiOiJQLTI1NiJ9fQ..A2GLJCjWdS0XRhHUIS3UWg." +
-                "LbQGCOYAqMDPiXuOw9mNpKF1Uqx_eff8K-HvJL0LXDA.iLuskqi6_UOkDyJz3Z56bg", null);
-    }
+        PrivateKey privateRsaKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPrivateKey();
+        PublicKey publicRsaKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPublicKey();
 
-    public void testEcWithWrongType() throws JoseException
-    {
-        PrivateKey privateKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPrivateKey();
-        PublicKey publicKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPublicKey();
-        expectBadKeyFailOnProduce(ECDH_ES, AES_128_CBC_HMAC_SHA_256, publicKey);
-        expectBadKeyFailOnProduce(ECDH_ES, AES_128_CBC_HMAC_SHA_256, privateKey);
-        expectBadKeyFailOnProduce(ECDH_ES, AES_128_CBC_HMAC_SHA_256, aesKey(32));
-        expectBadKeyFailOnProduce(ECDH_ES, AES_128_CBC_HMAC_SHA_256, ExampleEcKeysFromJws.PRIVATE_256);
+        for (String ecAlg : new String[] {ECDH_ES, ECDH_ES_A128KW, ECDH_ES_A192KW, ECDH_ES_A256KW})
+        {
+            expectBadKeyFailOnProduce(ecAlg, AES_128_CBC_HMAC_SHA_256, publicRsaKey);
+            expectBadKeyFailOnProduce(ecAlg, AES_128_CBC_HMAC_SHA_256, privateRsaKey);
+            expectBadKeyFailOnProduce(ecAlg, AES_128_CBC_HMAC_SHA_256, aesKey(32));
+            expectBadKeyFailOnProduce(ecAlg, AES_128_CBC_HMAC_SHA_256, ExampleEcKeysFromJws.PRIVATE_256);
+            expectBadKeyFailOnProduce(ecAlg, AES_128_CBC_HMAC_SHA_256, null);
+        }
 
-        String cs = "eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImVwayI6eyJrdHkiOiJFQyIsIngiO" +
+        String csEcdh = "eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImVwayI6eyJrdHkiOiJFQyIsIngiO" +
                 "iI5YlNnNjhoM1hmemJsbUJyeURhdWlySzd2YmNkRFpIajZqcFktdkU4MUhnIiwieSI6IndrbDhpWUlZeTJoSFpuLWxyS1c1Y1JI" +
                 "Vzl4cDlac1RrZVR3MEZjLW4xS2MiLCJjcnYiOiJQLTI1NiJ9fQ..A2GLJCjWdS0XRhHUIS3UWg." +
                 "LbQGCOYAqMDPiXuOw9mNpKF1Uqx_eff8K-HvJL0LXDA.iLuskqi6_UOkDyJz3Z56bg";
-        expectBadKeyFailOnConsume(cs, publicKey);
-        expectBadKeyFailOnConsume(cs, privateKey);
-        expectBadKeyFailOnConsume(cs, aesKey(16));
-        expectBadKeyFailOnConsume(cs, ExampleEcKeysFromJws.PUBLIC_256);
+
+        String csEcdhKw = "eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkExMjhDQkMtSFMyNTYiLCJlcGsiOnsia3R5IjoiRUMiLCJ4Ijoi" +
+                "X3BnSFZHOXhlWHd1elRxbkRfNnQzNm9MTGFlZmFQdlRlR2NHdHpZeXZ0NCIsInkiOiI4eHR6dFluNFNqaUVQSGlkemVpVzBWeDhFaE" +
+                "d0eVN4WVVDMXZjdTg0OXJnIiwiY3J2IjoiUC0yNTYifX0.LzVyMpb8WwfGpkVFUDd_kzJuaP4myaqR36xewhqwC4Ykl91kbh8pMA." +
+                "_lZgmx258W8L2sHkE8gaxw.fmZowRNnxfgpqImyyB_o4zCQ4Z6LLBtIEQBLZkELOqim5RM6O9t66_ZvAZphevbL." +
+                "DiRDsaE4g7ZcTQVxya19og";
+
+        String[] css = new String[] {csEcdh, csEcdhKw};
+
+        for (String cs : css)
+        {
+            expectBadKeyFailOnConsume(cs, publicRsaKey);
+            expectBadKeyFailOnConsume(cs, privateRsaKey);
+            expectBadKeyFailOnConsume(cs, aesKey(16));
+            expectBadKeyFailOnConsume(cs, ExampleEcKeysFromJws.PUBLIC_256);
+        }
     }
-
-
 
     private void expectBadKeyFailOnConsume(String cs, Key key) throws JoseException
     {

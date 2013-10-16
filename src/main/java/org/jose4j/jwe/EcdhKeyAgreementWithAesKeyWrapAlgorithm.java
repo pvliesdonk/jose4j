@@ -52,12 +52,12 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithm extends AlgorithmInfo imple
     @Override
     public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
     {
-        // todo
+        ecdh.validateEncryptionKey(managementKey, contentEncryptionAlg);
     }
 
     @Override
     public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
     {
-        // todo
+        ecdh.validateDecryptionKey(managementKey, contentEncryptionAlg);
     }
 }
