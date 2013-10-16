@@ -16,6 +16,7 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.JoseException;
@@ -112,6 +113,8 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
 
     public void validateSigningKey(Key key) throws JoseException
     {
+        checkForNullKey(key);
+
         try
         {
             validatePrivateKey((PrivateKey)key);
@@ -149,6 +152,6 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
     @Override
     public boolean isAvailable()
     {
-        return true; // todo for now...
+        return AlgorithmAvailability.isAvailable("Signature", getJavaAlgorithm());
     }
 }

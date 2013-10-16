@@ -16,6 +16,7 @@
 
 package org.jose4j.jwe;
 
+import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
@@ -84,6 +85,7 @@ public class AesKeyWrapManagementAlgorithm extends WrappingKeyManagementAlgorith
     public boolean isAvailable()
     {
         int aesByteKeyLength = getKeyByteLength();
-        return CipherStrengthSupport.isAvailable(getJavaAlgorithm(), aesByteKeyLength);
+        String agl = getJavaAlgorithm();
+        return AlgorithmAvailability.isAvailable("Cipher", agl) && CipherStrengthSupport.isAvailable(agl, aesByteKeyLength);
     }
 }

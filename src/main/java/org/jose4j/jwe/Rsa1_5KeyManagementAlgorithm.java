@@ -7,6 +7,5 @@ public class Rsa1_5KeyManagementAlgorithm extends RsaKeyManagementAlgorithm impl
     public Rsa1_5KeyManagementAlgorithm()
     {
         super("RSA/ECB/PKCS1Padding", KeyManagementAlgorithmIdentifiers.RSA1_5);
-
     }
 }

@@ -26,9 +26,15 @@ import java.security.spec.*;
 
 /**
  */
-public class EcKeyUtil
+public class EcKeyUtil extends KeyPairUtil
 {
     public static final String EC = "EC";
+
+    @Override
+    String getAlgorithm()
+    {
+        return EC;
+    }
 
     public ECPublicKey publicKey(BigInteger x, BigInteger y, ECParameterSpec spec) throws JoseException
     {
@@ -75,29 +81,4 @@ public class EcKeyUtil
             throw new JoseException("Unable to create EC key pair with spec " + spec, e);
         }
     }
-
-    private KeyPairGenerator getKeyPairGenerator() throws JoseException
-    {
-        try
-        {
-            return KeyPairGenerator.getInstance(EC);
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new JoseException("Couldn't find "+ EC + " KeyPairGenerator!", e);
-        }
-    }
-
-    private KeyFactory getKeyFactory() throws JoseException
-    {
-        try
-        {
-            return KeyFactory.getInstance(EC);
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new JoseException("Couldn't find "+ EC + " KeyFactory!", e);
-        }
-    }
-
 }

@@ -46,10 +46,15 @@ public class AlgorithmFactory<A extends Algorithm>
         
         if (algo == null)
         {
-            throw new JoseException(algorithmIdentifier + " is an unknown or unsupported "+parameterName+" algorithm (not one of " + getSupportedAlgorithms() + ").");
+            throw new JoseException(algorithmIdentifier + " is an unknown, unsupported or unavailable "+parameterName+" algorithm (not one of " + getSupportedAlgorithms() + ").");
         }
         
         return algo;
+    }
+
+    public boolean isAvailable(String algorithmIdentifier)
+    {
+        return algorithms.containsKey(algorithmIdentifier);
     }
 
     public Set<String> getSupportedAlgorithms()

@@ -16,6 +16,7 @@
 
 package org.jose4j.keys;
 
+import org.apache.commons.logging.LogFactory;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 
@@ -50,8 +51,8 @@ public class ExampleEcKeysFromJws
     public static final BigInteger D_256 = BigEndianBigInteger.fromBytes(D_BYTES_256);
 
 
-    public static final ECPrivateKey PRIVATE_256;
-    public static final ECPublicKey PUBLIC_256;
+    public static ECPrivateKey PRIVATE_256 = null;
+    public static ECPublicKey PUBLIC_256 = null;
 
 
         // The ECDSA key consists of a public part, the EC point (x, y)
@@ -85,8 +86,8 @@ public class ExampleEcKeysFromJws
     public static final BigInteger D_521 = BigEndianBigInteger.fromBytes(D_BYTES_521);
 
 
-    public static final ECPrivateKey PRIVATE_521;
-    public static final ECPublicKey PUBLIC_521;
+    public static ECPrivateKey PRIVATE_521 = null;
+    public static ECPublicKey PUBLIC_521 = null;
 
     static
     {
@@ -102,7 +103,7 @@ public class ExampleEcKeysFromJws
         }
         catch (JoseException e)
         {
-            throw new IllegalStateException(e.getMessage(),e);
+            LogFactory.getLog(ExampleEcKeysFromJws.class).warn("Unable to initialize Example EC keys.", e);
         }
     }
 }

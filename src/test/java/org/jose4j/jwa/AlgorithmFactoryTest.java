@@ -29,10 +29,13 @@ public class AlgorithmFactoryTest extends TestCase
         AlgorithmFactoryFactory algoFactoryFactory = AlgorithmFactoryFactory.getInstance();
         AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory = algoFactoryFactory.getJwsAlgorithmFactory();
 
+        assertFalse(jwsAlgorithmFactory.isAvailable("blahblahblah"));
+
         for (String algo : jwsAlgorithmFactory.getSupportedAlgorithms())
         {
             JsonWebSignatureAlgorithm jsonWebSignatureAlgorithm = jwsAlgorithmFactory.getAlgorithm(algo);
             assertNotNull(jsonWebSignatureAlgorithm.getKeyPersuasion());
+            assertTrue(jwsAlgorithmFactory.isAvailable(algo));
         }
     }
 }

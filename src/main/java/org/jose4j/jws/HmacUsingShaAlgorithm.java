@@ -16,6 +16,7 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.keys.KeyPersuasion;
@@ -84,6 +85,6 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
     @Override
     public boolean isAvailable()
     {
-        return true;
+        return AlgorithmAvailability.isAvailable("Mac", getJavaAlgorithm());
     }
 }

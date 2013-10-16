@@ -29,9 +29,15 @@ import java.security.spec.RSAPublicKeySpec;
 
 /**
  */
-public class RsaKeyUtil
+public class RsaKeyUtil extends KeyPairUtil
 {
     public static final String RSA = "RSA";
+
+    @Override
+    String getAlgorithm()
+    {
+        return RSA;
+    }
 
     public RSAPublicKey publicKey(BigInteger modulus, BigInteger publicExponent) throws JoseException
     {
@@ -77,33 +83,8 @@ public class RsaKeyUtil
 
     public KeyPair generateKeyPair(int bits) throws JoseException
     {
-        KeyPairGenerator keyGenerator = getKeyGenerator();
+        KeyPairGenerator keyGenerator = getKeyPairGenerator();
         keyGenerator.initialize(bits);
         return keyGenerator.generateKeyPair();
-    }
-
-    private KeyFactory getKeyFactory() throws JoseException
-    {
-        try
-        {
-           return KeyFactory.getInstance(RSA);
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-           throw new JoseException("Couldn't find "+ RSA + " KeyFactory!?!", e);
-        }
-    }
-
-    private KeyPairGenerator getKeyGenerator() throws JoseException
-    {
-        try
-        {
-
-           return KeyPairGenerator.getInstance(RSA);
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-           throw new JoseException("Couldn't find "+ RSA + " KeyPairGenerator!?!", e);
-        }
     }
 }
