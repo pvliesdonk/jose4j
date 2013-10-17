@@ -29,24 +29,26 @@ import java.util.Set;
  */
 public class AlgorithmFactory<A extends Algorithm>
 {
-    private final Log log = LogFactory.getLog(this.getClass());
+    private final Log log;
 
     private String parameterName;
 
-    private final Map<String,A> algorithms = new LinkedHashMap<String, A>();
+    private final Map<String,A> algorithms = new LinkedHashMap<>();
 
-    public AlgorithmFactory(String parameterName)
+    public AlgorithmFactory(String parameterName, Class<A> type)
     {
         this.parameterName = parameterName;
+        log = LogFactory.getLog(this.getClass() + "->" + type.getSimpleName());
     }
 
     public A getAlgorithm(String algorithmIdentifier) throws JoseException
     {
         A algo = algorithms.get(algorithmIdentifier);
-        
+
         if (algo == null)
         {
-            throw new JoseException(algorithmIdentifier + " is an unknown, unsupported or unavailable "+parameterName+" algorithm (not one of " + getSupportedAlgorithms() + ").");
+            throw new JoseException(algorithmIdentifier + " is an unknown, unsupported or unavailable "+parameterName
+                    +" algorithm (not one of " + getSupportedAlgorithms() + ").");
         }
         
         return algo;
@@ -64,13 +66,15 @@ public class AlgorithmFactory<A extends Algorithm>
 
     public void registerAlgorithm(A algorithm)
     {
+        String algId = algorithm.getAlgorithmIdentifier();
         if (algorithm.isAvailable())
         {
-            algorithms.put(algorithm.getAlgorithmIdentifier(), algorithm);
+            algorithms.put(algId, algorithm);
+            log.info(algorithm + " registered for " + parameterName + " algorithm " + algId);
         }
         else
         {
-            log.info(algorithm.getAlgorithmIdentifier() + " is unavailable so will not be registered.");
+            log.info(algId + " is unavailable so will not be registered for " + parameterName + " algorithms.");
         }
     }
 

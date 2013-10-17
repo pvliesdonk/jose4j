@@ -16,6 +16,8 @@
 
 package org.jose4j.jwa;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jose4j.jwe.*;
 import org.jose4j.jws.*;
 import org.jose4j.jwx.HeaderParameterNames;
@@ -35,7 +37,10 @@ public class AlgorithmFactoryFactory
 
     private AlgorithmFactoryFactory()
     {
-        jwsAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ALGORITHM);
+        Log log = LogFactory.getLog(this.getClass());
+
+        log.info("Initializing jose4j...");
+        jwsAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ALGORITHM, JsonWebSignatureAlgorithm.class);
         jwsAlgorithmFactory.registerAlgorithm(new PlaintextNoneAlgorithm());
         jwsAlgorithmFactory.registerAlgorithm(new HmacUsingSha256Algorithm());
         jwsAlgorithmFactory.registerAlgorithm(new HmacUsingSha384Algorithm());
@@ -47,7 +52,9 @@ public class AlgorithmFactoryFactory
         jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha384Algorithm());
         jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha512Algorithm());
 
-        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ALGORITHM);
+        log.info("JWS signature algorithms: " + jwsAlgorithmFactory.getSupportedAlgorithms());
+
+        jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ALGORITHM, KeyManagementAlgorithm.class);
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Rsa1_5KeyManagementAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new RsaOaepKeyManagementAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new DirectKeyManagementAlgorithm());
@@ -59,13 +66,20 @@ public class AlgorithmFactoryFactory
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes192KeyWrapAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes256KeyWrapAlgorithm());
 
-        jweContentEncryptionAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ENCRYPTION_METHOD);
+        log.info("JWE key management algorithms: " + jweKeyMgmtModeAlgorithmFactory.getSupportedAlgorithms());
+
+        jweContentEncryptionAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ENCRYPTION_METHOD, ContentEncryptionAlgorithm.class);
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes128CbcHmacSha256ContentEncryptionAlgorithm());
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes192CbcHmacSha384ContentEncryptionAlgorithm());
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes256CbcHmacSha512ContentEncryptionAlgorithm());
 
-        compressionAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ZIP);
+        log.info("JWE content encryption algorithms: " + jweContentEncryptionAlgorithmFactory.getSupportedAlgorithms());
+
+        compressionAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ZIP, CompressionAlgorithm.class);
         compressionAlgorithmFactory.registerAlgorithm(new DeflateRFC1951CompressionAlgorithm());
+
+        log.info("JWE compression algorithms: " + compressionAlgorithmFactory.getSupportedAlgorithms());
+
     }
 
     public static AlgorithmFactoryFactory getInstance()
@@ -78,7 +92,7 @@ public class AlgorithmFactoryFactory
         return jwsAlgorithmFactory;
     }
 
-    public AlgorithmFactory<KeyManagementAlgorithm> getJweKeyManagementAlgorithmFactory() // todo change name to have jwe
+    public AlgorithmFactory<KeyManagementAlgorithm> getJweKeyManagementAlgorithmFactory()
     {
         return jweKeyMgmtModeAlgorithmFactory;
     }
