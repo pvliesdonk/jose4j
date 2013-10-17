@@ -75,7 +75,7 @@ public abstract class PublicJsonWebKey extends JsonWebKey
     protected abstract void fillPublicTypeSpecificParams(Map<String,Object> params);
     protected abstract void fillPrivateTypeSpecificParams(Map<String,Object> params);
 
-    protected void fillTypeSpecificParams(Map<String,Object> params, OutputControl outputLevel)
+    protected void fillTypeSpecificParams(Map<String,Object> params, OutputControlLevel outputLevel)
     {
         fillPublicTypeSpecificParams(params);
 
@@ -93,7 +93,7 @@ public abstract class PublicJsonWebKey extends JsonWebKey
             params.put(X509_CERTIFICATE_CHAIN_PARAMETER, x5cStrings);
         }
 
-        if (writeOutPrivateKeyToJson || outputLevel == OutputControl.INCLUDE_PRIVATE)
+        if (writeOutPrivateKeyToJson || outputLevel == OutputControlLevel.INCLUDE_PRIVATE)
         {
             fillPrivateTypeSpecificParams(params);
         }
@@ -105,7 +105,7 @@ public abstract class PublicJsonWebKey extends JsonWebKey
     }
 
     /**
-     * @deprecated as of 0.3.2 use {@link #toJson(org.jose4j.jwk.JsonWebKey.OutputControl)}
+     * @deprecated as of 0.3.2 use {@link #toJson(org.jose4j.jwk.JsonWebKey.OutputControlLevel)}
      */
     public void setWriteOutPrivateKeyToJson(boolean writeOutPrivateKeyToJson)
     {

@@ -103,16 +103,16 @@ public class JsonWebKeySet
 
     public String toJson()
     {
-        return toJson(JsonWebKey.OutputControl.PUBLIC_ONLY);
+        return toJson(JsonWebKey.OutputControlLevel.PUBLIC_ONLY);
     }
 
-    public String toJson(JsonWebKey.OutputControl outputControl)
+    public String toJson(JsonWebKey.OutputControlLevel outputControlLevel)
     {
         LinkedList<Map<String, Object>> keyList = new LinkedList<Map<String, Object>>();
 
         for (JsonWebKey key : keys)
         {
-            Map<String, Object> params = key.toParams(outputControl);
+            Map<String, Object> params = key.toParams(outputControlLevel);
             keyList.add(params);
         }
 

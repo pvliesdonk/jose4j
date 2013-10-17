@@ -65,9 +65,9 @@ public class OctetSequenceJsonWebKey extends JsonWebKey
     }
 
     @Override
-    protected void fillTypeSpecificParams(Map<String, Object> params, OutputControl outputLevel)
+    protected void fillTypeSpecificParams(Map<String, Object> params, OutputControlLevel outputLevel)
     {
-        if (OutputControl.INCLUDE_SYMMETRIC.compareTo(outputLevel) >= 0)
+        if (OutputControlLevel.INCLUDE_SYMMETRIC.compareTo(outputLevel) >= 0)
         {
             Base64Url base64Url = new Base64Url();
             String encodedBytes = base64Url.base64UrlEncode(octetSequence);

@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public abstract class JsonWebKey implements Serializable
 {
-    public enum OutputControl {INCLUDE_PRIVATE, INCLUDE_SYMMETRIC, PUBLIC_ONLY}
+    public enum OutputControlLevel {INCLUDE_PRIVATE, INCLUDE_SYMMETRIC, PUBLIC_ONLY}
 
     public static final String KEY_TYPE_PARAMETER = "kty";
     public static final String USE_PARAMETER = "use";
@@ -58,7 +58,7 @@ public abstract class JsonWebKey implements Serializable
     }
 
     public abstract String getKeyType();
-    protected abstract void fillTypeSpecificParams(Map<String,Object> params, OutputControl outputLevel);
+    protected abstract void fillTypeSpecificParams(Map<String,Object> params, OutputControlLevel outputLevel);
 
     /**
      * @deprecated deprecated in favor {@link #getKey()} or {@link PublicJsonWebKey#getPublicKey()}
@@ -110,7 +110,7 @@ public abstract class JsonWebKey implements Serializable
         this.algorithm = algorithm;
     }
 
-    public Map<String, Object> toParams(OutputControl outputLevel)
+    public Map<String, Object> toParams(OutputControlLevel outputLevel)
     {
         Map<String, Object> params = new LinkedHashMap<String, Object>();
         params.put(KEY_TYPE_PARAMETER, getKeyType());
@@ -123,10 +123,10 @@ public abstract class JsonWebKey implements Serializable
 
     public String toJson()
     {
-        return toJson(OutputControl.INCLUDE_SYMMETRIC);
+        return toJson(OutputControlLevel.INCLUDE_SYMMETRIC);
     }
 
-    public String toJson(OutputControl outputLevel)
+    public String toJson(OutputControlLevel outputLevel)
     {
         Map<String, Object> params = toParams(outputLevel);
         return JsonUtil.toJson(params);
@@ -135,7 +135,7 @@ public abstract class JsonWebKey implements Serializable
     @Override
     public String toString()
     {
-        return getClass().getName() + toParams(OutputControl.PUBLIC_ONLY);
+        return getClass().getName() + toParams(OutputControlLevel.PUBLIC_ONLY);
     }
 
     protected void putIfNotNull(String name, String value, Map<String, Object> params)

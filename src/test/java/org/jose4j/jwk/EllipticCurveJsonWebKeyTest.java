@@ -21,7 +21,7 @@ import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.lang.JoseException;
 
-import static org.jose4j.jwk.JsonWebKey.OutputControl.*;
+import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.*;
 
 /**
  */
