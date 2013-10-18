@@ -2,6 +2,7 @@ package org.jose4j.jwe;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.Headers;
 import org.jose4j.lang.ByteUtil;
@@ -15,7 +16,7 @@ import java.security.Key;
 
 /**
  */
-public class WrappingKeyManagementAlgorithm extends AlgorithmInfo implements KeyManagementAlgorithm
+public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo implements KeyManagementAlgorithm
 {
     private final Log log = LogFactory.getLog(this.getClass());
 
@@ -44,7 +45,7 @@ public class WrappingKeyManagementAlgorithm extends AlgorithmInfo implements Key
         }
         catch (IllegalBlockSizeException | InvalidKeyException e)
         {
-            throw new JoseException("Unable to encrypt the Content Encryption Key", e);
+            throw new JoseException("Unable to encrypt the Content Encryption Key: " + e, e);
         }
     }
 

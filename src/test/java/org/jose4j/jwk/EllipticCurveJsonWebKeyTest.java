@@ -21,6 +21,8 @@ import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.lang.JoseException;
 
+import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.*;
+
 /**
  */
 public class EllipticCurveJsonWebKeyTest extends TestCase
@@ -52,8 +54,10 @@ public class EllipticCurveJsonWebKeyTest extends TestCase
         assertFalse(jwk.toJson().contains(d));
         assertEquals(jsonNoPrivateKey, jwk.toJson());
 
-        jwk.setWriteOutPrivateKeyToJson(true);
-        assertTrue(jwk.toJson().contains(d));
+        assertFalse(jwk.toJson(PUBLIC_ONLY).contains(d));
+        assertFalse(jwk.toJson().contains(d));
+        assertFalse(jwk.toJson(INCLUDE_SYMMETRIC).contains(d));
+        assertTrue(jwk.toJson(INCLUDE_PRIVATE).contains(d));
     }
 
     public void testParseExampleWithPrivate512() throws JoseException
@@ -86,7 +90,11 @@ public class EllipticCurveJsonWebKeyTest extends TestCase
         assertFalse(jwk.toJson().contains(d));
         assertEquals(jsonNoPrivateKey, jwk.toJson());
 
-        jwk.setWriteOutPrivateKeyToJson(true);
-        assertTrue(jwk.toJson().contains(d));
+        assertFalse(jwk.toJson(PUBLIC_ONLY).contains(d));
+        assertFalse(jwk.toJson().contains(d));
+        assertFalse(jwk.toJson(INCLUDE_SYMMETRIC).contains(d));
+        assertTrue(jwk.toJson(INCLUDE_PRIVATE).contains(d));
+
+        System.out.println(jwk);
     }
 }

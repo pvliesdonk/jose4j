@@ -6,8 +6,6 @@ import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 
-import java.security.Security;
-
 /**
  */
 public class Aes256GcmContentEncryptionAlgorithmTest extends TestCase

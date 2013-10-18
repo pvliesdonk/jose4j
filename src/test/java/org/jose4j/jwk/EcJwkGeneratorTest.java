@@ -20,6 +20,8 @@ import junit.framework.TestCase;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.lang.JoseException;
 
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 
 /**
@@ -32,8 +34,11 @@ public class EcJwkGeneratorTest extends TestCase
         {
             EllipticCurveJsonWebKey ecJwk = EcJwkGenerator.generateJwk(spec);
             assertNotNull(ecJwk.getKey());
+            assertTrue(ecJwk.getKey() instanceof ECPublicKey);
             assertNotNull(ecJwk.getPublicKey());
+            assertTrue(ecJwk.getPublicKey() instanceof ECPublicKey);
             assertNotNull(ecJwk.getPrivateKey());
+            assertTrue(ecJwk.getPrivateKey() instanceof ECPrivateKey);
         }
     }
 }

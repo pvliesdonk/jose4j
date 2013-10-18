@@ -20,34 +20,43 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jose4j.lang.JoseException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  */
 public class AlgorithmFactory<A extends Algorithm>
 {
+    private final Log log;
+
     private String parameterName;
 
-    private final Map<String,A> algorithms = new LinkedHashMap<String, A>();
+    private final Map<String,A> algorithms = new LinkedHashMap<>();
 
-    public AlgorithmFactory(String parameterName)
+    public AlgorithmFactory(String parameterName, Class<A> type)
     {
         this.parameterName = parameterName;
+        log = LogFactory.getLog(this.getClass() + "->" + type.getSimpleName());
     }
 
     public A getAlgorithm(String algorithmIdentifier) throws JoseException
     {
         A algo = algorithms.get(algorithmIdentifier);
-        
+
         if (algo == null)
         {
-            throw new JoseException(algorithmIdentifier + " is an unknown or unsupported "+parameterName+" algorithm (not one of " + getSupportedAlgorithms() + ").");
+            throw new JoseException(algorithmIdentifier + " is an unknown, unsupported or unavailable "+parameterName
+                    +" algorithm (not one of " + getSupportedAlgorithms() + ").");
         }
         
         return algo;
+    }
+
+    public boolean isAvailable(String algorithmIdentifier)
+    {
+        return algorithms.containsKey(algorithmIdentifier);
     }
 
     public Set<String> getSupportedAlgorithms()
@@ -57,7 +66,16 @@ public class AlgorithmFactory<A extends Algorithm>
 
     public void registerAlgorithm(A algorithm)
     {
-        algorithms.put(algorithm.getAlgorithmIdentifier(), algorithm);
+        String algId = algorithm.getAlgorithmIdentifier();
+        if (algorithm.isAvailable())
+        {
+            algorithms.put(algId, algorithm);
+            log.info(algorithm + " registered for " + parameterName + " algorithm " + algId);
+        }
+        else
+        {
+            log.info(algId + " is unavailable so will not be registered for " + parameterName + " algorithms.");
+        }
     }
 
     public void unregisterAlgorithm(String algorithmIdentifier)

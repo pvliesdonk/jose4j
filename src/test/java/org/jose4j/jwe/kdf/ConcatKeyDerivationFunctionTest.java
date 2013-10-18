@@ -18,7 +18,6 @@ package org.jose4j.jwe.kdf;
 
 import junit.framework.TestCase;
 
-
 import java.util.Arrays;
 
 /**

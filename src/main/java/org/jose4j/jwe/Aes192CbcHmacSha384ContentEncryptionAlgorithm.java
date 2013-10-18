@@ -16,8 +16,6 @@
 
 package org.jose4j.jwe;
 
-import org.jose4j.keys.AesKey;
-import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.mac.MacUtil;
 
 /**

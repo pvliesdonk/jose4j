@@ -1,5 +1,6 @@
 package org.jose4j.jwe;
 
+import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwe.kdf.KdfUtil;
 import org.jose4j.jwk.EcJwkGenerator;
@@ -8,6 +9,8 @@ import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
+import org.jose4j.jwx.KeyValidationSupport;
+import org.jose4j.keys.EcKeyUtil;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
@@ -16,6 +19,7 @@ import org.jose4j.lang.UncheckedJoseException;
 import javax.crypto.KeyAgreement;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 
 /**
@@ -107,5 +111,24 @@ public class EcdhKeyAgreementAlgorithm extends AlgorithmInfo implements KeyManag
         }
 
         return keyAgreement.generateSecret();
+    }
+
+    @Override
+    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    {
+        KeyValidationSupport.castKey(managementKey, ECPublicKey.class);
+    }
+
+    @Override
+    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    {
+        KeyValidationSupport.castKey(managementKey, ECPrivateKey.class);
+    }
+
+    @Override
+    public boolean isAvailable()
+    {
+        EcKeyUtil ecKeyUtil = new EcKeyUtil();
+        return ecKeyUtil.isAvailable() && AlgorithmAvailability.isAvailable("KeyAgreement", getJavaAlgorithm());
     }
 }

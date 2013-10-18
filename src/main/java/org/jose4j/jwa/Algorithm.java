@@ -26,4 +26,5 @@ public interface Algorithm
     String getAlgorithmIdentifier();
     KeyPersuasion getKeyPersuasion();
     String getKeyType();
+    boolean isAvailable();
 }

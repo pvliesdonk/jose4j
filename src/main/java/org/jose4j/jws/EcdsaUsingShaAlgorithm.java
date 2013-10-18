@@ -18,7 +18,6 @@ package org.jose4j.jws;
 
 
 import org.jose4j.jwk.EllipticCurveJsonWebKey;
-import org.jose4j.keys.EcKeyUtil;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.lang.JoseException;
 
@@ -26,6 +25,8 @@ import java.io.IOException;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.ECKey;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.EllipticCurve;
@@ -197,21 +198,27 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
 
     public void validatePrivateKey(PrivateKey privateKey) throws JoseException
     {
-        // todo
+        ECPrivateKey ecPrivateKey = (ECPrivateKey) privateKey;
+        validateKeySpec(ecPrivateKey);
     }
 
     public void validatePublicKey(PublicKey publicKey) throws JoseException
     {
         ECPublicKey ecPublicKey = (ECPublicKey) publicKey;
-        ECParameterSpec spec = ecPublicKey.getParams();
+        validateKeySpec(ecPublicKey);
+    }
+
+    private void validateKeySpec(ECKey ecKey) throws JoseException
+    {
+        ECParameterSpec spec = ecKey.getParams();
         EllipticCurve curve = spec.getCurve();
 
         String name = EllipticCurves.getName(curve);
 
-        if (!curveName.equals(name))
+        if (!getCurveName().equals(name))
         {
             throw new JoseException(getAlgorithmIdentifier() + "/" + getJavaAlgorithm() + " expects a key using " +
-                    curveName + " but was " + name);
+                    getCurveName() + " but was " + name);
         }
     }
 

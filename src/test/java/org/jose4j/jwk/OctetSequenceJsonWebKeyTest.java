@@ -22,6 +22,10 @@ import org.jose4j.lang.ByteUtil;
 
 import java.util.Arrays;
 
+import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE;
+import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.INCLUDE_SYMMETRIC;
+import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.PUBLIC_ONLY;
+
 /**
  */
 public class OctetSequenceJsonWebKeyTest extends TestCase
@@ -47,5 +51,8 @@ public class OctetSequenceJsonWebKeyTest extends TestCase
 
         assertEquals(OctetSequenceJsonWebKey.KEY_TYPE, jwk.getKeyType());
         assertTrue(jwk.toJson().contains(base64UrlKey));
+        assertTrue(jwk.toJson(INCLUDE_PRIVATE).contains(base64UrlKey));
+        assertTrue(jwk.toJson(INCLUDE_SYMMETRIC).contains(base64UrlKey));
+        assertFalse(jwk.toJson(PUBLIC_ONLY).contains(base64UrlKey));
     }
 }

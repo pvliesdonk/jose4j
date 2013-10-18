@@ -17,6 +17,7 @@
 package org.jose4j.jws;
 
 import junit.framework.TestCase;
+import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.keys.HmacKey;
@@ -34,7 +35,7 @@ public class RsaUsingShaTest extends TestCase
     public void testRoundTrips() throws JoseException
     {
         RsaKeyUtil keyUtil = new RsaKeyUtil();
-        KeyPair pair = keyUtil.generateKeyPair(RsaUsingShaAlgorithm.MIN_RSA_KEY_LENGTH);
+        KeyPair pair = keyUtil.generateKeyPair(KeyValidationSupport.MIN_RSA_KEY_LENGTH);
 
         PrivateKey priv1 = pair.getPrivate();
         PublicKey pub1 = pair.getPublic();

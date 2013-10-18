@@ -18,6 +18,9 @@ package org.jose4j.jwk;
 
 import junit.framework.TestCase;
 
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+
 /**
  */
 public class RsaJwkGeneratorTest extends TestCase
@@ -26,7 +29,10 @@ public class RsaJwkGeneratorTest extends TestCase
     {
         RsaJsonWebKey rsaJsonWebKey = RsaJwkGenerator.generateJwk(2048);
         assertNotNull(rsaJsonWebKey.getPrivateKey());
+        assertTrue(rsaJsonWebKey.getKey() instanceof RSAPublicKey);
         assertNotNull(rsaJsonWebKey.getPublicKey());
-        assertNotNull(rsaJsonWebKey.getKey());
+        assertTrue(rsaJsonWebKey.getPublicKey() instanceof RSAPublicKey);
+        assertNotNull(rsaJsonWebKey.getPrivateKey());
+        assertTrue(rsaJsonWebKey.getPrivateKey() instanceof RSAPrivateKey);
     }
 }

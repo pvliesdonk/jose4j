@@ -1,3 +1,19 @@
+/*
+ * Copyright 2012-2013 Brian Campbell
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
@@ -18,21 +34,22 @@ import javax.crypto.spec.IvParameterSpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 
 /**
  */
 public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo implements ContentEncryptionAlgorithm
 {
-    private String hmacJavaAlgorithm;
-    private int tagTruncationLength;
-    private ContentEncryptionKeyDescriptor contentEncryptionKeyDescriptor;
+    private final String hmacJavaAlgorithm;
+    private final int tagTruncationLength;
+    private final ContentEncryptionKeyDescriptor contentEncryptionKeyDescriptor;
 
     public AesCbcHmacSha2ContentEncryptionAlgorithm(String alg, int cekByteLen, String javaHmacAlg, int tagTruncationLength)
     {
         setAlgorithmIdentifier(alg);
-        setContentEncryptionKeyByteLength(cekByteLen);
-        setHmacJavaAlgorithm(javaHmacAlg);
-        setTagTruncationLength(tagTruncationLength);
+        contentEncryptionKeyDescriptor = new ContentEncryptionKeyDescriptor(cekByteLen, AesKey.ALGORITHM);
+        this.hmacJavaAlgorithm = javaHmacAlg;
+        this.tagTruncationLength = tagTruncationLength;
         setJavaAlgorithm("AES/CBC/PKCS5Padding");
         setKeyPersuasion(KeyPersuasion.SYMMETRIC);
         setKeyType(AesKey.ALGORITHM);
@@ -43,29 +60,14 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         return hmacJavaAlgorithm;
     }
 
-    void setHmacJavaAlgorithm(String hmacJavaAlgorithm)
-    {
-        this.hmacJavaAlgorithm = hmacJavaAlgorithm;
-    }
-
     public int getTagTruncationLength()
     {
         return tagTruncationLength;
     }
 
-    void setTagTruncationLength(int tagTruncationLength)
-    {
-        this.tagTruncationLength = tagTruncationLength;
-    }
-
     public ContentEncryptionKeyDescriptor getContentEncryptionKeyDescriptor()
     {
         return contentEncryptionKeyDescriptor;
-    }
-
-    void setContentEncryptionKeyByteLength(int cekByteLenght)
-    {
-        this.contentEncryptionKeyDescriptor = new ContentEncryptionKeyDescriptor(cekByteLenght, AesKey.ALGORITHM);
     }
 
     public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers) throws JoseException
@@ -158,11 +160,7 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         {
             return cipher.doFinal(ciphertext);
         }
-        catch (IllegalBlockSizeException e)
-        {
-            throw new JoseException(e.toString(), e);
-        }
-        catch (BadPaddingException e)
+        catch (IllegalBlockSizeException | BadPaddingException e)
         {
             throw new JoseException(e.toString(), e);
         }
@@ -174,5 +172,13 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         //       as a 64-bit unsigned integer in network byte order.
         long aadLength = ByteUtil.bitLength(additionalAuthenticatedData);
         return ByteUtil.getBytes(aadLength);
+    }
+
+    @Override
+    public boolean isAvailable()
+    {
+        int contentEncryptionKeyByteLength = getContentEncryptionKeyDescriptor().getContentEncryptionKeyByteLength();
+        int aesByteKeyLength = contentEncryptionKeyByteLength / 2;
+        return CipherStrengthSupport.isAvailable(getJavaAlgorithm(), aesByteKeyLength);
     }
 }

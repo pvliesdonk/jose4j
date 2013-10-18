@@ -18,10 +18,8 @@ package org.jose4j.jwe;
 
 import junit.framework.TestCase;
 import org.jose4j.jwk.JsonWebKey;
-import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
-import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 
@@ -105,7 +103,7 @@ public class JsonWebEncryptionTest extends TestCase
         jweForEncrypt.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
         ContentEncryptionAlgorithm contentEncryptionAlgorithm = jweForEncrypt.getContentEncryptionAlgorithm();
         ContentEncryptionKeyDescriptor cekDesc = contentEncryptionAlgorithm.getContentEncryptionKeyDescriptor();
-        byte[] cekBytes = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength() * 2);
+        byte[] cekBytes = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength());
         Key key = new SecretKeySpec(cekBytes, cekDesc.getContentEncryptionKeyAlgorithm());
         jweForEncrypt.setKey(key);
 

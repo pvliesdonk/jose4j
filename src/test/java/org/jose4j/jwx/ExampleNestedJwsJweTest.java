@@ -1,7 +1,6 @@
 package org.jose4j.jwx;
 
 import junit.framework.TestCase;
-import org.jose4j.json.JsonHeaderUtil;
 import org.jose4j.json.JsonUtil;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jws.JsonWebSignature;

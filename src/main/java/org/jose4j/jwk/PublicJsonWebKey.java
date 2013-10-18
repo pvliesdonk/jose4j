@@ -27,7 +27,6 @@ import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -76,7 +75,7 @@ public abstract class PublicJsonWebKey extends JsonWebKey
     protected abstract void fillPublicTypeSpecificParams(Map<String,Object> params);
     protected abstract void fillPrivateTypeSpecificParams(Map<String,Object> params);
 
-    protected void fillTypeSpecificParams(Map<String,Object> params)
+    protected void fillTypeSpecificParams(Map<String,Object> params, OutputControlLevel outputLevel)
     {
         fillPublicTypeSpecificParams(params);
 
@@ -94,7 +93,7 @@ public abstract class PublicJsonWebKey extends JsonWebKey
             params.put(X509_CERTIFICATE_CHAIN_PARAMETER, x5cStrings);
         }
 
-        if (writeOutPrivateKeyToJson)
+        if (writeOutPrivateKeyToJson || outputLevel == OutputControlLevel.INCLUDE_PRIVATE)
         {
             fillPrivateTypeSpecificParams(params);
         }
@@ -105,6 +104,9 @@ public abstract class PublicJsonWebKey extends JsonWebKey
         return (PublicKey) key;
     }
 
+    /**
+     * @deprecated as of 0.3.2 use {@link #toJson(org.jose4j.jwk.JsonWebKey.OutputControlLevel)}
+     */
     public void setWriteOutPrivateKeyToJson(boolean writeOutPrivateKeyToJson)
     {
         this.writeOutPrivateKeyToJson = writeOutPrivateKeyToJson;

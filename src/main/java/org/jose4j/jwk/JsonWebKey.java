@@ -16,8 +16,8 @@
 
 package org.jose4j.jwk;
 
-import org.jose4j.lang.JoseException;
 import org.jose4j.json.JsonUtil;
+import org.jose4j.lang.JoseException;
 import org.jose4j.lang.JsonHelp;
 
 import java.io.Serializable;
@@ -32,6 +32,8 @@ import java.util.Map;
  */
 public abstract class JsonWebKey implements Serializable
 {
+    public enum OutputControlLevel {INCLUDE_PRIVATE, INCLUDE_SYMMETRIC, PUBLIC_ONLY}
+
     public static final String KEY_TYPE_PARAMETER = "kty";
     public static final String USE_PARAMETER = "use";
     public static final String KEY_ID_PARAMETER = "kid";
@@ -56,10 +58,10 @@ public abstract class JsonWebKey implements Serializable
     }
 
     public abstract String getKeyType();
-    protected abstract void fillTypeSpecificParams(Map<String,Object> params);
+    protected abstract void fillTypeSpecificParams(Map<String,Object> params, OutputControlLevel outputLevel);
 
     /**
-     * @deprecated deprecated in favor of getKey() or getPublicKey() on PublicJsonWebKey
+     * @deprecated deprecated in favor {@link #getKey()} or {@link PublicJsonWebKey#getPublicKey()}
      */
     public PublicKey getPublicKey()
     {
@@ -108,27 +110,32 @@ public abstract class JsonWebKey implements Serializable
         this.algorithm = algorithm;
     }
 
-    public Map<String, Object> toParams()
+    public Map<String, Object> toParams(OutputControlLevel outputLevel)
     {
         Map<String, Object> params = new LinkedHashMap<String, Object>();
         params.put(KEY_TYPE_PARAMETER, getKeyType());
         putIfNotNull(KEY_ID_PARAMETER, getKeyId(), params);
         putIfNotNull(USE_PARAMETER, getUse(), params);
         putIfNotNull(ALGORITHM_PARAMETER, getAlgorithm(), params);
-        fillTypeSpecificParams(params);
+        fillTypeSpecificParams(params, outputLevel);
         return params;
     }
 
     public String toJson()
     {
-        Map<String, Object> params = toParams();
+        return toJson(OutputControlLevel.INCLUDE_SYMMETRIC);
+    }
+
+    public String toJson(OutputControlLevel outputLevel)
+    {
+        Map<String, Object> params = toParams(outputLevel);
         return JsonUtil.toJson(params);
     }
 
     @Override
     public String toString()
     {
-        return getClass().getName() + toParams();
+        return getClass().getName() + toParams(OutputControlLevel.PUBLIC_ONLY);
     }
 
     protected void putIfNotNull(String name, String value, Map<String, Object> params)

@@ -16,6 +16,7 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.JoseException;
@@ -112,13 +113,15 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
 
     public void validateSigningKey(Key key) throws JoseException
     {
+        checkForNullKey(key);
+
         try
         {
             validatePrivateKey((PrivateKey)key);
         }
         catch (ClassCastException e)
         {
-            throw new JoseException(getBadKeyMessage(key) + "(not a private key or is the wrong type of key) for " + getJavaAlgorithm() + "/" + getAlgorithmIdentifier() + " " +  e);
+            throw new JoseException(getBadKeyMessage(key) + "(not a private key or is the wrong type of key) for " + getJavaAlgorithm() + " / " + getAlgorithmIdentifier() + " " +  e);
         }
     }
 
@@ -144,5 +147,11 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
         {
             throw new JoseException("Key cannot be null");
         }
+    }
+
+    @Override
+    public boolean isAvailable()
+    {
+        return AlgorithmAvailability.isAvailable("Signature", getJavaAlgorithm());
     }
 }

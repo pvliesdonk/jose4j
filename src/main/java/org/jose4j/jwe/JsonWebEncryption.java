@@ -26,8 +26,6 @@ import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 import org.jose4j.zip.CompressionAlgorithm;
-import org.jose4j.zip.CompressionAlgorithmIdentifiers;
-import org.jose4j.zip.DeflateRFC1951CompressionAlgorithm;
 
 import java.security.Key;
 
@@ -103,7 +101,7 @@ public class JsonWebEncryption extends JsonWebStructure
             throw new JoseException(HeaderParameterNames.ALGORITHM + " header not set.");
         }
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
-        AlgorithmFactory<KeyManagementAlgorithm> factory = factoryFactory.getKeyManagementAlgorithmFactory();
+        AlgorithmFactory<KeyManagementAlgorithm> factory = factoryFactory.getJweKeyManagementAlgorithmFactory();
         return factory.getAlgorithm(algo);
     }
 
@@ -128,6 +126,11 @@ public class JsonWebEncryption extends JsonWebStructure
         ContentEncryptionAlgorithm contentEncryptionAlg = getContentEncryptionAlgorithm();
 
         ContentEncryptionKeyDescriptor contentEncryptionKeyDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
+
+        if (isDoKeyValidation())
+        {
+            keyManagementModeAlg.validateDecryptionKey(getKey(), contentEncryptionAlg);
+        }
 
         Key cek = keyManagementModeAlg.manageForDecrypt(getKey(), encryptedKey, contentEncryptionKeyDesc, getHeaders());
 
@@ -179,6 +182,11 @@ public class JsonWebEncryption extends JsonWebStructure
 
         ContentEncryptionKeyDescriptor contentEncryptionKeyDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
         Key managementKey = getKey();
+        if (isDoKeyValidation())
+        {
+            keyManagementModeAlg.validateEncryptionKey(getKey(), contentEncryptionAlg);
+        }
+
         ContentEncryptionKeys contentEncryptionKeys = keyManagementModeAlg.manageForEncrypt(managementKey, contentEncryptionKeyDesc, getHeaders());
 
         byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();

@@ -36,8 +36,6 @@ public class JsonWebSignature extends JsonWebStructure
     private String payload;
     private String payloadCharEncoding = StringUtil.UTF_8;
 
-    private boolean doKeyValidation = true;
-
     public void setPayload(String payload)
     {
         this.payload = payload;
@@ -68,7 +66,7 @@ public class JsonWebSignature extends JsonWebStructure
     {
         JsonWebSignatureAlgorithm algorithm = getAlgorithm();
         Key signingKey = getKey();
-        if (doKeyValidation)
+        if (isDoKeyValidation())
         {
             algorithm.validateSigningKey(signingKey);
         }
@@ -81,7 +79,7 @@ public class JsonWebSignature extends JsonWebStructure
     {
         JsonWebSignatureAlgorithm algorithm = getAlgorithm();
         Key verificationKey = getKey();
-        if (doKeyValidation)
+        if (isDoKeyValidation())
         {
             algorithm.validateVerificationKey(verificationKey);
         }
@@ -137,16 +135,6 @@ public class JsonWebSignature extends JsonWebStructure
     public KeyPersuasion getKeyPersuasion() throws JoseException
     {
         return getAlgorithm().getKeyPersuasion();
-    }
-
-    public boolean isDoKeyValidation()
-    {
-        return doKeyValidation;
-    }
-
-    public void setDoKeyValidation(boolean doKeyValidation)
-    {
-        this.doKeyValidation = doKeyValidation;
     }
 
     private String getEncodedPayload()

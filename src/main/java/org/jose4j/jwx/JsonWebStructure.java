@@ -33,8 +33,18 @@ public abstract class JsonWebStructure
 
     private Key key;
 
+    protected boolean doKeyValidation = true;
+
     abstract public String getCompactSerialization() throws JoseException;
     abstract public void setCompactSerialization(String cs) throws JoseException;
+
+    /**
+     * @deprecated replaced by {@link #getHeaders()} and {@link org.jose4j.jwx.Headers#getFullHeaderAsJsonString()}
+     */
+    public String getHeader()
+    {
+        return getHeaders().getFullHeaderAsJsonString();
+    }
 
     protected String getEncodedHeader()
     {
@@ -109,4 +119,16 @@ public abstract class JsonWebStructure
     {
         this.integrity = integrity;
     }
+
+    public boolean isDoKeyValidation()
+    {
+        return doKeyValidation;
+    }
+
+    public void setDoKeyValidation(boolean doKeyValidation)
+    {
+        this.doKeyValidation = doKeyValidation;
+    }
+
+    // todo consider make this base class more useful/consistent to client code that might want to to treat JWS and JWE similarly
 }
