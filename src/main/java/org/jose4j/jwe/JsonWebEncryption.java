@@ -33,6 +33,9 @@ import java.security.Key;
  */
 public class JsonWebEncryption extends JsonWebStructure
 {
+	
+	public static final short COMPACT_SERIALIZATION_PARTS = 5;
+	
     private Base64Url base64url = new Base64Url();
     
     private String plaintextCharEncoding = StringUtil.UTF_8;
@@ -107,7 +110,12 @@ public class JsonWebEncryption extends JsonWebStructure
 
     public void setCompactSerialization(String compactSerialization) throws JoseException
     {
-        String[] parts = CompactSerializer.deserialize(compactSerialization);
+    	String[] parts = CompactSerializer.deserialize(compactSerialization);
+        if (parts.length != COMPACT_SERIALIZATION_PARTS)
+        {
+            throw new JoseException("A JWE Compact Serialization must have exactly " + COMPACT_SERIALIZATION_PARTS + " parts separated by period ('.') characters");
+        }
+
         setEncodedHeader(parts[0]);
         encryptedKey = base64url.base64UrlDecode(parts[1]);
         iv = base64url.base64UrlDecode(parts[2]);

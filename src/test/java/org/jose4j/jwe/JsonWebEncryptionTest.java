@@ -115,5 +115,28 @@ public class JsonWebEncryptionTest extends TestCase
 
         assertEquals(plaintext, jweForDecrypt.getPlaintextString());
     }
+    
+    public void testAcceptingCompactSerializationWithMalformedJWE() throws JoseException
+    {
+        // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#appendix-A.3
+        String damaged_version_of_jweCsFromAppdxA3 = "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." +
+                "6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ." +
+                "AxY8DCtDaGlsbGljb3RoZQ." +
+                "KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY";
+                
+
+        JsonWebEncryption jwe = new JsonWebEncryption();
+        
+        JoseException joseEx = null;
+        
+        try {
+        	jwe.setCompactSerialization(damaged_version_of_jweCsFromAppdxA3);	// This is when Junit 4 would be handy.
+        } catch (JoseException e) {
+        	joseEx = e;
+        }
+
+        assertNotNull(joseEx);        
+    }
+    
 
 }
