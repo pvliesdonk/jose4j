@@ -130,4 +130,15 @@ public class JsonWebKeySetTest extends TestCase
         JsonWebKeySet jsonWebKeySet = new JsonWebKeySet(ecjwks);
         assertEquals(2, jsonWebKeySet.getJsonWebKeys().size());
     }
+
+    public void testOctAndDefaultToJson() throws JoseException
+    {
+        JsonWebKeySet jwks = new JsonWebKeySet(OctJwkGenerator.generateJwk(128), OctJwkGenerator.generateJwk(128));
+        String json = jwks.toJson();
+        assertTrue(json.contains("\"k\""));
+
+        JsonWebKeySet newJwks = new JsonWebKeySet(json);
+        assertEquals(jwks.getJsonWebKeys().size(), newJwks.getJsonWebKeys().size());
+    }
+
 }
