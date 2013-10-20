@@ -69,6 +69,19 @@ public class CompactSerializerTest extends TestCase
         assertEquals(i, parts.length);
     }
 
+    public void testDeserialize5() throws JoseException
+    {
+        String cs = "one..three.four.five";
+        String[] parts = CompactSerializer.deserialize(cs);
+        int i = 0;
+        assertEquals("one", parts[i++]);
+        assertEquals("", parts[i++]);
+        assertEquals("three", parts[i++]);
+        assertEquals("four", parts[i++]);
+        assertEquals("five", parts[i++]);
+        assertEquals(i, parts.length);
+    }
+
     public void testSerialize1() throws JoseException
     {
         String cs = CompactSerializer.serialize("one", "two", "three");
@@ -91,5 +104,17 @@ public class CompactSerializerTest extends TestCase
     {
         String cs = CompactSerializer.serialize("one", "two", "three", "");
         assertEquals("one.two.three.", cs);
+    }
+
+    public void testSerialize5() throws JoseException
+    {
+        String cs = CompactSerializer.serialize("one", null, "three", "four", "five");
+        assertEquals("one..three.four.five", cs);
+    }
+
+    public void testSerialize6() throws JoseException
+    {
+        String cs = CompactSerializer.serialize("one", "", "three", "four", "five");
+        assertEquals("one..three.four.five", cs);
     }
 }
