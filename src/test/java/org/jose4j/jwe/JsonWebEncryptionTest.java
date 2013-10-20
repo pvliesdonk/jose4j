@@ -118,7 +118,7 @@ public class JsonWebEncryptionTest extends TestCase
     
     public void testAcceptingCompactSerializationWithMalformedJWE() throws JoseException
     {
-        // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#appendix-A.3
+        // modified to have only 4 parts from http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#appendix-A.3.11
         String damaged_version_of_jweCsFromAppdxA3 = "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." +
                 "6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ." +
                 "AxY8DCtDaGlsbGljb3RoZQ." +
