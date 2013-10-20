@@ -46,7 +46,7 @@ public class JsonWebSignature extends JsonWebStructure
         String[] parts = CompactSerializer.deserialize(compactSerialization);
         if (parts.length != COMPACT_SERIALIZATION_PARTS)
         {
-            throw new JoseException("A JWS Compact Serialization must have exactly 3 parts separated by period ('.') characters");
+            throw new JoseException("A JWS Compact Serialization must have exactly "+COMPACT_SERIALIZATION_PARTS+" parts separated by period ('.') characters");
         }
 
         setEncodedHeader(parts[0]);
