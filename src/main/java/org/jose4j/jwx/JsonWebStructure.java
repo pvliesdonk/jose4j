@@ -38,6 +38,9 @@ public abstract class JsonWebStructure
     abstract public String getCompactSerialization() throws JoseException;
     abstract public void setCompactSerialization(String cs) throws JoseException;
 
+    abstract public String getPayload() throws JoseException;
+    abstract public void setPayload(String payload);
+
     /**
      * @deprecated replaced by {@link #getHeaders()} and {@link org.jose4j.jwx.Headers#getFullHeaderAsJsonString()}
      */
