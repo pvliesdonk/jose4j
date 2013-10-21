@@ -36,6 +36,8 @@ public class JsonWebSignature extends JsonWebStructure
     private String payload;
     private String payloadCharEncoding = StringUtil.UTF_8;
 
+    private Boolean validSignature;
+
     public void setPayload(String payload)
     {
         this.payload = payload;
@@ -77,15 +79,20 @@ public class JsonWebSignature extends JsonWebStructure
 
     public boolean verifySignature() throws JoseException
     {
-        JsonWebSignatureAlgorithm algorithm = getAlgorithm();
-        Key verificationKey = getKey();
-        if (isDoKeyValidation())
+        if (validSignature == null)
         {
-            algorithm.validateVerificationKey(verificationKey);
+            JsonWebSignatureAlgorithm algorithm = getAlgorithm();
+            Key verificationKey = getKey();
+            if (isDoKeyValidation())
+            {
+                algorithm.validateVerificationKey(verificationKey);
+            }
+            byte[] signatureBytes = getSignature();
+            byte[] inputBytes = getSigningInputBytes();
+            validSignature = algorithm.verifySignature(signatureBytes, verificationKey, inputBytes);
         }
-        byte[] signatureBytes = getSignature();
-        byte[] inputBytes = getSigningInputBytes();
-        return algorithm.verifySignature(signatureBytes, verificationKey, inputBytes);
+
+        return validSignature;
     }
 
     public JsonWebSignatureAlgorithm getAlgorithm() throws JoseException
@@ -112,7 +119,16 @@ public class JsonWebSignature extends JsonWebStructure
         return CompactSerializer.serialize(getEncodedHeader(), getEncodedPayload());
     }
 
-    public String getPayload()
+    public String getPayload() throws JoseException
+    {
+        if (!verifySignature())
+        {
+            throw new JoseException("JWS signature is invalid.");
+        }
+        return payload;
+    }
+
+    public String getUnverifiedPayload()
     {
         return payload;
     }
@@ -139,7 +155,7 @@ public class JsonWebSignature extends JsonWebStructure
 
     private String getEncodedPayload()
     {
-        return base64url.base64UrlEncode(payload, payloadCharEncoding);
+        return base64url.base64UrlEncode(payload, getPayloadCharEncoding());
     }
 
     private String getEncodedSignature()

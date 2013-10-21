@@ -71,8 +71,8 @@ public class JwsTestSupport
         jws.setKey(verificationKey2);
         Assert.assertFalse(jws.verifySignature());
 
-        Assert.assertEquals(payload, jwsWithKey1.getPayload());
-        Assert.assertEquals(payload, jwsWithKey2.getPayload());
+        Assert.assertEquals(payload, jwsWithKey1.getUnverifiedPayload());
+        Assert.assertEquals(payload, jwsWithKey2.getUnverifiedPayload());
     }
 
     static void validateBasicStructure(String compactSerialization) throws JoseException
