@@ -120,9 +120,8 @@ public class JsonWebEncryption extends JsonWebStructure
         return factory.getAlgorithm(algo);
     }
 
-    public void setCompactSerialization(String compactSerialization) throws JoseException
+    protected void setCompactSerializationParts(String[] parts) throws JoseException
     {
-    	String[] parts = CompactSerializer.deserialize(compactSerialization);
         if (parts.length != COMPACT_SERIALIZATION_PARTS)
         {
             throw new JoseException("A JWE Compact Serialization must have exactly " + COMPACT_SERIALIZATION_PARTS + " parts separated by period ('.') characters");

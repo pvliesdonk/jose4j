@@ -44,9 +44,8 @@ public class JsonWebSignature extends JsonWebStructure
         this.payload = payload;
     }
 
-    public void setCompactSerialization(String compactSerialization) throws JoseException
+    protected void setCompactSerializationParts(String[] parts) throws JoseException
     {
-        String[] parts = CompactSerializer.deserialize(compactSerialization);
         if (parts.length != COMPACT_SERIALIZATION_PARTS)
         {
             throw new JoseException("A JWS Compact Serialization must have exactly "+COMPACT_SERIALIZATION_PARTS+" parts separated by period ('.') characters");
@@ -58,6 +57,7 @@ public class JsonWebSignature extends JsonWebStructure
         setPayload(base64url.base64UrlDecodeToString(encodedPayload, payloadCharEncoding));
         setSignature(base64url.base64UrlDecode(parts[2]));
     }
+
 
     public String getCompactSerialization() throws JoseException
     {

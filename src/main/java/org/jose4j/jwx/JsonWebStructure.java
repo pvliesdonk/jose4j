@@ -38,7 +38,7 @@ public abstract class JsonWebStructure
     protected boolean doKeyValidation = true;
 
     abstract public String getCompactSerialization() throws JoseException;
-    abstract public void setCompactSerialization(String cs) throws JoseException;
+    abstract protected void setCompactSerializationParts(String[] parts) throws JoseException;
 
     abstract public String getPayload() throws JoseException;
     abstract public void setPayload(String payload);
@@ -63,8 +63,14 @@ public abstract class JsonWebStructure
                     + " parts for JWS or JWE respectively but was " + parts.length + ".");
         }
 
-        jsonWebObject.setCompactSerialization(cs);
+        jsonWebObject.setCompactSerializationParts(parts);
         return jsonWebObject;
+    }
+
+    public void setCompactSerialization(String compactSerialization) throws JoseException
+    {
+    	String[] parts = CompactSerializer.deserialize(compactSerialization);
+        setCompactSerializationParts(parts);
     }
 
     /**
