@@ -17,16 +17,22 @@
 package org.jose4j.jwk;
 
 import junit.framework.TestCase;
+
+import org.hamcrest.core.Is;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.lang.JoseException;
+import org.junit.Test;
 
+import static org.junit.Assert.*;
 import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.*;
+import static org.hamcrest.CoreMatchers.*;
 
 /**
  */
-public class EllipticCurveJsonWebKeyTest extends TestCase
+public class EllipticCurveJsonWebKeyTest
 {
+	@Test
     public void testParseExampleWithPrivate256() throws JoseException
     {
         // key from http://tools.ietf.org/html/draft-ietf-jose-json-web-signature-13#appendix-A.3.1
@@ -44,6 +50,7 @@ public class EllipticCurveJsonWebKeyTest extends TestCase
         assertEquals(EllipticCurves.P_256, ((EllipticCurveJsonWebKey)jwk).getCurveName());
     }
 
+	@Test
     public void testFromKeyWithPrivate256() throws JoseException
     {
         PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(ExampleEcKeysFromJws.PUBLIC_256);
@@ -60,6 +67,7 @@ public class EllipticCurveJsonWebKeyTest extends TestCase
         assertTrue(jwk.toJson(INCLUDE_PRIVATE).contains(d));
     }
 
+	@Test
     public void testParseExampleWithPrivate512() throws JoseException
     {
         // this key also from http://tools.ietf.org/html/draft-ietf-jose-json-web-signature-13#appendix-A.3.1
@@ -80,6 +88,7 @@ public class EllipticCurveJsonWebKeyTest extends TestCase
         assertEquals(EllipticCurves.P_521, ((EllipticCurveJsonWebKey)jwk).getCurveName());
     }
 
+	@Test
     public void testFromKeyWithPrivate512() throws JoseException
     {
         PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(ExampleEcKeysFromJws.PUBLIC_521);
@@ -97,4 +106,13 @@ public class EllipticCurveJsonWebKeyTest extends TestCase
 
         System.out.println(jwk);
     }
+	
+	@Test
+	public void testToJsonWithPublicKeyOnlyJWKAndIncludePrivateSettings() throws JoseException {
+		  	PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(ExampleEcKeysFromJws.PUBLIC_521);
+	        String jsonNoPrivateKey = jwk.toJson(PUBLIC_ONLY);
+	        PublicJsonWebKey publicOnlyJWK = PublicJsonWebKey.Factory.newPublicJwk(jsonNoPrivateKey);
+	        assertThat(jsonNoPrivateKey,is(equalTo(publicOnlyJWK.toJson(INCLUDE_PRIVATE))));
+	}
+	
 }

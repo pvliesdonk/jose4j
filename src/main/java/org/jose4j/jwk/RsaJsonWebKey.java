@@ -113,16 +113,20 @@ public class RsaJsonWebKey extends PublicJsonWebKey
     protected void fillPrivateTypeSpecificParams(Map<String,Object> params)
     {
         RSAPrivateKey rsaPrivateKey = getRsaPrivateKey();
-        putBigIntAsBase64UrlEncodedParam(params, PRIVATE_EXPONENT_MEMBER_NAME, rsaPrivateKey.getPrivateExponent());
-
-        if (rsaPrivateKey instanceof RSAPrivateCrtKey)
+        
+        if (rsaPrivateKey != null) 
         {
-            RSAPrivateCrtKey crt = (RSAPrivateCrtKey) rsaPrivateKey;
-            putBigIntAsBase64UrlEncodedParam(params, FIRST_PRIME_FACTOR_MEMBER_NAME, crt.getPrimeP());
-            putBigIntAsBase64UrlEncodedParam(params, SECOND_PRIME_FACTOR_MEMBER_NAME, crt.getPrimeQ());
-            putBigIntAsBase64UrlEncodedParam(params, FIRST_FACTOR_CRT_EXPONENT_MEMBER_NAME, crt.getPrimeExponentP());
-            putBigIntAsBase64UrlEncodedParam(params, SECOND_FACTOR_CRT_EXPONENT_MEMBER_NAME, crt.getPrimeExponentQ());
-            putBigIntAsBase64UrlEncodedParam(params, FIRST_CRT_COEFFICIENT_MEMBER_NAME, crt.getCrtCoefficient());
+            putBigIntAsBase64UrlEncodedParam(params, PRIVATE_EXPONENT_MEMBER_NAME, rsaPrivateKey.getPrivateExponent());
+
+	        if (rsaPrivateKey instanceof RSAPrivateCrtKey)
+	        {
+	            RSAPrivateCrtKey crt = (RSAPrivateCrtKey) rsaPrivateKey;
+	            putBigIntAsBase64UrlEncodedParam(params, FIRST_PRIME_FACTOR_MEMBER_NAME, crt.getPrimeP());
+	            putBigIntAsBase64UrlEncodedParam(params, SECOND_PRIME_FACTOR_MEMBER_NAME, crt.getPrimeQ());
+	            putBigIntAsBase64UrlEncodedParam(params, FIRST_FACTOR_CRT_EXPONENT_MEMBER_NAME, crt.getPrimeExponentP());
+	            putBigIntAsBase64UrlEncodedParam(params, SECOND_FACTOR_CRT_EXPONENT_MEMBER_NAME, crt.getPrimeExponentQ());
+	            putBigIntAsBase64UrlEncodedParam(params, FIRST_CRT_COEFFICIENT_MEMBER_NAME, crt.getCrtCoefficient());
+	        }
         }
     }
 }

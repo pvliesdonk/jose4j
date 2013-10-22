@@ -17,14 +17,22 @@
 package org.jose4j.jwk;
 
 import junit.framework.TestCase;
+
+import org.jose4j.keys.EllipticCurves;
+import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.JoseException;
+import org.junit.Test;
 
 import java.security.interfaces.RSAPrivateCrtKey;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE;
 import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.INCLUDE_SYMMETRIC;
 import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.PUBLIC_ONLY;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  */
@@ -143,5 +151,13 @@ public class RsaJsonWebKeyTest extends TestCase
         assertTrue(jwkAgain.getPrivateKey() instanceof RSAPrivateCrtKey);
         assertEquals(jwk.getPrivateKey(), jwkAgain.getPrivateKey());
     }
+    
+	@Test
+	public void testToJsonWithPublicKeyOnlyJWKAndIncludePrivateSettings() throws JoseException {
+			PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(ExampleRsaKeyFromJws.PUBLIC_KEY);
+	        String jsonNoPrivateKey = jwk.toJson(PUBLIC_ONLY);
+	        PublicJsonWebKey publicOnlyJWK = PublicJsonWebKey.Factory.newPublicJwk(jsonNoPrivateKey);
+	        assertThat(jsonNoPrivateKey,is(equalTo(publicOnlyJWK.toJson(INCLUDE_PRIVATE))));
+	}
 
 }
