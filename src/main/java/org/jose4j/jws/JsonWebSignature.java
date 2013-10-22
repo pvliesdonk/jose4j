@@ -22,6 +22,7 @@ import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.keys.KeyPersuasion;
+import org.jose4j.lang.IntegrityException;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 
@@ -123,7 +124,7 @@ public class JsonWebSignature extends JsonWebStructure
     {
         if (!verifySignature())
         {
-            throw new JoseException("JWS signature is invalid.");
+            throw new IntegrityException("JWS signature is invalid.");
         }
         return payload;
     }

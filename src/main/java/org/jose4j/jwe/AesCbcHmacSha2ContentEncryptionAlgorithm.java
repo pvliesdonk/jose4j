@@ -23,6 +23,7 @@ import org.jose4j.keys.AesKey;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.IntegrityException;
 import org.jose4j.lang.JoseException;
 import org.jose4j.mac.MacUtil;
 
@@ -119,7 +120,6 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         return new ContentEncryptionParts(iv, cipherText, authenticationTag);
     }
 
-
     public byte[] decrypt(ContentEncryptionParts contentEncryptionParts, byte[] aad, byte[] contentEncryptionKey, Headers headers) throws JoseException
     {
         byte[] iv = contentEncryptionParts.getIv();
@@ -137,7 +137,7 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
             Base64Url base64Url = new Base64Url();
             String encTag = base64Url.base64UrlEncode(authenticationTag);
             String calcEncTag = base64Url.base64UrlEncode(calculatedAuthenticationTag);
-            throw new JoseException("Authentication tag failed. Message=" + encTag + " calculated=" + calcEncTag);
+            throw new IntegrityException("Authentication tag check failed. Message=" + encTag + " calculated=" + calcEncTag);
         }
 
         Key encryptionKey = new AesKey(ByteUtil.rightHalf(contentEncryptionKey));
