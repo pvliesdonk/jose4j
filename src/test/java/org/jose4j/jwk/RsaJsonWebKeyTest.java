@@ -16,10 +16,8 @@
 
 package org.jose4j.jwk;
 
-import junit.framework.TestCase;
 
-import org.jose4j.keys.EllipticCurves;
-import org.jose4j.keys.ExampleEcKeysFromJws;
+
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.JoseException;
 import org.junit.Test;
@@ -32,11 +30,13 @@ import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE;
 import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.INCLUDE_SYMMETRIC;
 import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.PUBLIC_ONLY;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 /**
  */
-public class RsaJsonWebKeyTest extends TestCase
+public class RsaJsonWebKeyTest
 {
     // key from http://tools.ietf.org/html/draft-ietf-jose-json-web-signature-13#appendix-A.3.1
     // it was shown as octets in -11 and before
@@ -57,6 +57,7 @@ public class RsaJsonWebKeyTest extends TestCase
             "      BOneufuBiB4cS98l2SR_RQyGWSeWjnczT0QU91p1DhOVRuOopznQ\"\n" +
             "}";
 
+    @Test
     public void testParseExampleWithPrivate() throws JoseException
     {
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(RSA_JWK_WITH_PRIVATE_KEY);
@@ -65,6 +66,7 @@ public class RsaJsonWebKeyTest extends TestCase
         assertEquals(ExampleRsaKeyFromJws.PUBLIC_KEY, pubJwk.getPublicKey());
     }
 
+    @Test
     public void testFromKeyWithPrivate() throws JoseException
     {
         PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(ExampleRsaKeyFromJws.PUBLIC_KEY);
@@ -77,6 +79,7 @@ public class RsaJsonWebKeyTest extends TestCase
         assertTrue(jwk.toJson(INCLUDE_PRIVATE).contains(dKey));
     }
 
+    @Test
     public void testFromKeyWithCrtPrivateAndBackAndAgain() throws JoseException
     {
         String json = "{\"kty\":\"RSA\",\n" +
@@ -153,11 +156,12 @@ public class RsaJsonWebKeyTest extends TestCase
     }
     
 	@Test
-	public void testToJsonWithPublicKeyOnlyJWKAndIncludePrivateSettings() throws JoseException {
-			PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(ExampleRsaKeyFromJws.PUBLIC_KEY);
-	        String jsonNoPrivateKey = jwk.toJson(PUBLIC_ONLY);
-	        PublicJsonWebKey publicOnlyJWK = PublicJsonWebKey.Factory.newPublicJwk(jsonNoPrivateKey);
-	        assertThat(jsonNoPrivateKey,is(equalTo(publicOnlyJWK.toJson(INCLUDE_PRIVATE))));
+	public void testToJsonWithPublicKeyOnlyJWKAndIncludePrivateSettings() throws JoseException
+    {
+        PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(ExampleRsaKeyFromJws.PUBLIC_KEY);
+        String jsonNoPrivateKey = jwk.toJson(PUBLIC_ONLY);
+        PublicJsonWebKey publicOnlyJWK = PublicJsonWebKey.Factory.newPublicJwk(jsonNoPrivateKey);
+        assertThat(jsonNoPrivateKey,is(equalTo(publicOnlyJWK.toJson(INCLUDE_PRIVATE))));
 	}
 
 }
