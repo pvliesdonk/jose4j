@@ -17,6 +17,8 @@
 package org.jose4j.jwx;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwe.JsonWebEncryption;
+import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
@@ -40,6 +42,30 @@ public abstract class JsonWebStructure
 
     abstract public String getPayload() throws JoseException;
     abstract public void setPayload(String payload);
+
+    public static JsonWebStructure fromCompactSerialization(String cs) throws JoseException
+    {
+        JsonWebStructure jsonWebObject;
+        String[] parts = CompactSerializer.deserialize(cs);
+        if (parts.length == JsonWebEncryption.COMPACT_SERIALIZATION_PARTS)
+        {
+            jsonWebObject = new JsonWebEncryption();
+        }
+        else if (parts.length == JsonWebSignature.COMPACT_SERIALIZATION_PARTS)
+        {
+            jsonWebObject = new JsonWebSignature();
+        }
+        else
+        {
+            throw new JoseException("Invalid JOSE Compact Serialization. Expecting either "
+                    + JsonWebSignature.COMPACT_SERIALIZATION_PARTS + " or "
+                    + JsonWebEncryption.COMPACT_SERIALIZATION_PARTS
+                    + " parts for JWS or JWE respectively but was " + parts.length + ".");
+        }
+
+        jsonWebObject.setCompactSerialization(cs);
+        return jsonWebObject;
+    }
 
     /**
      * @deprecated replaced by {@link #getHeaders()} and {@link org.jose4j.jwx.Headers#getFullHeaderAsJsonString()}
@@ -132,6 +158,4 @@ public abstract class JsonWebStructure
     {
         this.doKeyValidation = doKeyValidation;
     }
-
-    // todo consider make this base class more useful/consistent to client code that might want to to treat JWS and JWE similarly
 }
