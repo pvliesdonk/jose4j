@@ -27,9 +27,7 @@ public class CompactSerializer
 
     private static final String EMPTY_STRING = "";
 
-    private static final String NO_EMPTY_PARTS_MSG = "Compact serialization cannot contain empty middle or beginning parts.";
-
-    public static String[] deserialize(String compactSerialization) throws JoseException
+    public static String[] deserialize(String compactSerialization)
     {
         String[] parts = compactSerialization.split(PERIOD_SEPARATOR_REGEX);
 
@@ -53,10 +51,6 @@ public class CompactSerializer
             sb.append(part);
             if (i != parts.length - 1)
             {
-//                if (EMPTY_STRING.equals(part))
-//                {
-//                    throw new JoseException(NO_EMPTY_PARTS_MSG);
-//                }
                 sb.append(PERIOD_SEPARATOR);
             }
         }
