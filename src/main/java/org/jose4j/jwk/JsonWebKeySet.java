@@ -103,7 +103,7 @@ public class JsonWebKeySet
 
     public String toJson()
     {
-        return toJson(JsonWebKey.OutputControlLevel.PUBLIC_ONLY);
+        return toJson(JsonWebKey.OutputControlLevel.INCLUDE_SYMMETRIC);
     }
 
     public String toJson(JsonWebKey.OutputControlLevel outputControlLevel)

@@ -74,6 +74,18 @@ public class JsonWebEncryption extends JsonWebStructure
         return plaintext;
     }
 
+    @Override
+    public String getPayload() throws JoseException
+    {
+        return getPlaintextString();
+    }
+
+    @Override
+    public void setPayload(String payload)
+    {
+        setPlaintext(payload);
+    }
+
     public void setEncryptionMethodHeaderParameter(String enc)
     {
         setHeader(HeaderParameterNames.ENCRYPTION_METHOD, enc);

@@ -16,20 +16,24 @@
 
 package org.jose4j.jwe;
 
-import junit.framework.TestCase;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
+import org.junit.Assert;
+import org.junit.Test;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 
+import static org.junit.Assert.*;
+
 /**
  */
-public class JsonWebEncryptionTest extends TestCase
+public class JsonWebEncryptionTest
 {
+    @Test
     public void testJweExampleA3() throws JoseException
     {
         // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#appendix-A.3
@@ -54,6 +58,7 @@ public class JsonWebEncryptionTest extends TestCase
 
     }
 
+    @Test
     public void testJweExampleA2() throws JoseException
     {
         // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#appendix-A.2
@@ -75,6 +80,7 @@ public class JsonWebEncryptionTest extends TestCase
         assertEquals("Live long and prosper.", plaintextString);
     }
 
+    @Test
     public void testHappyRoundTripRsa1_5AndAesCbc128() throws JoseException
     {
         JsonWebEncryption jweForEncrypt = new JsonWebEncryption();
@@ -94,6 +100,7 @@ public class JsonWebEncryptionTest extends TestCase
     }
 
 
+    @Test
     public void testHappyRoundTripDirectAndAesCbc128() throws JoseException
     {
         JsonWebEncryption jweForEncrypt = new JsonWebEncryption();
@@ -115,28 +122,17 @@ public class JsonWebEncryptionTest extends TestCase
 
         assertEquals(plaintext, jweForDecrypt.getPlaintextString());
     }
-    
+
+    @Test (expected = JoseException.class)
     public void testAcceptingCompactSerializationWithMalformedJWE() throws JoseException
     {
-        // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#appendix-A.3
+        // modified to have only 4 parts, which isn't legal, from http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#appendix-A.3.11
         String damaged_version_of_jweCsFromAppdxA3 = "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." +
                 "6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ." +
                 "AxY8DCtDaGlsbGljb3RoZQ." +
                 "KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY";
-                
 
         JsonWebEncryption jwe = new JsonWebEncryption();
-        
-        JoseException joseEx = null;
-        
-        try {
-        	jwe.setCompactSerialization(damaged_version_of_jweCsFromAppdxA3);	// This is when Junit 4 would be handy.
-        } catch (JoseException e) {
-        	joseEx = e;
-        }
-
-        assertNotNull(joseEx);        
+        jwe.setCompactSerialization(damaged_version_of_jweCsFromAppdxA3);
     }
-    
-
 }

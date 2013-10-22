@@ -2,6 +2,7 @@ package org.jose4j.jwe;
 
 import junit.framework.TestCase;
 import org.jose4j.jwk.JsonWebKey;
+import org.jose4j.jwk.OctJwkGenerator;
 import org.jose4j.jwk.OctetSequenceJsonWebKey;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.keys.AesKey;
@@ -58,9 +59,7 @@ public class ZipTest extends TestCase
         JsonWebEncryption jwe = new JsonWebEncryption();
         String plaintext = "This should compress pretty good, it should, yes it should pretty good it should it should";
         jwe.setPlaintext(plaintext);
-        AesKey key = new AesKey(ByteUtil.randomBytes(32));
-        OctetSequenceJsonWebKey jwk = new OctetSequenceJsonWebKey(key);
-        System.out.println(jwk.toJson());
+        AesKey key = new AesKey(new byte[32]);
         jwe.setKey(key);
         jwe.setHeader(HeaderParameterNames.ZIP, "bad");
         jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.DIRECT);
