@@ -108,11 +108,12 @@ public class EllipticCurveJsonWebKeyTest
     }
 	
 	@Test
-	public void testToJsonWithPublicKeyOnlyJWKAndIncludePrivateSettings() throws JoseException {
-		  	PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(ExampleEcKeysFromJws.PUBLIC_521);
-	        String jsonNoPrivateKey = jwk.toJson(PUBLIC_ONLY);
-	        PublicJsonWebKey publicOnlyJWK = PublicJsonWebKey.Factory.newPublicJwk(jsonNoPrivateKey);
-	        assertThat(jsonNoPrivateKey,is(equalTo(publicOnlyJWK.toJson(INCLUDE_PRIVATE))));
+	public void testToJsonWithPublicKeyOnlyJWKAndIncludePrivateSettings() throws JoseException
+    {
+        PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(ExampleEcKeysFromJws.PUBLIC_521);
+        String jsonNoPrivateKey = jwk.toJson(PUBLIC_ONLY);
+        PublicJsonWebKey publicOnlyJWK = PublicJsonWebKey.Factory.newPublicJwk(jsonNoPrivateKey);
+        assertThat(jsonNoPrivateKey,is(equalTo(publicOnlyJWK.toJson(INCLUDE_PRIVATE))));
 	}
 	
 }
