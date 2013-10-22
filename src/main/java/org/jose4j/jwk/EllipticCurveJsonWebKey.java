@@ -107,7 +107,8 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
     {
         ECPrivateKey ecPrivateKey = getEcPrivateKey();
         
-        if (ecPrivateKey != null) {
+        if (ecPrivateKey != null)
+        {
         	putBigIntAsBase64UrlEncodedParam(params, PRIVATE_KEY_MEMBER_NAME, ecPrivateKey.getS());
         }
         
