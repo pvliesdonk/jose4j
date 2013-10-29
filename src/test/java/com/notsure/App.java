@@ -20,10 +20,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.json.JsonUtil;
+import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwe.kdf.KdfUtil;
-import org.jose4j.jwk.JsonWebKey;
-import org.jose4j.jwk.JsonWebKeySet;
-import org.jose4j.jwk.PublicJsonWebKey;
+import org.jose4j.jwk.*;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwx.CompactSerializer;
@@ -54,7 +53,164 @@ public class App
 
     static String newline = new String(new char[]{0x0d, 0x0a});
 
-    public static void main(String[] args) throws Exception
+    public static void main(String... strings)
+    {
+
+    }
+
+    public static void mainNewExampleForSec5RequestParametersAsJWTs(String... args) throws JoseException
+    {
+        String five1 = "eyJhbGciOiJSUzI1NiJ9.ew0KICJyZXNwb25zZV90eXBlIjogImNvZGUgaWRfdG9rZ" +
+                "W4iLA0KICJjbGllbnRfaWQiOiAiczZCaGRSa3F0MyIsDQogInJlZGlyZWN0X3VyaSI" +
+                "6ICJodHRwczovL2NsaWVudC5leGFtcGxlLm9yZy9jYiIsDQogInNjb3BlIjogIm9wZ" +
+                "W5pZCIsDQogInN0YXRlIjogImFmMGlmanNsZGtqIiwNCiAibm9uY2UiOiAibi0wUzZ" +
+                "fV3pBMk1qIiwNCiAibWF4X2FnZSI6IDg2NDAwLA0KICJjbGFpbXMiOiANCiAgew0KI" +
+                "CAgInVzZXJpbmZvIjogDQogICAgew0KICAgICAiZ2l2ZW5fbmFtZSI6IHsiZXNzZW5" +
+                "0aWFsIjogdHJ1ZX0sDQogICAgICJuaWNrbmFtZSI6IG51bGwsDQogICAgICJlbWFpb" +
+                "CI6IHsiZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgICJlbWFpbF92ZXJpZmllZCI6IHs" +
+                "iZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgICJwaWN0dXJlIjogbnVsbA0KICAgIH0sD" +
+                "QogICAiaWRfdG9rZW4iOiANCiAgICB7DQogICAgICJnZW5kZXIiOiBudWxsLA0KICA" +
+                "gICAiYmlydGhkYXRlIjogeyJlc3NlbnRpYWwiOiB0cnVlfSwNCiAgICAgImFjciI6I" +
+                "HsidmFsdWVzIjogWyIyIl19DQogICAgfQ0KICB9DQp9.bOD4rUiQfzh4QPIs_f_R2G" +
+                "VBhNHcc1p2cQTgixB1tsYRs52xW4TO74USgb-nii3RPsLdfoPlsEbJLmtbxG8-TQBH" +
+                "qGAyZxMDPWy3phjeRt9ApDRnLQrjYuvsCj6byu9TVaKX9r1KDFGT-HLqUNlUTpYtCy" +
+                "M2B2rLkWM08ufBq9JBCEzzaLRzjevYEPMaoLAOjb8LPuYOYTBqshRMUxy4Z380-FJ2" +
+                "Lc7VSfSu6HcB2nLSjiKrrfI35xkRJsaSSmjasMYeDZarYCl7r4o17rFclk5KacYMYg" +
+                "As-JYFkwab6Dd56ZrAzakHt9cExMpg04lQIux56C-Qk6dAsB6W6W91AQ";
+
+
+        String five11 = "eyJhbGciOiJSUzI1NiJ9.ew0KICJyZXNwb25zZV90eXBlIjogImNvZG" +
+                "UgaWRfdG9rZW4iLA0KICJjbGllbnRfaWQiOiAiczZCaGRSa3F0MyIsDQogInJlZG" +
+                "lyZWN0X3VyaSI6ICJodHRwczovL2NsaWVudC5leGFtcGxlLm9yZy9jYiIsDQogIn" +
+                "Njb3BlIjogIm9wZW5pZCIsDQogInN0YXRlIjogImFmMGlmanNsZGtqIiwNCiAibm" +
+                "9uY2UiOiAibi0wUzZfV3pBMk1qIiwNCiAibWF4X2FnZSI6IDg2NDAwLA0KICJjbG" +
+                "FpbXMiOiANCiAgew0KICAgInVzZXJpbmZvIjogDQogICAgew0KICAgICAiZ2l2ZW" +
+                "5fbmFtZSI6IHsiZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgICJuaWNrbmFtZSI6IG" +
+                "51bGwsDQogICAgICJlbWFpbCI6IHsiZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgIC" +
+                "JlbWFpbF92ZXJpZmllZCI6IHsiZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgICJwaW" +
+                "N0dXJlIjogbnVsbA0KICAgIH0sDQogICAiaWRfdG9rZW4iOiANCiAgICB7DQogIC" +
+                "AgICJnZW5kZXIiOiBudWxsLA0KICAgICAiYmlydGhkYXRlIjogeyJlc3NlbnRpYW" +
+                "wiOiB0cnVlfSwNCiAgICAgImFjciI6IHsidmFsdWVzIjogWyIyIl19DQogICAgfQ" +
+                "0KICB9DQp9.bOD4rUiQfzh4QPIs_f_R2GVBhNHcc1p2cQTgixB1tsYRs52xW4TO7" +
+                "4USgb-nii3RPsLdfoPlsEbJLmtbxG8-TQBHqGAyZxMDPWy3phjeRt9ApDRnLQrjY" +
+                "uvsCj6byu9TVaKX9r1KDFGT-HLqUNlUTpYtCyM2B2rLkWM08ufBq9JBCEzzaLRzj" +
+                "evYEPMaoLAOjb8LPuYOYTBqshRMUxy4Z380-FJ2Lc7VSfSu6HcB2nLSjiKrrfI35" +
+                "xkRJsaSSmjasMYeDZarYCl7r4o17rFclk5KacYMYgAs-JYFkwab6Dd56ZrAzakHt" +
+                "9cExMpg04lQIux56C-Qk6dAsB6W6W91AQ";
+
+        String five2 = "eyJhbGciOiJSUzI1NiJ9.ew0KICJyZXNwb25zZV90eXBlIjogImNvZGUgaWRfdG9rZ" +
+                "W4iLA0KICJjbGllbnRfaWQiOiAiczZCaGRSa3F0MyIsDQogInJlZGlyZWN0X3VyaSI" +
+                "6ICJodHRwczovL2NsaWVudC5leGFtcGxlLm9yZy9jYiIsDQogInNjb3BlIjogIm9wZ" +
+                "W5pZCIsDQogInN0YXRlIjogImFmMGlmanNsZGtqIiwNCiAibm9uY2UiOiAibi0wUzZ" +
+                "fV3pBMk1qIiwNCiAibWF4X2FnZSI6IDg2NDAwLA0KICJjbGFpbXMiOiANCiAgew0KI" +
+                "CAgInVzZXJpbmZvIjogDQogICAgew0KICAgICAiZ2l2ZW5fbmFtZSI6IHsiZXNzZW5" +
+                "0aWFsIjogdHJ1ZX0sDQogICAgICJuaWNrbmFtZSI6IG51bGwsDQogICAgICJlbWFpb" +
+                "CI6IHsiZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgICJlbWFpbF92ZXJpZmllZCI6IHs" +
+                "iZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgICJwaWN0dXJlIjogbnVsbA0KICAgIH0sD" +
+                "QogICAiaWRfdG9rZW4iOiANCiAgICB7DQogICAgICJnZW5kZXIiOiBudWxsLA0KICA" +
+                "gICAiYmlydGhkYXRlIjogeyJlc3NlbnRpYWwiOiB0cnVlfSwNCiAgICAgImFjciI6I" +
+                "HsidmFsdWVzIjogWyIyIl19DQogICAgfQ0KICB9DQp9.bOD4rUiQfzh4QPIs_f_R2G" +
+                "VBhNHcc1p2cQTgixB1tsYRs52xW4TO74USgb-nii3RPsLdfoPlsEbJLmtbxG8-TQBH" +
+                "qGAyZxMDPWy3phjeRt9ApDRnLQrjYuvsCj6byu9TVaKX9r1KDFGT-HLqUNlUTpYtCy" +
+                "M2B2rLkWM08ufBq9JBCEzzaLRzjevYEPMaoLAOjb8LPuYOYTBqshRMUxy4Z380-FJ2" +
+                "Lc7VSfSu6HcB2nLSjiKrrfI35xkRJsaSSmjasMYeDZarYCl7r4o17rFclk5KacYMYg" +
+                "As-JYFkwab6Dd56ZrAzakHt9cExMpg04lQIux56C-Qk6dAsB6W6W91AQ";
+
+        System.out.println(five1.equals(five11));
+        System.out.println(five1.equals(five2));
+
+        AlgorithmFactoryFactory.getInstance().getJwsAlgorithmFactory();
+        JsonWebSignature jws;
+
+
+
+        String reqJson =  "{\n"+
+            " \"response_type\": \"code id_token\",\n"+
+            " \"client_id\": \"s6BhdRkqt3\",\n"+
+            " \"redirect_uri\": \"https://client.example.org/cb\",\n"+
+            " \"scope\": \"openid\",\n"+
+            " \"state\": \"af0ifjsldkj\",\n"+
+            " \"nonce\": \"n-0S6_WzA2Mj\",\n"+
+            " \"max_age\": 86400,\n"+
+            " \"claims\": \n"+
+            "  {\n"+
+            "   \"userinfo\": \n"+
+            "    {\n"+
+            "     \"given_name\": {\"essential\": true},\n"+
+            "     \"nickname\": null,\n"+
+            "     \"email\": {\"essential\": true},\n"+
+            "     \"email_verified\": {\"essential\": true},\n"+
+            "     \"picture\": null\n"+
+            "    },\n"+
+            "   \"id_token\": \n"+
+            "    {\n"+
+            "     \"gender\": null,\n"+
+            "     \"birthdate\": {\"essential\": true},\n"+
+            "     \"acr\": {\"values\": [\"2\"]}\n"+
+            "    }\n"+
+            "  }\n"+
+            "}";
+        System.out.println(reqJson);
+        RsaJsonWebKey jwk = RsaJwkGenerator.generateJwk(2048);
+        String keyId = "6k";
+        jwk.setKeyId(keyId);
+        System.out.println(jwk.toJson(JsonWebKey.OutputControlLevel.PUBLIC_ONLY));
+
+        Map<String, Object> claimsMap = JsonUtil.parseJson(reqJson);
+
+        jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
+        jws.setKey(jwk.getPrivateKey());
+        jws.setKeyIdHeaderValue(jwk.getKeyId());
+        jws.setPayload(reqJson);
+
+        System.out.println(jws.getCompactSerialization());
+    }
+
+    public static void mainNewExampleForSec2133TokenSuccessfulResponse(String... args) throws JoseException
+    {
+        String prev = "eyJhbGciOiJSUzI1NiJ9.ew0KICAgICJpc3MiOiAiaHR0cDovL\n" +
+                "     3NlcnZlci5leGFtcGxlLmNvbSIsDQogICAgInVzZXJfaWQiOiAiMjQ4Mjg5NzYxM\n" +
+                "     DAxIiwNCiAgICAiYXVkIjogInM2QmhkUmtxdDMiLA0KICAgICJub25jZSI6ICJuL\n" +
+                "     TBTNl9XekEyTWoiLA0KICAgICJleHAiOiAxMzExMjgxOTcwLA0KICAgICJpYXQiO\n" +
+                "     iAxMzExMjgwOTcwDQp9.lsQI_KNHpl58YY24G9tUHXr3Yp7OKYnEaVpRL0KI4szT\n" +
+                "     D6GXpZcgxIpkOCcajyDiIv62R9rBWASV191Akk1BM36gUMm8H5s8xyxNdRfBViCa\n" +
+                "     xTqHA7X_vV3U-tSWl6McR5qaSJaNQBpg1oGPjZdPG7zWCG-yEJC4-Fbx2FPOS7-h\n" +
+                "     5V0k33O5Okd-OoDUKoFPMd6ur5cIwsNyBazcsHdFHqWlCby5nl_HZdW-PHq0gjzy\n" +
+                "     JydB5eYIvOfOHYBRVML9fKwdOLM2xVxJsPwvy3BqlVKc593p2WwItIg52ILWrc6A\n" +
+                "     tqkqHxKsAXLVyAoVInYkl_NDBkCqYe2KgNJFzfEC8g\n";
+
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setCompactSerialization(prev);
+        System.out.println(jws.getHeaders().getFullHeaderAsJsonString()+"."+ jws.getUnverifiedPayload());
+
+        String claims = "{\n" +
+                " \"iss\": \"http://server.example.com\",\n" +
+                " \"sub\": \"248289761001\",\n" +
+                " \"aud\": \"s6BhdRkqt3\",\n" +
+                " \"nonce\": \"n-0S6_WzA2Mj\",\n" +
+                " \"exp\": 1311281970,\n" +
+                " \"iat\": 1311280970\n" +
+                "}";
+        System.out.println(claims);
+        RsaJsonWebKey jwk = RsaJwkGenerator.generateJwk(2048);
+        String keyId = "742";
+        jwk.setKeyId(keyId);
+        System.out.println(jwk.toJson(JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE));
+
+        Map<String, Object> claimsMap = JsonUtil.parseJson(claims);
+
+        jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
+        jws.setKey(jwk.getPrivateKey());
+        jws.setKeyIdHeaderValue(jwk.getKeyId());
+        jws.setPayload(claims);
+
+        System.out.println(jws.getCompactSerialization());
+    }
+
+
+    public static void mainEcdheskdf(String[] args) throws Exception
     {
         // um... trying to verify example ECDH-ES with KDF example from JWA -14
         // but the values don't match...
