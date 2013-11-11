@@ -45,7 +45,7 @@ public class IntDate
         return fromSeconds(millisecondsFromEpoch / CONVERSION);
     }
 
-    public void addSeconds(int seconds)
+    public void addSeconds(long seconds)
     {
         value += seconds;
     }
