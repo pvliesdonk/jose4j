@@ -18,6 +18,7 @@ package org.jose4j.jwa;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jose4j.lang.InvalidAlgorithmException;
 import org.jose4j.lang.JoseException;
 
 import java.util.Collections;
@@ -41,13 +42,13 @@ public class AlgorithmFactory<A extends Algorithm>
         log = LogFactory.getLog(this.getClass() + "->" + type.getSimpleName());
     }
 
-    public A getAlgorithm(String algorithmIdentifier) throws JoseException
+    public A getAlgorithm(String algorithmIdentifier) throws InvalidAlgorithmException
     {
         A algo = algorithms.get(algorithmIdentifier);
 
         if (algo == null)
         {
-            throw new JoseException(algorithmIdentifier + " is an unknown, unsupported or unavailable "+parameterName
+            throw new InvalidAlgorithmException(algorithmIdentifier + " is an unknown, unsupported or unavailable "+parameterName
                     +" algorithm (not one of " + getSupportedAlgorithms() + ").");
         }
         

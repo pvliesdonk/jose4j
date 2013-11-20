@@ -23,6 +23,7 @@ import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.IntegrityException;
+import org.jose4j.lang.InvalidAlgorithmException;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 
@@ -96,12 +97,12 @@ public class JsonWebSignature extends JsonWebStructure
         return validSignature;
     }
 
-    public JsonWebSignatureAlgorithm getAlgorithm() throws JoseException
+    public JsonWebSignatureAlgorithm getAlgorithm() throws InvalidAlgorithmException
     {
         String algo = getAlgorithmHeaderValue();
         if (algo == null)
         {
-            throw new JoseException(HeaderParameterNames.ALGORITHM + " header not set.");
+            throw new InvalidAlgorithmException("Signature algorithm header ("+HeaderParameterNames.ALGORITHM+") not set.");
         }
 
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();

@@ -23,6 +23,7 @@ import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
 import org.jose4j.jwx.JsonWebStructure;
+import org.jose4j.lang.InvalidAlgorithmException;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 import org.jose4j.zip.CompressionAlgorithm;
@@ -96,24 +97,24 @@ public class JsonWebEncryption extends JsonWebStructure
         return getHeader(HeaderParameterNames.ENCRYPTION_METHOD);
     }
 
-    public ContentEncryptionAlgorithm getContentEncryptionAlgorithm() throws JoseException
+    public ContentEncryptionAlgorithm getContentEncryptionAlgorithm() throws InvalidAlgorithmException
     {
         String encValue = getEncryptionMethodHeaderParameter();
         if (encValue == null)
         {
-            throw new JoseException(HeaderParameterNames.ENCRYPTION_METHOD + " header not set.");
+            throw new InvalidAlgorithmException("Content encryption header ("+HeaderParameterNames.ENCRYPTION_METHOD+") not set.");
         }
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
         AlgorithmFactory<ContentEncryptionAlgorithm> factory = factoryFactory.getJweContentEncryptionAlgorithmFactory();
         return factory.getAlgorithm(encValue);
     }
 
-    public KeyManagementAlgorithm getKeyManagementModeAlgorithm() throws JoseException
+    public KeyManagementAlgorithm getKeyManagementModeAlgorithm() throws InvalidAlgorithmException
     {
         String algo = getAlgorithmHeaderValue();
         if (algo == null)
         {
-            throw new JoseException(HeaderParameterNames.ALGORITHM + " header not set.");
+            throw new InvalidAlgorithmException("Encryption key management algorithm header ("+HeaderParameterNames.ALGORITHM+") not set.");
         }
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
         AlgorithmFactory<KeyManagementAlgorithm> factory = factoryFactory.getJweKeyManagementAlgorithmFactory();
@@ -181,7 +182,7 @@ public class JsonWebEncryption extends JsonWebStructure
         return data;
     }
 
-    byte[] compress(Headers headers, byte[] data) throws JoseException
+    byte[] compress(Headers headers, byte[] data) throws InvalidAlgorithmException
     {
         String zipHeaderValue = headers.getStringHeaderValue(HeaderParameterNames.ZIP);
         if (zipHeaderValue != null)
