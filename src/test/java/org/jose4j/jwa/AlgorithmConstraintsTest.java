@@ -1,6 +1,5 @@
 package org.jose4j.jwa;
 
-import junit.framework.TestCase;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.lang.InvalidAlgorithmException;
