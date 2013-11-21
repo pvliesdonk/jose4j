@@ -17,6 +17,7 @@
 package org.jose4j.jwx;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.lang.JoseException;
@@ -36,6 +37,8 @@ public abstract class JsonWebStructure
     private Key key;
 
     protected boolean doKeyValidation = true;
+
+    private AlgorithmConstraints algorithmConstraints = AlgorithmConstraints.NO_CONSTRAINTS;
 
     abstract public String getCompactSerialization() throws JoseException;
     abstract protected void setCompactSerializationParts(String[] parts) throws JoseException;
@@ -163,5 +166,15 @@ public abstract class JsonWebStructure
     public void setDoKeyValidation(boolean doKeyValidation)
     {
         this.doKeyValidation = doKeyValidation;
+    }
+
+    protected AlgorithmConstraints getAlgorithmConstraints()
+    {
+        return algorithmConstraints;
+    }
+
+    public void setAlgorithmConstraints(AlgorithmConstraints algorithmConstraints)
+    {
+        this.algorithmConstraints = algorithmConstraints;
     }
 }

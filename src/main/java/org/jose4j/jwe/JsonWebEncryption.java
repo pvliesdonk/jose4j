@@ -17,6 +17,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwa.AlgorithmFactory;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwx.CompactSerializer;
@@ -34,7 +35,6 @@ import java.security.Key;
  */
 public class JsonWebEncryption extends JsonWebStructure
 {
-	
 	public static final short COMPACT_SERIALIZATION_PARTS = 5;
 	
     private Base64Url base64url = new Base64Url();
@@ -45,6 +45,8 @@ public class JsonWebEncryption extends JsonWebStructure
     byte[] encryptedKey;
     byte[] iv;
     byte[] ciphertext;
+
+    private AlgorithmConstraints contentEncryptionAlgorithmConstraints = AlgorithmConstraints.NO_CONSTRAINTS;
 
     public void setPlainTextCharEncoding(String plaintextCharEncoding)
     {
@@ -97,6 +99,11 @@ public class JsonWebEncryption extends JsonWebStructure
         return getHeader(HeaderParameterNames.ENCRYPTION_METHOD);
     }
 
+    public void setContentEncryptionAlgorithmConstraints(AlgorithmConstraints contentEncryptionAlgorithmConstraints)
+    {
+        this.contentEncryptionAlgorithmConstraints = contentEncryptionAlgorithmConstraints;
+    }
+
     public ContentEncryptionAlgorithm getContentEncryptionAlgorithm() throws InvalidAlgorithmException
     {
         String encValue = getEncryptionMethodHeaderParameter();
@@ -104,6 +111,8 @@ public class JsonWebEncryption extends JsonWebStructure
         {
             throw new InvalidAlgorithmException("Content encryption header ("+HeaderParameterNames.ENCRYPTION_METHOD+") not set.");
         }
+
+        contentEncryptionAlgorithmConstraints.checkConstraint(encValue);
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
         AlgorithmFactory<ContentEncryptionAlgorithm> factory = factoryFactory.getJweContentEncryptionAlgorithmFactory();
         return factory.getAlgorithm(encValue);
@@ -116,6 +125,8 @@ public class JsonWebEncryption extends JsonWebStructure
         {
             throw new InvalidAlgorithmException("Encryption key management algorithm header ("+HeaderParameterNames.ALGORITHM+") not set.");
         }
+
+        getAlgorithmConstraints().checkConstraint(algo);
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
         AlgorithmFactory<KeyManagementAlgorithm> factory = factoryFactory.getJweKeyManagementAlgorithmFactory();
         return factory.getAlgorithm(algo);

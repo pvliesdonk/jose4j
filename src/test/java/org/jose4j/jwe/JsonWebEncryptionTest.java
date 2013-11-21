@@ -16,10 +16,12 @@
 
 package org.jose4j.jwe;
 
+import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.InvalidAlgorithmException;
 import org.jose4j.lang.JoseException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,6 +29,9 @@ import org.junit.Test;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 
+import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.*;
+import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.*;
+import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.*;
 import static org.junit.Assert.*;
 
 /**
@@ -55,7 +60,6 @@ public class JsonWebEncryptionTest
         String plaintextString = jwe.getPlaintextString();
 
         assertEquals("Live long and prosper.", plaintextString);
-
     }
 
     @Test
@@ -86,8 +90,8 @@ public class JsonWebEncryptionTest
         JsonWebEncryption jweForEncrypt = new JsonWebEncryption();
         String plaintext = "Some text that's on double secret probation";
         jweForEncrypt.setPlaintext(plaintext);
-        jweForEncrypt.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.RSA1_5);
-        jweForEncrypt.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+        jweForEncrypt.setAlgorithmHeaderValue(RSA1_5);
+        jweForEncrypt.setEncryptionMethodHeaderParameter(AES_128_CBC_HMAC_SHA_256);
         jweForEncrypt.setKey(ExampleRsaJwksFromJwe.APPENDIX_A_2.getPublicKey());
 
         String compactSerialization = jweForEncrypt.getCompactSerialization();
@@ -106,8 +110,8 @@ public class JsonWebEncryptionTest
         JsonWebEncryption jweForEncrypt = new JsonWebEncryption();
         String plaintext = "Some sensitive info";
         jweForEncrypt.setPlaintext(plaintext);
-        jweForEncrypt.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.DIRECT);
-        jweForEncrypt.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+        jweForEncrypt.setAlgorithmHeaderValue(DIRECT);
+        jweForEncrypt.setEncryptionMethodHeaderParameter(AES_128_CBC_HMAC_SHA_256);
         ContentEncryptionAlgorithm contentEncryptionAlgorithm = jweForEncrypt.getContentEncryptionAlgorithm();
         ContentEncryptionKeyDescriptor cekDesc = contentEncryptionAlgorithm.getContentEncryptionKeyDescriptor();
         byte[] cekBytes = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength());
@@ -117,6 +121,8 @@ public class JsonWebEncryptionTest
         String compactSerialization = jweForEncrypt.getCompactSerialization();
 
         JsonWebEncryption jweForDecrypt = new JsonWebEncryption();
+        jweForDecrypt.setAlgorithmConstraints(new AlgorithmConstraints(WHITELIST, DIRECT));
+        jweForDecrypt.setContentEncryptionAlgorithmConstraints(new AlgorithmConstraints(WHITELIST, AES_128_CBC_HMAC_SHA_256));
         jweForDecrypt.setCompactSerialization(compactSerialization);
         jweForDecrypt.setKey(key);
 
@@ -135,4 +141,32 @@ public class JsonWebEncryptionTest
         JsonWebEncryption jwe = new JsonWebEncryption();
         jwe.setCompactSerialization(damaged_version_of_jweCsFromAppdxA3);
     }
+
+    @Test (expected = InvalidAlgorithmException.class)
+    public void testBlackListAlg() throws JoseException
+    {
+        String jwecs = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..LpJAcwq3RzCs-zPRQzT-jg.IO0ZwAhWnSF05dslZwaBKcHYOAKlSpt_l7Dl5ABrUS0.0KfkxQTFqTQjzfJIm8MNjg";
+        JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"I95jRMEyRvD0t3LRgL1GSWTgkX5jznuhX4mce9bYV_A\"}");
+
+        JsonWebEncryption jwe = new JsonWebEncryption();
+        jwe.setAlgorithmConstraints(new AlgorithmConstraints(BLACKLIST, DIRECT));
+        jwe.setCompactSerialization(jwecs);
+        jwe.setKey(jsonWebKey.getKey());
+        jwe.getPayload();
+    }
+
+    @Test (expected = InvalidAlgorithmException.class)
+    public void testBlackListEncAlg() throws JoseException
+    {
+        String jwecs = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..LpJAcwq3RzCs-zPRQzT-jg.IO0ZwAhWnSF05dslZwaBKcHYOAKlSpt_l7Dl5ABrUS0.0KfkxQTFqTQjzfJIm8MNjg";
+        JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"I95jRMEyRvD0t3LRgL1GSWTgkX5jznuhX4mce9bYV_A\"}");
+
+        JsonWebEncryption jwe = new JsonWebEncryption();
+        jwe.setContentEncryptionAlgorithmConstraints(new AlgorithmConstraints(BLACKLIST, AES_128_CBC_HMAC_SHA_256));
+        jwe.setCompactSerialization(jwecs);
+        jwe.setKey(jsonWebKey.getKey());
+        jwe.getPayload();
+    }
+
+
 }

@@ -105,6 +105,7 @@ public class JsonWebSignature extends JsonWebStructure
             throw new InvalidAlgorithmException("Signature algorithm header ("+HeaderParameterNames.ALGORITHM+") not set.");
         }
 
+        getAlgorithmConstraints().checkConstraint(algo);
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
         AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory = factoryFactory.getJwsAlgorithmFactory();
         return jwsAlgorithmFactory.getAlgorithm(algo);
@@ -145,12 +146,12 @@ public class JsonWebSignature extends JsonWebStructure
         this.payloadCharEncoding = payloadCharEncoding;
     }
 
-    public String getKeyType() throws JoseException
+    public String getKeyType() throws InvalidAlgorithmException
     {
         return getAlgorithm().getKeyType();
     }
 
-    public KeyPersuasion getKeyPersuasion() throws JoseException
+    public KeyPersuasion getKeyPersuasion() throws InvalidAlgorithmException
     {
         return getAlgorithm().getKeyPersuasion();
     }
