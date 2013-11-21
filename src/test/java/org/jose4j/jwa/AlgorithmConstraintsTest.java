@@ -1,11 +1,16 @@
 package org.jose4j.jwa;
 
 import junit.framework.TestCase;
+import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.lang.InvalidAlgorithmException;
 import org.junit.Test;
 
 import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.*;
+import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.A128KW;
+import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.A256KW;
+import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.DIRECT;
+import static org.jose4j.jws.AlgorithmIdentifiers.*;
 
 /**
  */
@@ -35,8 +40,8 @@ public class AlgorithmConstraintsTest
     @Test(expected = InvalidAlgorithmException.class)
     public void blacklistNone() throws InvalidAlgorithmException
     {
-        AlgorithmConstraints constraints = new AlgorithmConstraints(BLACKLIST, AlgorithmIdentifiers.NONE);
-        constraints.checkConstraint(AlgorithmIdentifiers.NONE);
+        AlgorithmConstraints constraints = new AlgorithmConstraints(BLACKLIST, NONE);
+        constraints.checkConstraint(NONE);
     }
 
     @Test(expected = InvalidAlgorithmException.class)
@@ -61,4 +66,19 @@ public class AlgorithmConstraintsTest
         constraints.checkConstraint("gooder");
         constraints.checkConstraint("goodest");
     }
+
+    @Test
+    public void noRestrictions() throws InvalidAlgorithmException
+    {
+        AlgorithmConstraints constraints = AlgorithmConstraints.NO_CONSTRAINTS;
+
+        String[] algs = {NONE, HMAC_SHA256, HMAC_SHA512, RSA_USING_SHA256, RSA_USING_SHA512,
+                         ECDSA_USING_P256_CURVE_AND_SHA256, "something", A128KW, A256KW,
+                         DIRECT, "etc,", "etc."};
+        for (String alg : algs)
+        {
+            constraints.checkConstraint(alg);
+        }
+    }
+
 }
