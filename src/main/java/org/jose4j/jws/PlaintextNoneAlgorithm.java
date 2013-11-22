@@ -51,17 +51,17 @@ public class PlaintextNoneAlgorithm extends AlgorithmInfo implements JsonWebSign
         return ByteUtil.EMPTY_BYTES;
     }
 
-    public void validateSigningKey(Key key) throws JoseException
+    public void validateSigningKey(Key key) throws InvalidKeyException
     {
         validateKey(key);
     }
 
-    public void validateVerificationKey(Key key) throws JoseException
+    public void validateVerificationKey(Key key) throws InvalidKeyException
     {
         validateKey(key);
     }
 
-    private void validateKey(Key key) throws JoseException
+    private void validateKey(Key key) throws InvalidKeyException
     {
         if (key != null)
         {

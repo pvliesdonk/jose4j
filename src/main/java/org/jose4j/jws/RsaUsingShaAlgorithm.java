@@ -18,6 +18,7 @@ package org.jose4j.jws;
 
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jwx.KeyValidationSupport;
+import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 
 import java.security.PrivateKey;
@@ -34,12 +35,12 @@ public class RsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Json
         super(id, javaAlgo, RsaJsonWebKey.KEY_TYPE);
     }
 
-    public void validatePublicKey(PublicKey key) throws JoseException
+    public void validatePublicKey(PublicKey key) throws InvalidKeyException
     {
         KeyValidationSupport.checkRsaKeySize((RSAPublicKey) key);
     }
 
-    public void validatePrivateKey(PrivateKey privateKey) throws JoseException
+    public void validatePrivateKey(PrivateKey privateKey) throws InvalidKeyException
     {
         KeyValidationSupport.checkRsaKeySize((RSAPrivateKey) privateKey);
     }

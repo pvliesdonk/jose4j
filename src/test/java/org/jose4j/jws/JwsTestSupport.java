@@ -20,6 +20,7 @@ import junit.framework.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jose4j.jwx.CompactSerializer;
+import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
@@ -110,7 +111,7 @@ public class JwsTestSupport
             jws.verifySignature();
             Assert.fail("Should have failed with some kind of invalid key message");
         }
-        catch (JoseException e)
+        catch (InvalidKeyException e)
         {
             log.debug("Expected something like this: " + e);
         }

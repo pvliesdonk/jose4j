@@ -19,6 +19,7 @@ package org.jose4j.jws;
 
 import org.jose4j.jwk.EllipticCurveJsonWebKey;
 import org.jose4j.keys.EllipticCurves;
+import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 
 import java.io.IOException;
@@ -196,19 +197,19 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
         return concatenatedSignatureBytes;
     }
 
-    public void validatePrivateKey(PrivateKey privateKey) throws JoseException
+    public void validatePrivateKey(PrivateKey privateKey) throws InvalidKeyException
     {
         ECPrivateKey ecPrivateKey = (ECPrivateKey) privateKey;
         validateKeySpec(ecPrivateKey);
     }
 
-    public void validatePublicKey(PublicKey publicKey) throws JoseException
+    public void validatePublicKey(PublicKey publicKey) throws InvalidKeyException
     {
         ECPublicKey ecPublicKey = (ECPublicKey) publicKey;
         validateKeySpec(ecPublicKey);
     }
 
-    private void validateKeySpec(ECKey ecKey) throws JoseException
+    private void validateKeySpec(ECKey ecKey) throws InvalidKeyException
     {
         ECParameterSpec spec = ecKey.getParams();
         EllipticCurve curve = spec.getCurve();
@@ -217,7 +218,7 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
 
         if (!getCurveName().equals(name))
         {
-            throw new JoseException(getAlgorithmIdentifier() + "/" + getJavaAlgorithm() + " expects a key using " +
+            throw new InvalidKeyException(getAlgorithmIdentifier() + "/" + getJavaAlgorithm() + " expects a key using " +
                     getCurveName() + " but was " + name);
         }
     }

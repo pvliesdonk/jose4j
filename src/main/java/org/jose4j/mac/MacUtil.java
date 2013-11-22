@@ -16,7 +16,6 @@
 
 package org.jose4j.mac;
 
-import org.jose4j.lang.JoseException;
 import org.jose4j.lang.UncheckedJoseException;
 
 import javax.crypto.Mac;
@@ -32,7 +31,7 @@ public class MacUtil
     public static final String HMAC_SHA384 = "HmacSHA384";
     public static final String HMAC_SHA512 = "HmacSHA512";
 
-    public static Mac getInitializedMac(String algorithm, Key key) throws JoseException
+    public static Mac getInitializedMac(String algorithm, Key key) throws org.jose4j.lang.InvalidKeyException
     {
         Mac mac = getMac(algorithm);
         initMacWithKey(mac, key);
@@ -51,7 +50,7 @@ public class MacUtil
         }
     }
 
-    public static void initMacWithKey(Mac mac, Key key) throws JoseException
+    public static void initMacWithKey(Mac mac, Key key) throws org.jose4j.lang.InvalidKeyException
     {
         try
         {
@@ -59,7 +58,7 @@ public class MacUtil
         }
         catch (InvalidKeyException e)
         {
-            throw new JoseException("Key is not valid for " + mac.getAlgorithm(), e);
+            throw new org.jose4j.lang.InvalidKeyException("Key is not valid for " + mac.getAlgorithm(), e);
         }
     }
 }

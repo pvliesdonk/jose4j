@@ -19,7 +19,8 @@ package org.jose4j.jws;
 import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.KeyPersuasion;
-import org.jose4j.lang.JoseException;
+import org.jose4j.lang.*;
+import org.jose4j.lang.InvalidKeyException;
 
 import java.security.*;
 
@@ -65,29 +66,29 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
         }
     }
 
-    private void initForSign(Signature signature, Key key) throws JoseException
+    private void initForSign(Signature signature, Key key) throws InvalidKeyException
     {
         try
         {
             PrivateKey privateKey = (PrivateKey) key;
             signature.initSign(privateKey);
         }
-        catch (InvalidKeyException e)
+        catch (java.security.InvalidKeyException e)
         {
-            throw new JoseException(getBadKeyMessage(key) + "for " + getJavaAlgorithm(), e);
+            throw new InvalidKeyException(getBadKeyMessage(key) + "for " + getJavaAlgorithm(), e);
         }
     }
 
-    private void initForVerify(Signature signature, Key key) throws JoseException
+    private void initForVerify(Signature signature, Key key) throws InvalidKeyException
     {
         try
         {
            PublicKey publicKey = (PublicKey) key;
            signature.initVerify(publicKey);
         }
-        catch (InvalidKeyException e)
+        catch (java.security.InvalidKeyException e)
         {
-            throw new JoseException(getBadKeyMessage(key) + "for " + getJavaAlgorithm(), e);
+            throw new InvalidKeyException(getBadKeyMessage(key) + "for " + getJavaAlgorithm(), e);
         }
     }
 
@@ -109,9 +110,9 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
         }
     }
 
-    public abstract void validatePrivateKey(PrivateKey privateKey) throws JoseException;
+    public abstract void validatePrivateKey(PrivateKey privateKey) throws InvalidKeyException;
 
-    public void validateSigningKey(Key key) throws JoseException
+    public void validateSigningKey(Key key) throws InvalidKeyException
     {
         checkForNullKey(key);
 
@@ -121,13 +122,14 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
         }
         catch (ClassCastException e)
         {
-            throw new JoseException(getBadKeyMessage(key) + "(not a private key or is the wrong type of key) for " + getJavaAlgorithm() + " / " + getAlgorithmIdentifier() + " " +  e);
+            throw new InvalidKeyException(getBadKeyMessage(key) + "(not a private key or is the wrong type of key) for "
+                    + getJavaAlgorithm() + " / " + getAlgorithmIdentifier() + " " +  e);
         }
     }
 
-    public abstract void validatePublicKey(PublicKey publicKey) throws JoseException;
+    public abstract void validatePublicKey(PublicKey publicKey) throws InvalidKeyException;
 
-    public void validateVerificationKey(Key key) throws JoseException
+    public void validateVerificationKey(Key key) throws InvalidKeyException
     {
         checkForNullKey(key);
 
@@ -137,15 +139,16 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
         }
         catch (ClassCastException e)
         {
-            throw new JoseException(getBadKeyMessage(key) + "(not a public key or is the wrong type of key) for " + getJavaAlgorithm() + "/" + getAlgorithmIdentifier() + " " +  e);
+            throw new InvalidKeyException(getBadKeyMessage(key) + "(not a public key or is the wrong type of key) for "
+                    + getJavaAlgorithm() + "/" + getAlgorithmIdentifier() + " " +  e);
         }
     }
 
-    private void checkForNullKey(Key key) throws JoseException
+    private void checkForNullKey(Key key) throws InvalidKeyException
     {
         if (key == null)
         {
-            throw new JoseException("Key cannot be null");
+            throw new InvalidKeyException("Key cannot be null");
         }
     }
 

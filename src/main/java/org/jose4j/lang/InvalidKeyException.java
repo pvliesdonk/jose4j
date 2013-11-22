@@ -8,4 +8,9 @@ public class InvalidKeyException extends JoseException
     {
         super(message);
     }
+
+    public InvalidKeyException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 }

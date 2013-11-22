@@ -21,6 +21,7 @@ import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 import org.jose4j.mac.MacUtil;
 
@@ -42,7 +43,7 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
         this.minimumKeyLength = minimumKeyLength;
     }
 
-    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException
+    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws InvalidKeyException
     {
         Mac mac = getMacInstance(key);
         byte[] calculatedSigature = mac.doFinal(securedInputBytes);
@@ -50,34 +51,34 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
         return ByteUtil.secureEquals(signatureBytes, calculatedSigature);
     }
 
-    public byte[] sign(Key key, byte[] securedInputBytes) throws JoseException
+    public byte[] sign(Key key, byte[] securedInputBytes) throws InvalidKeyException
     {
         Mac mac = getMacInstance(key);
         return mac.doFinal(securedInputBytes);
     }
 
-    private Mac getMacInstance(Key key) throws JoseException
+    private Mac getMacInstance(Key key) throws InvalidKeyException
     {
         return MacUtil.getInitializedMac(getJavaAlgorithm(), key);
     }
 
-    void validateKey(Key key) throws JoseException
+    void validateKey(Key key) throws InvalidKeyException
     {
         int length = ByteUtil.bitLength(key.getEncoded());
         if (length < minimumKeyLength)
         {
-            throw new JoseException("A key of the same size as the hash output (i.e. "+minimumKeyLength+
+            throw new InvalidKeyException("A key of the same size as the hash output (i.e. "+minimumKeyLength+
                     " bits for "+getAlgorithmIdentifier()+
                     ") or larger MUST be used with the HMAC SHA algorithms but this key is only " + length + " bits");
         }
     }
 
-    public void validateSigningKey(Key key) throws JoseException
+    public void validateSigningKey(Key key) throws InvalidKeyException
     {
         validateKey(key);
     }
 
-    public void validateVerificationKey(Key key) throws JoseException
+    public void validateVerificationKey(Key key) throws InvalidKeyException
     {
         validateKey(key);
     }
