@@ -21,11 +21,17 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.BLACKLIST;
+import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.WHITELIST;
+import static org.jose4j.jws.AlgorithmIdentifiers.NONE;
+
 /**
  */
 public class AlgorithmConstraints
 {
     public static final AlgorithmConstraints NO_CONSTRAINTS = new AlgorithmConstraints(ConstraintType.BLACKLIST);
+    public static final AlgorithmConstraints DISALLOW_NONE = new AlgorithmConstraints(BLACKLIST, NONE);
+    public static final AlgorithmConstraints ALLOW_ONLY_NONE = new AlgorithmConstraints(WHITELIST, NONE);
 
     public enum ConstraintType {WHITELIST, BLACKLIST}
 

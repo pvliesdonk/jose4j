@@ -20,6 +20,7 @@ import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
@@ -64,7 +65,7 @@ public class PlaintextNoneAlgorithm extends AlgorithmInfo implements JsonWebSign
     {
         if (key != null)
         {
-            throw new JoseException(CANNOT_HAVE_KEY_MESSAGE);
+            throw new InvalidKeyException(CANNOT_HAVE_KEY_MESSAGE);
         }
     }
 

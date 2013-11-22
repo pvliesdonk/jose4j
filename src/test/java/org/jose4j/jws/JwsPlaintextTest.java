@@ -20,6 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.keys.HmacKey;
+import org.jose4j.lang.InvalidAlgorithmException;
+import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 import org.junit.Test;
 
@@ -46,6 +48,7 @@ public class JwsPlaintextTest
     public void testExampleDecode() throws JoseException
     {
         JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmConstraints(AlgorithmConstraints.ALLOW_ONLY_NONE);
         jws.setCompactSerialization(JWS);
         assertTrue(jws.verifySignature());
         String payload = jws.getPayload();
@@ -57,6 +60,7 @@ public class JwsPlaintextTest
     {
         String cs = "eyJhbGciOiJub25lIn0.eyJhdXRoX3RpbWUiOjEzMzk2MTMyNDgsImV4cCI6MTMzOTYxMzU0OCwiaXNzIjoiaHR0cHM6XC9cL2V4YW1wbGUuY29tIiwiYXVkIjoiYSIsImp0aSI6ImpJQThxYTM1QXJvVjZpUDJxNHdSQWwiLCJ1c2VyX2lkIjoiam9obiIsImlhdCI6MTMzOTYxMzI0OCwiYWNyIjozfQ.";
         JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS);
         jws.setCompactSerialization(cs);
         assertTrue(jws.verifySignature());
         String payload = jws.getPayload();
@@ -67,31 +71,34 @@ public class JwsPlaintextTest
     public void testExampleEncode() throws JoseException
     {
         JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmConstraints(AlgorithmConstraints.ALLOW_ONLY_NONE);
         jws.setAlgorithmHeaderValue(NONE);
         jws.setPayload(PAYLOAD);
         assertEquals(JWS, jws.getCompactSerialization());
     }
 
-    @Test(expected = JoseException.class)
+    @Test(expected = InvalidKeyException.class)
     public void testSignWithKeyNoGood() throws JoseException
     {
         JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS);
         jws.setAlgorithmHeaderValue(NONE);
         jws.setPayload(PAYLOAD);
         jws.setKey(KEY);
-        String cs = jws.getCompactSerialization();
+        jws.getCompactSerialization();
     }
 
-    @Test(expected = JoseException.class)
+    @Test(expected = InvalidKeyException.class)
     public void testExampleVerifyWithKeyNoGood() throws JoseException
     {
         JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS);
         jws.setCompactSerialization(JWS);
         jws.setKey(KEY);
         jws.verifySignature();
     }
 
-    @Test(expected = JoseException.class)
+    @Test(expected = InvalidAlgorithmException.class)
     public void testExampleVerifyButNoneNotAllowed() throws JoseException
     {
         JsonWebSignature jws = new JsonWebSignature();
@@ -101,7 +108,7 @@ public class JwsPlaintextTest
     }
 
     @Test
-    public void testExampleVerifyWithNoneAllowed() throws JoseException
+    public void testExampleVerifyWithOnlyNoneAllowed() throws JoseException
     {
         JsonWebSignature jws = new JsonWebSignature();
         jws.setAlgorithmConstraints(new AlgorithmConstraints(WHITELIST, NONE));

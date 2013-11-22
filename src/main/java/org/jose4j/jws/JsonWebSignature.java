@@ -16,6 +16,7 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwa.AlgorithmFactory;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwx.CompactSerializer;
@@ -39,6 +40,11 @@ public class JsonWebSignature extends JsonWebStructure
     private String payloadCharEncoding = StringUtil.UTF_8;
 
     private Boolean validSignature;
+
+    public JsonWebSignature()
+    {
+        setAlgorithmConstraints(AlgorithmConstraints.DISALLOW_NONE);
+    }
 
     public void setPayload(String payload)
     {
