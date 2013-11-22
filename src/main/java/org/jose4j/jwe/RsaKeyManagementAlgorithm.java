@@ -3,7 +3,7 @@ package org.jose4j.jwe;
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.keys.KeyPersuasion;
-import org.jose4j.lang.JoseException;
+import org.jose4j.lang.InvalidKeyException;
 
 import java.security.Key;
 import java.security.interfaces.RSAPrivateKey;
@@ -21,14 +21,14 @@ public class RsaKeyManagementAlgorithm extends WrappingKeyManagementAlgorithm im
     }
 
     @Override
-    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
         RSAPublicKey rsaPublicKey = KeyValidationSupport.castKey(managementKey, RSAPublicKey.class);
         KeyValidationSupport.checkRsaKeySize(rsaPublicKey);
     }
 
     @Override
-    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
         RSAPrivateKey rsaPrivateKey = KeyValidationSupport.castKey(managementKey, RSAPrivateKey.class);
         KeyValidationSupport.checkRsaKeySize(rsaPrivateKey);

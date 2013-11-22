@@ -12,9 +12,8 @@ import org.jose4j.jwx.Headers;
 import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.keys.EcKeyUtil;
 import org.jose4j.keys.KeyPersuasion;
-import org.jose4j.lang.ByteUtil;
-import org.jose4j.lang.JoseException;
-import org.jose4j.lang.UncheckedJoseException;
+import org.jose4j.lang.*;
+import org.jose4j.lang.InvalidKeyException;
 
 import javax.crypto.KeyAgreement;
 import javax.crypto.spec.SecretKeySpec;
@@ -96,7 +95,7 @@ public class EcdhKeyAgreementAlgorithm extends AlgorithmInfo implements KeyManag
         }
     }
 
-    private byte[] generateEcdhSecret(PrivateKey privateKey, PublicKey publicKey) throws JoseException
+    private byte[] generateEcdhSecret(PrivateKey privateKey, PublicKey publicKey) throws InvalidKeyException
     {
         KeyAgreement keyAgreement = getKeyAgreement();
 
@@ -105,22 +104,22 @@ public class EcdhKeyAgreementAlgorithm extends AlgorithmInfo implements KeyManag
             keyAgreement.init(privateKey);
             keyAgreement.doPhase(publicKey, true);
         }
-        catch (InvalidKeyException e)
+        catch (java.security.InvalidKeyException e)
         {
-            throw new JoseException("Invalid Key for " + getJavaAlgorithm() + " key agreement." ,e);
+            throw new InvalidKeyException("Invalid Key for " + getJavaAlgorithm() + " key agreement." ,e);
         }
 
         return keyAgreement.generateSecret();
     }
 
     @Override
-    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
         KeyValidationSupport.castKey(managementKey, ECPublicKey.class);
     }
 
     @Override
-    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
         KeyValidationSupport.castKey(managementKey, ECPrivateKey.class);
     }

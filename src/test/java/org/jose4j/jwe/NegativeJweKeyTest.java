@@ -130,7 +130,7 @@ public class NegativeJweKeyTest extends TestCase
         expectBadKeyFailOnProduce(DIRECT, AES_256_CBC_HMAC_SHA_512, ExampleEcKeysFromJws.PUBLIC_521);
     }
 
-    public void testNullAesKey()
+    public void testNullAesKey() throws JoseException
     {
         expectBadKeyFailOnProduce(A128KW, AES_128_CBC_HMAC_SHA_256, null);
         expectBadKeyFailOnProduce(DIRECT, AES_256_CBC_HMAC_SHA_512, null);
@@ -230,7 +230,7 @@ public class NegativeJweKeyTest extends TestCase
     {
         String cs = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0.." +
                 "bvmPzabWZFdbiDrJLDoQVw.i7aWtdTVPhVgVDP0lx8TnA.djK6f7tQ44T8aBAfblXu8qA4j9KHMjomy_Ho0sb4S1g";
-        expectBadKeyFailOnConsume(cs, aesKey(64));
+        expectBadKeyFailOnConsume(cs, aesKey(32));
     }
 
     public void testConsumeKeySizeMismatch14() throws JoseException
@@ -302,7 +302,7 @@ public class NegativeJweKeyTest extends TestCase
                 "pZyCrX1Aae9kvKEyCvUTfA.H7qnqcNKWAVhd-xAVdAgkw.kDaHS6qIiKxAH4Z316EJ6w", publicKey);
     }
 
-    public void testRsaWithWrongType()
+    public void testRsaWithWrongType() throws JoseException
     {
         expectBadKeyFailOnProduce(RSA_OAEP, AES_128_CBC_HMAC_SHA_256, aesKey(256));
         expectBadKeyFailOnProduce(RSA_OAEP, AES_128_CBC_HMAC_SHA_256, ExampleEcKeysFromJws.PUBLIC_521);
@@ -363,7 +363,7 @@ public class NegativeJweKeyTest extends TestCase
         }
     }
 
-    private void expectBadKeyFailOnProduce(String alg, String enc, Key key)
+    private void expectBadKeyFailOnProduce(String alg, String enc, Key key) throws JoseException
     {
         JsonWebEncryption jwe = new JsonWebEncryption();
         jwe.setPlaintext("PLAIN OLD TEXT");

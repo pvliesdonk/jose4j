@@ -20,11 +20,9 @@ import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
-import org.jose4j.lang.JoseException;
+import org.jose4j.lang.InvalidKeyException;
 
-import javax.crypto.Cipher;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 
 /**
  */
@@ -46,36 +44,36 @@ public class AesKeyWrapManagementAlgorithm extends WrappingKeyManagementAlgorith
     }
 
     @Override
-    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
         validateKey(managementKey);
     }
 
     @Override
-    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
         validateKey(managementKey);
     }
 
-    void validateKey(Key managementKey) throws JoseException
+    void validateKey(Key managementKey) throws InvalidKeyException
     {
         if (managementKey == null)
         {
-            throw new JoseException("The key must not be null.");
+            throw new InvalidKeyException("The key must not be null.");
         }
 
         String alg = managementKey.getAlgorithm();
 
         if (!AesKey.ALGORITHM.equals(alg))
         {
-            throw new JoseException("Invalid key for JWE " + getAlgorithmIdentifier() + ", expected an "
+            throw new InvalidKeyException("Invalid key for JWE " + getAlgorithmIdentifier() + ", expected an "
                                + AesKey.ALGORITHM+ " key but an " + alg + " bit key was provided.");
         }
 
         int managementKeyByteLength = managementKey.getEncoded().length;
         if (managementKeyByteLength != getKeyByteLength())
         {
-           throw new JoseException("Invalid key for JWE " + getAlgorithmIdentifier() + ", expected a "
+           throw new InvalidKeyException("Invalid key for JWE " + getAlgorithmIdentifier() + ", expected a "
                    + ByteUtil.bitLength(getKeyByteLength())+ " bit key but a "
                    + ByteUtil.bitLength(managementKeyByteLength) + " bit key was provided.");
         }

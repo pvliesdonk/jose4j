@@ -4,6 +4,7 @@ import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.Headers;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
@@ -28,30 +29,30 @@ public class DirectKeyManagementAlgorithm extends AlgorithmInfo implements KeyMa
     {
         if (encryptedKey.length != 0)
         {
-            throw new JoseException("An empty octet sequence is used as the JWE Encrypted Key value when utilizing " +
+            throw new InvalidKeyException("An empty octet sequence is to be used as the JWE Encrypted Key value when utilizing " +
                     "direct encryption but this JWE has " + encryptedKey.length + " octets in the encrypted key part.");
         }
         return managementKey;
     }
 
     @Override
-    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
         validateKey(managementKey, contentEncryptionAlg);
     }
 
-    private void validateKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    private void validateKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
         if (managementKey == null)
         {
-            throw new JoseException("The key must not be null.");
+            throw new InvalidKeyException("The key must not be null.");
         }
 
         int managementKeyByteLength = managementKey.getEncoded().length;
         int expectedByteLength = contentEncryptionAlg.getContentEncryptionKeyDescriptor().getContentEncryptionKeyByteLength();
         if (expectedByteLength != managementKeyByteLength)
         {
-            throw new JoseException("Invalid key for " + getAlgorithmIdentifier() + " with "
+            throw new InvalidKeyException("Invalid key for " + getAlgorithmIdentifier() + " with "
                               + contentEncryptionAlg.getAlgorithmIdentifier() +", expected a "
                               + ByteUtil.bitLength(expectedByteLength)+ " bit key but a "
                               + ByteUtil.bitLength(managementKeyByteLength) + " bit key was provided.");
@@ -59,7 +60,7 @@ public class DirectKeyManagementAlgorithm extends AlgorithmInfo implements KeyMa
     }
 
     @Override
-    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws JoseException
+    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
         validateKey(managementKey, contentEncryptionAlg);
     }
