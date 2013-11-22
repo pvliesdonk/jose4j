@@ -55,13 +55,13 @@ public class AlgorithmConstraints
             case WHITELIST:
                 if (!algorithms.contains(algorithm))
                 {
-                    throw new InvalidAlgorithmException(algorithm + " is not whitelisted.");
+                    throw new InvalidAlgorithmException("'" +algorithm + "' is not a whitelisted algorithm.");
                 }
                 break;
             case BLACKLIST:
                 if (algorithms.contains(algorithm))
                 {
-                    throw new InvalidAlgorithmException(algorithm + " is blacklisted");
+                    throw new InvalidAlgorithmException("'" + algorithm + "' is a blacklisted algorithm.");
                 }
                 break;
         }
