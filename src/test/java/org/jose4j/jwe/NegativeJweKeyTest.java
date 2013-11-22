@@ -23,6 +23,7 @@ import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
+import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
@@ -356,7 +357,7 @@ public class NegativeJweKeyTest extends TestCase
             fail("plaintextString w/ "+jwe.getHeaders().getFullHeaderAsJsonString() +
                     " should have failed due to bad key ("+key+") but gave " + plaintextString);
         }
-        catch (JoseException e)
+        catch (InvalidKeyException e)
         {
             log.debug("Expected exception due to invalid key: " + e);
         }
@@ -375,7 +376,7 @@ public class NegativeJweKeyTest extends TestCase
             String cs = jwe.getCompactSerialization();
             fail("getCompactSerialization w/ " + alg + "/" + enc + " should have failed due to bad key (" + key + ") but gave " + cs);
         }
-        catch (JoseException e)
+        catch (InvalidKeyException e)
         {
             log.debug("Expected exception due to invalid key: " + e);
         }
