@@ -7,6 +7,7 @@ import org.jose4j.jwk.OctetSequenceJsonWebKey;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.keys.AesKey;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.InvalidAlgorithmException;
 import org.jose4j.lang.JoseException;
 import org.jose4j.zip.CompressionAlgorithmIdentifiers;
 
@@ -54,7 +55,7 @@ public class ZipTest extends TestCase
         assertEquals(plaintext, plaintextString);
     }
 
-    public void testJweBadZipValueProduce()
+    public void testJweBadZipValueProduce() throws JoseException
     {
         JsonWebEncryption jwe = new JsonWebEncryption();
         String plaintext = "This should compress pretty good, it should, yes it should pretty good it should it should";
@@ -70,7 +71,7 @@ public class ZipTest extends TestCase
             String cs = jwe.getCompactSerialization();
             fail("Should fail with invalid zip header value: " + cs);
         }
-        catch (JoseException e)
+        catch (InvalidAlgorithmException e)
         {
             // just see if the exception message says something about the header name
             assertTrue(e.getMessage().contains(HeaderParameterNames.ZIP));
@@ -95,7 +96,7 @@ public class ZipTest extends TestCase
             String plaintextString = jwe.getPlaintextString();
             fail("Should fail with invalid zip header value but gave: " + plaintextString);
         }
-        catch (JoseException e)
+        catch (InvalidAlgorithmException e)
         {
             // just see if the exception message says something about the header name
             assertTrue(e.getMessage().contains(HeaderParameterNames.ZIP));
