@@ -69,8 +69,7 @@ public class RsaJsonWebKey extends PublicJsonWebKey
 
         if (params.containsKey(PRIVATE_EXPONENT_MEMBER_NAME))
         {
-            String b64d = JsonHelp.getString(params, PRIVATE_EXPONENT_MEMBER_NAME);
-            BigInteger d = BigEndianBigInteger.fromBase64Url(b64d);
+            BigInteger d = getBigIntFromBase64UrlEncodedParam(params, PRIVATE_EXPONENT_MEMBER_NAME);
 
             if (params.containsKey(FIRST_PRIME_FACTOR_MEMBER_NAME))
             {
