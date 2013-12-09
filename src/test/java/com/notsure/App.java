@@ -165,103 +165,58 @@ public class App
         System.out.println(jwe.getHeaders().getFullHeaderAsJsonString());
     }
 
-    public static void mainNewExampleForSec5RequestParametersAsJWTs(String... args) throws JoseException
+    public static void main/*NewExampleForSec5RequestParametersAsJWTs*/(String... args) throws JoseException
     {
-        String five1 = "eyJhbGciOiJSUzI1NiJ9.ew0KICJyZXNwb25zZV90eXBlIjogImNvZGUgaWRfdG9rZ" +
-                "W4iLA0KICJjbGllbnRfaWQiOiAiczZCaGRSa3F0MyIsDQogInJlZGlyZWN0X3VyaSI" +
-                "6ICJodHRwczovL2NsaWVudC5leGFtcGxlLm9yZy9jYiIsDQogInNjb3BlIjogIm9wZ" +
-                "W5pZCIsDQogInN0YXRlIjogImFmMGlmanNsZGtqIiwNCiAibm9uY2UiOiAibi0wUzZ" +
-                "fV3pBMk1qIiwNCiAibWF4X2FnZSI6IDg2NDAwLA0KICJjbGFpbXMiOiANCiAgew0KI" +
-                "CAgInVzZXJpbmZvIjogDQogICAgew0KICAgICAiZ2l2ZW5fbmFtZSI6IHsiZXNzZW5" +
-                "0aWFsIjogdHJ1ZX0sDQogICAgICJuaWNrbmFtZSI6IG51bGwsDQogICAgICJlbWFpb" +
-                "CI6IHsiZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgICJlbWFpbF92ZXJpZmllZCI6IHs" +
-                "iZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgICJwaWN0dXJlIjogbnVsbA0KICAgIH0sD" +
-                "QogICAiaWRfdG9rZW4iOiANCiAgICB7DQogICAgICJnZW5kZXIiOiBudWxsLA0KICA" +
-                "gICAiYmlydGhkYXRlIjogeyJlc3NlbnRpYWwiOiB0cnVlfSwNCiAgICAgImFjciI6I" +
-                "HsidmFsdWVzIjogWyIyIl19DQogICAgfQ0KICB9DQp9.bOD4rUiQfzh4QPIs_f_R2G" +
-                "VBhNHcc1p2cQTgixB1tsYRs52xW4TO74USgb-nii3RPsLdfoPlsEbJLmtbxG8-TQBH" +
-                "qGAyZxMDPWy3phjeRt9ApDRnLQrjYuvsCj6byu9TVaKX9r1KDFGT-HLqUNlUTpYtCy" +
-                "M2B2rLkWM08ufBq9JBCEzzaLRzjevYEPMaoLAOjb8LPuYOYTBqshRMUxy4Z380-FJ2" +
-                "Lc7VSfSu6HcB2nLSjiKrrfI35xkRJsaSSmjasMYeDZarYCl7r4o17rFclk5KacYMYg" +
-                "As-JYFkwab6Dd56ZrAzakHt9cExMpg04lQIux56C-Qk6dAsB6W6W91AQ";
+        String one = "ew0KICJpc3MiOiAiczZCaGRSa3F0MyIsDQogImF1ZCI6ICJodHRwczovL3NlcnZlci5leGFtcGxlLmNvbSIsDQogInJlc3BvbnNlX3R5cGUiOiAiY29kZSBpZF90b2tlbiIsDQogImNsaWVudF9pZCI6ICJzNkJoZFJrcXQzIiwNCiAicmVkaXJlY3RfdXJpIjogImh0dHBzOi8vY2xpZW50LmV4YW1wbGUub3JnL2NiIiwNCiAic2NvcGUiOiAib3BlbmlkIiwNCiAic3RhdGUiOiAiYWYwaWZqc2xka2oiLA0KICJub25jZSI6ICJuLTBTNl9XekEyTWoiLA0KICJtYXhfYWdlIjogODY0MDAsDQogImNsYWltcyI6IA0KICB7DQogICAidXNlcmluZm8iOiANCiAgICB7DQogICAgICJnaXZlbl9uYW1lIjogeyJlc3NlbnRpYWwiOiB0cnVlfSwNCiAgICAgIm5pY2tuYW1lIjogbnVsbCwNCiAgICAgImVtYWlsIjogeyJlc3NlbnRpYWwiOiB0cnVlfSwNCiAgICAgImVtYWlsX3ZlcmlmaWVkIjogeyJlc3NlbnRpYWwiOiB0cnVlfSwNCiAgICAgInBpY3R1cmUiOiBudWxsDQogICAgfSwNCiAgICJpZF90b2tlbiI6IA0KICAgIHsNCiAgICAgImdlbmRlciI6IG51bGwsDQogICAgICJiaXJ0aGRhdGUiOiB7ImVzc2VudGlhbCI6IHRydWV9LA0KICAgICAiYWNyIjogeyJ2YWx1ZXMiOiBbInVybjptYWNlOmluY29tbW9uOmlhcDpzaWx2ZXIiXX0NCiAgICB9DQogIH0NCn0";
 
+        String two = "ew0KICJpc3MiOiAiczZCaGRSa3F0MyIsDQogImF1ZCI6ICJodHRwczovL3NlcnZlci5leGFtcGxlLmNvbSIsDQogInJlc3BvbnNlX3R5cGUiOiAiY29kZSBpZF90b2tlbiIsDQogImNsaWVudF9pZCI6ICJzNkJoZFJrcXQzIiwNCiAicmVkaXJlY3RfdXJpIjogImh0dHBzOi8vY2xpZW50LmV4YW1wbGUub3JnL2NiIiwNCiAic2NvcGUiOiAib3BlbmlkIiwNCiAic3RhdGUiOiAiYWYwaWZqc2xka2oiLA0KICJub25jZSI6ICJuLTBTNl9XekEyTWoiLA0KICJtYXhfYWdlIjogODY0MDAsDQogImNsYWltcyI6IA0KICB7DQogICAidXNlcmluZm8iOiANCiAgICB7DQogICAgICJnaXZlbl9uYW1lIjogeyJlc3NlbnRpYWwiOiB0cnVlfSwNCiAgICAgIm5pY2tuYW1lIjogbnVsbCwNCiAgICAgImVtYWlsIjogeyJlc3NlbnRpYWwiOiB0cnVlfSwNCiAgICAgImVtYWlsX3ZlcmlmaWVkIjogeyJlc3NlbnRpYWwiOiB0cnVlfSwNCiAgICAgInBpY3R1cmUiOiBudWxsDQogICAgfSwNCiAgICJpZF90b2tlbiI6IA0KICAgIHsNCiAgICAgImdlbmRlciI6IG51bGwsDQogICAgICJiaXJ0aGRhdGUiOiB7ImVzc2VudGlhbCI6IHRydWV9LA0KICAgICAiYWNyIjogeyJ2YWx1ZXMiOiBbInVybjptYWNlOmluY29tbW9uOmlhcDpzaWx2ZXIiXX0NCiAgICB9DQogIH0NCn0";
 
-        String five11 = "eyJhbGciOiJSUzI1NiJ9.ew0KICJyZXNwb25zZV90eXBlIjogImNvZG" +
-                "UgaWRfdG9rZW4iLA0KICJjbGllbnRfaWQiOiAiczZCaGRSa3F0MyIsDQogInJlZG" +
-                "lyZWN0X3VyaSI6ICJodHRwczovL2NsaWVudC5leGFtcGxlLm9yZy9jYiIsDQogIn" +
-                "Njb3BlIjogIm9wZW5pZCIsDQogInN0YXRlIjogImFmMGlmanNsZGtqIiwNCiAibm" +
-                "9uY2UiOiAibi0wUzZfV3pBMk1qIiwNCiAibWF4X2FnZSI6IDg2NDAwLA0KICJjbG" +
-                "FpbXMiOiANCiAgew0KICAgInVzZXJpbmZvIjogDQogICAgew0KICAgICAiZ2l2ZW" +
-                "5fbmFtZSI6IHsiZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgICJuaWNrbmFtZSI6IG" +
-                "51bGwsDQogICAgICJlbWFpbCI6IHsiZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgIC" +
-                "JlbWFpbF92ZXJpZmllZCI6IHsiZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgICJwaW" +
-                "N0dXJlIjogbnVsbA0KICAgIH0sDQogICAiaWRfdG9rZW4iOiANCiAgICB7DQogIC" +
-                "AgICJnZW5kZXIiOiBudWxsLA0KICAgICAiYmlydGhkYXRlIjogeyJlc3NlbnRpYW" +
-                "wiOiB0cnVlfSwNCiAgICAgImFjciI6IHsidmFsdWVzIjogWyIyIl19DQogICAgfQ" +
-                "0KICB9DQp9.bOD4rUiQfzh4QPIs_f_R2GVBhNHcc1p2cQTgixB1tsYRs52xW4TO7" +
-                "4USgb-nii3RPsLdfoPlsEbJLmtbxG8-TQBHqGAyZxMDPWy3phjeRt9ApDRnLQrjY" +
-                "uvsCj6byu9TVaKX9r1KDFGT-HLqUNlUTpYtCyM2B2rLkWM08ufBq9JBCEzzaLRzj" +
-                "evYEPMaoLAOjb8LPuYOYTBqshRMUxy4Z380-FJ2Lc7VSfSu6HcB2nLSjiKrrfI35" +
-                "xkRJsaSSmjasMYeDZarYCl7r4o17rFclk5KacYMYgAs-JYFkwab6Dd56ZrAzakHt" +
-                "9cExMpg04lQIux56C-Qk6dAsB6W6W91AQ";
-
-        String five2 = "eyJhbGciOiJSUzI1NiJ9.ew0KICJyZXNwb25zZV90eXBlIjogImNvZGUgaWRfdG9rZ" +
-                "W4iLA0KICJjbGllbnRfaWQiOiAiczZCaGRSa3F0MyIsDQogInJlZGlyZWN0X3VyaSI" +
-                "6ICJodHRwczovL2NsaWVudC5leGFtcGxlLm9yZy9jYiIsDQogInNjb3BlIjogIm9wZ" +
-                "W5pZCIsDQogInN0YXRlIjogImFmMGlmanNsZGtqIiwNCiAibm9uY2UiOiAibi0wUzZ" +
-                "fV3pBMk1qIiwNCiAibWF4X2FnZSI6IDg2NDAwLA0KICJjbGFpbXMiOiANCiAgew0KI" +
-                "CAgInVzZXJpbmZvIjogDQogICAgew0KICAgICAiZ2l2ZW5fbmFtZSI6IHsiZXNzZW5" +
-                "0aWFsIjogdHJ1ZX0sDQogICAgICJuaWNrbmFtZSI6IG51bGwsDQogICAgICJlbWFpb" +
-                "CI6IHsiZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgICJlbWFpbF92ZXJpZmllZCI6IHs" +
-                "iZXNzZW50aWFsIjogdHJ1ZX0sDQogICAgICJwaWN0dXJlIjogbnVsbA0KICAgIH0sD" +
-                "QogICAiaWRfdG9rZW4iOiANCiAgICB7DQogICAgICJnZW5kZXIiOiBudWxsLA0KICA" +
-                "gICAiYmlydGhkYXRlIjogeyJlc3NlbnRpYWwiOiB0cnVlfSwNCiAgICAgImFjciI6I" +
-                "HsidmFsdWVzIjogWyIyIl19DQogICAgfQ0KICB9DQp9.bOD4rUiQfzh4QPIs_f_R2G" +
-                "VBhNHcc1p2cQTgixB1tsYRs52xW4TO74USgb-nii3RPsLdfoPlsEbJLmtbxG8-TQBH" +
-                "qGAyZxMDPWy3phjeRt9ApDRnLQrjYuvsCj6byu9TVaKX9r1KDFGT-HLqUNlUTpYtCy" +
-                "M2B2rLkWM08ufBq9JBCEzzaLRzjevYEPMaoLAOjb8LPuYOYTBqshRMUxy4Z380-FJ2" +
-                "Lc7VSfSu6HcB2nLSjiKrrfI35xkRJsaSSmjasMYeDZarYCl7r4o17rFclk5KacYMYg" +
-                "As-JYFkwab6Dd56ZrAzakHt9cExMpg04lQIux56C-Qk6dAsB6W6W91AQ";
-
-        System.out.println(five1.equals(five11));
-        System.out.println(five1.equals(five2));
+        System.out.println(one.equals(two));
 
         AlgorithmFactoryFactory.getInstance().getJwsAlgorithmFactory();
         JsonWebSignature jws;
 
+        String reqJson =  new Base64Url().base64UrlDecodeToUtf8String(one);
 
-
-        String reqJson =  "{\n"+
-            " \"response_type\": \"code id_token\",\n"+
-            " \"client_id\": \"s6BhdRkqt3\",\n"+
-            " \"redirect_uri\": \"https://client.example.org/cb\",\n"+
-            " \"scope\": \"openid\",\n"+
-            " \"state\": \"af0ifjsldkj\",\n"+
-            " \"nonce\": \"n-0S6_WzA2Mj\",\n"+
-            " \"max_age\": 86400,\n"+
-            " \"claims\": \n"+
-            "  {\n"+
-            "   \"userinfo\": \n"+
-            "    {\n"+
-            "     \"given_name\": {\"essential\": true},\n"+
-            "     \"nickname\": null,\n"+
-            "     \"email\": {\"essential\": true},\n"+
-            "     \"email_verified\": {\"essential\": true},\n"+
-            "     \"picture\": null\n"+
-            "    },\n"+
-            "   \"id_token\": \n"+
-            "    {\n"+
-            "     \"gender\": null,\n"+
-            "     \"birthdate\": {\"essential\": true},\n"+
-            "     \"acr\": {\"values\": [\"2\"]}\n"+
-            "    }\n"+
-            "  }\n"+
-            "}";
         System.out.println(reqJson);
-        RsaJsonWebKey jwk = RsaJwkGenerator.generateJwk(2048);
-        String keyId = "6k";
+
+        String jkwFromCore = "  {\n" +
+                "   \"kty\": \"RSA\",\n" +
+                "   \"n\": \"y9Lqv4fCp6Ei-u2-ZCKq83YvbFEk6JMs_pSj76eMkddWRuWX2aBKGHAtKlE\n" +
+                "         5P7_vn__PCKZWePt3vGkB6ePgzAFu08NmKemwE5bQI0e6kIChtt_6KzT5Oa\n" +
+                "         aXDFI6qCLJmk51Cc4VYFaxgqevMncYrzaW_50mZ1yGSFIQzLYP8bijAHGVj\n" +
+                "         dEFgZaZEN9lsn_GdWLaJpHrB3ROlS50E45wxrlg9xMncVb8qDPuXZarvghL\n" +
+                "         L0HzOuYRadBJVoWZowDNTpKpk2RklZ7QaBO7XDv3uR7s_sf2g-bAjSYxYUG\n" +
+                "         sqkNA9b3xVW53am_UZZ3tZbFTIh557JICWKHlWj5uzeJXaw\",\n" +
+                "   \"e\": \"AQAB\",\n" +
+                "   \"d\": \"LNwG_pCKrwowALpCpRdcOKlSVqylSurZhE6CpkRiE9cpDgGKIkO9CxPlXOL\n" +
+                "         zjqxXuQc8MdMqRQZTnAwgd7HH0B6gncrruV3NewI-XQV0ckldTjqNfOTz1V\n" +
+                "         Rs-jE-57KAXI3YBIhu-_0YpIDzdk_wBuAk661Svn0GsPQe7m9DoxdzenQu9\n" +
+                "         O_soewUhlPzRrTH0EeIqYI715rwI3TYaSzoWBmEPD2fICyj18FF0MPy_SQz\n" +
+                "         k3noVUUIzfzLnnJiWy_p63QBCMqjRoSHHdMnI4z9iVpIwJWQ3jO5n_2lC2-\n" +
+                "         cSgwjmKsFzDBbQNJc7qMG1N6EssJUwgGJxz1eAUFf0w4YAQ\",\n" +
+                "   \"qi\": \"J-mG0swR4FTy3atrcQ7dd0hhYn1E9QndN-\n" +
+                "         -sDG4EQO0RnFj6wIefCvwIc4\n" +
+                "         7hCtVeFnCTPYJNc_JyV-mU-9vlzS5GSNuyR5qdpsMZXUMpEvQcwKt23ffPZ\n" +
+                "         YGaqfKyEesmf_Wi8fFcE68H9REQjnniKrXm7w2-IuG_IrVJA9Ox-uU\",\n" +
+                "   \"q\": \"4hlMYAGa0dvogdK1jnxQ7J_Lqpqi99e-AeoFvoYpMPhthChTzwFZO9lQmUo\n" +
+                "         BpMqVQTws_s7vWGmt7ZAB3ywkurf0pV7BD0fweJiUzrWk4KJjxtmP_auuxr\n" +
+                "         jvm3s2FUGn6f0wRY9Z8Hj9A7C72DnYCjuZiJQMYCWDsZ8-d-L1a-s\",\n" +
+                "   \"p\": \"5sd9Er3I2FFT9R-gy84_oakEyCmgw036B_nfYEEOCwpSvi2z7UcIVK3bSEL\n" +
+                "         5WCW6BNgB3HDWhq8aYPirwQnqm0K9mX1E-4xM10WWZ-rP3XjYpQeS0Snru5\n" +
+                "         LFVWsAzi-FX7BOqBibSAXLdEGXcXa44l08iec_bPD3xduq5V_1YoE\",\n" +
+                "   \"dq\": \"Nz2PF3XM6bEc4XsluKZO70ErdYdKgdtIJReUR7Rno_tOZpejwlPGBYVW19\n" +
+                "         zpAeYtCT82jxroB2XqhLxGeMxEPQpsz2qTKLSe4BgHY2ml2uxSDGdjcsrbb\n" +
+                "         NoKUKaN1CuyZszhWl1n0AT_bENl4bJgQj_Fh0UEsQj5YBBUJt5gr_k\",\n" +
+                "   \"dp\": \"Zc877jirkkLOtyTs2vxyNe9KnMNAmOidlUc2tE_-0gAL4Lpo1hSwKCtKwe\n" +
+                "         ZJ-gkqt1hT-dwNx_0Xtg_-NXsadMRMwJnzBMYwYAfjApUkfqABc0yUCJJl3\n" +
+                "         KozRCugf1WXkU9GZAH2_x8PUopdNUEa70ISowPRh04HANKX4fkjWAE\"\n" +
+                "  }";
+        PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(jkwFromCore);
+        String keyId = "k2bdc";
         jwk.setKeyId(keyId);
         System.out.println(jwk.toJson(JsonWebKey.OutputControlLevel.PUBLIC_ONLY));
+        System.out.println(jwk.toJson(JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE));
 
         Map<String, Object> claimsMap = JsonUtil.parseJson(reqJson);
 
