@@ -41,7 +41,7 @@ public class Aes256GcmContentEncryptionAlgorithm extends AlgorithmInfo implement
 
     public Aes256GcmContentEncryptionAlgorithm()
     {
-        setAlgorithmIdentifier("A128GCM");
+        setAlgorithmIdentifier("A256GCM");
         setJavaAlgorithm("AES/GCM/NoPadding");
         setKeyPersuasion(KeyPersuasion.SYMMETRIC);
         setKeyType(AesKey.ALGORITHM);
