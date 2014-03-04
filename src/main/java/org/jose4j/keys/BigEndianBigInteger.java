@@ -17,6 +17,7 @@
 package org.jose4j.keys;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.lang.ByteUtil;
 
 import java.math.BigInteger;
 
@@ -49,9 +50,7 @@ public class BigEndianBigInteger
 
         if ((bigInteger.bitLength() % 8 == 0) && (twosComplementBytes[0] == 0) && twosComplementBytes.length > 1)
         {
-            byte[] bytes = new byte[twosComplementBytes.length - 1];
-            System.arraycopy(twosComplementBytes, 1, bytes, 0, bytes.length);
-            magnitude = bytes;
+            magnitude = ByteUtil.subArray(twosComplementBytes, 1, twosComplementBytes.length - 1);
         }
         else
         {
