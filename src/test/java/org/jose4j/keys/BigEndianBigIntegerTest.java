@@ -16,17 +16,13 @@
 
 package org.jose4j.keys;
 
-import junit.framework.TestCase;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import static java.util.Arrays.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
