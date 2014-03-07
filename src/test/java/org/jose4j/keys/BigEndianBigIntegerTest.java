@@ -19,14 +19,22 @@ package org.jose4j.keys;
 import junit.framework.TestCase;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 
+import static java.util.Arrays.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
 /**
  */
-public class BigEndianBigIntegerTest extends TestCase
+public class BigEndianBigIntegerTest
 {
+    @Test
     public void testExampleStuff()
     {
         basicConversionTest(BigEndianBigInteger.toBase64Url(ExampleRsaKeyFromJws.PUBLIC_KEY.getPublicExponent()));
@@ -34,6 +42,7 @@ public class BigEndianBigIntegerTest extends TestCase
         basicConversionTest(BigEndianBigInteger.toBase64Url(ExampleRsaKeyFromJws.PRIVATE_KEY.getPrivateExponent()));
     }
 
+    @Test
     public void testBasicConversions()
     {
         for (int i = 0; i < 500; i++)
@@ -42,6 +51,7 @@ public class BigEndianBigIntegerTest extends TestCase
         }
     }
 
+    @Test
     public void testBasicConversions2()
     {
         for (long l = 200; l < Long.MAX_VALUE && l > 0; l=l*2)
@@ -53,6 +63,7 @@ public class BigEndianBigIntegerTest extends TestCase
         }
     }
 
+    @Test
     public void testBasicConversionSub0()
     {
         try
@@ -65,6 +76,7 @@ public class BigEndianBigIntegerTest extends TestCase
         }
     }
 
+    @Test
     public void testBasicConversionSub0MinLong()
     {
         try
@@ -77,41 +89,49 @@ public class BigEndianBigIntegerTest extends TestCase
         }
     }
 
+    @Test
     public void testBasicConversion0()
     {
         basicConversionTest(0);
     }
 
+    @Test
     public void testBasicConversion1()
     {
         basicConversionTest(129);
     }
 
+    @Test
     public void testBasicConversion2()
     {
         basicConversionTest(8388608);
     }
 
+    @Test
     public void testBasicConversion3()
     {
         basicConversionTest(8388609);
     }
 
+    @Test
     public void testBasicConversion4()
     {
         basicConversionTest(8388811);
     }
 
+    @Test
     public void testBasicConversion5()
     {
         basicConversionTest(16777215);
     }
     
+    @Test
     public void testBasicConversion6()
     {
         basicConversionTest(16777217);
     }
 
+    @Test
     public void testBasicConversionMaxLong()
     {
         basicConversionTest(Long.MAX_VALUE);
@@ -122,29 +142,32 @@ public class BigEndianBigIntegerTest extends TestCase
         BigInteger bigInt1 = BigInteger.valueOf(i);
         String b64 = BigEndianBigInteger.toBase64Url(bigInt1);
         BigInteger bigInt2= BigEndianBigInteger.fromBase64Url(b64);
-        assertEquals(bigInt1, bigInt2);
+        assertThat(bigInt1, is(equalTo(bigInt2)));
 
         byte[] bytes = BigEndianBigInteger.toByteArray(bigInt1);
         byte[] bytes2 = toByteArrayViaHex(bigInt1);
-        boolean okay = Arrays.equals(bytes, bytes2);
-        assertTrue("array comp on " + i + " " + Arrays.toString(bytes) + " " + Arrays.toString(bytes2), okay);
+        assertArrayEquals("array comp on " + i + " " + Arrays.toString(bytes) + " " + Arrays.toString(bytes2), bytes, bytes2);
     }
 
+    @Test
     public void testConversion1()
     {
         basicConversionTest("AQAB");
     }
 
+    @Test
     public void testConversion2()
     {
         basicConversionTest("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
     }
 
+    @Test
     public void testConversion3()
     {
         basicConversionTest("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
     }
 
+    @Test
     public void testConversion4()
     {
         String s = "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
@@ -166,7 +189,7 @@ public class BigEndianBigIntegerTest extends TestCase
 
         byte[] bytes = BigEndianBigInteger.toByteArray(bigInt);
         byte[] bytes2 = toByteArrayViaHex(bigInt);
-        assertTrue("array comp on " + urlEncodedBytes, Arrays.equals(bytes, bytes2));
+        assertArrayEquals("array comp on " + urlEncodedBytes, bytes, bytes2);
     }
 
     private byte[] toByteArrayViaHex(BigInteger bigInteger)
