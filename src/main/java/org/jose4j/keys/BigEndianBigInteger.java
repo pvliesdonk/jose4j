@@ -75,4 +75,11 @@ public class BigEndianBigInteger
         byte[] bytes = toByteArray(bigInteger);
         return base64Url.base64UrlEncode(bytes);
     }
+
+    public static String toBase64Url(BigInteger bigInteger, int minByteArrayLength)
+    {
+        Base64Url base64Url = new Base64Url();
+        byte[] bytes = toByteArray(bigInteger, minByteArrayLength);
+        return base64Url.base64UrlEncode(bytes);
+    }
 }

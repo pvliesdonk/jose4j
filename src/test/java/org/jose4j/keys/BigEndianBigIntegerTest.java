@@ -234,5 +234,27 @@ public class BigEndianBigIntegerTest
             }
         }
     }
+    @Test
+    public void minLengthEncoded()
+    {
+        String testNumber = "3411573884280259127265394545583489556845492233706098942622874385873783026581606817" +
+                "805506341607692318868814372414764859287098904949502022867291016696377213417";
+
+        String notPadded = "_nJhyQ20ca7Nn0Zvyiq54FfCAblGK7kuduFBTPkxv9eOjiaeGp7V_f3qV1kxS_Il2LY7Tc5l2GSlW_-SzYKxgek";
+        String lftPadded = "AP5yYckNtHGuzZ9Gb8oqueBXwgG5Riu5LnbhQUz5Mb_Xjo4mnhqe1f396ldZMUvyJdi2O03OZdhkpVv_ks2CsYHp";
+
+        BigInteger bigInteger1 = BigEndianBigInteger.fromBase64Url(notPadded);
+        BigInteger bigInteger2 = BigEndianBigInteger.fromBase64Url(lftPadded);
+        assertThat(bigInteger1, is(equalTo(bigInteger2)));
+
+        BigInteger fromBase10 = new BigInteger(testNumber);
+        assertThat(fromBase10, is(equalTo(bigInteger1)));
+
+        String toBase64 = BigEndianBigInteger.toBase64Url(fromBase10);
+        assertThat(toBase64, is(equalTo(notPadded)));
+
+        String toBase64IncludingLeftPad = BigEndianBigInteger.toBase64Url(fromBase10, 66);
+        assertThat(toBase64IncludingLeftPad, is(equalTo(lftPadded)));
+    }
 
 }
