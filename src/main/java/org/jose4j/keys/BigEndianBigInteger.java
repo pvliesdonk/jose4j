@@ -36,6 +36,15 @@ public class BigEndianBigInteger
         byte[] magnitude = base64Url.base64UrlDecode(base64urlEncodedBytes);
         return fromBytes(magnitude);
     }
+    public static byte[] toByteArray(BigInteger bigInteger, int minArrayLength)
+    {
+        byte[] bytes = toByteArray(bigInteger);
+        if (minArrayLength > bytes.length)
+        {
+            bytes = ByteUtil.concat(new byte[minArrayLength - bytes.length], bytes);
+        }
+        return bytes;
+    }
 
     public static byte[] toByteArray(BigInteger bigInteger)
     {

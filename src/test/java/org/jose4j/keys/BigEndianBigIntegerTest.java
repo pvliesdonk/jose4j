@@ -120,7 +120,7 @@ public class BigEndianBigIntegerTest
     {
         basicConversionTest(16777215);
     }
-    
+
     @Test
     public void testBasicConversion6()
     {
@@ -205,4 +205,34 @@ public class BigEndianBigIntegerTest
             throw new IllegalArgumentException("Problem converting BigInteger to byte array via hex.", e);
         }
     }
+
+    @Test
+    public void minArrayLengthOneByteNumbers()
+    {
+        BigInteger[] oneByteBigs = new BigInteger[]
+        {
+            BigInteger.ZERO, BigInteger.ONE, BigInteger.TEN, BigInteger.valueOf(127), BigInteger.valueOf(255)
+        };
+
+        for (BigInteger bi : oneByteBigs)
+        {
+            byte[] conciseBytes = BigEndianBigInteger.toByteArray(bi);
+            assertThat(1, is(equalTo(conciseBytes.length)));
+            BigInteger fromConciseByteArray = BigEndianBigInteger.fromBytes(conciseBytes);
+
+            assertThat(bi, is(equalTo(fromConciseByteArray)));
+
+            int[] minArrayLengths = new int[] {1, 2, 3, 5, 66};
+
+            for (int minArrayLength : minArrayLengths)
+            {
+                byte[] zeroPaddedBytes = BigEndianBigInteger.toByteArray(bi, minArrayLength);
+                assertThat(minArrayLength, is(equalTo(zeroPaddedBytes.length)));
+
+                BigInteger fromZeroPaddedBytes = BigEndianBigInteger.fromBytes(zeroPaddedBytes);
+                assertThat(bi, is(equalTo(fromZeroPaddedBytes)));
+            }
+        }
+    }
+
 }
