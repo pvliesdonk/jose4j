@@ -94,12 +94,19 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
         return curveName;
     }
 
+    private int getCoordinateByteLength()
+    {
+        ECParameterSpec spec = EllipticCurves.getSpec(getCurveName());
+        return (int) Math.ceil(spec.getCurve().getField().getFieldSize() / 8d);
+    }
+
     protected void fillPublicTypeSpecificParams(Map<String,Object> params)
     {
         ECPublicKey ecPublicKey = getECPublicKey();
         ECPoint w = ecPublicKey.getW();
-        putBigIntAsBase64UrlEncodedParam(params, X_MEMBER_NAME, w.getAffineX());
-        putBigIntAsBase64UrlEncodedParam(params, Y_MEMBER_NAME, w.getAffineY());
+        int coordinateByteLength = getCoordinateByteLength();
+        putBigIntAsBase64UrlEncodedParam(params, X_MEMBER_NAME, w.getAffineX(), coordinateByteLength);
+        putBigIntAsBase64UrlEncodedParam(params, Y_MEMBER_NAME, w.getAffineY(), coordinateByteLength);
         params.put(CURVE_MEMBER_NAME, getCurveName());
     }
 
@@ -109,8 +116,11 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
         
         if (ecPrivateKey != null)
         {
-        	putBigIntAsBase64UrlEncodedParam(params, PRIVATE_KEY_MEMBER_NAME, ecPrivateKey.getS());
+            // This should be 'length of this octet
+            // string MUST be ceiling(log-base-2(n)/8) octets (where n is the order
+            //  of the curve).' but this is the same thing for the prime integer curves
+            int coordinateByteLength = getCoordinateByteLength();
+        	putBigIntAsBase64UrlEncodedParam(params, PRIVATE_KEY_MEMBER_NAME, ecPrivateKey.getS(), coordinateByteLength);
         }
-        
     }
 }

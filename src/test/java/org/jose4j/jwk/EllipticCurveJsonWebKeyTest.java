@@ -16,13 +16,25 @@
 
 package org.jose4j.jwk;
 
-import junit.framework.TestCase;
-
-import org.hamcrest.core.Is;
+import org.jose4j.base64url.Base64Url;
+import org.jose4j.json.JsonUtil;
+import org.jose4j.jwt.IntDate;
+import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.ExampleEcKeysFromJws;
+import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.junit.Test;
+
+import java.math.BigInteger;
+import java.security.KeyFactory;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.*;
@@ -115,5 +127,36 @@ public class EllipticCurveJsonWebKeyTest
         PublicJsonWebKey publicOnlyJWK = PublicJsonWebKey.Factory.newPublicJwk(jsonNoPrivateKey);
         assertThat(jsonNoPrivateKey,is(equalTo(publicOnlyJWK.toJson(INCLUDE_PRIVATE))));
 	}
-	
+
+    @Test
+    public void testCryptoBinaryThread() throws Exception
+    {
+        // make sure that "The length of [the y] octet string MUST
+        //   be the full size of a coordinate for the curve specified in the "crv"
+        //  parameter."
+        String keySpec = "MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBCCAc9n4N7ZOr_tTu" +
+                "_wAOmPKi4qTp5X3su6O3010hxmBYj9zI4u_0dm6UZa0LsjdfvcAET6vH3mEApvGKpDWrRsAA_nJhyQ20ca7Nn0Zvyiq54FfCAblGK7kuduF" +
+                "BTPkxv9eOjiaeGp7V_f3qV1kxS_Il2LY7Tc5l2GSlW_-SzYKxgek";
+
+        Base64Url base64Url = new Base64Url();
+        byte[] bytes = base64Url.base64UrlDecode(keySpec);
+        PublicKey ecPubKey = KeyFactory.getInstance("EC").generatePublic(new X509EncodedKeySpec(bytes));
+
+        PublicJsonWebKey jwk = EllipticCurveJsonWebKey.Factory.newPublicJwk(ecPubKey);
+        String jwkJson = jwk.toJson(PUBLIC_ONLY);
+        Map<String,Object> parsed = JsonUtil.parseJson(jwkJson);
+        String x = (String)parsed.get(EllipticCurveJsonWebKey.X_MEMBER_NAME);
+        assertThat("AQggHPZ-De2Tq_7U7v8ADpjyouKk6eV97Lujt9NdIcZgWI_cyOLv9HZulGWtC7I3X73ABE-rx95hAKbxiqQ1q0bA", is(equalTo(x)));
+        String y = (String)parsed.get(EllipticCurveJsonWebKey.Y_MEMBER_NAME);
+        assertThat("AP5yYckNtHGuzZ9Gb8oqueBXwgG5Riu5LnbhQUz5Mb_Xjo4mnhqe1f396ldZMUvyJdi2O03OZdhkpVv_ks2CsYHp", is(equalTo(y)));
+
+        // we will be liberal and accept either
+        String noLeftZeroPaddingBytes = "{\"kty\":\"EC\",\"x\":\"AQggHPZ-De2Tq_7U7v8ADpjyouKk6eV97Lujt9NdIcZgWI_cyOLv9HZulGWtC7I3X73ABE-rx95hAKbxiqQ1q0bA\",\"y\":\"_nJhyQ20ca7Nn0Zvyiq54FfCAblGK7kuduFBTPkxv9eOjiaeGp7V_f3qV1kxS_Il2LY7Tc5l2GSlW_-SzYKxgek\",\"crv\":\"P-521\"}";
+        String withLeftZeroPaddingBytes = "{\"kty\":\"EC\",\"x\":\"AQggHPZ-De2Tq_7U7v8ADpjyouKk6eV97Lujt9NdIcZgWI_cyOLv9HZulGWtC7I3X73ABE-rx95hAKbxiqQ1q0bA\",\"y\":\"AP5yYckNtHGuzZ9Gb8oqueBXwgG5Riu5LnbhQUz5Mb_Xjo4mnhqe1f396ldZMUvyJdi2O03OZdhkpVv_ks2CsYHp\",\"crv\":\"P-521\"}";
+        PublicJsonWebKey jwkWithNoZeroLeftPaddingBytes = EllipticCurveJsonWebKey.Factory.newPublicJwk(noLeftZeroPaddingBytes);
+        PublicJsonWebKey jwkWithZeroLeftPaddingBytes = EllipticCurveJsonWebKey.Factory.newPublicJwk(withLeftZeroPaddingBytes);
+
+        assertEquals(jwkWithNoZeroLeftPaddingBytes.getPublicKey(), jwkWithZeroLeftPaddingBytes.getPublicKey());
+
+    }
 }

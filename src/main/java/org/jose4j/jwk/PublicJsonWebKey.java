@@ -167,6 +167,12 @@ public abstract class PublicJsonWebKey extends JsonWebKey
         params.put(parameterName, base64UrlValue);
     }
 
+    void putBigIntAsBase64UrlEncodedParam(Map<String,Object> params, String parameterName, BigInteger value, int minLength)
+    {
+        String base64UrlValue = BigEndianBigInteger.toBase64Url(value, minLength);
+        params.put(parameterName, base64UrlValue);
+    }
+
     public static class Factory
     {
         public static PublicJsonWebKey newPublicJwk(Map<String,Object> params) throws JoseException
