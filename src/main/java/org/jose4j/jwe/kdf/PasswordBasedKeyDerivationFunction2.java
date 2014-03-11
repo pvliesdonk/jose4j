@@ -9,8 +9,6 @@ import org.jose4j.mac.MacUtil;
 import javax.crypto.Mac;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * An implementation of PBKDF2 from RFC 2898 using HMAC as the underlying pseudorandom function.
@@ -74,7 +72,13 @@ public class PasswordBasedKeyDerivationFunction2
         //
         //     Here, INT (i) is a four-octet encoding of the integer i, most
         //     significant octet first.
-        List<byte[]> blocks = new ArrayList<>(l);
+
+        //  4. Concatenate the blocks and extract the first dkLen octets to
+        //     produce a derived key DK:
+        //
+        //               DK = T_1 || T_2 ||  ...  || T_l<0..r-1>
+        //
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         for (int i = 0; i < l; i++)
         {
             byte[] block = f(salt, iterationCount, i + 1, prf);
@@ -82,21 +86,10 @@ public class PasswordBasedKeyDerivationFunction2
             {
                 block = ByteUtil.subArray(block, 0, r);
             }
-            blocks.add(block);
-        }
-
-
-        //  4. Concatenate the blocks and extract the first dkLen octets to
-        //     produce a derived key DK:
-        //
-        //               DK = T_1 || T_2 ||  ...  || T_l<0..r-1>
-        //
-        //  5. Output the derived key DK.
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        for (byte[] block : blocks)
-        {
             byteArrayOutputStream.write(block);
         }
+
+        //  5. Output the derived key DK.
         return byteArrayOutputStream.toByteArray();
     }
 
