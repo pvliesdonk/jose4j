@@ -42,4 +42,9 @@ public class JsonHelp
         long l = (Long)map.get(name);
         return IntDate.fromSeconds(l);
     }
+
+    public static long getLong(Map<String, Object> map, String name)
+    {
+        return (Long)map.get(name);
+    }
 }

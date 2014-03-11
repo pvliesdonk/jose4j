@@ -60,6 +60,11 @@ public class Headers
         return JsonHelp.getString(headerMap, headerName);
     }
 
+    public long getLongHeaderValue(String headerName)
+    {
+        return JsonHelp.getLong(headerMap, headerName);
+    }
+
     public Object getObjectHeaderValue(String name)
     {
         return headerMap.get(name);
