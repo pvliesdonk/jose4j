@@ -22,7 +22,7 @@ public class PasswordBasedKeyDerivationFunction2
         this.hmacAlgorithm = hmacAlgorithm;
     }
 
-    public byte[] derive(byte[] password, byte[] salt, int iterationCount, int dkLen) throws InvalidKeyException, IOException
+    public byte[] derive(byte[] password, byte[] salt, int iterationCount, int dkLen) throws InvalidKeyException
     {
         Mac prf = MacUtil.getInitializedMac(hmacAlgorithm, new HmacKey(password));
         int hLen = prf.getMacLength();
@@ -86,7 +86,7 @@ public class PasswordBasedKeyDerivationFunction2
             {
                 block = ByteUtil.subArray(block, 0, r);
             }
-            byteArrayOutputStream.write(block);
+            byteArrayOutputStream.write(block, 0, block.length);
         }
 
         //  5. Output the derived key DK.
