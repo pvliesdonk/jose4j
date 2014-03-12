@@ -2,6 +2,7 @@ package org.jose4j.jwe;
 
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.Headers;
+import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidKeyException;
@@ -43,10 +44,7 @@ public class DirectKeyManagementAlgorithm extends AlgorithmInfo implements KeyMa
 
     private void validateKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
-        if (managementKey == null)
-        {
-            throw new InvalidKeyException("The key must not be null.");
-        }
+        KeyValidationSupport.notNull(managementKey);
 
         int managementKeyByteLength = managementKey.getEncoded().length;
         int expectedByteLength = contentEncryptionAlg.getContentEncryptionKeyDescriptor().getContentEncryptionKeyByteLength();

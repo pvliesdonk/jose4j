@@ -43,7 +43,7 @@ public class JsonHelp
         return IntDate.fromSeconds(l);
     }
 
-    public static long getLong(Map<String, Object> map, String name)
+    public static Long getLong(Map<String, Object> map, String name)
     {
         return (Long)map.get(name);
     }

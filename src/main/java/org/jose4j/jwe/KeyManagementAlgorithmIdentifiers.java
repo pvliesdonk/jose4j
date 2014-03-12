@@ -30,5 +30,9 @@ public class KeyManagementAlgorithmIdentifiers
     public static final String A192KW = "A192KW";
     public static final String A256KW = "A256KW";
 
+    public static final String PBES2_HS256_A128KW = "PBES2-HS256+A128KW";
+    public static final String PBES2_HS384_A192KW = "PBES2-HS384+A192KW";
+    public static final String PBES2_HS512_A256KW = "PBES2-HS512+A256KW";
+
     public static final String DIRECT = "dir";
 }

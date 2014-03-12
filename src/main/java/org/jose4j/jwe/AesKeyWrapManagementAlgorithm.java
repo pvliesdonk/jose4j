@@ -17,6 +17,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.jwa.AlgorithmAvailability;
+import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
@@ -57,10 +58,7 @@ public class AesKeyWrapManagementAlgorithm extends WrappingKeyManagementAlgorith
 
     void validateKey(Key managementKey) throws InvalidKeyException
     {
-        if (managementKey == null)
-        {
-            throw new InvalidKeyException("The key must not be null.");
-        }
+        KeyValidationSupport.notNull(managementKey);
 
         String alg = managementKey.getAlgorithm();
 

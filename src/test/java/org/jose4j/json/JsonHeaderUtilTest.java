@@ -18,6 +18,7 @@ package org.jose4j.json;
 
 import junit.framework.TestCase;
 import org.jose4j.lang.JoseException;
+import org.jose4j.lang.JsonHelp;
 
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class JsonHeaderUtilTest extends TestCase
     public void testParseJson1() throws JoseException
     {
         String basic = "{\"key\":\"value\"}";
-        Map<String,?> map = JsonHeaderUtil.parseJson(basic);
+        Map<String,Object> map = JsonHeaderUtil.parseJson(basic);
         assertEquals(1, map.size());
         assertEquals("value", map.get("key"));
     }

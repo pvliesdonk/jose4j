@@ -29,10 +29,7 @@ public class KeyValidationSupport
 
     public static <K extends Key> K castKey(Key key, Class<K> type) throws InvalidKeyException
     {
-        if (key == null)
-        {
-            throw new InvalidKeyException("The key must not be null.");
-        }
+        notNull(key);
 
         try
         {
@@ -41,6 +38,14 @@ public class KeyValidationSupport
         catch (ClassCastException e)
         {
             throw new InvalidKeyException("Invalid key " + e);
+        }
+    }
+
+    public static void notNull(Key key) throws InvalidKeyException
+    {
+        if (key == null)
+        {
+            throw new InvalidKeyException("The key must not be null.");
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Brian Campbell
+ * Copyright 2012-2014 Brian Campbell
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,9 @@ public class AlgorithmFactoryFactory
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes128KeyWrapAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes192KeyWrapAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes256KeyWrapAlgorithm());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Pbes2HmacSha256WithAes128KeyWrapAlgorithm());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Pbes2HmacSha384WithAes192KeyWrapAlgorithm());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Pbes2HmacSha512WithAes256KeyWrapAlgorithm());
 
         log.info("JWE key management algorithms: " + jweKeyMgmtModeAlgorithmFactory.getSupportedAlgorithms());
 

@@ -1,0 +1,132 @@
+/*
+ * Copyright 2012-2014 Brian Campbell
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jose4j.jwe;
+
+import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwa.AlgorithmInfo;
+import org.jose4j.jwe.kdf.PasswordBasedKeyDerivationFunction2;
+import org.jose4j.jwx.HeaderParameterNames;
+import org.jose4j.jwx.Headers;
+import org.jose4j.jwx.KeyValidationSupport;
+import org.jose4j.keys.AesKey;
+import org.jose4j.keys.KeyPersuasion;
+import org.jose4j.keys.PbkdfKey;
+import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.InvalidKeyException;
+import org.jose4j.lang.JoseException;
+import org.jose4j.lang.StringUtil;
+
+import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
+
+/**
+ */
+public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implements KeyManagementAlgorithm
+{
+    public static final byte[] ZERO_BYTE = new byte[]{0};
+
+    private AesKeyWrapManagementAlgorithm keyWrap;
+    private ContentEncryptionKeyDescriptor keyWrapKeyDescriptor;
+
+    protected PasswordBasedKeyDerivationFunction2 pbkdf2;
+
+    public Pbes2HmacShaWithAesKeyWrapAlgorithm(String alg, String hmacAlg, AesKeyWrapManagementAlgorithm keyWrapAlg)
+    {
+        setAlgorithmIdentifier(alg);
+        setJavaAlgorithm("n/a");
+        pbkdf2 = new PasswordBasedKeyDerivationFunction2(hmacAlg);
+        setKeyPersuasion(KeyPersuasion.SYMMETRIC);
+        setKeyType(PbkdfKey.ALGORITHM);
+        keyWrap = keyWrapAlg;
+        keyWrapKeyDescriptor = new ContentEncryptionKeyDescriptor(keyWrap.getKeyByteLength(), AesKey.ALGORITHM);
+    }
+
+    @Override
+    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
+    {
+        Key derivedKey = deriveForEncrypt(managementKey, headers);
+        return keyWrap.manageForEncrypt(derivedKey, cekDesc, headers);
+    }
+
+    protected Key deriveForEncrypt(Key managementKey, Headers headers) throws InvalidKeyException
+    {
+        Long iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
+        if (iterationCount == null)
+        {
+            iterationCount = 1024L; // todo something with defaults
+            headers.setObjectHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT, iterationCount);
+        }
+
+        String saltInputString = headers.getStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT);
+        byte[] saltInput;
+        Base64Url base64Url = new Base64Url();
+        if (saltInputString == null)
+        {
+            saltInput = ByteUtil.randomBytes(8); // todo something with defaults
+            saltInputString = base64Url.base64UrlEncode(saltInput);
+            headers.setStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT, saltInputString);
+        }
+        else
+        {
+            saltInput = base64Url.base64UrlDecode(saltInputString);
+        }
+
+        return deriveKey(managementKey, iterationCount, saltInput);
+    }
+
+    @Override
+    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
+    {
+        Long iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
+        String saltInputString = headers.getStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT);
+        Base64Url base64Url = new Base64Url();
+        byte[] saltInput = base64Url.base64UrlDecode(saltInputString);
+        Key derivedKey = deriveKey(managementKey, iterationCount, saltInput);
+        return keyWrap.manageForDecrypt(derivedKey, encryptedKey, cekDesc, headers);
+    }
+
+    private Key deriveKey(Key managementKey, Long iterationCount, byte[] saltInput) throws InvalidKeyException
+    {
+        byte[] salt = ByteUtil.concat(StringUtil.getBytesUtf8(getAlgorithmIdentifier()), ZERO_BYTE, saltInput);
+        int dkLen = keyWrapKeyDescriptor.getContentEncryptionKeyByteLength();
+        byte[] derivedKeyBytes = pbkdf2.derive(managementKey.getEncoded(), salt, iterationCount.intValue(), dkLen);
+        return new SecretKeySpec(derivedKeyBytes, keyWrapKeyDescriptor.getContentEncryptionKeyAlgorithm());
+    }
+
+    @Override
+    public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
+    {
+        validateKey(managementKey);
+    }
+
+    @Override
+    public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
+    {
+        validateKey(managementKey);
+    }
+
+    public void validateKey(Key managementKey) throws InvalidKeyException
+    {
+        KeyValidationSupport.notNull(managementKey);
+    }
+
+    @Override
+    public boolean isAvailable()
+    {
+        return true;
+    }
+}

@@ -43,4 +43,6 @@ public class HeaderParameterNames
 
     public static final String ZIP = "zip";
 
+    public static final String PBES2_SALT_INPUT = "p2s";
+    public static final String PBES2_ITERATION_COUNT = "p2c";
 }
