@@ -16,20 +16,21 @@
 
 package org.jose4j.jwe;
 
-import org.hamcrest.CoreMatchers;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
 import org.jose4j.keys.PbkdfKey;
+import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.security.Key;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.*;
 import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.*;
+import static org.junit.Assert.*;
 
 /**
  */
@@ -66,7 +67,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithmTest
                 JsonWebEncryption decryptingJwe = new JsonWebEncryption();
                 decryptingJwe.setCompactSerialization(compactSerialization);
                 decryptingJwe.setKey(new PbkdfKey(password));
-                Assert.assertThat(plaintext, CoreMatchers.equalTo(decryptingJwe.getPayload()));
+                assertThat(plaintext, equalTo(decryptingJwe.getPayload()));
             }
         }
     }
@@ -101,32 +102,32 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithmTest
         Headers headers = decryptingJwe.getHeaders();
 
         Long iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
-        Assert.assertTrue(iterationCount >= MINIMUM_ITERAION_COUNT);
+        assertTrue(iterationCount >= MINIMUM_ITERAION_COUNT);
 
         String saltInputString = headers.getStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT);
         Base64Url b = new Base64Url();
         byte[] saltInput = b.base64UrlDecode(saltInputString);
-        Assert.assertTrue(saltInput.length >= MINIMUM_SALT_BYTE_LENGTH);
+        assertTrue(saltInput.length >= MINIMUM_SALT_BYTE_LENGTH);
     }
 
     @Test
     public void testUsingAndSettingDefaults() throws JoseException
     {
         Pbes2HmacShaWithAesKeyWrapAlgorithm pbes2 = new Pbes2HmacSha256WithAes128KeyWrapAlgorithm();
-        Assert.assertTrue(pbes2.getDefaultIterationCount() >= MINIMUM_ITERAION_COUNT);
-        Assert.assertTrue(pbes2.getDefaultSaltByteLength() >= MINIMUM_SALT_BYTE_LENGTH);
+        assertTrue(pbes2.getDefaultIterationCount() >= MINIMUM_ITERAION_COUNT);
+        assertTrue(pbes2.getDefaultSaltByteLength() >= MINIMUM_SALT_BYTE_LENGTH);
 
         PbkdfKey key = new PbkdfKey("a password");
 
         Headers headers = new Headers();
         Key derivedKey = pbes2.deriveForEncrypt(key, headers);
-        Assert.assertThat(derivedKey.getEncoded().length , CoreMatchers.equalTo(16));
+        assertThat(derivedKey.getEncoded().length, equalTo(16));
 
         String saltInputString = headers.getStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT);
         byte[] saltInput = Base64Url.decode(saltInputString);
-        Assert.assertThat(saltInput.length, CoreMatchers.equalTo(pbes2.getDefaultSaltByteLength()));
+        assertThat(saltInput.length, equalTo(pbes2.getDefaultSaltByteLength()));
         Long iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
-        Assert.assertThat(iterationCount, CoreMatchers.equalTo(pbes2.getDefaultIterationCount()));
+        assertThat(iterationCount, equalTo(pbes2.getDefaultIterationCount()));
 
         Pbes2HmacShaWithAesKeyWrapAlgorithm newPbes2 = new Pbes2HmacSha256WithAes128KeyWrapAlgorithm();
         long newDefaultIterationCount = 1024;
@@ -139,10 +140,41 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithmTest
         derivedKey = newPbes2.deriveForEncrypt(key, headers);
         saltInputString = headers.getStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT);
         saltInput = Base64Url.decode(saltInputString);
-        Assert.assertThat(saltInput.length, CoreMatchers.equalTo(newDefaultSaltByteLength));
+        assertThat(saltInput.length, equalTo(newDefaultSaltByteLength));
         iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
-        Assert.assertThat(iterationCount, CoreMatchers.equalTo(newDefaultIterationCount));
+        assertThat(iterationCount, equalTo(newDefaultIterationCount));
 
-        Assert.assertThat(derivedKey.getEncoded().length , CoreMatchers.equalTo(16));
+        assertThat(derivedKey.getEncoded().length, equalTo(16));
+    }
+
+    @Test
+    public void testSettingSaltAndIterationCount() throws JoseException
+    {
+        String password = "secret word";
+        String plaintext = "<insert some witty quote or remark here, again>";
+
+        JsonWebEncryption encryptingJwe  = new JsonWebEncryption();
+        int saltByteLength = 32;
+        String saltInputString = Base64Url.encode(ByteUtil.randomBytes(saltByteLength));
+        encryptingJwe.getHeaders().setStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT, saltInputString);
+        long iterationCount = 1024L;
+        encryptingJwe.getHeaders().setObjectHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT, iterationCount);
+
+        encryptingJwe.setAlgorithmHeaderValue(PBES2_HS384_A192KW);
+        encryptingJwe.setEncryptionMethodHeaderParameter(AES_192_CBC_HMAC_SHA_384);
+        encryptingJwe.setPayload(plaintext);
+        encryptingJwe.setKey(new PbkdfKey(password));
+        String compactSerialization = encryptingJwe.getCompactSerialization();
+
+        JsonWebEncryption decryptingJwe = new JsonWebEncryption();
+        decryptingJwe.setCompactSerialization(compactSerialization);
+        decryptingJwe.setKey(new PbkdfKey(password));
+        assertThat(plaintext, equalTo(decryptingJwe.getPayload()));
+
+        String saltInputStringFromHeader = decryptingJwe.getHeader(HeaderParameterNames.PBES2_SALT_INPUT);
+        assertThat(saltInputString, equalTo(saltInputStringFromHeader));
+        assertThat(saltByteLength, equalTo(Base64Url.decode(saltInputStringFromHeader).length));
+        long iterationCountFromHeader = decryptingJwe.getHeaders().getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
+        assertThat(iterationCount, equalTo(iterationCountFromHeader));
     }
 }
