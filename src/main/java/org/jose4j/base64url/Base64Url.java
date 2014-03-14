@@ -61,4 +61,39 @@ public class Base64Url
     {
         return base64urlCodec.encodeToString(bytes);
     }
+
+    private static Base64Url getOne()
+    {
+        return new Base64Url();
+    }
+
+    public static String decodeToUtf8String(String encodedValue)
+    {
+        return getOne().base64UrlDecodeToString(encodedValue, StringUtil.UTF_8);
+    }
+
+    public static String decodeToString(String encodedValue, String charsetName)
+    {
+        return getOne().base64UrlDecodeToString(encodedValue, charsetName);
+    }
+
+    public static byte[] decode(String encodedValue)
+    {
+        return getOne().base64UrlDecode(encodedValue);
+    }
+
+    public static String encodeUtf8ByteRepresentation(String value)
+    {
+        return getOne().base64UrlDecodeToUtf8String(value);
+    }
+
+    public static String encode(String value, String charsetName)
+    {
+        return getOne().base64UrlEncode(value, charsetName);
+    }
+
+    public static String encode(byte[] bytes)
+    {
+        return getOne().base64UrlEncode(bytes);
+    }
 }
