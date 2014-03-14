@@ -17,11 +17,16 @@
 package org.jose4j.jwe;
 
 import org.hamcrest.CoreMatchers;
+import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwx.HeaderParameterNames;
+import org.jose4j.jwx.Headers;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.security.Key;
 
 import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.*;
 import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.*;
@@ -30,8 +35,16 @@ import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.*;
  */
 public class Pbes2HmacShaWithAesKeyWrapAlgorithmTest
 {
+    // per http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-23#section-4.8.1.2
+    // "A minimum iteration count of 1000 is RECOMMENDED."
+    public static final int MINIMUM_ITERAION_COUNT = 1000;
+
+    // per tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-23#section-4.8.1.1
+    // "A Salt Input value containing 8 or more octets MUST be used"
+    public static final int MINIMUM_SALT_BYTE_LENGTH = 8;
+
     @Test
-    public void roundTrips() throws Exception
+    public void combinationOfRoundTrips() throws Exception
     {
         String[] algs = new String[] {PBES2_HS256_A128KW, PBES2_HS384_A192KW, PBES2_HS256_A128KW};
         String[] encs = new String[] {AES_128_CBC_HMAC_SHA_256, AES_192_CBC_HMAC_SHA_384, AES_256_CBC_HMAC_SHA_512};
@@ -69,6 +82,67 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithmTest
         encryptingJwe.getCompactSerialization();
     }
 
+    @Test
+    public void testDefaultsMeetMinimumRequiredOrSuggested() throws JoseException
+    {
+        JsonWebEncryption encryptingJwe  = new JsonWebEncryption();
+        encryptingJwe.setAlgorithmHeaderValue(PBES2_HS256_A128KW);
+        encryptingJwe.setEncryptionMethodHeaderParameter(AES_128_CBC_HMAC_SHA_256);
+        encryptingJwe.setPayload("meh");
+        PbkdfKey key = new PbkdfKey("passtheword");
+        encryptingJwe.setKey(key);
+        String compactSerialization = encryptingJwe.getCompactSerialization();
+        System.out.println(compactSerialization);
 
+        JsonWebEncryption decryptingJwe = new JsonWebEncryption();
+        decryptingJwe.setCompactSerialization(compactSerialization);
+        decryptingJwe.setKey(key);
+        decryptingJwe.getPayload();
+        Headers headers = decryptingJwe.getHeaders();
 
+        Long iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
+        Assert.assertTrue(iterationCount >= MINIMUM_ITERAION_COUNT);
+
+        String saltInputString = headers.getStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT);
+        Base64Url b = new Base64Url();
+        byte[] saltInput = b.base64UrlDecode(saltInputString);
+        Assert.assertTrue(saltInput.length >= MINIMUM_SALT_BYTE_LENGTH);
+    }
+
+    @Test
+    public void testUsingAndSettingDefaults() throws JoseException
+    {
+        Pbes2HmacShaWithAesKeyWrapAlgorithm pbes2 = new Pbes2HmacSha256WithAes128KeyWrapAlgorithm();
+        Assert.assertTrue(pbes2.getDefaultIterationCount() >= MINIMUM_ITERAION_COUNT);
+        Assert.assertTrue(pbes2.getDefaultSaltByteLength() >= MINIMUM_SALT_BYTE_LENGTH);
+
+        PbkdfKey key = new PbkdfKey("a password");
+
+        Headers headers = new Headers();
+        Key derivedKey = pbes2.deriveForEncrypt(key, headers);
+        Assert.assertThat(derivedKey.getEncoded().length , CoreMatchers.equalTo(16));
+
+        String saltInputString = headers.getStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT);
+        byte[] saltInput = Base64Url.decode(saltInputString);
+        Assert.assertThat(saltInput.length, CoreMatchers.equalTo(pbes2.getDefaultSaltByteLength()));
+        Long iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
+        Assert.assertThat(iterationCount, CoreMatchers.equalTo(pbes2.getDefaultIterationCount()));
+
+        Pbes2HmacShaWithAesKeyWrapAlgorithm newPbes2 = new Pbes2HmacSha256WithAes128KeyWrapAlgorithm();
+        long newDefaultIterationCount = 1024;
+        newPbes2.setDefaultIterationCount(newDefaultIterationCount);
+
+        int newDefaultSaltByteLength = 16;
+        newPbes2.setDefaultSaltByteLength(newDefaultSaltByteLength);
+
+        headers = new Headers();
+        derivedKey = newPbes2.deriveForEncrypt(key, headers);
+        saltInputString = headers.getStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT);
+        saltInput = Base64Url.decode(saltInputString);
+        Assert.assertThat(saltInput.length, CoreMatchers.equalTo(newDefaultSaltByteLength));
+        iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
+        Assert.assertThat(iterationCount, CoreMatchers.equalTo(newDefaultIterationCount));
+
+        Assert.assertThat(derivedKey.getEncoded().length , CoreMatchers.equalTo(16));
+    }
 }

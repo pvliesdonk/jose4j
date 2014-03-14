@@ -37,12 +37,17 @@ import java.security.Key;
  */
 public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implements KeyManagementAlgorithm
 {
-    public static final byte[] ZERO_BYTE = new byte[]{0};
+    private static final byte[] ZERO_BYTE = new byte[]{0};
 
     private AesKeyWrapManagementAlgorithm keyWrap;
     private ContentEncryptionKeyDescriptor keyWrapKeyDescriptor;
 
-    protected PasswordBasedKeyDerivationFunction2 pbkdf2;
+    private PasswordBasedKeyDerivationFunction2 pbkdf2;
+
+    // RFC 2898 and JWA both recommend a minimum iteration count of 1000 and mandate at least 8 bytes of salt
+    // so we'll go with defaults that somewhat exceed those requirements/recommendations
+    private long defaultIterationCount = 8192L;
+    private int defaultSaltByteLength = 12;
 
     public Pbes2HmacShaWithAesKeyWrapAlgorithm(String alg, String hmacAlg, AesKeyWrapManagementAlgorithm keyWrapAlg)
     {
@@ -67,7 +72,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
         Long iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
         if (iterationCount == null)
         {
-            iterationCount = 1024L; // todo something with defaults
+            iterationCount = defaultIterationCount;
             headers.setObjectHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT, iterationCount);
         }
 
@@ -76,7 +81,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
         Base64Url base64Url = new Base64Url();
         if (saltInputString == null)
         {
-            saltInput = ByteUtil.randomBytes(8); // todo something with defaults
+            saltInput = ByteUtil.randomBytes(defaultSaltByteLength);
             saltInputString = base64Url.base64UrlEncode(saltInput);
             headers.setStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT, saltInputString);
         }
@@ -128,5 +133,25 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     public boolean isAvailable()
     {
         return true;
+    }
+
+    public long getDefaultIterationCount()
+    {
+        return defaultIterationCount;
+    }
+
+    public void setDefaultIterationCount(long defaultIterationCount)
+    {
+        this.defaultIterationCount = defaultIterationCount;
+    }
+
+    public int getDefaultSaltByteLength()
+    {
+        return defaultSaltByteLength;
+    }
+
+    public void setDefaultSaltByteLength(int defaultSaltByteLength)
+    {
+        this.defaultSaltByteLength = defaultSaltByteLength;
     }
 }
