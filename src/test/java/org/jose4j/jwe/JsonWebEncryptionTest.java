@@ -23,16 +23,17 @@ import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidAlgorithmException;
 import org.jose4j.lang.JoseException;
-import org.junit.Assert;
 import org.junit.Test;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 
-import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.*;
-import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.*;
-import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.*;
-import static org.junit.Assert.*;
+import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.BLACKLIST;
+import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.WHITELIST;
+import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256;
+import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.DIRECT;
+import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.RSA1_5;
+import static org.junit.Assert.assertEquals;
 
 /**
  */

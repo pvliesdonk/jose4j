@@ -22,9 +22,7 @@ import org.jose4j.lang.ByteUtil;
 
 import java.util.Arrays;
 
-import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE;
-import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.INCLUDE_SYMMETRIC;
-import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.PUBLIC_ONLY;
+import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.*;
 
 /**
  */

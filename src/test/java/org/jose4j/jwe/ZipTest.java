@@ -2,8 +2,6 @@ package org.jose4j.jwe;
 
 import junit.framework.TestCase;
 import org.jose4j.jwk.JsonWebKey;
-import org.jose4j.jwk.OctJwkGenerator;
-import org.jose4j.jwk.OctetSequenceJsonWebKey;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.keys.AesKey;
 import org.jose4j.lang.ByteUtil;

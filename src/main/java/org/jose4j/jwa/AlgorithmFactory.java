@@ -19,7 +19,6 @@ package org.jose4j.jwa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jose4j.lang.InvalidAlgorithmException;
-import org.jose4j.lang.JoseException;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

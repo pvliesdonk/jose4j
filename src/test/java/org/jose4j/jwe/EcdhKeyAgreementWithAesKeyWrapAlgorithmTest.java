@@ -8,7 +8,9 @@ import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.lang.JoseException;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  */

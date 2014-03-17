@@ -19,8 +19,8 @@ package org.jose4j.jws;
 import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.KeyPersuasion;
-import org.jose4j.lang.*;
 import org.jose4j.lang.InvalidKeyException;
+import org.jose4j.lang.JoseException;
 
 import java.security.*;
 

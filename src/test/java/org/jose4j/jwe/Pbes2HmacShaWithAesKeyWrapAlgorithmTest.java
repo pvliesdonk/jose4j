@@ -27,10 +27,12 @@ import org.junit.Test;
 
 import java.security.Key;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.*;
-import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.*;
-import static org.junit.Assert.*;
+import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.PBES2_HS256_A128KW;
+import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.PBES2_HS384_A192KW;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  */

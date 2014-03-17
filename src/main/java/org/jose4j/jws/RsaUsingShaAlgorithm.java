@@ -19,7 +19,6 @@ package org.jose4j.jws;
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.lang.InvalidKeyException;
-import org.jose4j.lang.JoseException;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;

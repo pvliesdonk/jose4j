@@ -12,12 +12,17 @@ import org.jose4j.jwx.Headers;
 import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.keys.EcKeyUtil;
 import org.jose4j.keys.KeyPersuasion;
-import org.jose4j.lang.*;
+import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidKeyException;
+import org.jose4j.lang.JoseException;
+import org.jose4j.lang.UncheckedJoseException;
 
 import javax.crypto.KeyAgreement;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.*;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 

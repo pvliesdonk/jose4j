@@ -23,7 +23,8 @@ import org.junit.Test;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 /**

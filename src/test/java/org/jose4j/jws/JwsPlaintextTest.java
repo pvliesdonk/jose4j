@@ -28,11 +28,10 @@ import org.junit.Test;
 import java.security.Key;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.*;
-import static org.jose4j.jws.AlgorithmIdentifiers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.BLACKLIST;
+import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.WHITELIST;
+import static org.jose4j.jws.AlgorithmIdentifiers.NONE;
+import static org.junit.Assert.*;
 
 /**
  */

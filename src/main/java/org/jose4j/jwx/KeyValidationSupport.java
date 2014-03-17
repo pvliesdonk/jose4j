@@ -1,7 +1,6 @@
 package org.jose4j.jwx;
 
 import org.jose4j.lang.InvalidKeyException;
-import org.jose4j.lang.JoseException;
 
 import java.security.Key;
 import java.security.interfaces.RSAKey;

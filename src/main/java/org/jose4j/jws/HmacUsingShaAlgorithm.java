@@ -22,7 +22,6 @@ import org.jose4j.keys.HmacKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidKeyException;
-import org.jose4j.lang.JoseException;
 import org.jose4j.mac.MacUtil;
 
 import javax.crypto.Mac;

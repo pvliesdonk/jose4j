@@ -1,14 +1,11 @@
 package org.jose4j.jwa;
 
-import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
-import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.lang.InvalidAlgorithmException;
 import org.junit.Test;
 
-import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.*;
-import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.A128KW;
-import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.A256KW;
-import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.DIRECT;
+import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.BLACKLIST;
+import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.WHITELIST;
+import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.*;
 import static org.jose4j.jws.AlgorithmIdentifiers.*;
 
 /**

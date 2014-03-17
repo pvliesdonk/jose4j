@@ -16,10 +16,8 @@
 
 package org.jose4j.jwk;
 
-import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.RsaKeyUtil;
 import org.jose4j.lang.JoseException;
-import org.jose4j.lang.JsonHelp;
 
 import java.math.BigInteger;
 import java.security.interfaces.RSAPrivateCrtKey;

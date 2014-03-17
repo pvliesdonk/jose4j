@@ -2,7 +2,6 @@ package org.jose4j.jwe;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.Headers;
 import org.jose4j.lang.ByteUtil;

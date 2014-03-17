@@ -17,7 +17,6 @@
 package org.jose4j.jwk;
 
 
-
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.JoseException;
 import org.junit.Test;
@@ -26,13 +25,8 @@ import java.security.interfaces.RSAPrivateCrtKey;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE;
-import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.INCLUDE_SYMMETRIC;
-import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.PUBLIC_ONLY;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
+import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.*;
+import static org.junit.Assert.*;
 
 /**
  */

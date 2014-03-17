@@ -8,7 +8,6 @@ import org.jose4j.mac.MacUtil;
 
 import javax.crypto.Mac;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 /**
  * An implementation of PBKDF2 from RFC 2898 using HMAC as the underlying pseudorandom function.
