@@ -176,13 +176,13 @@ public class JoseCookbookTest
         assertThat(jws.getKeyIdHeaderValue(), equalTo(jwk.getKeyId()));
         assertThat(alg, equalTo(jws.getAlgorithmHeaderValue()));
 
-        // verify reproducing it
+        // verify reproducing it (which doesn't really work with ECDSA so yeah)
         jws = new JsonWebSignature();
         jws.setPayload(payloadContent);
         jws.setAlgorithmHeaderValue(alg);
         jws.setKeyIdHeaderValue(jwk.getKeyId());
-        PublicJsonWebKey rsaJwk = (PublicJsonWebKey) jwk;
-        jws.setKey(rsaJwk.getPrivateKey());
+        PublicJsonWebKey pubJwk = (PublicJsonWebKey) jwk;
+        jws.setKey(pubJwk.getPrivateKey());
         String compactSerialization = jws.getCompactSerialization();
 
         // Here's what I get:
