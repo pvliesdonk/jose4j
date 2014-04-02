@@ -24,6 +24,6 @@ public class EcdsaP521UsingSha512Algorithm extends EcdsaUsingShaAlgorithm
 {
     public EcdsaP521UsingSha512Algorithm()
     {
-        super(AlgorithmIdentifiers.ECDSA_USING_P521_CURVE_AND_SHA512, "SHA512withECDSA", EllipticCurves.P_521);
+        super(AlgorithmIdentifiers.ECDSA_USING_P521_CURVE_AND_SHA512, "SHA512withECDSA", EllipticCurves.P_521, 132);
     }
 }

@@ -38,11 +38,13 @@ import java.security.spec.EllipticCurve;
 public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements JsonWebSignatureAlgorithm
 {
     private String curveName;
+    private int signatureByteLength;
 
-    public EcdsaUsingShaAlgorithm(String id, String javaAlgo, String curveName)
+    public EcdsaUsingShaAlgorithm(String id, String javaAlgo, String curveName, int signatureByteLength)
     {
         super(id, javaAlgo, EllipticCurveJsonWebKey.KEY_TYPE);
         this.curveName = curveName;
+        this.signatureByteLength = signatureByteLength;
     }
 
     public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException
@@ -65,7 +67,7 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
         byte[] derEncodedSignatureBytes = super.sign(key, securedInputBytes);
         try
         {
-            return convertDerToConcatenated(derEncodedSignatureBytes);
+            return convertDerToConcatenated(derEncodedSignatureBytes, signatureByteLength);
         }
         catch (IOException e)
         {
@@ -77,10 +79,14 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
         The result of an ECDSA signature is the EC point (R, S), where R and S are unsigned (very large) integers.
         The JCA ECDSA signature implementation (sun.security.ec.ECDSASignature) produces and expects a DER encoding
         of R and S while JOSE/JWS wants R and S as a concatenated byte array. XML signatures (best I can tell) treats
-        ECDSA the same way as JOSE and the code for the two methods that convert to and from DER and concatenated
+        ECDSA similarly to JOSE and the code for the two methods that convert to and from DER and concatenated
         R and S was originally taken from org.apache.xml.security.algorithms.implementations.SignatureECDSA in the
-        (Apache 2 licensed) Apache Santuario XML Security library. Which seemed like a better idea than trying to
-        write it myself or using sun.security.util.Der[Input/Output]Stream as sun.security.ec.ECDSASignature does.
+        (Apache 2 licensed) Apache Santuario XML Security library. Some minor changes have been made to ensure the
+        concatenated output left zero pads R & S to consistent length - i.e. the "octet sequence representations
+        MUST NOT be shortened to omit any leading zero octets" per http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-25#section-3.4
+
+        Which seemed like a better idea than trying to write it myself or using sun.security.util.Der[Input/Output]Stream
+        as sun.security.ec.ECDSASignature does or some other half-arsed approach.
      */
 
     // Convert the concatenation of R and S into DER encoding
@@ -147,7 +153,7 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
     }
 
     // Convert the DER encoding of R and S into a concatenation of R and S
-    public static byte[] convertDerToConcatenated(byte derEncodedBytes[]) throws IOException
+    public static byte[] convertDerToConcatenated(byte derEncodedBytes[], int outputLength) throws IOException
     {
 
         if (derEncodedBytes.length < 8 || derEncodedBytes[0] != 48)
@@ -180,6 +186,7 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
         for (j = sLength; (j > 0) && (derEncodedBytes[(offset + 2 + rLength + 2 + sLength) - j] == 0); j--);
 
         int rawLen = Math.max(i, j);
+        rawLen = Math.max(rawLen, outputLength/2);
 
         if ((derEncodedBytes[offset - 1] & 0xff) != derEncodedBytes.length - offset
             || (derEncodedBytes[offset - 1] & 0xff) != 2 + rLength + 2 + sLength

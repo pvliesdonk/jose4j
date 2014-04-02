@@ -24,6 +24,6 @@ public class EcdsaP384UsingSha384Algorithm extends EcdsaUsingShaAlgorithm
 {
     public EcdsaP384UsingSha384Algorithm()
     {
-        super(AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384, "SHA384withECDSA", EllipticCurves.P_384);
+        super(AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384, "SHA384withECDSA", EllipticCurves.P_384, 96);
     }
 }

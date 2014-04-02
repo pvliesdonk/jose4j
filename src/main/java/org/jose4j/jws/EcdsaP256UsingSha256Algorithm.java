@@ -24,6 +24,6 @@ public class EcdsaP256UsingSha256Algorithm extends EcdsaUsingShaAlgorithm
 {
     public EcdsaP256UsingSha256Algorithm()
     {
-        super(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256, "SHA256withECDSA", EllipticCurves.P_256);
+        super(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256, "SHA256withECDSA", EllipticCurves.P_256, 64);
     }
 }
