@@ -59,9 +59,7 @@ public class JsonWebSignature extends JsonWebStructure
         }
 
         setEncodedHeader(parts[0]);
-        String encodedPayload = parts[1];
-        checkNotEmptyPart(encodedPayload, "Encoded JWS Payload");
-        setPayload(base64url.base64UrlDecodeToString(encodedPayload, payloadCharEncoding));
+        setEncodedPayload(parts[1]);
         setSignature(base64url.base64UrlDecode(parts[2]));
     }
 
@@ -72,7 +70,7 @@ public class JsonWebSignature extends JsonWebStructure
         return CompactSerializer.serialize(getSigningInput(), getEncodedSignature());
     }
 
-    private void sign() throws JoseException
+    public void sign() throws JoseException
     {
         JsonWebSignatureAlgorithm algorithm = getAlgorithm();
         Key signingKey = getKey();
@@ -162,12 +160,17 @@ public class JsonWebSignature extends JsonWebStructure
         return getAlgorithm().getKeyPersuasion();
     }
 
-    private String getEncodedPayload()
+    public void setEncodedPayload(String encodedPayload)
+    {
+        setPayload(base64url.base64UrlDecodeToString(encodedPayload, payloadCharEncoding));
+    }
+
+    public String getEncodedPayload()
     {
         return base64url.base64UrlEncode(payload, getPayloadCharEncoding());
     }
 
-    private String getEncodedSignature()
+    public String getEncodedSignature()
     {
         return base64url.base64UrlEncode(getSignature());
     }

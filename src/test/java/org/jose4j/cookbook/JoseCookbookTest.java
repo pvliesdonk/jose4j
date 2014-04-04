@@ -34,6 +34,7 @@ import static org.junit.Assert.*;
  * 3.1. RSA v1.5 Signature
  * 3.3. ECDSA Signature
  * 3.4. HMAC-SHA2 Integrity Protection
+ * 3.5. Detached Signature
  */
 public class JoseCookbookTest
 {
@@ -47,7 +48,7 @@ public class JoseCookbookTest
     String payloadContent = Base64Url.decodeToUtf8String(payloadContentBase64urlEncoded);
 
     @Test
-    public void rsa_v1_5Signature() throws JoseException
+    public void rsa_v1_5Signature_3_1() throws JoseException
     {
         String jwkJson =
                 "{\n" +
@@ -119,7 +120,8 @@ public class JoseCookbookTest
         assertThat(jws.getKeyIdHeaderValue(), equalTo(jwk.getKeyId()));
         assertThat(alg, equalTo(jws.getAlgorithmHeaderValue()));
 
-        // verify reproducing it
+        // verify reproducing it (it's just luck that using the setters for the headers results in the exact same
+        // JSON representation of the header)
         jws = new JsonWebSignature();
         jws.setPayload(payloadContent);
         jws.setAlgorithmHeaderValue(alg);
@@ -196,19 +198,7 @@ public class JoseCookbookTest
         assertThat(jws.getKeyIdHeaderValue(), equalTo(jwk.getKeyId()));
         assertThat(alg, equalTo(jws.getAlgorithmHeaderValue()));
 
-        // verify reproducing it (which doesn't really work with ECDSA so yeah)
-        jws = new JsonWebSignature();
-        jws.setPayload(payloadContent);
-        jws.setAlgorithmHeaderValue(alg);
-        jws.setKeyIdHeaderValue(jwk.getKeyId());
-        PublicJsonWebKey pubJwk = (PublicJsonWebKey) jwk;
-        jws.setKey(pubJwk.getPrivateKey());
-        String compactSerialization = jws.getCompactSerialization();
-
-        // Here's what I get:
-        System.out.println(compactSerialization);
-
-        //assertThat(jwsCompactSerialization, equalTo(compactSerialization));
+        // can't really verify reproducing ECDSA
     }
 
     @Test
@@ -255,4 +245,45 @@ public class JoseCookbookTest
         assertThat(jwsCompactSerialization, equalTo(compactSerialization));
     }
 
+    @Test
+    public void detached() throws JoseException
+    {
+        String jwkJsonString =
+                "   {\n" +
+                "     \"kty\": \"oct\",\n" +
+                "     \"kid\": \"018c0ae5-4d9b-471b-bfd6-eef314bc7037\",\n" +
+                "     \"use\": \"sig\",\n" +
+                "     \"k\": \"hJtXIZ2uSN5kbQfbtTNWbpdmhkV8FJG-Onbc6mxCcYg\"\n" +
+                "   }";
+
+        String detachedCs = "eyJhbGciOiJIUzI1NiIsImtpZCI6IjAxOGMwYWU1LTRkOWItNDcxYi1iZmQ2LW" +
+                "VlZjMxNGJjNzAzNyJ9" +
+                "." +
+                "." +
+                "s0h6KThzkfBBBkLspW1h84VsJZFTsPPqMDA7g1Md7p0";
+
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setCompactSerialization(detachedCs);
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJsonString);
+        jws.setKey(jwk.getKey());
+        jws.setEncodedPayload(payloadContentBase64urlEncoded);
+        assertThat(jws.verifySignature(), is(true));
+        assertThat(jws.getPayload(), equalTo(payloadContent));
+
+        // verify reproducing it (it's just luck that using the setters for the headers results in the exact same
+        // JSON representation of the header)
+        jws = new JsonWebSignature();
+        jws.setPayload(payloadContent);
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jws.setKeyIdHeaderValue(jwk.getKeyId());
+        jws.setKey(jwk.getKey());
+        // To create a detached signature, sign and then concatenate the encoded header, two dots "..", and the encoded signature
+        jws.sign();
+        String encodedHeader = jws.getHeaders().getEncodedHeader();
+        String encodedSignature = jws.getEncodedSignature();
+        String reproducedDetachedCs = encodedHeader + ".." + encodedSignature;
+        assertThat(detachedCs, is(equalTo(reproducedDetachedCs)));
+        assertThat(payloadContentBase64urlEncoded, is(equalTo(jws.getEncodedPayload())));
+
+    }
 }

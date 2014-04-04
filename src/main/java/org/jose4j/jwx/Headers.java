@@ -28,7 +28,7 @@ public class Headers
         return header;
     }
 
-    String getEncodedHeader()
+    public String getEncodedHeader()
     {
         if (encodedHeader == null)
         {
@@ -47,6 +47,7 @@ public class Headers
     {
         headerMap.put(name, value);
         this.header = null;
+        this.encodedHeader = null;
     }
 
     public void setJwkHeaderValue(String name, JsonWebKey jwk)
@@ -79,6 +80,7 @@ public class Headers
 
     public void setFullHeaderAsJsonString(String header) throws JoseException
     {
+        this.encodedHeader = null;
         this.header = header;
         headerMap = JsonHeaderUtil.parseJson(header);
     }
