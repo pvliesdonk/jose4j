@@ -85,8 +85,8 @@ public class JsonWebKeySetTest extends TestCase
         assertEquals(Use.SIGNATURE, jwk.getUse());
 
         RsaJsonWebKey rsaJsonWebKey = (RsaJsonWebKey) jwk;
-        assertEquals(ExampleRsaKeyFromJws.PUBLIC_KEY.getModulus(), rsaJsonWebKey.getRSAPublicKey().getModulus());
-        assertEquals(ExampleRsaKeyFromJws.PUBLIC_KEY.getPublicExponent(), rsaJsonWebKey.getRSAPublicKey().getPublicExponent());
+        assertEquals(ExampleRsaKeyFromJws.PUBLIC_KEY.getModulus(), rsaJsonWebKey.getRsaPublicKey().getModulus());
+        assertEquals(ExampleRsaKeyFromJws.PUBLIC_KEY.getPublicExponent(), rsaJsonWebKey.getRsaPublicKey().getPublicExponent());
     }
 
     public void testFromEcPublicKeyAndBack() throws JoseException

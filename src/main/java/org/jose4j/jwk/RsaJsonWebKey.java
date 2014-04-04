@@ -90,9 +90,17 @@ public class RsaJsonWebKey extends PublicJsonWebKey
         return KEY_TYPE;
     }
 
-    public RSAPublicKey getRSAPublicKey()
+    public RSAPublicKey getRsaPublicKey()
     {
         return (RSAPublicKey) key;
+    }
+
+    /**
+     * @deprecated deprecated in favor of the more consistently named {@link #getRsaPublicKey()}
+     */
+    public RSAPublicKey getRSAPublicKey()
+    {
+        return getRsaPublicKey();
     }
 
     public RSAPrivateKey getRsaPrivateKey()
@@ -102,7 +110,7 @@ public class RsaJsonWebKey extends PublicJsonWebKey
 
     protected void fillPublicTypeSpecificParams(Map<String,Object> params)
     {
-        RSAPublicKey rsaPublicKey = getRSAPublicKey();
+        RSAPublicKey rsaPublicKey = getRsaPublicKey();
         putBigIntAsBase64UrlEncodedParam(params, MODULUS_MEMBER_NAME, rsaPublicKey.getModulus());
         putBigIntAsBase64UrlEncodedParam(params, EXPONENT_MEMBER_NAME, rsaPublicKey.getPublicExponent());
     }
