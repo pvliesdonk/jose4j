@@ -33,6 +33,4 @@ public class JwsUsingEcdsaP256Sha256ExampleTest extends TestCase
         jws.setKey(ExampleEcKeysFromJws.PUBLIC_256);
         assertTrue("signature should validate", jws.verifySignature());
     }
-
-    // todo need to test for array lengths...
 }

@@ -92,9 +92,4 @@ public class JsonWebKeyTest extends TestCase
         JsonWebKey jwk2 = JsonWebKey.Factory.newJwk(jsonOut);
         assertIsRsa(jwk2); 
     }
-
-
-    // todo think we need a test some place for "The array representation MUST not be shortened to omit
-    // any leading zero bytes contained in the value." from jwk/jwa 'cause I'm pretty sure we are (or would be) shortening now
-    
 }
