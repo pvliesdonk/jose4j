@@ -149,6 +149,7 @@ public class JoseCookbookTest
                 "      KipQrCW9CGZH3T4ubpnoTKLDYJ_fF3_rJt\"\n" +
                 "}";
 
+
         String jwsCompactSerialization =
                 "eyJhbGciOiJFUzUxMiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZX" +
                 "hhbXBsZSJ9" +
@@ -158,22 +159,9 @@ public class JoseCookbookTest
                 "b24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcm" +
                 "UgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4" +
                 "." +
-                "EvRCJgYnTh--MujbaxJCs6ulxanF5-XZ1BG2nPSnffu8aTzD9JkFZuGf5eSRoJ" +
-                "Bmb3as3A_Qg1oSh7VGRYqqIkwZ9RIUM-k66Zf08mnpBxeSzu9KAQ8ZVF3sOPP1" +
-                "TShgv03CE1Hq0LDvHR2WZvzZJsZClzB_nYaC_-oeNt-oKB7dxQ";
-
-        jwsCompactSerialization =  // this from email from matt but still doesn't verify and only 130 octets in sig
-                "eyJhbGciOiJFUzUxMiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZX" +
-                "hhbXBsZSJ9" +
-                "." +
-                "SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IH" +
-                "lvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBk" +
-                "b24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcm" +
-                "UgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4" +
-                "." +
-                "ALTcqjGDa6yYwNuHJ2y02uyInEmWxlchpTdX8r-1lXZNZ2zMKZG14K4rOC0eCF" +
-                "kDhguX3oM2Eg9Sa8gB4kl4TEQDI5WJ7c4g7A3cmnEdaFpOs7w7RigzIRV2DNwQ" +
-                "57JxB2cy3ImRT3WkJ57SgVijptnNEpV2f2yHoJgpHxDcOOe10Q";
+                "AE_R_YZCChjn4791jSQCrdPZCNYqHXCTZH0-JZGYNlaAjP2kqaluUIIUnC9qvb" +
+                "u9Plon7KRTzoNEuT4Va2cmL1eJAQy3mtPBu_u_sDDyYjnAMDxXPn7XrT0lw-kv" +
+                "AD890jl8e2puQens_IEKBpHABlsbEPX6sFY8OcGDqoRuBomu9xQ2";
 
         String alg = AlgorithmIdentifiers.ECDSA_USING_P521_CURVE_AND_SHA512;
 
@@ -182,18 +170,11 @@ public class JoseCookbookTest
         jws.setCompactSerialization(jwsCompactSerialization);
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
 
-        String[] deserialize = CompactSerializer.deserialize(jwsCompactSerialization);
-        byte[] decode = Base64Url.decode(deserialize[2]);
-        System.out.println("signature is "+decode.length + " bytes");
-
-
         jws.setKey(jwk.getKey());
         assertThat(jws.getUnverifiedPayload(), equalTo(payloadContent));
 
-        // my results don't match up with Matt's http://tools.ietf.org/html/draft-ietf-jose-cookbook-01#section-3.3
-        // comment out asserts that break for now, will get in touch with him to try and sort out the issue
-//        assertThat(jws.verifySignature(), is(true));
-//       assertThat(jws.getPayload(), equalTo(payloadContent));
+        assertThat(jws.verifySignature(), is(true));
+        assertThat(jws.getPayload(), equalTo(payloadContent));
 
         assertThat(jws.getKeyIdHeaderValue(), equalTo(jwk.getKeyId()));
         assertThat(alg, equalTo(jws.getAlgorithmHeaderValue()));
@@ -284,6 +265,5 @@ public class JoseCookbookTest
         String reproducedDetachedCs = encodedHeader + ".." + encodedSignature;
         assertThat(detachedCs, is(equalTo(reproducedDetachedCs)));
         assertThat(payloadContentBase64urlEncoded, is(equalTo(jws.getEncodedPayload())));
-
     }
 }
