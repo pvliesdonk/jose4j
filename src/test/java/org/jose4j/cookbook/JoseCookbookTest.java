@@ -32,6 +32,7 @@ import static org.junit.Assert.*;
  * http://tools.ietf.org/html/draft-ietf-jose-cookbook-01
  *
  * 3.1. RSA v1.5 Signature
+ * ... PSS might drop in more easily than GCM w/ BC ... something to think about ...
  * 3.3. ECDSA Signature
  * 3.4. HMAC-SHA2 Integrity Protection
  * 3.5. Detached Signature
