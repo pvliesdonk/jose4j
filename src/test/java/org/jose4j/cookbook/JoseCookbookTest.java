@@ -21,7 +21,6 @@ import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
-import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.lang.JoseException;
 import org.junit.Test;
 
@@ -36,17 +35,19 @@ import static org.junit.Assert.*;
  * 3.3. ECDSA Signature
  * 3.4. HMAC-SHA2 Integrity Protection
  * 3.5. Detached Signature
+ *
+ * 4.1. Key Encryption using RSA v1.5 and AES-HMAC-SHA2
  */
 public class JoseCookbookTest
 {
     // http://tools.ietf.org/html/draft-ietf-jose-cookbook-01#section-3
-    String payloadContentBase64urlEncoded =
+    String encodedJwsPayload =
             "SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IH" +
             "lvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBk" +
             "b24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcm" +
             "UgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4";
 
-    String payloadContent = Base64Url.decodeToUtf8String(payloadContentBase64urlEncoded);
+    String jwsPayload = Base64Url.decodeToUtf8String(encodedJwsPayload);
 
     @Test
     public void rsa_v1_5Signature_3_1() throws JoseException
@@ -117,14 +118,14 @@ public class JoseCookbookTest
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
         jws.setKey(jwk.getKey());
         assertThat(jws.verifySignature(), is(true));
-        assertThat(jws.getPayload(), equalTo(payloadContent));
+        assertThat(jws.getPayload(), equalTo(jwsPayload));
         assertThat(jws.getKeyIdHeaderValue(), equalTo(jwk.getKeyId()));
         assertThat(alg, equalTo(jws.getAlgorithmHeaderValue()));
 
         // verify reproducing it (it's just luck that using the setters for the headers results in the exact same
         // JSON representation of the header)
         jws = new JsonWebSignature();
-        jws.setPayload(payloadContent);
+        jws.setPayload(jwsPayload);
         jws.setAlgorithmHeaderValue(alg);
         jws.setKeyIdHeaderValue(jwk.getKeyId());
         PublicJsonWebKey rsaJwk = (PublicJsonWebKey) jwk;
@@ -134,7 +135,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void ecdsaSignature() throws JoseException
+    public void ecdsaSignature_3_3() throws JoseException
     {
         String jwkJson = 
                 "{\n" +
@@ -172,10 +173,10 @@ public class JoseCookbookTest
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
 
         jws.setKey(jwk.getKey());
-        assertThat(jws.getUnverifiedPayload(), equalTo(payloadContent));
+        assertThat(jws.getUnverifiedPayload(), equalTo(jwsPayload));
 
         assertThat(jws.verifySignature(), is(true));
-        assertThat(jws.getPayload(), equalTo(payloadContent));
+        assertThat(jws.getPayload(), equalTo(jwsPayload));
 
         assertThat(jws.getKeyIdHeaderValue(), equalTo(jwk.getKeyId()));
         assertThat(alg, equalTo(jws.getAlgorithmHeaderValue()));
@@ -184,7 +185,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void hmacSha2IntegrityProtection() throws JoseException
+    public void hmacSha2IntegrityProtection_3_4() throws JoseException
     {
         String jwkJson =
                "   {\n" +
@@ -213,13 +214,13 @@ public class JoseCookbookTest
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
         jws.setKey(jwk.getKey());
         assertThat(jws.verifySignature(), is(true));
-        assertThat(jws.getPayload(), equalTo(payloadContent));
+        assertThat(jws.getPayload(), equalTo(jwsPayload));
         assertThat(jws.getKeyIdHeaderValue(), equalTo(jwk.getKeyId()));
         assertThat(alg, equalTo(jws.getAlgorithmHeaderValue()));
 
         // verify reproducing it
         jws = new JsonWebSignature();
-        jws.setPayload(payloadContent);
+        jws.setPayload(jwsPayload);
         jws.setAlgorithmHeaderValue(alg);
         jws.setKeyIdHeaderValue(jwk.getKeyId());
         jws.setKey(jwk.getKey());
@@ -228,7 +229,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void detached() throws JoseException
+    public void detached_3_5() throws JoseException
     {
         String jwkJsonString =
                 "   {\n" +
@@ -248,14 +249,14 @@ public class JoseCookbookTest
         jws.setCompactSerialization(detachedCs);
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJsonString);
         jws.setKey(jwk.getKey());
-        jws.setEncodedPayload(payloadContentBase64urlEncoded);
+        jws.setEncodedPayload(encodedJwsPayload);
         assertThat(jws.verifySignature(), is(true));
-        assertThat(jws.getPayload(), equalTo(payloadContent));
+        assertThat(jws.getPayload(), equalTo(jwsPayload));
 
         // verify reproducing it (it's just luck that using the setters for the headers results in the exact same
         // JSON representation of the header)
         jws = new JsonWebSignature();
-        jws.setPayload(payloadContent);
+        jws.setPayload(jwsPayload);
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
         jws.setKeyIdHeaderValue(jwk.getKeyId());
         jws.setKey(jwk.getKey());
@@ -265,6 +266,8 @@ public class JoseCookbookTest
         String encodedSignature = jws.getEncodedSignature();
         String reproducedDetachedCs = encodedHeader + ".." + encodedSignature;
         assertThat(detachedCs, is(equalTo(reproducedDetachedCs)));
-        assertThat(payloadContentBase64urlEncoded, is(equalTo(jws.getEncodedPayload())));
+        assertThat(encodedJwsPayload, is(equalTo(jws.getEncodedPayload())));
     }
+
+
 }
