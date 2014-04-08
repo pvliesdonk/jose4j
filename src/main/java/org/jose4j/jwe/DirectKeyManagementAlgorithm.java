@@ -20,8 +20,9 @@ public class DirectKeyManagementAlgorithm extends AlgorithmInfo implements KeyMa
         setKeyPersuasion(KeyPersuasion.ASYMMETRIC);
     }
 
-    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
+    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride) throws JoseException
     {
+        KeyValidationSupport.cekNotAllowed(cekOverride, getAlgorithmIdentifier());
         byte[] cekBytes = managementKey.getEncoded();
         return new ContentEncryptionKeys(cekBytes, ByteUtil.EMPTY_BYTES);
     }

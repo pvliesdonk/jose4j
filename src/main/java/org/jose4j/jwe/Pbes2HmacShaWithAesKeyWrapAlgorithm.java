@@ -61,10 +61,10 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     }
 
     @Override
-    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
+    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride) throws JoseException
     {
         Key derivedKey = deriveForEncrypt(managementKey, headers);
-        return keyWrap.manageForEncrypt(derivedKey, cekDesc, headers);
+        return keyWrap.manageForEncrypt(derivedKey, cekDesc, headers, cekOverride);
     }
 
     protected Key deriveForEncrypt(Key managementKey, Headers headers) throws InvalidKeyException

@@ -52,9 +52,9 @@ public class Aes256GcmContentEncryptionAlgorithm extends AlgorithmInfo implement
         return contentEncryptionKeyDescriptor;
     }
 
-    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers) throws JoseException
+    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers, byte[] ivOverride) throws JoseException
     {
-        byte[] iv = ByteUtil.randomBytes(IV_BYTE_LENGTH);
+        byte[] iv = InitializationVectorHelp.iv(IV_BYTE_LENGTH, ivOverride);
         return encrypt(plaintext, aad, contentEncryptionKey, iv);
     }
 

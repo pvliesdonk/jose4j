@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Brian Campbell
+ * Copyright 2012-2014 Brian Campbell
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.jose4j.jwe;
 
-import org.jose4j.jwa.Algorithm;
-import org.jose4j.jwx.Headers;
-import org.jose4j.lang.JoseException;
+import org.jose4j.lang.ByteUtil;
 
-/**
- */
-public interface ContentEncryptionAlgorithm extends Algorithm
+public class InitializationVectorHelp
 {
-    ContentEncryptionKeyDescriptor getContentEncryptionKeyDescriptor();
-
-    ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers, byte[] ivOverride) throws JoseException;
-    byte[] decrypt(ContentEncryptionParts contentEncryptionParts, byte[] aad, byte[] contentEncryptionKey, Headers headers) throws JoseException;
-
+    static byte[] iv(int byteLength, byte[] ivOverride)
+    {
+        return (ivOverride == null) ? ByteUtil.randomBytes(byteLength) : ivOverride;
+    }
 }

@@ -46,8 +46,9 @@ public class EcdhKeyAgreementAlgorithm extends AlgorithmInfo implements KeyManag
         this.algorithmIdHeaderName = algorithmIdHeaderName;
     }
 
-    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
+    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride) throws JoseException
     {
+        KeyValidationSupport.cekNotAllowed(cekOverride, getAlgorithmIdentifier());
         ECPublicKey receiversKey = (ECPublicKey) managementKey;
         EllipticCurveJsonWebKey ephemeralJwk = EcJwkGenerator.generateJwk(receiversKey.getParams());
         return manageForEncrypt(managementKey, cekDesc, headers, ephemeralJwk);

@@ -67,7 +67,7 @@ public class Aes128CbcHmacSha256ContentEncryptionAlgorithmTest extends TestCase
         Aes128CbcHmacSha256ContentEncryptionAlgorithm contentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
         ContentEncryptionKeyDescriptor cekDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
         byte[] cek = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength());
-        ContentEncryptionParts encryptionParts = contentEncryptionAlg.encrypt(plaintext, aad, cek, (Headers)null);
+        ContentEncryptionParts encryptionParts = contentEncryptionAlg.encrypt(plaintext, aad, cek, null, null);
 
         byte[] decrypt = contentEncryptionAlg.decrypt(encryptionParts, aad, cek, null);
         assertEquals(text, StringUtil.newStringUtf8(decrypt));

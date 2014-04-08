@@ -25,9 +25,9 @@ public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo imple
         setAlgorithmIdentifier(alg);
     }
 
-    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
+    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride) throws JoseException
     {
-        byte[] contentEncryptionKey = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength());
+        byte[] contentEncryptionKey = cekOverride == null ? ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength()) : cekOverride;
         return manageForEnc(managementKey, cekDesc, contentEncryptionKey);
     }
 

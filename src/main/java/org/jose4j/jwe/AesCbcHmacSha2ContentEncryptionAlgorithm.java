@@ -40,6 +40,8 @@ import java.security.Key;
  */
 public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo implements ContentEncryptionAlgorithm
 {
+    public static final int IV_BYTE_LENGTH = 16;
+
     private final String hmacJavaAlgorithm;
     private final int tagTruncationLength;
     private final ContentEncryptionKeyDescriptor contentEncryptionKeyDescriptor;
@@ -70,11 +72,10 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         return contentEncryptionKeyDescriptor;
     }
 
-    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers) throws JoseException
+    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers, byte[] ivOverride) throws JoseException
     {
-        // The Initialization Vector (IV) used is a 128 bit value generated
-        //       randomly or pseudorandomly for use in the cipher.
-        byte[] iv = ByteUtil.randomBytes(16);
+        // The Initialization Vector (IV) used is a 128 bit value generated randomly or pseudorandomly for use in the cipher.
+        byte[] iv = InitializationVectorHelp.iv(IV_BYTE_LENGTH, ivOverride);
         return encrypt(plaintext, aad, contentEncryptionKey, iv);
     }
 

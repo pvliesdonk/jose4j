@@ -46,6 +46,8 @@ public class JsonWebEncryption extends JsonWebStructure
     byte[] iv;
     byte[] ciphertext;
 
+    byte[] contentEncryptionKey;
+
     private AlgorithmConstraints contentEncryptionAlgorithmConstraints = AlgorithmConstraints.NO_CONSTRAINTS;
 
     public void setPlainTextCharEncoding(String plaintextCharEncoding)
@@ -141,7 +143,7 @@ public class JsonWebEncryption extends JsonWebStructure
 
         setEncodedHeader(parts[0]);
         encryptedKey = base64url.base64UrlDecode(parts[1]);
-        iv = base64url.base64UrlDecode(parts[2]);
+        setEncodedIv(parts[2]);
         String encodedCiphertext = parts[3];
         checkNotEmptyPart(encodedCiphertext, "Encoded JWE Ciphertext");
         ciphertext = base64url.base64UrlDecode(encodedCiphertext);
@@ -163,7 +165,7 @@ public class JsonWebEncryption extends JsonWebStructure
             keyManagementModeAlg.validateDecryptionKey(getKey(), contentEncryptionAlg);
         }
 
-        Key cek = keyManagementModeAlg.manageForDecrypt(getKey(), encryptedKey, contentEncryptionKeyDesc, getHeaders());
+        Key cek = keyManagementModeAlg.manageForDecrypt(getKey(), getEncryptedKey(), contentEncryptionKeyDesc, getHeaders());
 
         ContentEncryptionParts contentEncryptionParts = new ContentEncryptionParts(iv, ciphertext, getIntegrity());
         byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();
@@ -172,6 +174,11 @@ public class JsonWebEncryption extends JsonWebStructure
         decrypted = decompress(getHeaders(), decrypted);
 
         setPlaintext(decrypted);
+    }
+
+    public byte[] getEncryptedKey()
+    {
+        return encryptedKey;
     }
 
     byte[] getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData()
@@ -218,7 +225,9 @@ public class JsonWebEncryption extends JsonWebStructure
             keyManagementModeAlg.validateEncryptionKey(getKey(), contentEncryptionAlg);
         }
 
-        ContentEncryptionKeys contentEncryptionKeys = keyManagementModeAlg.manageForEncrypt(managementKey, contentEncryptionKeyDesc, getHeaders());
+        ContentEncryptionKeys contentEncryptionKeys = keyManagementModeAlg.manageForEncrypt(managementKey, contentEncryptionKeyDesc, getHeaders(), contentEncryptionKey);
+        setContentEncryptionKey(contentEncryptionKeys.getContentEncryptionKey());
+        encryptedKey = contentEncryptionKeys.getEncryptedKey();
 
         byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();
         byte[] contentEncryptionKey = contentEncryptionKeys.getContentEncryptionKey();
@@ -227,7 +236,9 @@ public class JsonWebEncryption extends JsonWebStructure
 
         plaintextBytes = compress(getHeaders(), plaintextBytes);
 
-        ContentEncryptionParts contentEncryptionParts = contentEncryptionAlg.encrypt(plaintextBytes, aad, contentEncryptionKey, getHeaders());
+        ContentEncryptionParts contentEncryptionParts = contentEncryptionAlg.encrypt(plaintextBytes, aad, contentEncryptionKey, getHeaders(), getIv());
+        setIv(contentEncryptionParts.getIv());
+        ciphertext = contentEncryptionParts.getCiphertext();
 
         String encodedIv = base64url.base64UrlEncode(contentEncryptionParts.getIv());
         String encodedCiphertext = base64url.base64UrlEncode(contentEncryptionParts.getCiphertext());
@@ -238,5 +249,36 @@ public class JsonWebEncryption extends JsonWebStructure
         String encodedEncryptedKey = base64url.base64UrlEncode(encryptedKey);
 
         return CompactSerializer.serialize(getEncodedHeader(), encodedEncryptedKey, encodedIv, encodedCiphertext, encodedTag);
+    }
+
+    public byte[] getContentEncryptionKey()
+    {
+        return contentEncryptionKey;
+    }
+
+    public void setContentEncryptionKey(byte[] contentEncryptionKey)
+    {
+        this.contentEncryptionKey = contentEncryptionKey;
+    }
+
+    public void setEncodedContentEncryptionKey(String encodedContentEncryptionKey)
+    {
+        setContentEncryptionKey(base64url.decode(encodedContentEncryptionKey));
+    }
+
+    public byte[] getIv()
+    {
+        return iv;
+    }
+
+    public void setIv(byte[] iv)
+    {
+        this.iv = iv;
+    }
+
+    public void setEncodedIv(String encodedIv)
+    {
+        setIv(base64url.base64UrlDecode(encodedIv));
+
     }
 }

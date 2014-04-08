@@ -47,4 +47,12 @@ public class KeyValidationSupport
             throw new InvalidKeyException("The key must not be null.");
         }
     }
+
+    public static void cekNotAllowed(byte[] cekOverride, String alg) throws InvalidKeyException
+    {
+        if (cekOverride != null)
+        {
+            throw new InvalidKeyException("An explicit content encryption key cannot be used with " + alg);
+        }
+    }
 }

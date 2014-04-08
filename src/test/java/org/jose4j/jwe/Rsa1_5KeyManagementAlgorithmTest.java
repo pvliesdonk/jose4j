@@ -2,12 +2,14 @@ package org.jose4j.jwe;
 
 import junit.framework.TestCase;
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Arrays;
 
 /**
@@ -38,5 +40,21 @@ public class Rsa1_5KeyManagementAlgorithmTest extends TestCase
 
         byte[] encoded = key.getEncoded();
         assertTrue(Arrays.toString(encoded), Arrays.equals(cekBytes, encoded));
+    }
+
+    public void testRoundTrip() throws JoseException
+    {
+        Rsa1_5KeyManagementAlgorithm rsa = new Rsa1_5KeyManagementAlgorithm();
+        ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(128, AesKey.ALGORITHM);
+        PublicKey publicKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPublicKey();
+        ContentEncryptionKeys contentEncryptionKeys = rsa.manageForEncrypt(publicKey, cekDesc, null, null);
+
+        byte[] encryptedKey = contentEncryptionKeys.getEncryptedKey();
+
+        PrivateKey privateKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPrivateKey();
+        Key key = rsa.manageForDecrypt(privateKey, encryptedKey, cekDesc, null);
+
+        byte[] cek = contentEncryptionKeys.getContentEncryptionKey();
+        assertTrue(Arrays.equals(cek, key.getEncoded()));
     }
 }

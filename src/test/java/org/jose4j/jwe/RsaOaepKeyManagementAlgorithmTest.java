@@ -46,7 +46,7 @@ public class RsaOaepKeyManagementAlgorithmTest extends TestCase
         RsaOaepKeyManagementAlgorithm oaep = new RsaOaepKeyManagementAlgorithm();
         ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(128, AesKey.ALGORITHM);
         PublicKey publicKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPublicKey();
-        ContentEncryptionKeys contentEncryptionKeys = oaep.manageForEncrypt(publicKey, cekDesc, null);
+        ContentEncryptionKeys contentEncryptionKeys = oaep.manageForEncrypt(publicKey, cekDesc, null, null);
 
         byte[] encryptedKey = contentEncryptionKeys.getEncryptedKey();
 

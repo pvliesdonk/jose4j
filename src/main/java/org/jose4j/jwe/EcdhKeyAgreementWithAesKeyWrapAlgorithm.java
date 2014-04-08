@@ -4,6 +4,7 @@ import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwk.EllipticCurveJsonWebKey;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
+import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
@@ -34,13 +35,13 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithm extends AlgorithmInfo imple
         keyWrapKeyDescriptor = new ContentEncryptionKeyDescriptor(keyWrapAlgorithm.getKeyByteLength(), AesKey.ALGORITHM);
     }
 
-    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers)
+    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride)
             throws JoseException
     {
-        ContentEncryptionKeys agreedKeys = ecdh.manageForEncrypt(managementKey, keyWrapKeyDescriptor, headers);
+        ContentEncryptionKeys agreedKeys = ecdh.manageForEncrypt(managementKey, keyWrapKeyDescriptor, headers, (byte[])null);
         String contentEncryptionKeyAlgorithm = keyWrapKeyDescriptor.getContentEncryptionKeyAlgorithm();
         Key agreedKey = new SecretKeySpec(agreedKeys.getContentEncryptionKey(), contentEncryptionKeyAlgorithm);
-        return keyWrap.manageForEncrypt(agreedKey, cekDesc, headers);
+        return keyWrap.manageForEncrypt(agreedKey, cekDesc, headers, cekOverride);
     }
 
     public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers)
