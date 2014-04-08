@@ -84,7 +84,7 @@ public class Base64Url
 
     public static String encodeUtf8ByteRepresentation(String value)
     {
-        return getOne().base64UrlDecodeToUtf8String(value);
+        return getOne().base64UrlEncodeUtf8ByteRepresentation(value);
     }
 
     public static String encode(String value, String charsetName)
