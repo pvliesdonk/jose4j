@@ -78,14 +78,15 @@
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>1.2.16</version>
-      <scope>test</scope>      
+      <scope>test</scope>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.bouncycastle</groupId>-->
-      <!--<artifactId>bcprov-jdk15on</artifactId>-->
-      <!--<version>1.49</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>1.50</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

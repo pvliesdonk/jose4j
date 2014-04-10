@@ -16,13 +16,17 @@
 
 package org.jose4j.cookbook;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwa.AlgorithmFactory;
+import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwe.*;
 import org.jose4j.jwk.JsonWebKey;
-import org.jose4j.jwk.JsonWebKeySet;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.jws.JsonWebSignatureAlgorithm;
+import org.jose4j.jws.RsaPssUsingSha384Algorithm;
 import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
@@ -32,6 +36,7 @@ import org.jose4j.lang.JoseException;
 import org.junit.Test;
 
 import java.security.Key;
+import java.security.Security;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -40,7 +45,7 @@ import static org.junit.Assert.*;
  * http://tools.ietf.org/html/draft-ietf-jose-cookbook-01
  *
  * 3.1. RSA v1.5 Signature
- * ... PSS might drop in more easily than GCM w/ BC ... something to think about ...
+ * 3.2. RSA-PSS Signature (via the the Bouncy Castle provider)
  * 3.3. ECDSA Signature
  * 3.4. HMAC-SHA2 Integrity Protection
  * 3.5. Detached Signature
@@ -67,51 +72,51 @@ public class JoseCookbookTest
             "yourself. But you cannot trust us to let you face trouble " +
             "alone, and go off without a word. We are your friends, Frodo.";
 
+    String figure3RsaJwkJsonString =
+            "{\n" +
+            "  \"kty\": \"RSA\",\n" +
+            "  \"kid\": \"bilbo.baggins@hobbiton.example\",\n" +
+            "  \"use\": \"sig\",\n" +
+            "  \"n\": \"n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT\n" +
+            "      -O-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqV\n" +
+            "      wGU_NsYOYL-QtiWN2lbzcEe6XC0dApr5ydQLrHqkHHig3RBordaZ6Aj-\n" +
+            "      oBHqFEHYpPe7Tpe-OfVfHd1E6cS6M1FZcD1NNLYD5lFHpPI9bTwJlsde\n" +
+            "      3uhGqC0ZCuEHg8lhzwOHrtIQbS0FVbb9k3-tVTU4fg_3L_vniUFAKwuC\n" +
+            "      LqKnS2BYwdq_mzSnbLY7h_qixoR7jig3__kRhuaxwUkRz5iaiQkqgc5g\n" +
+            "      HdrNP5zw\",\n" +
+            "  \"e\": \"AQAB\",\n" +
+            "  \"d\": \"bWUC9B-EFRIo8kpGfh0ZuyGPvMNKvYWNtB_ikiH9k20eT-O1q_I78e\n" +
+            "      iZkpXxXQ0UTEs2LsNRS-8uJbvQ-A1irkwMSMkK1J3XTGgdrhCku9gRld\n" +
+            "      Y7sNA_AKZGh-Q661_42rINLRCe8W-nZ34ui_qOfkLnK9QWDDqpaIsA-b\n" +
+            "      MwWWSDFu2MUBYwkHTMEzLYGqOe04noqeq1hExBTHBOBdkMXiuFhUq1BU\n" +
+            "      6l-DqEiWxqg82sXt2h-LMnT3046AOYJoRioz75tSUQfGCshWTBnP5uDj\n" +
+            "      d18kKhyv07lhfSJdrPdM5Plyl21hsFf4L_mHCuoFau7gdsPfHPxxjVOc\n" +
+            "      OpBrQzwQ\",\n" +
+            "  \"p\": \"3Slxg_DwTXJcb6095RoXygQCAZ5RnAvZlno1yhHtnUex_fp7AZ_9nR\n" +
+            "      aO7HX_-SFfGQeutao2TDjDAWU4Vupk8rw9JR0AzZ0N2fvuIAmr_WCsmG\n" +
+            "      peNqQnev1T7IyEsnh8UMt-n5CafhkikzhEsrmndH6LxOrvRJlsPp6Zv8\n" +
+            "      bUq0k\",\n" +
+            "  \"q\": \"uKE2dh-cTf6ERF4k4e_jy78GfPYUIaUyoSSJuBzp3Cubk3OCqs6grT\n" +
+            "      8bR_cu0Dm1MZwWmtdqDyI95HrUeq3MP15vMMON8lHTeZu2lmKvwqW7an\n" +
+            "      V5UzhM1iZ7z4yMkuUwFWoBvyY898EXvRD-hdqRxHlSqAZ192zB3pVFJ0\n" +
+            "      s7pFc\",\n" +
+            "  \"dp\": \"B8PVvXkvJrj2L-GYQ7v3y9r6Kw5g9SahXBwsWUzp19TVlgI-YV85q\n" +
+            "      1NIb1rxQtD-IsXXR3-TanevuRPRt5OBOdiMGQp8pbt26gljYfKU_E9xn\n" +
+            "      -RULHz0-ed9E9gXLKD4VGngpz-PfQ_q29pk5xWHoJp009Qf1HvChixRX\n" +
+            "      59ehik\",\n" +
+            "  \"dq\": \"CLDmDGduhylc9o7r84rEUVn7pzQ6PF83Y-iBZx5NT-TpnOZKF1pEr\n" +
+            "      AMVeKzFEl41DlHHqqBLSM0W1sOFbwTxYWZDm6sI6og5iTbwQGIC3gnJK\n" +
+            "      bi_7k_vJgGHwHxgPaX2PnvP-zyEkDERuf-ry4c_Z11Cq9AqC2yeL6kdK\n" +
+            "      T1cYF8\",\n" +
+            "  \"qi\": \"3PiqvXQN0zwMeE-sBvZgi289XP9XCQF3VWqPzMKnIgQp7_Tugo6-N\n" +
+            "      ZBKCQsMf3HaEGBjTVJs_jcK8-TRXvaKe-7ZMaQj8VfBdYkssbu0NKDDh\n" +
+            "      jJ-GtiseaDVWt7dcH0cfwxgFUHpQh7FoCrjFJ6h6ZEpMF6xmujs4qMpP\n" +
+            "      z8aaI4\"\n" +
+            "}";
+
     @Test
     public void rsa_v1_5Signature_3_1() throws JoseException
     {
-        String jwkJson =
-                "{" +
-                "  \"kty\": \"RSA\"," +
-                "  \"kid\": \"bilbo.baggins@hobbiton.example\"," +
-                "  \"use\": \"sig\"," +
-                "  \"n\": \"n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT\n" +
-                "-O-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqV\n" +
-                "wGU_NsYOYL-QtiWN2lbzcEe6XC0dApr5ydQLrHqkHHig3RBordaZ6Aj-\n" +
-                "oBHqFEHYpPe7Tpe-OfVfHd1E6cS6M1FZcD1NNLYD5lFHpPI9bTwJlsde\n" +
-                "3uhGqC0ZCuEHg8lhzwOHrtIQbS0FVbb9k3-tVTU4fg_3L_vniUFAKwuC\n" +
-                "LqKnS2BYwdq_mzSnbLY7h_qixoR7jig3__kRhuaxwUkRz5iaiQkqgc5g\n" +
-                "HdrNP5zw\",\n" +
-                "  \"e\": \"AQAB\",\n" +
-                "  \"d\": \"bWUC9B-EFRIo8kpGfh0ZuyGPvMNKvYWNtB_ikiH9k20eT-O1q_I78e\n" +
-                "iZkpXxXQ0UTEs2LsNRS-8uJbvQ-A1irkwMSMkK1J3XTGgdrhCku9gRld\n" +
-                "Y7sNA_AKZGh-Q661_42rINLRCe8W-nZ34ui_qOfkLnK9QWDDqpaIsA-b\n" +
-                "MwWWSDFu2MUBYwkHTMEzLYGqOe04noqeq1hExBTHBOBdkMXiuFhUq1BU\n" +
-                "6l-DqEiWxqg82sXt2h-LMnT3046AOYJoRioz75tSUQfGCshWTBnP5uDj\n" +
-                "d18kKhyv07lhfSJdrPdM5Plyl21hsFf4L_mHCuoFau7gdsPfHPxxjVOc\n" +
-                "OpBrQzwQ\",\n" +
-                "  \"p\": \"3Slxg_DwTXJcb6095RoXygQCAZ5RnAvZlno1yhHtnUex_fp7AZ_9nR\n" +
-                "aO7HX_-SFfGQeutao2TDjDAWU4Vupk8rw9JR0AzZ0N2fvuIAmr_WCsmG\n" +
-                "peNqQnev1T7IyEsnh8UMt-n5CafhkikzhEsrmndH6LxOrvRJlsPp6Zv8\n" +
-                "bUq0k\",\n" +
-                "  \"q\": \"uKE2dh-cTf6ERF4k4e_jy78GfPYUIaUyoSSJuBzp3Cubk3OCqs6grT\n" +
-                "8bR_cu0Dm1MZwWmtdqDyI95HrUeq3MP15vMMON8lHTeZu2lmKvwqW7an\n" +
-                "V5UzhM1iZ7z4yMkuUwFWoBvyY898EXvRD-hdqRxHlSqAZ192zB3pVFJ0\n" +
-                "s7pFc\",\n" +
-                "  \"dp\": \"B8PVvXkvJrj2L-GYQ7v3y9r6Kw5g9SahXBwsWUzp19TVlgI-YV85q\n" +
-                "1NIb1rxQtD-IsXXR3-TanevuRPRt5OBOdiMGQp8pbt26gljYfKU_E9xn\n" +
-                "-RULHz0-ed9E9gXLKD4VGngpz-PfQ_q29pk5xWHoJp009Qf1HvChixRX\n" +
-                "59ehik\",\n" +
-                "  \"dq\": \"CLDmDGduhylc9o7r84rEUVn7pzQ6PF83Y-iBZx5NT-TpnOZKF1pEr\n" +
-                "AMVeKzFEl41DlHHqqBLSM0W1sOFbwTxYWZDm6sI6og5iTbwQGIC3gnJK\n" +
-                "bi_7k_vJgGHwHxgPaX2PnvP-zyEkDERuf-ry4c_Z11Cq9AqC2yeL6kdK\n" +
-                "T1cYF8\",\n" +
-                "  \"qi\": \"3PiqvXQN0zwMeE-sBvZgi289XP9XCQF3VWqPzMKnIgQp7_Tugo6-N\n" +
-                "ZBKCQsMf3HaEGBjTVJs_jcK8-TRXvaKe-7ZMaQj8VfBdYkssbu0NKDDh\n" +
-                "jJ-GtiseaDVWt7dcH0cfwxgFUHpQh7FoCrjFJ6h6ZEpMF6xmujs4qMpP\n" +
-                "z8aaI4\"\n" +
-                "}";
-
         String jwsCompactSerialization =
                 "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZX" +
                 "hhbXBsZSJ9" +
@@ -133,7 +138,7 @@ public class JoseCookbookTest
         // verify consuming the JWS
         JsonWebSignature jws = new JsonWebSignature();
         jws.setCompactSerialization(jwsCompactSerialization);
-        JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(figure3RsaJwkJsonString);
         jws.setKey(jwk.getKey());
         assertThat(jws.verifySignature(), is(true));
         assertThat(jws.getPayload(), equalTo(jwsPayload));
@@ -150,6 +155,55 @@ public class JoseCookbookTest
         jws.setKey(rsaJwk.getPrivateKey());
         String compactSerialization = jws.getCompactSerialization();
         assertThat(jwsCompactSerialization, equalTo(compactSerialization));
+    }
+
+    @Test
+    public void rsaPssSignature_3_2() throws JoseException
+    {
+        BouncyCastleProvider bouncyCastleProvider = new BouncyCastleProvider();
+        AlgorithmFactoryFactory instance = AlgorithmFactoryFactory.getInstance();
+        AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory = instance.getJwsAlgorithmFactory();
+        RsaPssUsingSha384Algorithm rsaPssUsingSha384Algorithm = new RsaPssUsingSha384Algorithm();
+
+        try
+        {
+            Security.addProvider(bouncyCastleProvider);
+            jwsAlgorithmFactory.registerAlgorithm(rsaPssUsingSha384Algorithm);
+
+            PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(figure3RsaJwkJsonString);
+
+            String cs =
+                    "eyJhbGciOiJQUzM4NCIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZX" +
+                    "hhbXBsZSJ9" +
+                    "." +
+                    "SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IH" +
+                    "lvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBk" +
+                    "b24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcm" +
+                    "UgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4" +
+                    "." +
+                    "cu22eBqkYDKgIlTpzDXGvaFfz6WGoz7fUDcfT0kkOy42miAh2qyBzk1xEsnk2I" +
+                    "pN6-tPid6VrklHkqsGqDqHCdP6O8TTB5dDDItllVo6_1OLPpcbUrhiUSMxbbXU" +
+                    "vdvWXzg-UD8biiReQFlfz28zGWVsdiNAUf8ZnyPEgVFn442ZdNqiVJRmBqrYRX" +
+                    "e8P_ijQ7p8Vdz0TTrxUeT3lm8d9shnr2lfJT8ImUjvAA2Xez2Mlp8cBE5awDzT" +
+                    "0qI0n6uiP1aCN_2_jLAeQTlqRHtfa64QQSUmFAAjVKPbByi7xho0uTOcbH510a" +
+                    "6GYmJUAfmWjwZ6oD4ifKo8DYM-X72Eaw";
+
+            JsonWebSignature jws = new JsonWebSignature();
+            jws.setCompactSerialization(cs);
+            jws.setKey(jwk.getPublicKey());
+            assertThat(jws.verifySignature(), is(true));
+            assertThat(jws.getPayload(), equalTo(jwsPayload));
+            assertThat(jws.getKeyIdHeaderValue(), equalTo(jwk.getKeyId()));
+            assertThat(AlgorithmIdentifiers.RSA_PSS_USING_SHA384, equalTo(jws.getAlgorithmHeaderValue()));
+
+            // can't easily verify reproducing RSA-PSS because "it is probabilistic rather than deterministic,
+            // incorporating a randomly generated salt value" - from http://tools.ietf.org/html/rfc3447#section-8.1
+        }
+        finally
+        {
+            jwsAlgorithmFactory.unregisterAlgorithm(rsaPssUsingSha384Algorithm.getAlgorithmIdentifier());
+            Security.removeProvider(bouncyCastleProvider.getName());
+        }
     }
 
     @Test
@@ -617,5 +671,49 @@ public class JoseCookbookTest
 
         String encodedExampleCek = "_Tm_fqSViyOGQVK-aPJTIQ";
         assertArrayEquals(cek.getEncoded(), Base64Url.decode(encodedExampleCek));
+    }
+
+    // @Test not currently working -  "I changed the private key! d'oh" from MM ...
+    public void keyAgreementAndAesCbc_4_5() throws JoseException
+    {
+        String jwkJson =
+                "{\n" +
+                "  \"kty\": \"EC\",\n" +
+                "  \"kid\": \"meriadoc.brandybuck@buckland.example\",\n" +
+                "  \"use\": \"enc\",\n" +
+                "  \"crv\": \"P-256\",\n" +
+                "  \"x\": \"XnXXKEsaUU4hPZza_zSHIbt02UA505B1rDWc7JNlcDE\",\n" +
+                "  \"y\": \"Md5NqzfiXCytoaMglA-9MstvgOBdMSroXA2Hb6vR6dQ\",\n" +
+                "  \"d\": \"44eY-VRWsn1zdz3VaWS6idEpOGt1ErydBARq7Iyh9pY\"\n" +
+                "}";
+
+        String exampleCompactSerialization =
+                "eyJhbGciOiJFQ0RILUVTIiwia2lkIjoibWVyaWFkb2MuYnJhbmR5YnVja0BidW" +
+                        "NrbGFuZC5leGFtcGxlIiwiZXBrIjp7Imt0eSI6IkVDIiwiY3J2IjoiUC0yNTYi" +
+                        "LCJ4IjoiakNiWkZ4OXcwQUZMaUFZTW1xR0hPbkhWTUcyUExZLVQ0MU9WWFNwQW" +
+                        "dzVSIsInkiOiJjVk5TcTdIeG04LU5obFNKR3NRX21GelNSMnBELWRSTTJUenhD" +
+                        "cDlTOHJJIn0sImVuYyI6IkExMjhDQkMtSFMyNTYifQ" +
+                        "." +
+                        "." +
+                        "fQum9wPUungYjFzXTKLeMQ" +
+                        "." +
+                        "Fvzhocgmwm5PDjK5kLDf0B-IrI8Yqd9jtg5AfgFsqSiz4F7gCri4FiObRIHotz" +
+                        "BYqVF6MCyw5hs_gWTGWqZxFS-3BSIcdZ1WupNv5k6bnZIo97Oz5YLgevLW0NHh" +
+                        "JIC3-NNkNDgFk21WCzqyjhbhyflStqYZYUiakQ-WfzMTvcxMQgMLZL0TR_vUuI" +
+                        "JaCK7AhoxdCawtJuNGW_2we97QjBgcez8KH27jA7HIZ006rgqkNfGkpzDEsvs8" +
+                        "YE5AcnTPV5MZoUZCxAuc3C_UU1y7X4paqXOz6At7RZPGN0PX83l9La1pnI925L" +
+                        "-St0QsnzB9LVky8nVUKwOcN5YtpnXb5TU910Gi6YVBxgwhvTI71Bk6f8pTaQif" +
+                        "nxs4ISMN9lj3" +
+                        "." +
+                        "MG2uMNWljtqAVzkUg_oM5w";
+
+        PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(jwkJson);
+
+        // verify that we can decrypt it
+        JsonWebEncryption jwe = new JsonWebEncryption();
+        jwe.setCompactSerialization(exampleCompactSerialization);
+        jwe.setKey(jwk.getPrivateKey());
+        System.out.println(jwe.getPlaintextString());
+        assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
     }
 }

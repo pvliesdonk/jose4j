@@ -51,6 +51,9 @@ public class AlgorithmFactoryFactory
         jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha256Algorithm());
         jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha384Algorithm());
         jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha512Algorithm());
+        jwsAlgorithmFactory.registerAlgorithm(new RsaPssUsingSha256Algorithm());
+        jwsAlgorithmFactory.registerAlgorithm(new RsaPssUsingSha384Algorithm());
+        jwsAlgorithmFactory.registerAlgorithm(new RsaPssUsingSha512Algorithm());
 
         log.info("JWS signature algorithms: " + jwsAlgorithmFactory.getSupportedAlgorithms());
 
@@ -82,7 +85,6 @@ public class AlgorithmFactoryFactory
         compressionAlgorithmFactory.registerAlgorithm(new DeflateRFC1951CompressionAlgorithm());
 
         log.info("JWE compression algorithms: " + compressionAlgorithmFactory.getSupportedAlgorithms());
-
     }
 
     public static AlgorithmFactoryFactory getInstance()
