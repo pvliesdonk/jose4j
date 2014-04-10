@@ -33,6 +33,7 @@ public class ConcatKeyDerivationFunction
         log.debug("  keydatalen: " + keydatalen);
         log.debug("  algorithmId: " + ByteUtil.toDebugString(algorithmId));
         log.debug("  partyUInfo: " + ByteUtil.toDebugString(partyUInfo));
+        log.debug("  partyVInfo: " + ByteUtil.toDebugString(partyVInfo));
         log.debug("  suppPubInfo: " + ByteUtil.toDebugString(suppPubInfo));
         log.debug("  suppPrivInfo: " + ByteUtil.toDebugString(suppPrivInfo));
 
