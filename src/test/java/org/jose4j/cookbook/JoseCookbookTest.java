@@ -673,39 +673,39 @@ public class JoseCookbookTest
         assertArrayEquals(cek.getEncoded(), Base64Url.decode(encodedExampleCek));
     }
 
-    // @Test not currently working -  "I changed the private key! d'oh" from MM ...
+    // @Test still have some issue here...
     public void keyAgreementAndAesCbc_4_5() throws JoseException
     {
         String jwkJson =
-                "{\n" +
-                "  \"kty\": \"EC\",\n" +
-                "  \"kid\": \"meriadoc.brandybuck@buckland.example\",\n" +
-                "  \"use\": \"enc\",\n" +
-                "  \"crv\": \"P-256\",\n" +
-                "  \"x\": \"XnXXKEsaUU4hPZza_zSHIbt02UA505B1rDWc7JNlcDE\",\n" +
-                "  \"y\": \"Md5NqzfiXCytoaMglA-9MstvgOBdMSroXA2Hb6vR6dQ\",\n" +
-                "  \"d\": \"44eY-VRWsn1zdz3VaWS6idEpOGt1ErydBARq7Iyh9pY\"\n" +
-                "}";
+            "   {\n" +
+            "     \"kty\": \"EC\",\n" +
+            "     \"kid\": \"meriadoc.brandybuck@buckland.example\",\n" +
+            "     \"use\": \"enc\",\n" +
+            "     \"crv\": \"P-256\",\n" +
+            "     \"x\": \"XnXXKEsaUU4hPZza_zSHIbt02UA505B1rDWc7JNlcDE\",\n" +
+            "     \"y\": \"Md5NqzfiXCytoaMglA-9MstvgOBdMSroXA2Hb6vR6dQ\",\n" +
+            "     \"d\": \"44eY-VRWsn1zdz3VaWS6idEpOGt1ErydBARq7Iyh9pY\"\n" +
+            "   }";
 
         String exampleCompactSerialization =
                 "eyJhbGciOiJFQ0RILUVTIiwia2lkIjoibWVyaWFkb2MuYnJhbmR5YnVja0BidW" +
-                        "NrbGFuZC5leGFtcGxlIiwiZXBrIjp7Imt0eSI6IkVDIiwiY3J2IjoiUC0yNTYi" +
-                        "LCJ4IjoiakNiWkZ4OXcwQUZMaUFZTW1xR0hPbkhWTUcyUExZLVQ0MU9WWFNwQW" +
-                        "dzVSIsInkiOiJjVk5TcTdIeG04LU5obFNKR3NRX21GelNSMnBELWRSTTJUenhD" +
-                        "cDlTOHJJIn0sImVuYyI6IkExMjhDQkMtSFMyNTYifQ" +
-                        "." +
-                        "." +
-                        "fQum9wPUungYjFzXTKLeMQ" +
-                        "." +
-                        "Fvzhocgmwm5PDjK5kLDf0B-IrI8Yqd9jtg5AfgFsqSiz4F7gCri4FiObRIHotz" +
-                        "BYqVF6MCyw5hs_gWTGWqZxFS-3BSIcdZ1WupNv5k6bnZIo97Oz5YLgevLW0NHh" +
-                        "JIC3-NNkNDgFk21WCzqyjhbhyflStqYZYUiakQ-WfzMTvcxMQgMLZL0TR_vUuI" +
-                        "JaCK7AhoxdCawtJuNGW_2we97QjBgcez8KH27jA7HIZ006rgqkNfGkpzDEsvs8" +
-                        "YE5AcnTPV5MZoUZCxAuc3C_UU1y7X4paqXOz6At7RZPGN0PX83l9La1pnI925L" +
-                        "-St0QsnzB9LVky8nVUKwOcN5YtpnXb5TU910Gi6YVBxgwhvTI71Bk6f8pTaQif" +
-                        "nxs4ISMN9lj3" +
-                        "." +
-                        "MG2uMNWljtqAVzkUg_oM5w";
+                "NrbGFuZC5leGFtcGxlIiwiZXBrIjp7Imt0eSI6IkVDIiwiY3J2IjoiUC0yNTYi" +
+                "LCJ4IjoiVFRkYVUzcFJ3a0cyd1JDR0VqSGJ6UWRXSU1rYTJ6VW5qdlVkYWhOQm" +
+                "84MCIsInkiOiJsY1pkVWNfeXhXbjFFSnRzTHlIQjNMVmRWZEtzNE1pdDVtYVV2" +
+                "Uko2ODBBIn0sImVuYyI6IkExMjhDQkMtSFMyNTYifQ" +
+                "." +
+                "." +
+                "bT42VuUQSgwnFW0F5_RaVQ" +
+                "." +
+                "ayPFU_oBeXzXQvhNxVuGDllTRAhPDE1BgT5AVZUNrHFEwZKISaHtA3juO9lwtu" +
+                "NjWtNrj_hcs4UjFrdY3Lt3ZmsUQCeS5Rvh8oY1zie55xk1-jp2NAa05Ocoogrg" +
+                "pcvlJgdBr7oQCsvnUYTzNTRjoeWH0ZfeOARgbP_0jWDoI4Ko3awimdRXnu2fTO" +
+                "uyNl_yTd_Uz92zJ1ekB3WTDt3AKad9oLpXtLG86LagizhjH85wiq3Dj7QdUsDh" +
+                "5JpiijZwYD2foueUP88Vy0fXQ-3-SeD0mqCH_pGaCE_q_0meHxy7r2WwLvbvT9" +
+                "5UqrG1KeaBucgVgsgwwKF97lBzrH2LUCqnmdiuCZy7saRjtiOxVaJP1mCaFHY3" +
+                "xRWus8uUR_sc" +
+                "." +
+                "6sVgog8mv6ZHQgkAD23Z2Q";
 
         PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(jwkJson);
 
