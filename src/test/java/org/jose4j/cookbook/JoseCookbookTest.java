@@ -21,6 +21,8 @@ import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwa.AlgorithmFactory;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwe.*;
+import org.jose4j.jwk.EcJwkGenerator;
+import org.jose4j.jwk.EllipticCurveJsonWebKey;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jws.AlgorithmIdentifiers;
@@ -31,12 +33,15 @@ import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
 import org.jose4j.keys.AesKey;
+import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.lang.JoseException;
 import org.junit.Test;
 
 import java.security.Key;
+import java.security.Provider;
 import java.security.Security;
+import java.security.spec.ECParameterSpec;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -160,15 +165,22 @@ public class JoseCookbookTest
     @Test
     public void rsaPssSignature_3_2() throws JoseException
     {
-        BouncyCastleProvider bouncyCastleProvider = new BouncyCastleProvider();
+        String pssAlg = AlgorithmIdentifiers.RSA_PSS_USING_SHA384;
         AlgorithmFactoryFactory instance = AlgorithmFactoryFactory.getInstance();
         AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory = instance.getJwsAlgorithmFactory();
-        RsaPssUsingSha384Algorithm rsaPssUsingSha384Algorithm = new RsaPssUsingSha384Algorithm();
+        boolean pssIsAvailable = jwsAlgorithmFactory.isAvailable(pssAlg);
+
+        BouncyCastleProvider bouncyCastleProvider = new BouncyCastleProvider();
+        boolean removeBc = Security.getProvider(bouncyCastleProvider.getName()) == null;
+
 
         try
         {
             Security.addProvider(bouncyCastleProvider);
-            jwsAlgorithmFactory.registerAlgorithm(rsaPssUsingSha384Algorithm);
+            if (!pssIsAvailable)
+            {
+                jwsAlgorithmFactory.registerAlgorithm(new RsaPssUsingSha384Algorithm());
+            }
 
             PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(figure3RsaJwkJsonString);
 
@@ -194,15 +206,22 @@ public class JoseCookbookTest
             assertThat(jws.verifySignature(), is(true));
             assertThat(jws.getPayload(), equalTo(jwsPayload));
             assertThat(jws.getKeyIdHeaderValue(), equalTo(jwk.getKeyId()));
-            assertThat(AlgorithmIdentifiers.RSA_PSS_USING_SHA384, equalTo(jws.getAlgorithmHeaderValue()));
+            assertThat(pssAlg, equalTo(jws.getAlgorithmHeaderValue()));
 
             // can't easily verify reproducing RSA-PSS because "it is probabilistic rather than deterministic,
             // incorporating a randomly generated salt value" - from http://tools.ietf.org/html/rfc3447#section-8.1
         }
         finally
         {
-            jwsAlgorithmFactory.unregisterAlgorithm(rsaPssUsingSha384Algorithm.getAlgorithmIdentifier());
-            Security.removeProvider(bouncyCastleProvider.getName());
+            if (!pssIsAvailable)
+            {
+                jwsAlgorithmFactory.unregisterAlgorithm(pssAlg);
+            }
+
+            if (removeBc)
+            {
+                Security.removeProvider(bouncyCastleProvider.getName());
+            }
         }
     }
 
@@ -673,39 +692,13 @@ public class JoseCookbookTest
         assertArrayEquals(cek.getEncoded(), Base64Url.decode(encodedExampleCek));
     }
 
-    // @Test still have some issue here...
+    // @Test still not getting interop on this one so just a placeholder for now
     public void keyAgreementAndAesCbc_4_5() throws JoseException
     {
-        String jwkJson =
-            "   {\n" +
-            "     \"kty\": \"EC\",\n" +
-            "     \"kid\": \"meriadoc.brandybuck@buckland.example\",\n" +
-            "     \"use\": \"enc\",\n" +
-            "     \"crv\": \"P-256\",\n" +
-            "     \"x\": \"XnXXKEsaUU4hPZza_zSHIbt02UA505B1rDWc7JNlcDE\",\n" +
-            "     \"y\": \"Md5NqzfiXCytoaMglA-9MstvgOBdMSroXA2Hb6vR6dQ\",\n" +
-            "     \"d\": \"44eY-VRWsn1zdz3VaWS6idEpOGt1ErydBARq7Iyh9pY\"\n" +
-            "   }";
+        String jwkJson =  "";
 
         String exampleCompactSerialization =
-                "eyJhbGciOiJFQ0RILUVTIiwia2lkIjoibWVyaWFkb2MuYnJhbmR5YnVja0BidW" +
-                "NrbGFuZC5leGFtcGxlIiwiZXBrIjp7Imt0eSI6IkVDIiwiY3J2IjoiUC0yNTYi" +
-                "LCJ4IjoiVFRkYVUzcFJ3a0cyd1JDR0VqSGJ6UWRXSU1rYTJ6VW5qdlVkYWhOQm" +
-                "84MCIsInkiOiJsY1pkVWNfeXhXbjFFSnRzTHlIQjNMVmRWZEtzNE1pdDVtYVV2" +
-                "Uko2ODBBIn0sImVuYyI6IkExMjhDQkMtSFMyNTYifQ" +
-                "." +
-                "." +
-                "bT42VuUQSgwnFW0F5_RaVQ" +
-                "." +
-                "ayPFU_oBeXzXQvhNxVuGDllTRAhPDE1BgT5AVZUNrHFEwZKISaHtA3juO9lwtu" +
-                "NjWtNrj_hcs4UjFrdY3Lt3ZmsUQCeS5Rvh8oY1zie55xk1-jp2NAa05Ocoogrg" +
-                "pcvlJgdBr7oQCsvnUYTzNTRjoeWH0ZfeOARgbP_0jWDoI4Ko3awimdRXnu2fTO" +
-                "uyNl_yTd_Uz92zJ1ekB3WTDt3AKad9oLpXtLG86LagizhjH85wiq3Dj7QdUsDh" +
-                "5JpiijZwYD2foueUP88Vy0fXQ-3-SeD0mqCH_pGaCE_q_0meHxy7r2WwLvbvT9" +
-                "5UqrG1KeaBucgVgsgwwKF97lBzrH2LUCqnmdiuCZy7saRjtiOxVaJP1mCaFHY3" +
-                "xRWus8uUR_sc" +
-                "." +
-                "6sVgog8mv6ZHQgkAD23Z2Q";
+                "";
 
         PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(jwkJson);
 
@@ -715,5 +708,38 @@ public class JoseCookbookTest
         jwe.setKey(jwk.getPrivateKey());
         System.out.println(jwe.getPlaintextString());
         assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
+    }
+
+    @Test // generate a bunch of ECDH-ES examples for MM to try and help troubleshoot 4.5
+    public void someExamplesForMM() throws JoseException
+    {
+        ECParameterSpec[] specs = new ECParameterSpec[] {EllipticCurves.P256, EllipticCurves.P384, EllipticCurves.P521};
+        String[] encs = new String[]
+                {ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256,
+                        ContentEncryptionAlgorithmIdentifiers.AES_192_CBC_HMAC_SHA_384,
+                        ContentEncryptionAlgorithmIdentifiers.AES_256_CBC_HMAC_SHA_512};
+
+        AlgorithmFactoryFactory.getInstance();
+        for (ECParameterSpec spec : specs)
+        {
+            for (String enc : encs)
+            {
+                EllipticCurveJsonWebKey jwk = EcJwkGenerator.generateJwk(spec);
+
+                System.out.println();
+                System.out.println();
+
+                System.out.println(jwk.toJson(JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE));
+                JsonWebEncryption jwe = new JsonWebEncryption();
+                jwe.setKey(jwk.getKey());
+                jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.ECDH_ES);
+                jwe.setEncryptionMethodHeaderParameter(enc);
+                jwe.setPayload("Matt Miller always has the best, or biggest anyway, power supply at the IETF meetings.");
+
+                String compactSerialization = jwe.getCompactSerialization();
+                System.out.println(compactSerialization);
+            }
+        }
+
     }
 }
