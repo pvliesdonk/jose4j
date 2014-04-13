@@ -16,6 +16,7 @@
 
 package org.jose4j.jwe;
 
+import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.Headers;
 import org.jose4j.keys.AesKey;
@@ -26,7 +27,7 @@ import org.jose4j.lang.JoseException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.GCMParameterSpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 
@@ -36,8 +37,9 @@ public class Aes256GcmContentEncryptionAlgorithm extends AlgorithmInfo implement
 {
     public static final int IV_BYTE_LENGTH = 12;
     public static final int TAG_BYTE_LENGTH = 16;
+    public static final int TAG_BIT_LENGTH = ByteUtil.bitLength(TAG_BYTE_LENGTH);
 
-    private ContentEncryptionKeyDescriptor contentEncryptionKeyDescriptor = new ContentEncryptionKeyDescriptor(256, AesKey.ALGORITHM);
+    private ContentEncryptionKeyDescriptor contentEncryptionKeyDescriptor;
 
     public Aes256GcmContentEncryptionAlgorithm()
     {
@@ -45,6 +47,7 @@ public class Aes256GcmContentEncryptionAlgorithm extends AlgorithmInfo implement
         setJavaAlgorithm("AES/GCM/NoPadding");
         setKeyPersuasion(KeyPersuasion.SYMMETRIC);
         setKeyType(AesKey.ALGORITHM);
+        contentEncryptionKeyDescriptor = new ContentEncryptionKeyDescriptor(256, AesKey.ALGORITHM);
     }
 
     public ContentEncryptionKeyDescriptor getContentEncryptionKeyDescriptor()
@@ -52,31 +55,17 @@ public class Aes256GcmContentEncryptionAlgorithm extends AlgorithmInfo implement
         return contentEncryptionKeyDescriptor;
     }
 
-    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers, byte[] ivOverride) throws JoseException
+    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers, byte[] ivOverride)
+            throws JoseException
     {
         byte[] iv = InitializationVectorHelp.iv(IV_BYTE_LENGTH, ivOverride);
         return encrypt(plaintext, aad, contentEncryptionKey, iv);
     }
 
-    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, byte[] iv) throws JoseException
+    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, byte[] iv)
+            throws JoseException
     {
-        Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm());
-
-        try
-        {
-            // GCMParameterSpec   doesn't seem to work either
-            // GCMParameterSpec parameterSpec = new GCMParameterSpec(ByteUtil.bitLength(TAG_BYTE_LENGTH), iv);
-            IvParameterSpec parameterSpec = new IvParameterSpec(iv);
-            cipher.init(Cipher.ENCRYPT_MODE, new AesKey(contentEncryptionKey), parameterSpec);
-        }
-        catch (InvalidKeyException e)
-        {
-            throw new JoseException("Invalid key for " + getJavaAlgorithm(), e);
-        }
-        catch (InvalidAlgorithmParameterException e)
-        {
-            throw new JoseException(e.toString(), e);
-        }
+        Cipher cipher = getInitialisedCipher(Cipher.ENCRYPT_MODE, iv, contentEncryptionKey);
 
         cipher.updateAAD(aad);
 
@@ -97,14 +86,51 @@ public class Aes256GcmContentEncryptionAlgorithm extends AlgorithmInfo implement
         return new ContentEncryptionParts(iv, ciphertext, tag);
     }
 
-    public byte[] decrypt(ContentEncryptionParts contentEncryptionParts, byte[] aad, byte[] contentEncryptionKey, Headers headers) throws JoseException
+    Cipher getInitialisedCipher(int mode, byte[] iv, byte[] rawKey) throws JoseException
     {
-        return new byte[0]; // come back to this someday
+        Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm());
+        try
+        {
+            GCMParameterSpec parameterSpec = new GCMParameterSpec(TAG_BIT_LENGTH, iv);
+            cipher.init(mode, new AesKey(rawKey), parameterSpec);
+            return cipher;
+        }
+        catch (InvalidKeyException e)
+        {
+            throw new JoseException("Invalid key for " + getJavaAlgorithm(), e);
+        }
+        catch (InvalidAlgorithmParameterException e)
+        {
+            throw new JoseException(e.toString(), e);
+        }
+    }
+
+    public byte[] decrypt(ContentEncryptionParts contentEncParts, byte[] aad, byte[] contentEncryptionKey, Headers headers)
+            throws JoseException
+    {
+        byte[] iv = contentEncParts.getIv();
+        Cipher cipher = getInitialisedCipher(Cipher.DECRYPT_MODE, iv, contentEncryptionKey);
+
+        cipher.updateAAD(aad);
+
+        byte[] ciphertext = ByteUtil.concat(contentEncParts.getCiphertext(), contentEncParts.getAuthenticationTag());
+
+        try
+        {
+            return cipher.doFinal(ciphertext);
+        }
+        catch (IllegalBlockSizeException | BadPaddingException e)
+        {
+            throw new JoseException(e.toString(), e);
+        }
     }
 
     @Override
     public boolean isAvailable()
     {
-        return false;  // nope
+        // todo check for the cipher alg but also need more - BC 1.49 had it but didn't support the JCE AEAD interfaces
+        int aesByteKeyLength = getContentEncryptionKeyDescriptor().getContentEncryptionKeyByteLength();
+        String agl = getJavaAlgorithm();
+        return AlgorithmAvailability.isAvailable("Cipher", agl) && CipherStrengthSupport.isAvailable(agl, aesByteKeyLength);
     }
 }

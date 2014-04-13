@@ -1,23 +1,28 @@
 package org.jose4j.jwe;
 
-import junit.framework.TestCase;
+import org.hamcrest.CoreMatchers;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.security.Security;
 
 /**
  */
-public class Aes256GcmContentEncryptionAlgorithmTest extends TestCase
+public class Aes256GcmContentEncryptionAlgorithmTest
 {
+    @Test
     public void testExampleEncryptFromJweAppendix1() throws JoseException
     {
         // seems that maybe "AES/GCM/NoPadding" isn't supported with the standard JCE with the Java 7
         // so skipping this test for now...
         if (true) return;
 
-        // and BC supports GCM but maybe not via the standard JCE interfaces
-        //Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        // and BC supports GCM but maybe not via the standard JCE interfaces (until BC v 1.50)
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
         // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#appendix-A.1
         String plaintextText = "The true sign of intelligence is not knowledge but imagination.";
@@ -32,18 +37,22 @@ public class Aes256GcmContentEncryptionAlgorithmTest extends TestCase
 
         byte[] iv = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{227, 197, 117, 252, 2, 219, 233, 68, 180, 225, 77, 219});
 
-        Aes256GcmContentEncryptionAlgorithm contentEncryptionAlgorithm = new Aes256GcmContentEncryptionAlgorithm();
+        Aes256GcmContentEncryptionAlgorithm aesGcmContentEncryptionAlg = new Aes256GcmContentEncryptionAlgorithm();
 
-        ContentEncryptionParts encryptionParts = contentEncryptionAlgorithm.encrypt(plainText, aad, cek, iv);
+        ContentEncryptionParts encryptionParts = aesGcmContentEncryptionAlg.encrypt(plainText, aad, cek, iv);
 
         Base64Url base64Url = new Base64Url();
 
         byte[] ciphertext = encryptionParts.getCiphertext();
         String encodedJweCiphertext = "5eym8TW_c8SuK0ltJ3rpYIzOeDQz7TALvtu6UG9oMo4vpzs9tX_EFShS8iB7j6jiSdiwkIr3ajwQzaBtQD_A";
-        assertEquals(encodedJweCiphertext, base64Url.base64UrlEncode(ciphertext));
+        Assert.assertThat(encodedJweCiphertext, CoreMatchers.equalTo(base64Url.base64UrlEncode(ciphertext)));
 
         byte[] authenticationTag = encryptionParts.getAuthenticationTag();
         String encodedAuthenticationTag = "XFBoMYUZodetZdvTiFvSkQ";
-        assertEquals(encodedAuthenticationTag, base64Url.base64UrlEncode(authenticationTag));
+        Assert.assertThat(encodedAuthenticationTag, CoreMatchers.equalTo(base64Url.base64UrlEncode(authenticationTag)));
+
+        ContentEncryptionParts parts = new ContentEncryptionParts(iv, ciphertext, authenticationTag);
+        byte[] decrypted = aesGcmContentEncryptionAlg.decrypt(parts, aad, cek, null);
+        Assert.assertArrayEquals(plainText, decrypted);
     }
 }
