@@ -21,8 +21,6 @@ import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwa.AlgorithmFactory;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwe.*;
-import org.jose4j.jwk.EcJwkGenerator;
-import org.jose4j.jwk.EllipticCurveJsonWebKey;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jws.AlgorithmIdentifiers;
@@ -33,15 +31,12 @@ import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
 import org.jose4j.keys.AesKey;
-import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.lang.JoseException;
 import org.junit.Test;
 
 import java.security.Key;
-import java.security.Provider;
 import java.security.Security;
-import java.security.spec.ECParameterSpec;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -692,13 +687,39 @@ public class JoseCookbookTest
         assertArrayEquals(cek.getEncoded(), Base64Url.decode(encodedExampleCek));
     }
 
-    // @Test still not getting interop on this one so just a placeholder for now
+    @Test
     public void keyAgreementAndAesCbc_4_5() throws JoseException
     {
-        String jwkJson =  "";
+        String jwkJson =
+                "{" +
+                "  \"kty\": \"EC\"," +
+                "  \"kid\": \"meriadoc.brandybuck@buckland.example\"," +
+                "  \"use\": \"enc\"," +
+                "  \"crv\": \"P-256\"," +
+                "  \"x\": \"Ze2loSV3wrroKUN_4zhwGhCqo3Xhu1td4QjeQ5wIVR0\"," +
+                "  \"y\": \"HlLtdXARY_f55A3fnzQbPcm6hgr34Mp8p-nuzQCE0Zw\"," +
+                "  \"d\": \"r_kHyZ-a06rmxM3yESK84r1otSg-aQcVStkRhA-iCM8\"" +
+                "}";
 
         String exampleCompactSerialization =
-                "";
+                "eyJhbGciOiJFQ0RILUVTIiwia2lkIjoibWVyaWFkb2MuYnJhbmR5YnVja0BidW" +
+                "NrbGFuZC5leGFtcGxlIiwiZXBrIjp7Imt0eSI6IkVDIiwiY3J2IjoiUC0yNTYi" +
+                "LCJ4IjoiT0NqeTAyRlBIWm1iblFXZXdnYlNZb3dmeUtfWWV0bEV2NDFORUZ1VX" +
+                "d6NCIsInkiOiJ2b0xoZnBKeW1HNTZpaFhpZDc0enI1YkFBeUZwblBjajdlUVIw" +
+                "TmFMZGhzIn0sImVuYyI6IkExMjhDQkMtSFMyNTYifQ" +
+                "." +
+                "." +
+                "h7aTQdC79Du5VI5GuvPytg" +
+                "." +
+                "-azKUcPKsOVai6JcqvQAV7_h5m9I1xqSctFK-QOonel_9ao5wpYnoAhpZgx7wm" +
+                "i2muKvCZOVH1PSAmdnYAdfiVzIjiFRIt8nz8I8tX1Wve2ZniXEF_NSU6vvKQ2d" +
+                "tnH2xe73EsVV1AnhAykDeyP_OBCh4x_8Z6JYSxHIMeqUSdxbA6YkDLVjR8F6hK" +
+                "isvC52YcaRUvkxJWaVZfCkkBSuJT-XU7PCk-yngzfCn_lO_k-YbpsxNskFK7CA" +
+                "yWKxmVUfufT2cHBYdWARhr7KlDsJDW4PMdSId__9YX33ZptjJ07e29wIDR0AF0" +
+                "dNLGehukDmQatxs-uXpfcNMKJ-OsV-ZMiRVLVfjmPR9sg1O4nNFagaQyyGHIek" +
+                "nywPU4YAe6bG" +
+                "." +
+                "yJtmBD1DNmOeqe8CSyHF7Q";
 
         PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(jwkJson);
 
@@ -706,40 +727,6 @@ public class JoseCookbookTest
         JsonWebEncryption jwe = new JsonWebEncryption();
         jwe.setCompactSerialization(exampleCompactSerialization);
         jwe.setKey(jwk.getPrivateKey());
-        System.out.println(jwe.getPlaintextString());
         assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
-    }
-
-    @Test // generate a bunch of ECDH-ES examples for MM to try and help troubleshoot 4.5
-    public void someExamplesForMM() throws JoseException
-    {
-        ECParameterSpec[] specs = new ECParameterSpec[] {EllipticCurves.P256, EllipticCurves.P384, EllipticCurves.P521};
-        String[] encs = new String[]
-                {ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256,
-                        ContentEncryptionAlgorithmIdentifiers.AES_192_CBC_HMAC_SHA_384,
-                        ContentEncryptionAlgorithmIdentifiers.AES_256_CBC_HMAC_SHA_512};
-
-        AlgorithmFactoryFactory.getInstance();
-        for (ECParameterSpec spec : specs)
-        {
-            for (String enc : encs)
-            {
-                EllipticCurveJsonWebKey jwk = EcJwkGenerator.generateJwk(spec);
-
-                System.out.println();
-                System.out.println();
-
-                System.out.println(jwk.toJson(JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE));
-                JsonWebEncryption jwe = new JsonWebEncryption();
-                jwe.setKey(jwk.getKey());
-                jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.ECDH_ES);
-                jwe.setEncryptionMethodHeaderParameter(enc);
-                jwe.setPayload("Matt Miller always has the best, or biggest anyway, power supply at the IETF meetings.");
-
-                String compactSerialization = jwe.getCompactSerialization();
-                System.out.println(compactSerialization);
-            }
-        }
-
     }
 }
