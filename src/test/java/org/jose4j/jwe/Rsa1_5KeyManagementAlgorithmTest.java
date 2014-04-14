@@ -45,7 +45,7 @@ public class Rsa1_5KeyManagementAlgorithmTest extends TestCase
     public void testRoundTrip() throws JoseException
     {
         Rsa1_5KeyManagementAlgorithm rsa = new Rsa1_5KeyManagementAlgorithm();
-        ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(128, AesKey.ALGORITHM);
+        ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(16, AesKey.ALGORITHM);
         PublicKey publicKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPublicKey();
         ContentEncryptionKeys contentEncryptionKeys = rsa.manageForEncrypt(publicKey, cekDesc, null, null);
 

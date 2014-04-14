@@ -570,7 +570,7 @@ public class JoseCookbookTest
 
         KeyManagementAlgorithm keyManagementModeAlg = jwe.getKeyManagementModeAlgorithm();
 
-        ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(256, AesKey.ALGORITHM);
+        ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(32, AesKey.ALGORITHM);
 
         Key cek = keyManagementModeAlg.manageForDecrypt(jwe.getKey(), jwe.getEncryptedKey(), cekDesc, jwe.getHeaders());
 
@@ -684,7 +684,7 @@ public class JoseCookbookTest
 
         KeyManagementAlgorithm keyManagementModeAlg = jwe.getKeyManagementModeAlgorithm();
 
-        ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(256, AesKey.ALGORITHM);
+        ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(32, AesKey.ALGORITHM);
 
         Key cek = keyManagementModeAlg.manageForDecrypt(jwe.getKey(), jwe.getEncryptedKey(), cekDesc, jwe.getHeaders());
 
