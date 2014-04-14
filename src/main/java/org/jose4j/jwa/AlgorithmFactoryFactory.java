@@ -71,6 +71,7 @@ public class AlgorithmFactoryFactory
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Pbes2HmacSha256WithAes128KeyWrapAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Pbes2HmacSha384WithAes192KeyWrapAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Pbes2HmacSha512WithAes256KeyWrapAlgorithm());
+        // todo aes gcm key wrap per http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-25#section-4.7
 
         log.info("JWE key management algorithms: " + jweKeyMgmtModeAlgorithmFactory.getSupportedAlgorithms());
 
@@ -78,6 +79,9 @@ public class AlgorithmFactoryFactory
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes128CbcHmacSha256ContentEncryptionAlgorithm());
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes192CbcHmacSha384ContentEncryptionAlgorithm());
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes256CbcHmacSha512ContentEncryptionAlgorithm());
+        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes128GcmContentEncryptionAlgorithm());
+        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes192GcmContentEncryptionAlgorithm());
+        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes256GcmContentEncryptionAlgorithm());
 
         log.info("JWE content encryption algorithms: " + jweContentEncryptionAlgorithmFactory.getSupportedAlgorithms());
 

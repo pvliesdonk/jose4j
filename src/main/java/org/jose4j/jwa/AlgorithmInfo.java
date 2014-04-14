@@ -16,12 +16,16 @@
 
 package org.jose4j.jwa;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jose4j.keys.KeyPersuasion;
 
 /**
  */
 public abstract class AlgorithmInfo implements Algorithm
 {
+    protected final Log log = LogFactory.getLog(this.getClass());
+
     private String algorithmIdentifier;
     private String javaAlgorithm;
     private KeyPersuasion keyPersuasion;
