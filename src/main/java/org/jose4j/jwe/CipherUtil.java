@@ -32,11 +32,7 @@ public class CipherUtil
         {
             return Cipher.getInstance(algorithm);
         }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new JoseException(e.toString() , e);
-        }
-        catch (NoSuchPaddingException e)
+        catch (NoSuchAlgorithmException | NoSuchPaddingException e)
         {
             throw new JoseException(e.toString() , e);
         }
