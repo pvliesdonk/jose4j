@@ -148,8 +148,7 @@ public class ByteUtilTest extends TestCase
 
     public void testEquals0()
     {
-        DefaultByteGenerator bg = new DefaultByteGenerator();
-        byte[] bytes1 = bg.randomBytes(32);
+        byte[] bytes1 = ByteUtil.randomBytes(32);
         byte[] bytes2 = new byte[bytes1.length];
         bytes1[0] = 1;
         compareTest(bytes1, bytes2, false);
