@@ -30,9 +30,9 @@ public class AlgorithmAvailability
     public static boolean isAvailable(String serviceName, String algorithm)
     {
         Set<String> algorithms = Security.getAlgorithms(serviceName);
-        for (String signatureAlgorithm : algorithms)
+        for (String serviceAlg : algorithms)
         {
-            if (signatureAlgorithm.equalsIgnoreCase(algorithm))
+            if (serviceAlg.equalsIgnoreCase(algorithm))
             {
                 return true;
             }
