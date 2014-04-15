@@ -16,17 +16,12 @@
 
 package org.jose4j.cookbook;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jose4j.base64url.Base64Url;
-import org.jose4j.jwa.AlgorithmFactory;
-import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwe.*;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
-import org.jose4j.jws.JsonWebSignatureAlgorithm;
-import org.jose4j.jws.RsaPssUsingSha384Algorithm;
 import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
@@ -36,9 +31,9 @@ import org.jose4j.lang.JoseException;
 import org.junit.Test;
 
 import java.security.Key;
-import java.security.Security;
 
 import static org.hamcrest.CoreMatchers.*;
+import static org.jose4j.jwa.JceProviderTestSupport.*;
 import static org.junit.Assert.*;
 
 /**
@@ -158,66 +153,44 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void rsaPssSignature_3_2() throws JoseException
+    public void rsaPssSignature_3_2() throws Exception
     {
-        String pssAlg = AlgorithmIdentifiers.RSA_PSS_USING_SHA384;
-        AlgorithmFactoryFactory instance = AlgorithmFactoryFactory.getInstance();
-        AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory = instance.getJwsAlgorithmFactory();
-        boolean pssIsAvailable = jwsAlgorithmFactory.isAvailable(pssAlg);
-
-        BouncyCastleProvider bouncyCastleProvider = new BouncyCastleProvider();
-        boolean removeBc = Security.getProvider(bouncyCastleProvider.getName()) == null;
-
-
-        try
+        runWithBouncyCastleProvider(new RunnableTest()
         {
-            Security.addProvider(bouncyCastleProvider);
-            if (!pssIsAvailable)
+            @Override
+            public void runTest() throws JoseException
             {
-                jwsAlgorithmFactory.registerAlgorithm(new RsaPssUsingSha384Algorithm());
+                PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(figure3RsaJwkJsonString);
+
+                String cs =
+                        "eyJhbGciOiJQUzM4NCIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZX" +
+                        "hhbXBsZSJ9" +
+                        "." +
+                        "SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IH" +
+                        "lvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBk" +
+                        "b24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcm" +
+                        "UgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4" +
+                        "." +
+                        "cu22eBqkYDKgIlTpzDXGvaFfz6WGoz7fUDcfT0kkOy42miAh2qyBzk1xEsnk2I" +
+                        "pN6-tPid6VrklHkqsGqDqHCdP6O8TTB5dDDItllVo6_1OLPpcbUrhiUSMxbbXU" +
+                        "vdvWXzg-UD8biiReQFlfz28zGWVsdiNAUf8ZnyPEgVFn442ZdNqiVJRmBqrYRX" +
+                        "e8P_ijQ7p8Vdz0TTrxUeT3lm8d9shnr2lfJT8ImUjvAA2Xez2Mlp8cBE5awDzT" +
+                        "0qI0n6uiP1aCN_2_jLAeQTlqRHtfa64QQSUmFAAjVKPbByi7xho0uTOcbH510a" +
+                        "6GYmJUAfmWjwZ6oD4ifKo8DYM-X72Eaw";
+
+                JsonWebSignature jws = new JsonWebSignature();
+                jws.setCompactSerialization(cs);
+                jws.setKey(jwk.getPublicKey());
+                assertThat(jws.verifySignature(), is(true));
+                assertThat(jws.getPayload(), equalTo(jwsPayload));
+                assertThat(jws.getKeyIdHeaderValue(), equalTo(jwk.getKeyId()));
+                assertThat(AlgorithmIdentifiers.RSA_PSS_USING_SHA384, equalTo(jws.getAlgorithmHeaderValue()));
+
+                // can't easily verify reproducing RSA-PSS because "it is probabilistic rather than deterministic,
+                // incorporating a randomly generated salt value" - from http://tools.ietf.org/html/rfc3447#section-8.1
             }
+        });
 
-            PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(figure3RsaJwkJsonString);
-
-            String cs =
-                    "eyJhbGciOiJQUzM4NCIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZX" +
-                    "hhbXBsZSJ9" +
-                    "." +
-                    "SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IH" +
-                    "lvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBk" +
-                    "b24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcm" +
-                    "UgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4" +
-                    "." +
-                    "cu22eBqkYDKgIlTpzDXGvaFfz6WGoz7fUDcfT0kkOy42miAh2qyBzk1xEsnk2I" +
-                    "pN6-tPid6VrklHkqsGqDqHCdP6O8TTB5dDDItllVo6_1OLPpcbUrhiUSMxbbXU" +
-                    "vdvWXzg-UD8biiReQFlfz28zGWVsdiNAUf8ZnyPEgVFn442ZdNqiVJRmBqrYRX" +
-                    "e8P_ijQ7p8Vdz0TTrxUeT3lm8d9shnr2lfJT8ImUjvAA2Xez2Mlp8cBE5awDzT" +
-                    "0qI0n6uiP1aCN_2_jLAeQTlqRHtfa64QQSUmFAAjVKPbByi7xho0uTOcbH510a" +
-                    "6GYmJUAfmWjwZ6oD4ifKo8DYM-X72Eaw";
-
-            JsonWebSignature jws = new JsonWebSignature();
-            jws.setCompactSerialization(cs);
-            jws.setKey(jwk.getPublicKey());
-            assertThat(jws.verifySignature(), is(true));
-            assertThat(jws.getPayload(), equalTo(jwsPayload));
-            assertThat(jws.getKeyIdHeaderValue(), equalTo(jwk.getKeyId()));
-            assertThat(pssAlg, equalTo(jws.getAlgorithmHeaderValue()));
-
-            // can't easily verify reproducing RSA-PSS because "it is probabilistic rather than deterministic,
-            // incorporating a randomly generated salt value" - from http://tools.ietf.org/html/rfc3447#section-8.1
-        }
-        finally
-        {
-            if (!pssIsAvailable)
-            {
-                jwsAlgorithmFactory.unregisterAlgorithm(pssAlg);
-            }
-
-            if (removeBc)
-            {
-                Security.removeProvider(bouncyCastleProvider.getName());
-            }
-        }
     }
 
     @Test
