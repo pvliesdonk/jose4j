@@ -45,11 +45,13 @@ public class AlgorithmFactoryFactory
     void reinitialize()
     {
         log.info("Reinitializing jose4j...");
+        initialize();
     }
 
     private void initialize()
     {
         log.info("Initializing jose4j...");
+        long startTime = System.currentTimeMillis();
         jwsAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ALGORITHM, JsonWebSignatureAlgorithm.class);
         jwsAlgorithmFactory.registerAlgorithm(new PlaintextNoneAlgorithm());
         jwsAlgorithmFactory.registerAlgorithm(new HmacUsingSha256Algorithm());
@@ -99,6 +101,7 @@ public class AlgorithmFactoryFactory
         compressionAlgorithmFactory.registerAlgorithm(new DeflateRFC1951CompressionAlgorithm());
 
         log.info("JWE compression algorithms: " + compressionAlgorithmFactory.getSupportedAlgorithms());
+        log.info("Initialized jose4j in " + (System.currentTimeMillis() - startTime) + "ms");
     }
 
     public static AlgorithmFactoryFactory getInstance()
