@@ -37,7 +37,7 @@ import static org.jose4j.jwa.JceProviderTestSupport.*;
 import static org.junit.Assert.*;
 
 /**
- * http://tools.ietf.org/html/draft-ietf-jose-cookbook-01
+ * http://tools.ietf.org/html/draft-ietf-jose-cookbook-01 and incremental updates from https://github.com/linuxwolf/jose-more
  *
  * 3.1. RSA v1.5 Signature
  * 3.2. RSA-PSS Signature (via the the Bouncy Castle provider)
@@ -49,6 +49,7 @@ import static org.junit.Assert.*;
  * 4.2. Key Encryption using RSA-OAEP with A256GCM (but only the RSA-OAEP part for now given lack of GCM support)
  * 4.3. Key Wrap using PBES2-AES-KeyWrap with AES-CBC-HMAC-SHA2
  * 4.4. Key Agreement with Key Wrapping using ECDH-ES and AES-KeyWrap with AES-GCM (but only the ECDH-ES and AES-KeyWrap part for now given lack of GCM support)
+ * 4.5. Key Agreement using ECDH-ES with AES-CBC-HMAC-SHA2
  */
 public class JoseCookbookTest
 {
