@@ -677,22 +677,22 @@ public class JoseCookbookTest
         String exampleCompactSerialization =
                 "eyJhbGciOiJFQ0RILUVTIiwia2lkIjoibWVyaWFkb2MuYnJhbmR5YnVja0BidW" +
                 "NrbGFuZC5leGFtcGxlIiwiZXBrIjp7Imt0eSI6IkVDIiwiY3J2IjoiUC0yNTYi" +
-                "LCJ4IjoiT0NqeTAyRlBIWm1iblFXZXdnYlNZb3dmeUtfWWV0bEV2NDFORUZ1VX" +
-                "d6NCIsInkiOiJ2b0xoZnBKeW1HNTZpaFhpZDc0enI1YkFBeUZwblBjajdlUVIw" +
-                "TmFMZGhzIn0sImVuYyI6IkExMjhDQkMtSFMyNTYifQ" +
+                "LCJ4IjoibVBVS1RfYkFXR0hJaGcwVHBqanFWc1AxclhXUXVfdndWT0hIdE5rZF" +
+                "lvQSIsInkiOiI4QlFBc0ltR2VBUzQ2ZnlXdzVNaFlmR1RUMElqQnBGdzJTUzM0" +
+                "RHY0SXJzIn0sImVuYyI6IkExMjhDQkMtSFMyNTYifQ" +
                 "." +
                 "." +
-                "h7aTQdC79Du5VI5GuvPytg" +
+                "yc9N8v5sYyv3iGQT926IUg" +
                 "." +
-                "-azKUcPKsOVai6JcqvQAV7_h5m9I1xqSctFK-QOonel_9ao5wpYnoAhpZgx7wm" +
-                "i2muKvCZOVH1PSAmdnYAdfiVzIjiFRIt8nz8I8tX1Wve2ZniXEF_NSU6vvKQ2d" +
-                "tnH2xe73EsVV1AnhAykDeyP_OBCh4x_8Z6JYSxHIMeqUSdxbA6YkDLVjR8F6hK" +
-                "isvC52YcaRUvkxJWaVZfCkkBSuJT-XU7PCk-yngzfCn_lO_k-YbpsxNskFK7CA" +
-                "yWKxmVUfufT2cHBYdWARhr7KlDsJDW4PMdSId__9YX33ZptjJ07e29wIDR0AF0" +
-                "dNLGehukDmQatxs-uXpfcNMKJ-OsV-ZMiRVLVfjmPR9sg1O4nNFagaQyyGHIek" +
-                "nywPU4YAe6bG" +
+                "BoDlwPnTypYq-ivjmQvAYJLb5Q6l-F3LIgQomlz87yW4OPKbWE1zSTEFjDfhU9" +
+                "IPIOSA9Bml4m7iDFwA-1ZXvHteLDtw4R1XRGMEsDIqAYtskTTmzmzNa-_q4F_e" +
+                "vAPUmwlO-ZG45Mnq4uhM1fm_D9rBtWolqZSF3xGNNkpOMQKF1Cl8i8wjzRli7-" +
+                "IXgyirlKQsbhhqRzkv8IcY6aHl24j03C-AR2le1r7URUhArM79BY8soZU0lzwI" +
+                "-sD5PZ3l4NDCCei9XkoIAfsXJWmySPoeRb2Ni5UZL4mYpvKDiwmyzGd65KqVw7" +
+                "MsFfI_K767G9C9Azp73gKZD0DyUn1mn0WW5LmyX_yJ-3AROq8p1WZBfG-ZyJ61" +
+                "95_JGG2m9Csg" +
                 "." +
-                "yJtmBD1DNmOeqe8CSyHF7Q";
+                "WCCkNa-x4BeB9hIDIfFuhg";
 
         PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(jwkJson);
 
