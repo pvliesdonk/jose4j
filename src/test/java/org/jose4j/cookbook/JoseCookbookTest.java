@@ -51,6 +51,8 @@ import static org.junit.Assert.*;
  * 4.4. Key Agreement with Key Wrapping using ECDH-ES and AES-KeyWrap with AES-GCM
  * 4.5. Key Agreement using ECDH-ES with AES-CBC-HMAC-SHA2
  * 4.6. Direct Encryption using AES-GCM
+ * 4.7 TODO
+ * 4.8.  Key Wrap using AES-KeyWrap with AES-GCM
  */
 public class JoseCookbookTest
 {
@@ -748,6 +750,48 @@ public class JoseCookbookTest
                         "ZI-wjsY0yu3cT4_aQ3i1o-tiE-F8Ios61EKgyIQ4CWao8PFMj8TTnp" +
                         "." +
                         "vbb32Xvllea2OtmHAdccRQ";
+
+                JsonWebEncryption jwe = new JsonWebEncryption();
+                jwe.setKey(jwk.getKey());
+                jwe.setCompactSerialization(cs);
+                assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
+            }
+        });
+    }
+
+    @Test
+    public void aesKeyWrapAESGCM_4_8() throws Exception
+    {
+        runWithBouncyCastleProvider(new RunnableTest()
+        {
+            @Override
+            public void runTest() throws Exception
+            {
+                JsonWebKey jwk = JsonWebKey.Factory.newJwk(
+                       "   {\n" +
+                       "     \"kty\": \"oct\",\n" +
+                       "     \"kid\": \"81b20965-8332-43d9-a468-82160ad91ac8\",\n" +
+                       "     \"use\": \"enc\",\n" +
+                       "     \"alg\": \"A128KW\",\n" +
+                       "     \"k\": \"GZy6sIZ6wl9NJOKB-jnmVQ\"\n" +
+                       "   }\n");
+
+                String cs =
+                        "eyJhbGciOiJBMTI4S1ciLCJraWQiOiI4MWIyMDk2NS04MzMyLTQzZDktYTQ2OC\n" +
+                        "04MjE2MGFkOTFhYzgiLCJlbmMiOiJBMTI4R0NNIn0\n" +
+                        ".\n" +
+                        "CBI6oDw8MydIx1IBntf_lQcw2MmJKIQx\n" +
+                        ".\n" +
+                        "Qx0pmsDa8KnJc9Jo\n" +
+                        ".\n" +
+                        "AwliP-KmWgsZ37BvzCefNen6VTbRK3QMA4TkvRkH0tP1bTdhtFJgJxeVmJkLD6\n" +
+                        "1A1hnWGetdg11c9ADsnWgL56NyxwSYjU1ZEHcGkd3EkU0vjHi9gTlb90qSYFfe\n" +
+                        "F0LwkcTtjbYKCsiNJQkcIp1yeM03OmuiYSoYJVSpf7ej6zaYcMv3WwdxDFl8RE\n" +
+                        "wOhNImk2Xld2JXq6BR53TSFkyT7PwVLuq-1GwtGHlQeg7gDT6xW0JqHDPn_H-p\n" +
+                        "uQsmthc9Zg0ojmJfqqFvETUxLAF-KjcBTS5dNy6egwkYtOt8EIHK-oEsKYtZRa\n" +
+                        "a8Z7MOZ7UGxGIMvEmxrGCPeJa14slv2-gaqK0kEThkaSqdYw0FkQZF\n" +
+                        ".\n" +
+                        "ER7MWJZ1FBI_NKvn7Zb1Lw";
 
                 JsonWebEncryption jwe = new JsonWebEncryption();
                 jwe.setKey(jwk.getKey());
