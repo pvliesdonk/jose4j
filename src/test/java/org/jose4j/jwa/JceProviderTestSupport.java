@@ -7,7 +7,7 @@ import java.security.Security;
 /**
  *
  */
-public class AlgorithmFactoryFactoryTestHelp
+public class JceProviderTestSupport
 {
     private static void reinitialize()
     {
@@ -18,7 +18,6 @@ public class AlgorithmFactoryFactoryTestHelp
     {
         runWithBouncyCastleProvider(test, true);
     }
-
 
     public static void runWithBouncyCastleProvider(RunnableTest test, boolean doReinitialize) throws Exception
     {
