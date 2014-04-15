@@ -606,59 +606,58 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void keyAgreementWithKeyWrapButNotReallyGCM_4_4() throws JoseException
+    public void keyAgreementWithKeyWrapAndGcm4_4() throws Exception
     {
-        String jwkJsonString =
-            "{\n" +
-            "  \"kty\": \"EC\",\n" +
-            "  \"kid\": \"peregrin.took@tuckborough.example\",\n" +
-            "  \"use\": \"enc\",\n" +
-            "  \"crv\": \"P-384\",\n" +
-            "  \"x\": \"YU4rRUzdmVqmRtWOs2OpDE_T5fsNIodcG8G5FWPrTPMyxpzsSOGaQL\n" +
-            "      pe2FpxBmu2\",\n" +
-            "  \"y\": \"A8-yxCHxkfBz3hKZfI1jUYMjUhsEveZ9THuwFjH2sCNdtksRJU7D5-\n" +
-            "      SkgaFL1ETP\",\n" +
-            "  \"d\": \"iTx2pk7wW-GqJkHcEkFQb2EFyYcO7RugmaW3mRrQVAOUiPommT0Idn\n" +
-            "      YK2xDlZh-j\"\n" +
-            "}";
+        runWithBouncyCastleProvider(new RunnableTest()
+        {
+            @Override
+            public void runTest() throws Exception
+            {
+                String jwkJsonString =
+                        "{\n" +
+                        "  \"kty\": \"EC\",\n" +
+                        "  \"kid\": \"peregrin.took@tuckborough.example\",\n" +
+                        "  \"use\": \"enc\",\n" +
+                        "  \"crv\": \"P-384\",\n" +
+                        "  \"x\": \"YU4rRUzdmVqmRtWOs2OpDE_T5fsNIodcG8G5FWPrTPMyxpzsSOGaQL\n" +
+                        "      pe2FpxBmu2\",\n" +
+                        "  \"y\": \"A8-yxCHxkfBz3hKZfI1jUYMjUhsEveZ9THuwFjH2sCNdtksRJU7D5-\n" +
+                        "      SkgaFL1ETP\",\n" +
+                        "  \"d\": \"iTx2pk7wW-GqJkHcEkFQb2EFyYcO7RugmaW3mRrQVAOUiPommT0Idn\n" +
+                        "      YK2xDlZh-j\"\n" +
+                        "}";
 
 
-        String jweCompactSerialization =
-                "eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImtpZCI6InBlcmVncmluLnRvb2tAdH" +
-                "Vja2Jvcm91Z2guZXhhbXBsZSIsImVwayI6eyJrdHkiOiJFQyIsImNydiI6IlAt" +
-                "Mzg0IiwieCI6ImxCQXRwV3FFWGVxbndTLTctWmVVaG94U3FaMnZVWnVkdVdlRU" +
-                "J4OE5FVmFiZ1hWMXBSZjZnaUdsc0Z6M21uWGIiLCJ5Ijoic0FrN2VnZjZCT21z" +
-                "TWxaWVBYZ1VzYmh4c3pEajJRN3NjWjljTEFXaFpMWFEwMXFYMC12eF91T0Z0Q0" +
-                "hQb3BFOCJ9LCJlbmMiOiJBMTI4R0NNIn0" +
-                "." +
-                "hRoQEtCm89pJyxPi-ZppMUheKsVcnw_u" +
-                "." +
-                "CDLFinFbjSpqzCwi" +
-                "." +
-                "XLL2opd306uEqwYV4zouZYbw1_tbaXlN6w3e3K6lVOTNez9eAVf6NEGdgWOvjx" +
-                "Jh4Bh3x9eBYPvEI-8YJbXFSJi2K7NX6ThUTalCPfP8ehQ8aCvGMUTLovJqTIjg" +
-                "FmbinxFzz3gYZpm8UfdM2NG_iITafJRUHbp7pwCTOAUyep7c6uSMcTen_lSwYs" +
-                "xxlhMKU8mi3QG5yaZIh5TvK4ltXbd-FGg9EWDT8qE7wsnJfxByd-fyBAtyGP2o" +
-                "EAVXJ2yaYvyfXTm_5NoRJh84frylPzotosGSTkpRppb82IkDHoe6cvwIdeaVGG" +
-                "uy2yOtUBdbidIYHTjSFufN88SUIRRZftrE5WgzfplIRdoZlQb0youS" +
-                "." +
-                "OPP648_B5pMGPo_VxSvlCg";
+                String jweCompactSerialization =
+                        "eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImtpZCI6InBlcmVncmluLnRvb2tAdH" +
+                        "Vja2Jvcm91Z2guZXhhbXBsZSIsImVwayI6eyJrdHkiOiJFQyIsImNydiI6IlAt" +
+                        "Mzg0IiwieCI6InVCbzRrSFB3Nmtiang1bDB4b3dyZF9vWXpCbWF6LUdLRlp1NH" +
+                        "hBRkZrYllpV2d1dEVLNml1RURzUTZ3TmROZzMiLCJ5Ijoic3AzcDVTR2haVkMy" +
+                        "ZmFYdW1JLWU5SlUyTW84S3BvWXJGRHI1eVBOVnRXNFBnRXdaT3lRVEEtSmRhWT" +
+                        "h0YjdFMCJ9LCJlbmMiOiJBMTI4R0NNIn0" +
+                        "." +
+                        "0DJjBXri_kBcC46IkU5_Jk9BqaQeHdv2" +
+                        "." +
+                        "mH-G2zVqgztUtnW_" +
+                        "." +
+                        "tkZuOO9h95OgHJmkkrfLBisku8rGf6nzVxhRM3sVOhXgz5NJ76oID7lpnAi_cP" +
+                        "WJRCjSpAaUZ5dOR3Spy7QuEkmKx8-3RCMhSYMzsXaEwDdXta9Mn5B7cCBoJKB0" +
+                        "IgEnj_qfo1hIi-uEkUpOZ8aLTZGHfpl05jMwbKkTe2yK3mjF6SBAsgicQDVCkc" +
+                        "Y9BLluzx1RmC3ORXaM0JaHPB93YcdSDGgpgBWMVrNU1ErkjcMqMoT_wtCex3w0" +
+                        "3XdLkjXIuEr2hWgeP-nkUZTPU9EoGSPj6fAS-bSz87RCPrxZdj_iVyC6QWcqAu" +
+                        "07WNhjzJEPc4jVntRJ6K53NgPQ5p99l3Z408OUqj4ioYezbS6vTPlQ" +
+                        "." +
+                        "WuGzxmcreYjpHGJoa17EBg";
 
-        PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(jwkJsonString);
+                final PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(jwkJsonString);
 
-        // verify that we can decrypt the encrypted key (no GCM yet so not decrypting the whole thing)
-        JsonWebEncryption jwe = new JsonWebEncryption();
-        jwe.setCompactSerialization(jweCompactSerialization);
-        jwe.setKey(jwk.getPrivateKey());
-
-        KeyManagementAlgorithm keyManagementModeAlg = jwe.getKeyManagementModeAlgorithm();
-
-        ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(32, AesKey.ALGORITHM);
-
-        Key cek = keyManagementModeAlg.manageForDecrypt(jwe.getKey(), jwe.getEncryptedKey(), cekDesc, jwe.getHeaders());
-
-        String encodedExampleCek = "_Tm_fqSViyOGQVK-aPJTIQ";
-        assertArrayEquals(cek.getEncoded(), Base64Url.decode(encodedExampleCek));
+                // verify that we can decrypt the encrypted key (no GCM yet so not decrypting the whole thing)
+                JsonWebEncryption jwe = new JsonWebEncryption();
+                jwe.setCompactSerialization(jweCompactSerialization);
+                jwe.setKey(jwk.getPrivateKey());
+                assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
+            }
+        });
     }
 
     @Test
