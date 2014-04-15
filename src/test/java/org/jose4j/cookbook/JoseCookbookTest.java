@@ -50,6 +50,7 @@ import static org.junit.Assert.*;
  * 4.3. Key Wrap using PBES2-AES-KeyWrap with AES-CBC-HMAC-SHA2
  * 4.4. Key Agreement with Key Wrapping using ECDH-ES and AES-KeyWrap with AES-GCM
  * 4.5. Key Agreement using ECDH-ES with AES-CBC-HMAC-SHA2
+ * 4.6. Direct Encryption using AES-GCM
  */
 public class JoseCookbookTest
 {
@@ -713,5 +714,46 @@ public class JoseCookbookTest
         jwe.setCompactSerialization(exampleCompactSerialization);
         jwe.setKey(jwk.getPrivateKey());
         assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
+    }
+
+    @Test
+    public void directEncryptiouUsingAESGCM_4_6() throws Exception
+    {
+        runWithBouncyCastleProvider(new RunnableTest()
+        {
+            @Override
+            public void runTest() throws Exception
+            {
+                JsonWebKey jwk = JsonWebKey.Factory.newJwk(
+                        "   {\n" +
+                        "     \"kty\": \"oct\",\n" +
+                        "     \"kid\": \"77c7e2b8-6e13-45cf-8672-617b5b45243a\",\n" +
+                        "     \"use\": \"enc\",\n" +
+                        "     \"alg\": \"A128GCM\",\n" +
+                        "     \"k\": \"XctOhJAkA-pD9Lh7ZgW_2A\"\n" +
+                        "   }");
+
+                String cs =
+                        "eyJhbGciOiJkaXIiLCJraWQiOiI3N2M3ZTJiOC02ZTEzLTQ1Y2YtODY3Mi02MT" +
+                        "diNWI0NTI0M2EiLCJlbmMiOiJBMTI4R0NNIn0" +
+                        "." +
+                        "." +
+                        "refa467QzzKx6QAB" +
+                        "." +
+                        "JW_i_f52hww_ELQPGaYyeAB6HYGcR559l9TYnSovc23XJoBcW29rHP8yZOZG7Y" +
+                        "hLpT1bjFuvZPjQS-m0IFtVcXkZXdH_lr_FrdYt9HRUYkshtrMmIUAyGmUnd9zM" +
+                        "DB2n0cRDIHAzFVeJUDxkUwVAE7_YGRPdcqMyiBoCO-FBdE-Nceb4h3-FtBP-c_" +
+                        "BIwCPTjb9o0SbdcdREEMJMyZBH8ySWMVi1gPD9yxi-aQpGbSv_F9N4IZAxscj5" +
+                        "g-NJsUPbjk29-s7LJAGb15wEBtXphVCgyy53CoIKLHHeJHXex45Uz9aKZSRSIn" +
+                        "ZI-wjsY0yu3cT4_aQ3i1o-tiE-F8Ios61EKgyIQ4CWao8PFMj8TTnp" +
+                        "." +
+                        "vbb32Xvllea2OtmHAdccRQ";
+
+                JsonWebEncryption jwe = new JsonWebEncryption();
+                jwe.setKey(jwk.getKey());
+                jwe.setCompactSerialization(cs);
+                assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
+            }
+        });
     }
 }
