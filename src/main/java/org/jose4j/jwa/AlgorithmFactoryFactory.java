@@ -28,17 +28,27 @@ import org.jose4j.zip.DeflateRFC1951CompressionAlgorithm;
  */
 public class AlgorithmFactoryFactory
 {
+    private Log log = LogFactory.getLog(this.getClass());
+
     private static final AlgorithmFactoryFactory factoryFactory = new AlgorithmFactoryFactory();
 
-    private final AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory;
+    private AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory;
     private AlgorithmFactory<KeyManagementAlgorithm> jweKeyMgmtModeAlgorithmFactory;
     private AlgorithmFactory<ContentEncryptionAlgorithm> jweContentEncryptionAlgorithmFactory;
     private AlgorithmFactory<CompressionAlgorithm> compressionAlgorithmFactory;
 
     private AlgorithmFactoryFactory()
     {
-        Log log = LogFactory.getLog(this.getClass());
+        initialize();
+    }
 
+    void reinitialize()
+    {
+        log.info("Reinitializing jose4j...");
+    }
+
+    private void initialize()
+    {
         log.info("Initializing jose4j...");
         jwsAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ALGORITHM, JsonWebSignatureAlgorithm.class);
         jwsAlgorithmFactory.registerAlgorithm(new PlaintextNoneAlgorithm());
