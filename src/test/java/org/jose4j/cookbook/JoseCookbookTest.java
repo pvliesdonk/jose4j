@@ -17,6 +17,7 @@
 package org.jose4j.cookbook;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwa.JceProviderTestSupport;
 import org.jose4j.jwe.*;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
@@ -28,6 +29,7 @@ import org.jose4j.jwx.Headers;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.lang.JoseException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.security.Key;
@@ -53,6 +55,7 @@ import static org.junit.Assert.*;
  * 4.6. Direct Encryption using AES-GCM
  * 4.7 TODO
  * 4.8.  Key Wrap using AES-KeyWrap with AES-GCM
+ * 4.9.  Compressed Content
  */
 public class JoseCookbookTest
 {
@@ -72,7 +75,7 @@ public class JoseCookbookTest
             "alone, and go off without a word. We are your friends, Frodo.";
 
     String figure3RsaJwkJsonString =
-            "{\n" +
+            "{" +
             "  \"kty\": \"RSA\",\n" +
             "  \"kid\": \"bilbo.baggins@hobbiton.example\",\n" +
             "  \"use\": \"sig\",\n" +
@@ -762,6 +765,28 @@ public class JoseCookbookTest
     @Test
     public void aesKeyWrapAESGCM_4_8() throws Exception
     {
+        final String cs =
+                "eyJhbGciOiJBMTI4S1ciLCJraWQiOiI4MWIyMDk2NS04MzMyLTQzZDktYTQ2OC" +
+                "04MjE2MGFkOTFhYzgiLCJlbmMiOiJBMTI4R0NNIn0" +
+                "." +
+                "CBI6oDw8MydIx1IBntf_lQcw2MmJKIQx" +
+                "." +
+                "Qx0pmsDa8KnJc9Jo" +
+                "." +
+                "AwliP-KmWgsZ37BvzCefNen6VTbRK3QMA4TkvRkH0tP1bTdhtFJgJxeVmJkLD6" +
+                "1A1hnWGetdg11c9ADsnWgL56NyxwSYjU1ZEHcGkd3EkU0vjHi9gTlb90qSYFfe" +
+                "F0LwkcTtjbYKCsiNJQkcIp1yeM03OmuiYSoYJVSpf7ej6zaYcMv3WwdxDFl8RE" +
+                "wOhNImk2Xld2JXq6BR53TSFkyT7PwVLuq-1GwtGHlQeg7gDT6xW0JqHDPn_H-p" +
+                "uQsmthc9Zg0ojmJfqqFvETUxLAF-KjcBTS5dNy6egwkYtOt8EIHK-oEsKYtZRa" +
+                "a8Z7MOZ7UGxGIMvEmxrGCPeJa14slv2-gaqK0kEThkaSqdYw0FkQZF" +
+                "." +
+                "ER7MWJZ1FBI_NKvn7Zb1Lw";
+
+        common_4_8_and_4_9(cs);
+    }
+
+    private void common_4_8_and_4_9(final String cs) throws Exception
+    {
         runWithBouncyCastleProvider(new RunnableTest()
         {
             @Override
@@ -776,28 +801,31 @@ public class JoseCookbookTest
                        "     \"k\": \"GZy6sIZ6wl9NJOKB-jnmVQ\"\n" +
                        "   }\n");
 
-                String cs =
-                        "eyJhbGciOiJBMTI4S1ciLCJraWQiOiI4MWIyMDk2NS04MzMyLTQzZDktYTQ2OC\n" +
-                        "04MjE2MGFkOTFhYzgiLCJlbmMiOiJBMTI4R0NNIn0\n" +
-                        ".\n" +
-                        "CBI6oDw8MydIx1IBntf_lQcw2MmJKIQx\n" +
-                        ".\n" +
-                        "Qx0pmsDa8KnJc9Jo\n" +
-                        ".\n" +
-                        "AwliP-KmWgsZ37BvzCefNen6VTbRK3QMA4TkvRkH0tP1bTdhtFJgJxeVmJkLD6\n" +
-                        "1A1hnWGetdg11c9ADsnWgL56NyxwSYjU1ZEHcGkd3EkU0vjHi9gTlb90qSYFfe\n" +
-                        "F0LwkcTtjbYKCsiNJQkcIp1yeM03OmuiYSoYJVSpf7ej6zaYcMv3WwdxDFl8RE\n" +
-                        "wOhNImk2Xld2JXq6BR53TSFkyT7PwVLuq-1GwtGHlQeg7gDT6xW0JqHDPn_H-p\n" +
-                        "uQsmthc9Zg0ojmJfqqFvETUxLAF-KjcBTS5dNy6egwkYtOt8EIHK-oEsKYtZRa\n" +
-                        "a8Z7MOZ7UGxGIMvEmxrGCPeJa14slv2-gaqK0kEThkaSqdYw0FkQZF\n" +
-                        ".\n" +
-                        "ER7MWJZ1FBI_NKvn7Zb1Lw";
-
                 JsonWebEncryption jwe = new JsonWebEncryption();
                 jwe.setKey(jwk.getKey());
                 jwe.setCompactSerialization(cs);
                 assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
             }
         });
+    }
+
+    @Test @Ignore // I think the cookbook is using RFC 1950 compression rather than 1951 but need to verify and this fails now
+    public void aesKeyWrapAESGCMWithCompressedContent_4_9() throws Exception
+    {
+        String cs =
+                "eyJhbGciOiJBMTI4S1ciLCJraWQiOiI4MWIyMDk2NS04MzMyLTQzZDktYTQ2OC" +
+                "04MjE2MGFkOTFhYzgiLCJlbmMiOiJBMTI4R0NNIiwiemlwIjoiREVGIn0" +
+                "." +
+                "UCfvTL--SuX31GNhsoyDyNqtWGudNpEj" +
+                "." +
+                "PzlM5rwyEkQ9O1QF" +
+                "." +
+                "TkGe8Iu2WhBqRCnkPUktYP5M45MYI3OYikT6XZ52_jlOYLgWR19lelN-xWNyzK" +
+                "VmFMkzPLsgckIZN--J_4MH9hq5GCvgV0b1e058GWEqihYrZeUkgRU0JGcC72LT" +
+                "8s2PeR18wqmadgV0gdOgIN7RHS_tbqoxSn5ZM6wF1UuL2InGNwurvN2RaCeCqc" +
+                "VwOdJXO1dq6HhOX_PnPTuGnNgeFaqRyklhdjyRG-gudlI3nBY" +
+                "." +
+                "0l3nysmk6K1RQjIC4KtXTw";
+        common_4_8_and_4_9(cs);
     }
 }
