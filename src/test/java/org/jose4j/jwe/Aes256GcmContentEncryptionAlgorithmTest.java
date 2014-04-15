@@ -1,15 +1,16 @@
 package org.jose4j.jwe;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.hamcrest.CoreMatchers;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.security.Security;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  */
@@ -46,15 +47,15 @@ public class Aes256GcmContentEncryptionAlgorithmTest
 
             byte[] ciphertext = encryptionParts.getCiphertext();
             String encodedJweCiphertext = "5eym8TW_c8SuK0ltJ3rpYIzOeDQz7TALvtu6UG9oMo4vpzs9tX_EFShS8iB7j6jiSdiwkIr3ajwQzaBtQD_A";
-            Assert.assertThat(encodedJweCiphertext, CoreMatchers.equalTo(base64Url.base64UrlEncode(ciphertext)));
+            assertThat(encodedJweCiphertext, equalTo(base64Url.base64UrlEncode(ciphertext)));
 
             byte[] authenticationTag = encryptionParts.getAuthenticationTag();
             String encodedAuthenticationTag = "XFBoMYUZodetZdvTiFvSkQ";
-            Assert.assertThat(encodedAuthenticationTag, CoreMatchers.equalTo(base64Url.base64UrlEncode(authenticationTag)));
+            assertThat(encodedAuthenticationTag, equalTo(base64Url.base64UrlEncode(authenticationTag)));
 
             ContentEncryptionParts parts = new ContentEncryptionParts(iv, ciphertext, authenticationTag);
             byte[] decrypted = aesGcmContentEncryptionAlg.decrypt(parts, aad, cek, null);
-            Assert.assertArrayEquals(plainText, decrypted);
+            assertArrayEquals(plainText, decrypted);
         }
         finally
         {
