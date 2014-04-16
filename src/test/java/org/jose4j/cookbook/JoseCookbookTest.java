@@ -17,7 +17,6 @@
 package org.jose4j.cookbook;
 
 import org.jose4j.base64url.Base64Url;
-import org.jose4j.jwa.JceProviderTestSupport;
 import org.jose4j.jwe.*;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
@@ -53,9 +52,9 @@ import static org.junit.Assert.*;
  * 4.4. Key Agreement with Key Wrapping using ECDH-ES and AES-KeyWrap with AES-GCM
  * 4.5. Key Agreement using ECDH-ES with AES-CBC-HMAC-SHA2
  * 4.6. Direct Encryption using AES-GCM
- * 4.7 TODO
- * 4.8.  Key Wrap using AES-KeyWrap with AES-GCM
- * 4.9.  Compressed Content
+ * 4.7. Key Wrap using AES-GCM KeyWrap with AES-CBC-HMAC-SHA2
+ * 4.8. Key Wrap using AES-KeyWrap with AES-GCM
+ * 4.9. Compressed Content
  */
 public class JoseCookbookTest
 {
@@ -76,7 +75,7 @@ public class JoseCookbookTest
 
     String figure3RsaJwkJsonString =
             "{" +
-            "  \"kty\": \"RSA\",\n" +
+            "  \"kty\": \"RSA\"," +
             "  \"kid\": \"bilbo.baggins@hobbiton.example\",\n" +
             "  \"use\": \"sig\",\n" +
             "  \"n\": \"n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT\n" +
@@ -755,6 +754,78 @@ public class JoseCookbookTest
                         "vbb32Xvllea2OtmHAdccRQ";
 
                 JsonWebEncryption jwe = new JsonWebEncryption();
+                jwe.setKey(jwk.getKey());
+                jwe.setCompactSerialization(cs);
+                assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
+            }
+        });
+    }
+
+    @Test
+    public void gcmKeyWrapWithAesCbcContentEncryption() throws Exception
+    {
+        runWithBouncyCastleProvider(new RunnableTest()
+        {
+            @Override
+            public void runTest() throws Exception
+            {
+                JsonWebKey jwk = JsonWebKey.Factory.newJwk(
+                        "   {\n" +
+                        "     \"kty\": \"oct\",\n" +
+                        "     \"kid\": \"18ec08e1-bfa9-4d95-b205-2b4dd1d4321d\",\n" +
+                        "     \"use\": \"enc\",\n" +
+                        "     \"alg\": \"A256GCMKW\",\n" +
+                        "     \"k\": \"qC57l_uxcm7Nm3K-ct4GFjx8tM1U8CZ0NLBvdQstiS8\"\n" +
+                        "   }");
+
+                String cs =
+                        "eyJhbGciOiJBMjU2R0NNS1ciLCJraWQiOiIxOGVjMDhlMS1iZmE5LTRkOTUtYj" +
+                        "IwNS0yYjRkZDFkNDMyMWQiLCJ0YWciOiJrZlBkdVZRM1QzSDZ2bmV3dC0ta3N3" +
+                        "IiwiaXYiOiJLa1lUMEdYXzJqSGxmcU5fIiwiZW5jIjoiQTEyOENCQy1IUzI1Ni" +
+                        "J9" +
+                        "." +
+                        "lJf3HbOApxMEBkCMOoTnnABxs_CvTWUmZQ2ElLvYNok" +
+                        "." +
+                        "gz6NjyEFNm_vm8Gj6FwoFQ" +
+                        "." +
+                        "Jf5p9-ZhJlJy_IQ_byKFmI0Ro7w7G1QiaZpI8OaiVgD8EqoDZHyFKFBupS8iaE" +
+                        "eVIgMqWmsuJKuoVgzR3YfzoMd3GxEm3VxNhzWyWtZKX0gxKdy6HgLvqoGNbZCz" +
+                        "LjqcpDiF8q2_62EVAbr2uSc2oaxFmFuIQHLcqAHxy51449xkjZ7ewzZaGV3eFq" +
+                        "hpco8o4DijXaG5_7kp3h2cajRfDgymuxUbWgLqaeNQaJtvJmSMFuEOSAzw9Hde" +
+                        "b6yhdTynCRmu-kqtO5Dec4lT2OMZKpnxc_F1_4yDJFcqb5CiDSmA-psB2k0Jtj" +
+                        "xAj4UPI61oONK7zzFIu4gBfjJCndsZfdvG7h8wGjV98QhrKEnR7xKZ3KCr0_qR" +
+                        "1B-gxpNk3xWU" +
+                        "." +
+                        "DKW7jrb4WaRSNfbXVPlT5g";
+
+
+
+                // verify recreating it (or what we can)
+                JsonWebEncryption jwe = new JsonWebEncryption();
+                jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.A256GCMKW);
+                jwe.setKeyIdHeaderValue(jwk.getKeyId());
+                jwe.setHeader(HeaderParameterNames.INITIALIZATION_VECTOR, "KkYT0GX_2jHlfqN_");
+                jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+
+                jwe.setKey(jwk.getKey());
+                jwe.setEncodedIv("gz6NjyEFNm_vm8Gj6FwoFQ");
+                jwe.setEncodedContentEncryptionKey("UWxARpat23nL9ReIj4WG3D1ee9I4r-Mv5QLuFXdy_rE");
+                jwe.setPayload(jwePlaintext);
+
+
+                String compactSerialization = jwe.getCompactSerialization();
+                String[] exampleParts = CompactSerializer.deserialize(cs);
+                String[] producedParts = CompactSerializer.deserialize(compactSerialization);
+
+                // [0] header is different because of the order of params
+                assertThat(exampleParts[1], equalTo(producedParts[1]));
+                assertThat(exampleParts[2], equalTo(producedParts[2]));
+                assertThat(exampleParts[3], equalTo(producedParts[3]));
+                // [4] tag is different because of the header being different
+
+
+                // verify decrypting it
+                jwe = new JsonWebEncryption();
                 jwe.setKey(jwk.getKey());
                 jwe.setCompactSerialization(cs);
                 assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
