@@ -18,6 +18,8 @@ public class RsaOaepKeyManagementAlgorithmTest extends TestCase
 {
     public void testJweExampleA1() throws JoseException
     {
+        // only the key encryption part from
+        // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-25#appendix-A.1
         String encodedEncryptedKey =
                 "OKOawDo13gRp2ojaHV7LFpZcgV7T6DVZKTyKOMTYUmKoTCVJRgckCL9kiMT03JGe" +
                 "ipsEdY3mx_etLbbWSrFr05kLzcSr4qKAq7YN7e9jwQRb23nfa6c9d-StnImGyFDb" +
