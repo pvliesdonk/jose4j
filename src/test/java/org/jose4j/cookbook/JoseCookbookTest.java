@@ -28,7 +28,6 @@ import org.jose4j.jwx.Headers;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.lang.JoseException;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.security.Key;
@@ -880,23 +879,23 @@ public class JoseCookbookTest
         });
     }
 
-    @Test @Ignore // I think the cookbook is using RFC 1950 compression rather than 1951 but need to verify and this fails now
+    @Test
     public void aesKeyWrapAESGCMWithCompressedContent_4_9() throws Exception
     {
         String cs =
                 "eyJhbGciOiJBMTI4S1ciLCJraWQiOiI4MWIyMDk2NS04MzMyLTQzZDktYTQ2OC" +
                 "04MjE2MGFkOTFhYzgiLCJlbmMiOiJBMTI4R0NNIiwiemlwIjoiREVGIn0" +
                 "." +
-                "UCfvTL--SuX31GNhsoyDyNqtWGudNpEj" +
+                "5vUT2WOtQxKWcekM_IzVQwkGgzlFDwPi" +
                 "." +
-                "PzlM5rwyEkQ9O1QF" +
+                "p9pUq6XHY0jfEZIl" +
                 "." +
-                "TkGe8Iu2WhBqRCnkPUktYP5M45MYI3OYikT6XZ52_jlOYLgWR19lelN-xWNyzK" +
-                "VmFMkzPLsgckIZN--J_4MH9hq5GCvgV0b1e058GWEqihYrZeUkgRU0JGcC72LT" +
-                "8s2PeR18wqmadgV0gdOgIN7RHS_tbqoxSn5ZM6wF1UuL2InGNwurvN2RaCeCqc" +
-                "VwOdJXO1dq6HhOX_PnPTuGnNgeFaqRyklhdjyRG-gudlI3nBY" +
+                "HbDtOsdai1oYziSx25KEeTxmwnh8L8jKMFNc1k3zmMI6VB8hry57tDZ61jXyez" +
+                "SPt0fdLVfe6Jf5y5-JaCap_JQBcb5opbmT60uWGml8blyiMQmOn9J--XhhlYg0" +
+                "m-BHaqfDO5iTOWxPxFMUedx7WCy8mxgDHj0aBMG6152PsM-w5E_o2B3jDbrYBK" +
+                "hpYA7qi3AyijnCJ7BP9rr3U8kxExCpG3mK420TjOw" +
                 "." +
-                "0l3nysmk6K1RQjIC4KtXTw";
+                "VILuUwuIxaLVmh5X-T7kmA";
         common_4_8_and_4_9(cs);
     }
 }
