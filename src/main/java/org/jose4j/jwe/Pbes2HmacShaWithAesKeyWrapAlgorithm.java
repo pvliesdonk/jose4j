@@ -132,7 +132,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     @Override
     public boolean isAvailable()
     {
-        return true;
+        return keyWrap.isAvailable();
     }
 
     public long getDefaultIterationCount()
