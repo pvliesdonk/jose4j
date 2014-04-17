@@ -80,9 +80,9 @@ public class AlgorithmFactoryFactory
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes128KeyWrapAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes192KeyWrapAlgorithm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new EcdhKeyAgreementWithAes256KeyWrapAlgorithm());
-        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Pbes2HmacSha256WithAes128KeyWrapAlgorithm());
-        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Pbes2HmacSha384WithAes192KeyWrapAlgorithm());
-        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Pbes2HmacSha512WithAes256KeyWrapAlgorithm());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Pbes2HmacShaWithAesKeyWrapAlgorithm.HmacSha256Aes128());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Pbes2HmacShaWithAesKeyWrapAlgorithm.HmacSha384Aes192());
+        jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new Pbes2HmacShaWithAesKeyWrapAlgorithm.HmacSha512Aes256());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new AesGcmKeyEncryptionAlgorithm.Aes128Gcm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new AesGcmKeyEncryptionAlgorithm.Aes192Gcm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new AesGcmKeyEncryptionAlgorithm.Aes256Gcm());

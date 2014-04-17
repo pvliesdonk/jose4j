@@ -29,6 +29,7 @@ import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
+import org.jose4j.mac.MacUtil;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -153,5 +154,29 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     public void setDefaultSaltByteLength(int defaultSaltByteLength)
     {
         this.defaultSaltByteLength = defaultSaltByteLength;
+    }
+
+    public static class HmacSha256Aes128 extends Pbes2HmacShaWithAesKeyWrapAlgorithm
+    {
+        public HmacSha256Aes128()
+        {
+            super(KeyManagementAlgorithmIdentifiers.PBES2_HS256_A128KW, MacUtil.HMAC_SHA256, new Aes128KeyWrapManagementAlgorithm());
+        }
+    }
+
+    public static class HmacSha384Aes192 extends Pbes2HmacShaWithAesKeyWrapAlgorithm
+    {
+        public HmacSha384Aes192()
+        {
+            super(KeyManagementAlgorithmIdentifiers.PBES2_HS384_A192KW, MacUtil.HMAC_SHA384, new Aes192KeyWrapManagementAlgorithm());
+        }
+    }
+
+    public static class HmacSha512Aes256 extends Pbes2HmacShaWithAesKeyWrapAlgorithm
+    {
+        public HmacSha512Aes256()
+        {
+            super(KeyManagementAlgorithmIdentifiers.PBES2_HS512_A256KW, MacUtil.HMAC_SHA512, new Aes256KeyWrapManagementAlgorithm());
+        }
     }
 }

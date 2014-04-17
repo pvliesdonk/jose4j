@@ -220,8 +220,8 @@ public class Pbes2ExampleEncryptedRSAPrivateKeyJwkAppendixCTest
 
         PbkdfKey pbkdfKey = new PbkdfKey(PASSWORD);
 
-        Pbes2HmacSha256WithAes128KeyWrapAlgorithm pbes2HmacSha256WithAes128KeyWrapAlg = new Pbes2HmacSha256WithAes128KeyWrapAlgorithm();
-        Key derivedKey = pbes2HmacSha256WithAes128KeyWrapAlg.deriveForEncrypt(pbkdfKey, headers);
+        Pbes2HmacShaWithAesKeyWrapAlgorithm pbesAlg = new Pbes2HmacShaWithAesKeyWrapAlgorithm.HmacSha256Aes128();
+        Key derivedKey = pbesAlg.deriveForEncrypt(pbkdfKey, headers);
 
         byte[] expectedDerived = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{110, 171, 169, 92, 129, 92, 109, 117,
                                                                                         233, 242, 116, 233, 170, 14, 24, 75});

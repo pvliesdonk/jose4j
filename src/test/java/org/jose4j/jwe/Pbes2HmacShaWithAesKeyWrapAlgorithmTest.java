@@ -115,7 +115,8 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithmTest
     @Test
     public void testUsingAndSettingDefaults() throws JoseException
     {
-        Pbes2HmacShaWithAesKeyWrapAlgorithm pbes2 = new Pbes2HmacSha256WithAes128KeyWrapAlgorithm();
+        Pbes2HmacShaWithAesKeyWrapAlgorithm pbes2 = new Pbes2HmacShaWithAesKeyWrapAlgorithm.HmacSha256Aes128();
+
         assertTrue(pbes2.getDefaultIterationCount() >= MINIMUM_ITERAION_COUNT);
         assertTrue(pbes2.getDefaultSaltByteLength() >= MINIMUM_SALT_BYTE_LENGTH);
 
@@ -131,7 +132,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithmTest
         Long iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
         assertThat(iterationCount, equalTo(pbes2.getDefaultIterationCount()));
 
-        Pbes2HmacShaWithAesKeyWrapAlgorithm newPbes2 = new Pbes2HmacSha256WithAes128KeyWrapAlgorithm();
+        Pbes2HmacShaWithAesKeyWrapAlgorithm newPbes2 = new Pbes2HmacShaWithAesKeyWrapAlgorithm.HmacSha256Aes128();
         long newDefaultIterationCount = 1024;
         newPbes2.setDefaultIterationCount(newDefaultIterationCount);
 
@@ -179,4 +180,6 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithmTest
         long iterationCountFromHeader = decryptingJwe.getHeaders().getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
         assertThat(iterationCount, equalTo(iterationCountFromHeader));
     }
+
+
 }
