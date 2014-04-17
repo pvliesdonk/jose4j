@@ -54,18 +54,18 @@ public class AlgorithmFactoryFactory
         long startTime = System.currentTimeMillis();
         jwsAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ALGORITHM, JsonWebSignatureAlgorithm.class);
         jwsAlgorithmFactory.registerAlgorithm(new PlaintextNoneAlgorithm());
-        jwsAlgorithmFactory.registerAlgorithm(new HmacUsingSha256Algorithm());
-        jwsAlgorithmFactory.registerAlgorithm(new HmacUsingSha384Algorithm());
-        jwsAlgorithmFactory.registerAlgorithm(new HmacUsingSha512Algorithm());
-        jwsAlgorithmFactory.registerAlgorithm(new EcdsaP256UsingSha256Algorithm());
-        jwsAlgorithmFactory.registerAlgorithm(new EcdsaP384UsingSha384Algorithm());
-        jwsAlgorithmFactory.registerAlgorithm(new EcdsaP521UsingSha512Algorithm());
-        jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha256Algorithm());
-        jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha384Algorithm());
-        jwsAlgorithmFactory.registerAlgorithm(new RsaUsingSha512Algorithm());
-        jwsAlgorithmFactory.registerAlgorithm(new RsaPssUsingSha256Algorithm());
-        jwsAlgorithmFactory.registerAlgorithm(new RsaPssUsingSha384Algorithm());
-        jwsAlgorithmFactory.registerAlgorithm(new RsaPssUsingSha512Algorithm());
+        jwsAlgorithmFactory.registerAlgorithm(new HmacUsingShaAlgorithm.HmacSha256());
+        jwsAlgorithmFactory.registerAlgorithm(new HmacUsingShaAlgorithm.HmacSha384());
+        jwsAlgorithmFactory.registerAlgorithm(new HmacUsingShaAlgorithm.HmacSha512());
+        jwsAlgorithmFactory.registerAlgorithm(new EcdsaUsingShaAlgorithm.EcdsaP256UsingSha256());
+        jwsAlgorithmFactory.registerAlgorithm(new EcdsaUsingShaAlgorithm.EcdsaP384UsingSha384());
+        jwsAlgorithmFactory.registerAlgorithm(new EcdsaUsingShaAlgorithm.EcdsaP521UsingSha512());
+        jwsAlgorithmFactory.registerAlgorithm(new RsaUsingShaAlgorithm.RsaSha256());
+        jwsAlgorithmFactory.registerAlgorithm(new RsaUsingShaAlgorithm.RsaSha384());
+        jwsAlgorithmFactory.registerAlgorithm(new RsaUsingShaAlgorithm.RsaSha512());
+        jwsAlgorithmFactory.registerAlgorithm(new RsaUsingShaAlgorithm.RsaPssSha256());
+        jwsAlgorithmFactory.registerAlgorithm(new RsaUsingShaAlgorithm.RsaPssSha384());
+        jwsAlgorithmFactory.registerAlgorithm(new RsaUsingShaAlgorithm.RsaPssSha512());
 
         log.info("JWS signature algorithms: " + jwsAlgorithmFactory.getSupportedAlgorithms());
 

@@ -43,4 +43,64 @@ public class RsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Json
     {
         KeyValidationSupport.checkRsaKeySize((RSAPrivateKey) privateKey);
     }
+
+    /**
+     *
+     */
+    public static class RsaPssSha256 extends RsaUsingShaAlgorithm
+    {
+        public RsaPssSha256()
+        {
+            super(AlgorithmIdentifiers.RSA_PSS_USING_SHA256, "SHA256withRSA/PSS");
+        }
+    }
+
+    public static class RsaPssSha384 extends RsaUsingShaAlgorithm
+    {
+        public RsaPssSha384()
+        {
+            super(AlgorithmIdentifiers.RSA_PSS_USING_SHA384, "SHA384withRSA/PSS");
+        }
+    }
+
+    /**
+     *
+     */
+    public static class RsaPssSha512 extends RsaUsingShaAlgorithm
+    {
+        public RsaPssSha512()
+        {
+            super(AlgorithmIdentifiers.RSA_PSS_USING_SHA512, "SHA512withRSA/PSS");
+        }
+    }
+
+    /**
+     */
+    public static class RsaSha256 extends RsaUsingShaAlgorithm
+    {
+        public RsaSha256()
+        {
+            super(AlgorithmIdentifiers.RSA_USING_SHA256, "SHA256withRSA");
+        }
+    }
+
+    /**
+     */
+    public static class RsaSha384 extends RsaUsingShaAlgorithm
+    {
+        public RsaSha384()
+        {
+            super(AlgorithmIdentifiers.RSA_USING_SHA384, "SHA384withRSA");
+        }
+    }
+
+    /**
+     */
+    public static class RsaSha512 extends RsaUsingShaAlgorithm
+    {
+        public RsaSha512()
+        {
+            super(AlgorithmIdentifiers.RSA_USING_SHA512, "SHA512withRSA");
+        }
+    }
 }

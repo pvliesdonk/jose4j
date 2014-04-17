@@ -234,4 +234,34 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
     {
         return curveName;
     }
+
+    /**
+     */
+    public static class EcdsaP256UsingSha256 extends EcdsaUsingShaAlgorithm
+    {
+        public EcdsaP256UsingSha256()
+        {
+            super(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256, "SHA256withECDSA", EllipticCurves.P_256, 64);
+        }
+    }
+
+    /**
+     */
+    public static class EcdsaP384UsingSha384 extends EcdsaUsingShaAlgorithm
+    {
+        public EcdsaP384UsingSha384()
+        {
+            super(AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384, "SHA384withECDSA", EllipticCurves.P_384, 96);
+        }
+    }
+
+    /**
+     */
+    public static class EcdsaP521UsingSha512 extends EcdsaUsingShaAlgorithm
+    {
+        public EcdsaP521UsingSha512()
+        {
+            super(AlgorithmIdentifiers.ECDSA_USING_P521_CURVE_AND_SHA512, "SHA512withECDSA", EllipticCurves.P_521, 132);
+        }
+    }
 }
