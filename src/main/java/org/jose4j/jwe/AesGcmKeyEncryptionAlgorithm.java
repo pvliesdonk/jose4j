@@ -25,12 +25,8 @@ import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 
 /**
@@ -38,9 +34,10 @@ import java.security.Key;
  */
 public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyManagementAlgorithm
 {
-    public static final int TAG_BIT_LENGTH = 128;
-    public static final int TAG_BYTE_LENGTH = ByteUtil.byteLength(TAG_BIT_LENGTH);
-    public static final int IV_BYTE_LENGTH = 12;
+    private static final int TAG_BYTE_LENGTH = ByteUtil.byteLength(128);
+    private static final int IV_BYTE_LENGTH = 12;
+
+    private SimpleAeadCipher simpleAeadCipher;
 
     public AesGcmKeyEncryptionAlgorithm(String alg)
     {
@@ -48,6 +45,7 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
         setJavaAlgorithm("AES/GCM/NoPadding");
         setKeyPersuasion(KeyPersuasion.SYMMETRIC);
         setKeyType(AesKey.ALGORITHM);
+        simpleAeadCipher = new SimpleAeadCipher(getJavaAlgorithm(), TAG_BYTE_LENGTH);
     }
 
     @Override
@@ -70,47 +68,14 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
             iv = base64Url.base64UrlDecode(encodedIv);
         }
 
-        int mode = Cipher.ENCRYPT_MODE;
+        SimpleAeadCipher.CipherOutput encrypted = simpleAeadCipher.encrypt(managementKey, iv, cek, null);
+        byte[] encryptedKey = encrypted.getCiphertext();
+        byte[] tag = encrypted.getTag();
 
-        Cipher cipher = getInitialisedCipher(managementKey, iv, mode);
+        String encodedTag = base64Url.base64UrlEncode(tag);
+        headers.setStringHeaderValue(HeaderParameterNames.AUTHENTICATION_TAG, encodedTag);
 
-        try
-        {
-            byte[] ciphertext = cipher.doFinal(cek);
-
-            // todo extract some common GCM cipher things to somewhere and use with content enc too
-            int tagIndex = ciphertext.length - TAG_BYTE_LENGTH;
-            byte[] encryptedKey = ByteUtil.subArray(ciphertext, 0, tagIndex);
-            byte[] tag = ByteUtil.subArray(ciphertext, tagIndex, TAG_BYTE_LENGTH);
-
-            String encodedTag = base64Url.base64UrlEncode(tag);
-            headers.setStringHeaderValue(HeaderParameterNames.AUTHENTICATION_TAG, encodedTag);
-
-            return new ContentEncryptionKeys(cek, encryptedKey);
-        }
-        catch (IllegalBlockSizeException | BadPaddingException e)
-        {
-            throw new JoseException(e.toString(), e);
-        }
-    }
-
-    private Cipher getInitialisedCipher(Key key, byte[] iv, int mode) throws JoseException
-    {
-        Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm());
-        try
-        {
-            GCMParameterSpec parameterSpec = new GCMParameterSpec(TAG_BIT_LENGTH, iv);
-            cipher.init(mode, key, parameterSpec);
-            return cipher;
-        }
-        catch (java.security.InvalidKeyException e)
-        {
-            throw new JoseException("Invalid key for " + getJavaAlgorithm(), e);
-        }
-        catch (InvalidAlgorithmParameterException e)
-        {
-            throw new JoseException(e.toString(), e);
-        }
+        return new ContentEncryptionKeys(cek, encryptedKey);
     }
 
     @Override
@@ -120,20 +85,13 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
         String encodedIv = headers.getStringHeaderValue(HeaderParameterNames.INITIALIZATION_VECTOR);
         byte[] iv = base64Url.base64UrlDecode(encodedIv);
 
-        Cipher cipher = getInitialisedCipher(managementKey, iv, Cipher.DECRYPT_MODE);
+        Cipher cipher = simpleAeadCipher.getInitialisedCipher(managementKey, iv, Cipher.DECRYPT_MODE);
 
         String encodedTag = headers.getStringHeaderValue(HeaderParameterNames.AUTHENTICATION_TAG);
         byte[] tag = base64Url.base64UrlDecode(encodedTag);
-        byte[] ciphertext = ByteUtil.concat(encryptedKey, tag);
-        try
-        {
-            byte[] cek = cipher.doFinal(ciphertext);
-            return new SecretKeySpec(cek, cekDesc.getContentEncryptionKeyAlgorithm());
-        }
-        catch (IllegalBlockSizeException | BadPaddingException e)
-        {
-            throw new JoseException(e.toString(), e);
-        }
+
+        byte[] cek = simpleAeadCipher.decrypt(managementKey, iv, encryptedKey, tag, null);
+        return new SecretKeySpec(cek, cekDesc.getContentEncryptionKeyAlgorithm());
     }
 
     @Override
