@@ -1,5 +1,7 @@
 package org.jose4j.jwx;
 
+import org.jose4j.keys.AesKey;
+import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidKeyException;
 
 import java.security.Key;
@@ -53,6 +55,27 @@ public class KeyValidationSupport
         if (cekOverride != null)
         {
             throw new InvalidKeyException("An explicit content encryption key cannot be used with " + alg);
+        }
+    }
+
+    public static void validateAesWrappingKey(Key managementKey, String joseAlg, int expectedKeyByteLength) throws InvalidKeyException
+    {
+        KeyValidationSupport.notNull(managementKey);
+
+        String alg = managementKey.getAlgorithm();
+
+        if (!AesKey.ALGORITHM.equals(alg))
+        {
+            throw new InvalidKeyException("Invalid key for JWE " + joseAlg + ", expected an "
+                    + AesKey.ALGORITHM+ " key but an " + alg + " bit key was provided.");
+        }
+
+        int managementKeyByteLength = managementKey.getEncoded().length;
+        if (managementKeyByteLength != expectedKeyByteLength)
+        {
+            throw new InvalidKeyException("Invalid key for JWE " + joseAlg + ", expected a "
+                    + ByteUtil.bitLength(expectedKeyByteLength)+ " bit key but a "
+                    + ByteUtil.bitLength(managementKeyByteLength) + " bit key was provided.");
         }
     }
 }

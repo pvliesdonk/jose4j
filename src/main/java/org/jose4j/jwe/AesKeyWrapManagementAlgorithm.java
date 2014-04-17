@@ -20,7 +20,6 @@ import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.KeyPersuasion;
-import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidKeyException;
 
 import java.security.Key;
@@ -58,23 +57,7 @@ public class AesKeyWrapManagementAlgorithm extends WrappingKeyManagementAlgorith
 
     void validateKey(Key managementKey) throws InvalidKeyException
     {
-        KeyValidationSupport.notNull(managementKey);
-
-        String alg = managementKey.getAlgorithm();
-
-        if (!AesKey.ALGORITHM.equals(alg))
-        {
-            throw new InvalidKeyException("Invalid key for JWE " + getAlgorithmIdentifier() + ", expected an "
-                               + AesKey.ALGORITHM+ " key but an " + alg + " bit key was provided.");
-        }
-
-        int managementKeyByteLength = managementKey.getEncoded().length;
-        if (managementKeyByteLength != getKeyByteLength())
-        {
-           throw new InvalidKeyException("Invalid key for JWE " + getAlgorithmIdentifier() + ", expected a "
-                   + ByteUtil.bitLength(getKeyByteLength())+ " bit key but a "
-                   + ByteUtil.bitLength(managementKeyByteLength) + " bit key was provided.");
-        }
+        KeyValidationSupport.validateAesWrappingKey(managementKey, getAlgorithmIdentifier(), getKeyByteLength());
     }
 
     @Override

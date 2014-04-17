@@ -19,6 +19,7 @@ import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
+import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
@@ -97,14 +98,20 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
     @Override
     public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
-        // todo
+        validateKey(managementKey);
     }
 
     @Override
     public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
-        // todo
+        validateKey(managementKey);
     }
+
+    void validateKey(Key managementKey) throws InvalidKeyException
+    {
+        KeyValidationSupport.validateAesWrappingKey(managementKey, getAlgorithmIdentifier(), keyByteLength);
+    }
+
 
     @Override
     public boolean isAvailable()
