@@ -16,8 +16,6 @@ public class Aes256GcmContentEncryptionAlgorithmTest
     @Test
     public void testExampleEncryptFromJweAppendix1() throws Exception
     {
-        // todo figure out good way to plug/unplug for testing (including cookbook ones and other GCM tests coming soon and RSA PSS)
-
         JceProviderTestSupport.runWithBouncyCastleProvider(new JceProviderTestSupport.RunnableTest()
         {
             @Override
