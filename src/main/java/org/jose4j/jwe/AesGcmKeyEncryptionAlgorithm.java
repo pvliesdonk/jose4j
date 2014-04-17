@@ -25,7 +25,6 @@ import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 
-import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 
@@ -34,18 +33,21 @@ import java.security.Key;
  */
 public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyManagementAlgorithm
 {
-    private static final int TAG_BYTE_LENGTH = ByteUtil.byteLength(128);
+    private static final int TAG_BYTE_LENGTH = 16;
     private static final int IV_BYTE_LENGTH = 12;
 
     private SimpleAeadCipher simpleAeadCipher;
+    private int keyByteLength;
 
-    public AesGcmKeyEncryptionAlgorithm(String alg)
+    public AesGcmKeyEncryptionAlgorithm(String alg, int keyByteLength)
     {
         setAlgorithmIdentifier(alg);
-        setJavaAlgorithm("AES/GCM/NoPadding");
+        setJavaAlgorithm(SimpleAeadCipher.GCM_TRANSFORMATION_NAME);
         setKeyPersuasion(KeyPersuasion.SYMMETRIC);
         setKeyType(AesKey.ALGORITHM);
         simpleAeadCipher = new SimpleAeadCipher(getJavaAlgorithm(), TAG_BYTE_LENGTH);
+        this.keyByteLength = keyByteLength;
+
     }
 
     @Override
@@ -85,8 +87,6 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
         String encodedIv = headers.getStringHeaderValue(HeaderParameterNames.INITIALIZATION_VECTOR);
         byte[] iv = base64Url.base64UrlDecode(encodedIv);
 
-        Cipher cipher = simpleAeadCipher.getInitialisedCipher(managementKey, iv, Cipher.DECRYPT_MODE);
-
         String encodedTag = headers.getStringHeaderValue(HeaderParameterNames.AUTHENTICATION_TAG);
         byte[] tag = base64Url.base64UrlDecode(encodedTag);
 
@@ -109,14 +109,14 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
     @Override
     public boolean isAvailable()
     {
-        return true;  // todo
+        return simpleAeadCipher.isAvailable(log, keyByteLength, IV_BYTE_LENGTH, getAlgorithmIdentifier());
     }
 
     public static class Aes128Gcm extends AesGcmKeyEncryptionAlgorithm
     {
         public Aes128Gcm()
         {
-            super(KeyManagementAlgorithmIdentifiers.A128GCMKW);
+            super(KeyManagementAlgorithmIdentifiers.A128GCMKW, ByteUtil.byteLength(128));
         }
     }
 
@@ -124,7 +124,7 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
     {
         public Aes192Gcm()
         {
-            super(KeyManagementAlgorithmIdentifiers.A192GCMKW);
+            super(KeyManagementAlgorithmIdentifiers.A192GCMKW, ByteUtil.byteLength(192));
         }
     }
 
@@ -132,7 +132,7 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
     {
         public Aes256Gcm()
         {
-            super(KeyManagementAlgorithmIdentifiers.A256GCMKW);
+            super(KeyManagementAlgorithmIdentifiers.A256GCMKW, ByteUtil.byteLength(256));
         }
     }
 }
