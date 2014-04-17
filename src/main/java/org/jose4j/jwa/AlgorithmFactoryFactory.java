@@ -93,9 +93,9 @@ public class AlgorithmFactoryFactory
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes128CbcHmacSha256ContentEncryptionAlgorithm());
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes192CbcHmacSha384ContentEncryptionAlgorithm());
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes256CbcHmacSha512ContentEncryptionAlgorithm());
-        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes128GcmContentEncryptionAlgorithm());
-        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes192GcmContentEncryptionAlgorithm());
-        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new Aes256GcmContentEncryptionAlgorithm());
+        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new AesGcmContentEncryptionAlgorithm.Aes128Gcm());
+        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new AesGcmContentEncryptionAlgorithm.Aes192Gcm());
+        jweContentEncryptionAlgorithmFactory.registerAlgorithm(new AesGcmContentEncryptionAlgorithm.Aes256Gcm());
 
         log.info("JWE content encryption algorithms: " + jweContentEncryptionAlgorithmFactory.getSupportedAlgorithms());
 

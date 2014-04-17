@@ -64,4 +64,36 @@ public class AesGcmContentEncryptionAlgorithm extends AlgorithmInfo implements C
         int keyByteLength = getContentEncryptionKeyDescriptor().getContentEncryptionKeyByteLength();
         return simpleAeadCipher.isAvailable(log, keyByteLength, IV_BYTE_LENGTH, getAlgorithmIdentifier());
     }
+
+    /**
+     */
+    public static class Aes256Gcm extends AesGcmContentEncryptionAlgorithm
+    {
+        public Aes256Gcm()
+        {
+            super(ContentEncryptionAlgorithmIdentifiers.AES_256_GCM, 256);
+        }
+    }
+
+    /**
+     *
+     */
+    public static class Aes192Gcm extends AesGcmContentEncryptionAlgorithm
+    {
+        public Aes192Gcm()
+        {
+            super(ContentEncryptionAlgorithmIdentifiers.AES_192_GCM, 192);
+        }
+    }
+
+    /**
+     *
+     */
+    public static class Aes128Gcm extends AesGcmContentEncryptionAlgorithm
+    {
+        public Aes128Gcm()
+        {
+            super(ContentEncryptionAlgorithmIdentifiers.AES_128_GCM, 128);
+        }
+    }
 }

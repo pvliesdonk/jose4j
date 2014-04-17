@@ -21,7 +21,7 @@ public class Aes256GcmContentEncryptionAlgorithmTest
             @Override
             public void runTest() throws Exception
             {
-                Aes256GcmContentEncryptionAlgorithm aesGcmContentEncryptionAlg = new Aes256GcmContentEncryptionAlgorithm();
+                AesGcmContentEncryptionAlgorithm.Aes256Gcm aesGcmContentEncryptionAlg = new AesGcmContentEncryptionAlgorithm.Aes256Gcm();
 
                 // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#appendix-A.1
                 String plaintextText = "The true sign of intelligence is not knowledge but imagination.";
