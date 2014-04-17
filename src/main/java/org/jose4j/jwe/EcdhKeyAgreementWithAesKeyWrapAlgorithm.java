@@ -4,7 +4,6 @@ import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwk.EllipticCurveJsonWebKey;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
-import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
@@ -67,5 +66,35 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithm extends AlgorithmInfo imple
     public boolean isAvailable()
     {
         return ecdh.isAvailable() && keyWrap.isAvailable();
+    }
+
+    /**
+     */
+    public static class EcdhKeyAgreementWithAes128KeyWrapAlgorithm extends EcdhKeyAgreementWithAesKeyWrapAlgorithm implements KeyManagementAlgorithm
+    {
+        public EcdhKeyAgreementWithAes128KeyWrapAlgorithm()
+        {
+            super(KeyManagementAlgorithmIdentifiers.ECDH_ES_A128KW, new AesKeyWrapManagementAlgorithm.Aes128());
+        }
+    }
+
+    /**
+     */
+    public static class EcdhKeyAgreementWithAes192KeyWrapAlgorithm extends EcdhKeyAgreementWithAesKeyWrapAlgorithm implements KeyManagementAlgorithm
+    {
+        public EcdhKeyAgreementWithAes192KeyWrapAlgorithm()
+        {
+            super(KeyManagementAlgorithmIdentifiers.ECDH_ES_A192KW, new AesKeyWrapManagementAlgorithm.Aes192());
+        }
+    }
+
+    /**
+     */
+    public static class EcdhKeyAgreementWithAes256KeyWrapAlgorithm extends EcdhKeyAgreementWithAesKeyWrapAlgorithm implements KeyManagementAlgorithm
+    {
+        public EcdhKeyAgreementWithAes256KeyWrapAlgorithm()
+        {
+            super(KeyManagementAlgorithmIdentifiers.ECDH_ES_A256KW, new AesKeyWrapManagementAlgorithm.Aes256());
+        }
     }
 }

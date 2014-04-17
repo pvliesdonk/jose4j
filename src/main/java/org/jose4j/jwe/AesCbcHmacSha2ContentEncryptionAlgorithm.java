@@ -181,4 +181,46 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         int aesByteKeyLength = contentEncryptionKeyByteLength / 2;
         return CipherStrengthSupport.isAvailable(getJavaAlgorithm(), aesByteKeyLength);
     }
+
+    /**
+     */
+    public static class Aes128CbcHmacSha256
+            extends AesCbcHmacSha2ContentEncryptionAlgorithm
+            implements ContentEncryptionAlgorithm
+    {
+        public Aes128CbcHmacSha256()
+        {
+            // 16 octets for MAC_KEY_LEN + 16 octets for ENC_KEY_LEN
+            // The HMAC-SHA-256 output is truncated to T_LEN=16 octets
+            super(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256, 32, MacUtil.HMAC_SHA256, 16);
+        }
+    }
+
+    /**
+     */
+    public static class Aes192CbcHmacSha384
+            extends AesCbcHmacSha2ContentEncryptionAlgorithm
+            implements ContentEncryptionAlgorithm
+    {
+        public Aes192CbcHmacSha384()
+        {
+            // 24 octets for MAC_KEY_LEN + 24 octets for ENC_KEY_LEN
+            // The HMAC-SHA-256 output is truncated to T_LEN=24 octets
+            super(ContentEncryptionAlgorithmIdentifiers.AES_192_CBC_HMAC_SHA_384, 48, MacUtil.HMAC_SHA384, 24);
+        }
+    }
+
+    /**
+     */
+    public static class Aes256CbcHmacSha512
+            extends AesCbcHmacSha2ContentEncryptionAlgorithm
+            implements ContentEncryptionAlgorithm
+    {
+        public Aes256CbcHmacSha512()
+        {
+            // ENC_KEY_LEN is 32 octets & MAC_KEY_LEN is 32 octets.
+            // The HMAC SHA-512 value is truncated to T_LEN=32 octets instead of 16 octets.
+            super(ContentEncryptionAlgorithmIdentifiers.AES_256_CBC_HMAC_SHA_512, 64, MacUtil.HMAC_SHA512, 32);
+        }
+    }
 }

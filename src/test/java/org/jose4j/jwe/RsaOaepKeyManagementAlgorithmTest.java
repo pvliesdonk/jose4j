@@ -30,7 +30,7 @@ public class RsaOaepKeyManagementAlgorithmTest extends TestCase
         Base64Url base64Url = new Base64Url();
         byte[] encryptedKey = base64Url.base64UrlDecode(encodedEncryptedKey);
 
-        RsaOaepKeyManagementAlgorithm keyManagementAlgorithm = new RsaOaepKeyManagementAlgorithm();
+        RsaKeyManagementAlgorithm.RsaOaep keyManagementAlgorithm = new RsaKeyManagementAlgorithm.RsaOaep();
         PrivateKey privateKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPrivateKey();
         ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(32, AesKey.ALGORITHM);
         Key key = keyManagementAlgorithm.manageForDecrypt(privateKey, encryptedKey, cekDesc, null);
@@ -45,7 +45,7 @@ public class RsaOaepKeyManagementAlgorithmTest extends TestCase
 
     public void testRoundTrip() throws JoseException
     {
-        RsaOaepKeyManagementAlgorithm oaep = new RsaOaepKeyManagementAlgorithm();
+        RsaKeyManagementAlgorithm.RsaOaep oaep = new RsaKeyManagementAlgorithm.RsaOaep();
         ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(16, AesKey.ALGORITHM);
         PublicKey publicKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPublicKey();
         ContentEncryptionKeys contentEncryptionKeys = oaep.manageForEncrypt(publicKey, cekDesc, null, null);

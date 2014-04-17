@@ -232,7 +232,7 @@ public class Pbes2ExampleEncryptedRSAPrivateKeyJwkAppendixCTest
                                         112, 161, 131, 36, 55, 202, 236, 185, 172, 129, 23, 153, 194, 195,
                                         48, 253, 182});
 
-        WrappingKeyManagementAlgorithm keyWrap = new Aes128KeyWrapManagementAlgorithm();
+        WrappingKeyManagementAlgorithm keyWrap = new AesKeyWrapManagementAlgorithm.Aes128();
         ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(exampleCek.length, AesKey.ALGORITHM);
         ContentEncryptionKeys contentEncryptionKeys = keyWrap.manageForEnc(derivedKey, cekDesc, exampleCek);
         byte[] contentEncryptionKey = contentEncryptionKeys.getContentEncryptionKey();
@@ -249,7 +249,7 @@ public class Pbes2ExampleEncryptedRSAPrivateKeyJwkAppendixCTest
         String encodedIv = "Ye9j1qs22DmRSAddIh-VnA";
         byte[] iv = base64url.base64UrlDecode(encodedIv);
 
-        AesCbcHmacSha2ContentEncryptionAlgorithm aes128CbcHmacSha256 = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
+        AesCbcHmacSha2ContentEncryptionAlgorithm aes128CbcHmacSha256 = new AesCbcHmacSha2ContentEncryptionAlgorithm.Aes128CbcHmacSha256();
         byte[] aad = StringUtil.getBytesAscii(encodedHeader);
         ContentEncryptionParts contentEncryptionParts = aes128CbcHmacSha256.encrypt(plainTextOctetsAsBytes, aad, contentEncryptionKey, iv);
         byte[] authenticationTag = contentEncryptionParts.getAuthenticationTag();

@@ -67,4 +67,34 @@ public class AesKeyWrapManagementAlgorithm extends WrappingKeyManagementAlgorith
         String agl = getJavaAlgorithm();
         return AlgorithmAvailability.isAvailable("Cipher", agl) && CipherStrengthSupport.isAvailable(agl, aesByteKeyLength);
     }
+
+    /**
+     */
+    public static class Aes128 extends AesKeyWrapManagementAlgorithm
+    {
+        public Aes128()
+        {
+            super(KeyManagementAlgorithmIdentifiers.A128KW, 16);
+        }
+    }
+
+    /**
+     */
+    public static class Aes192 extends AesKeyWrapManagementAlgorithm
+    {
+        public Aes192()
+        {
+            super(KeyManagementAlgorithmIdentifiers.A192KW, 24);
+        }
+    }
+
+    /**
+     */
+    public static class Aes256 extends AesKeyWrapManagementAlgorithm
+    {
+        public Aes256()
+        {
+            super(KeyManagementAlgorithmIdentifiers.A256KW, 32);
+        }
+    }
 }

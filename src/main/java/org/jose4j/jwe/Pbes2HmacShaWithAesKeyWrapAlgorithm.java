@@ -160,7 +160,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     {
         public HmacSha256Aes128()
         {
-            super(KeyManagementAlgorithmIdentifiers.PBES2_HS256_A128KW, MacUtil.HMAC_SHA256, new Aes128KeyWrapManagementAlgorithm());
+            super(KeyManagementAlgorithmIdentifiers.PBES2_HS256_A128KW, MacUtil.HMAC_SHA256, new AesKeyWrapManagementAlgorithm.Aes128());
         }
     }
 
@@ -168,7 +168,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     {
         public HmacSha384Aes192()
         {
-            super(KeyManagementAlgorithmIdentifiers.PBES2_HS384_A192KW, MacUtil.HMAC_SHA384, new Aes192KeyWrapManagementAlgorithm());
+            super(KeyManagementAlgorithmIdentifiers.PBES2_HS384_A192KW, MacUtil.HMAC_SHA384, new AesKeyWrapManagementAlgorithm.Aes192());
         }
     }
 
@@ -176,7 +176,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     {
         public HmacSha512Aes256()
         {
-            super(KeyManagementAlgorithmIdentifiers.PBES2_HS512_A256KW, MacUtil.HMAC_SHA512, new Aes256KeyWrapManagementAlgorithm());
+            super(KeyManagementAlgorithmIdentifiers.PBES2_HS512_A256KW, MacUtil.HMAC_SHA512, new AesKeyWrapManagementAlgorithm.Aes256());
         }
     }
 }

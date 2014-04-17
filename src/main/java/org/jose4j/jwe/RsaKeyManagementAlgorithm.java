@@ -39,4 +39,24 @@ public class RsaKeyManagementAlgorithm extends WrappingKeyManagementAlgorithm im
     {
         return true; // todo maybe check about RSA though it's probably always there...
     }
+
+    /**
+     */
+    public static class RsaOaep extends RsaKeyManagementAlgorithm implements KeyManagementAlgorithm
+    {
+        public RsaOaep()
+        {
+            super("RSA/ECB/OAEPWithSHA-1AndMGF1Padding", KeyManagementAlgorithmIdentifiers.RSA_OAEP);
+        }
+    }
+
+    /**
+     */
+    public static class Rsa1_5 extends RsaKeyManagementAlgorithm implements KeyManagementAlgorithm
+    {
+        public Rsa1_5()
+        {
+            super("RSA/ECB/PKCS1Padding", KeyManagementAlgorithmIdentifiers.RSA1_5);
+        }
+    }
 }

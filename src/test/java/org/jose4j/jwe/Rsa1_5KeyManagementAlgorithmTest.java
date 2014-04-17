@@ -28,9 +28,9 @@ public class Rsa1_5KeyManagementAlgorithmTest extends TestCase
         Base64Url base64Url = new Base64Url();
         byte[] encryptedKey = base64Url.base64UrlDecode(encodedEncryptedKey);
 
-        Rsa1_5KeyManagementAlgorithm keyManagementAlgorithm = new Rsa1_5KeyManagementAlgorithm();
+        RsaKeyManagementAlgorithm.Rsa1_5 keyManagementAlgorithm = new RsaKeyManagementAlgorithm.Rsa1_5();
         PrivateKey privateKey = ExampleRsaJwksFromJwe.APPENDIX_A_2.getPrivateKey();
-        ContentEncryptionAlgorithm contentEncryptionAlgorithm = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
+        ContentEncryptionAlgorithm contentEncryptionAlgorithm = new AesCbcHmacSha2ContentEncryptionAlgorithm.Aes128CbcHmacSha256();
         ContentEncryptionKeyDescriptor cekDesc = contentEncryptionAlgorithm.getContentEncryptionKeyDescriptor();
         Key key = keyManagementAlgorithm.manageForDecrypt(privateKey, encryptedKey, cekDesc, null);
 
@@ -44,7 +44,7 @@ public class Rsa1_5KeyManagementAlgorithmTest extends TestCase
 
     public void testRoundTrip() throws JoseException
     {
-        Rsa1_5KeyManagementAlgorithm rsa = new Rsa1_5KeyManagementAlgorithm();
+        RsaKeyManagementAlgorithm.Rsa1_5 rsa = new RsaKeyManagementAlgorithm.Rsa1_5();
         ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(16, AesKey.ALGORITHM);
         PublicKey publicKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPublicKey();
         ContentEncryptionKeys contentEncryptionKeys = rsa.manageForEncrypt(publicKey, cekDesc, null, null);

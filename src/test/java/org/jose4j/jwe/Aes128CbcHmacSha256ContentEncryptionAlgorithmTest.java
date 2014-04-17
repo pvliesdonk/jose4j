@@ -2,7 +2,6 @@ package org.jose4j.jwe;
 
 import junit.framework.TestCase;
 import org.jose4j.base64url.Base64Url;
-import org.jose4j.jwx.Headers;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
@@ -26,7 +25,7 @@ public class Aes128CbcHmacSha256ContentEncryptionAlgorithmTest extends TestCase
 
         byte[] iv = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104, 101});
 
-        Aes128CbcHmacSha256ContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
+        AesCbcHmacSha2ContentEncryptionAlgorithm.Aes128CbcHmacSha256 jweContentEncryptionAlg = new AesCbcHmacSha2ContentEncryptionAlgorithm.Aes128CbcHmacSha256();
         ContentEncryptionParts contentEncryptionParts = jweContentEncryptionAlg.encrypt(plainText, aad, contentEncryptionKeyBytes, iv);
 
         Base64Url base64Url = new Base64Url();
@@ -52,7 +51,7 @@ public class Aes128CbcHmacSha256ContentEncryptionAlgorithmTest extends TestCase
         byte[] ciphertext = b.base64UrlDecode("KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY");
         byte[] tag = b.base64UrlDecode("9hH0vgRfYgPnAHOd8stkvw");
 
-        Aes128CbcHmacSha256ContentEncryptionAlgorithm jweContentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
+        AesCbcHmacSha2ContentEncryptionAlgorithm.Aes128CbcHmacSha256 jweContentEncryptionAlg = new AesCbcHmacSha2ContentEncryptionAlgorithm.Aes128CbcHmacSha256();
         ContentEncryptionParts encryptionParts = new ContentEncryptionParts(iv, ciphertext, tag);
         byte[] plaintextBytes = jweContentEncryptionAlg.decrypt(encryptionParts, header, contentEncryptionKeyBytes, null);
 
@@ -64,7 +63,7 @@ public class Aes128CbcHmacSha256ContentEncryptionAlgorithmTest extends TestCase
         String text = "I'm writing this test on a flight to Zurich";
         byte[] aad = StringUtil.getBytesUtf8("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0");
         byte[] plaintext = StringUtil.getBytesUtf8(text);
-        Aes128CbcHmacSha256ContentEncryptionAlgorithm contentEncryptionAlg = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
+        AesCbcHmacSha2ContentEncryptionAlgorithm.Aes128CbcHmacSha256 contentEncryptionAlg = new AesCbcHmacSha2ContentEncryptionAlgorithm.Aes128CbcHmacSha256();
         ContentEncryptionKeyDescriptor cekDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
         byte[] cek = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength());
         ContentEncryptionParts encryptionParts = contentEncryptionAlg.encrypt(plaintext, aad, cek, null, null);

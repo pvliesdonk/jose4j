@@ -30,9 +30,9 @@ public class Aes128KeyWrapManagementAlgorithmTest extends TestCase
                 "     }");
         AesKey managementKey = new AesKey(jsonWebKey.getKey().getEncoded());
 
-        WrappingKeyManagementAlgorithm wrappingKeyManagementAlgorithm = new Aes128KeyWrapManagementAlgorithm();
+        WrappingKeyManagementAlgorithm wrappingKeyManagementAlgorithm = new AesKeyWrapManagementAlgorithm.Aes128();
 
-        ContentEncryptionAlgorithm contentEncryptionAlgorithm = new Aes128CbcHmacSha256ContentEncryptionAlgorithm();
+        ContentEncryptionAlgorithm contentEncryptionAlgorithm = new AesCbcHmacSha2ContentEncryptionAlgorithm.Aes128CbcHmacSha256();
         ContentEncryptionKeyDescriptor cekDesc = contentEncryptionAlgorithm.getContentEncryptionKeyDescriptor();
 
         ContentEncryptionKeys contentEncryptionKeys = wrappingKeyManagementAlgorithm.manageForEnc(managementKey, cekDesc, cekBytes);
