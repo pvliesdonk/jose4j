@@ -1000,9 +1000,9 @@ public class JoseCookbookTest
                 JsonWebSignature jws = new JsonWebSignature();
                 jws.setCompactSerialization(jwePayload);
                 jws.setKey(sigJwk.getPublicKey());
+                assertTrue(jws.verifySignature());
                 String payload = jws.getPayload();
                 assertThat(expectedPayload, equalTo(payload));
-
             }
         });
     }
