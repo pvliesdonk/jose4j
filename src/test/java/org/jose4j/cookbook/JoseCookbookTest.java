@@ -38,7 +38,13 @@ import static org.jose4j.jwa.JceProviderTestSupport.*;
 import static org.junit.Assert.*;
 
 /**
- * http://tools.ietf.org/html/draft-ietf-jose-cookbook-01 and incremental updates from https://github.com/linuxwolf/jose-more
+ * Tests of the examples from the JOSE Cookbook.
+ * Started with http://tools.ietf.org/html/draft-ietf-jose-cookbook-01 and then worked with
+ * incremental updates from Matt at https://github.com/linuxwolf/jose-more
+ * and eventually resulted in http://tools.ietf.org/html/draft-ietf-jose-cookbook-02 that
+ * incorporates fixes to issues found while doing all this. Way at the end on page 94
+ * there's even acknowledgement of it
+ * http://tools.ietf.org/html/draft-ietf-jose-cookbook-02#appendix-A
  *
  * 3.1. RSA v1.5 Signature
  * 3.2. RSA-PSS Signature (via the the Bouncy Castle provider)
