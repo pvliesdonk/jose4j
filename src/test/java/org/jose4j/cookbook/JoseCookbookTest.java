@@ -17,6 +17,7 @@
 package org.jose4j.cookbook;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwa.JceProviderTestSupport;
 import org.jose4j.jwe.*;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
@@ -233,7 +234,8 @@ public class JoseCookbookTest
     @Test
     public void rsaPssSignature_3_2() throws Exception
     {
-        runWithBouncyCastleProvider(new RunnableTest()
+        JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
+        jceProviderTestSupport.runWithBouncyCastleProvider(new RunnableTest()
         {
             @Override
             public void runTest() throws JoseException
@@ -508,7 +510,9 @@ public class JoseCookbookTest
     @Test
     public void encryptionRSA_OAEPandAesGcm_4_2() throws Exception
     {
-        runWithBouncyCastleProvider(new RunnableTest()
+        JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
+
+        jceProviderTestSupport.runWithBouncyCastleProvider(new RunnableTest()
         {
             @Override
             public void runTest() throws Exception
@@ -629,7 +633,8 @@ public class JoseCookbookTest
     @Test
     public void keyAgreementWithKeyWrapAndGcm4_4() throws Exception
     {
-        runWithBouncyCastleProvider(new RunnableTest()
+        JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
+        jceProviderTestSupport.runWithBouncyCastleProvider(new RunnableTest()
         {
             @Override
             public void runTest() throws Exception
@@ -727,7 +732,8 @@ public class JoseCookbookTest
     @Test
     public void directEncryptiouUsingAESGCM_4_6() throws Exception
     {
-        runWithBouncyCastleProvider(new RunnableTest()
+        JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
+        jceProviderTestSupport.runWithBouncyCastleProvider(new RunnableTest()
         {
             @Override
             public void runTest() throws Exception
@@ -768,7 +774,8 @@ public class JoseCookbookTest
     @Test
     public void gcmKeyWrapWithAesCbcContentEncryption() throws Exception
     {
-        runWithBouncyCastleProvider(new RunnableTest()
+        JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
+        jceProviderTestSupport.runWithBouncyCastleProvider(new RunnableTest()
         {
             @Override
             public void runTest() throws Exception
@@ -862,7 +869,8 @@ public class JoseCookbookTest
 
     private void common_4_8_and_4_9(final String cs) throws Exception
     {
-        runWithBouncyCastleProvider(new RunnableTest()
+        JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
+        jceProviderTestSupport.runWithBouncyCastleProvider(new RunnableTest()
         {
             @Override
             public void runTest() throws Exception
@@ -983,7 +991,8 @@ public class JoseCookbookTest
                 "." +
                 "KnIKEhN8U-3C9s4gtSpjSw";
 
-        runWithBouncyCastleProvider(new RunnableTest()
+        JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
+        jceProviderTestSupport.runWithBouncyCastleProvider(new RunnableTest()
         {
             @Override
             public void runTest() throws Exception

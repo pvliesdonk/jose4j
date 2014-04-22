@@ -16,7 +16,10 @@ public class Aes256GcmContentEncryptionAlgorithmTest
     @Test
     public void testExampleEncryptFromJweAppendix1() throws Exception
     {
-        JceProviderTestSupport.runWithBouncyCastleProvider(new JceProviderTestSupport.RunnableTest()
+        JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
+        jceProviderTestSupport.setDoReinitialize(false);
+
+        jceProviderTestSupport.runWithBouncyCastleProvider(new JceProviderTestSupport.RunnableTest()
         {
             @Override
             public void runTest() throws Exception
@@ -52,7 +55,7 @@ public class Aes256GcmContentEncryptionAlgorithmTest
                 byte[] decrypted = aesGcmContentEncryptionAlg.decrypt(parts, aad, cek, null);
                 assertArrayEquals(plainText, decrypted);
             }
-        }, false);
+        });
 
     }
 }

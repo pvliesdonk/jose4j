@@ -17,6 +17,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.jwa.AlgorithmConstraints;
+import org.jose4j.jwa.JceProviderTestSupport;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
@@ -32,7 +33,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.BLACKLIST;
 import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.WHITELIST;
 import static org.jose4j.jwa.JceProviderTestSupport.RunnableTest;
-import static org.jose4j.jwa.JceProviderTestSupport.runWithBouncyCastleProvider;
 import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256;
 import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.DIRECT;
 import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.RSA1_5;
@@ -93,7 +93,8 @@ public class JsonWebEncryptionTest
     public void jweExampleA1() throws Exception
     {
         // http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-25#appendix-A.1
-        runWithBouncyCastleProvider(new RunnableTest()
+        JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
+        jceProviderTestSupport.runWithBouncyCastleProvider(new RunnableTest()
         {
             @Override
             public void runTest() throws Exception

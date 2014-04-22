@@ -9,17 +9,14 @@ import java.security.Security;
  */
 public class JceProviderTestSupport
 {
-    private static void reinitialize()
+    boolean doReinitialize = true;
+
+    private void reinitialize()
     {
         AlgorithmFactoryFactory.getInstance().reinitialize();
     }
 
-    public static void runWithBouncyCastleProvider(RunnableTest test)  throws Exception
-    {
-        runWithBouncyCastleProvider(test, true);
-    }
-
-    public static void runWithBouncyCastleProvider(RunnableTest test, boolean doReinitialize) throws Exception
+    public void runWithBouncyCastleProvider(RunnableTest test) throws Exception
     {
         BouncyCastleProvider bouncyCastleProvider = new BouncyCastleProvider();
         boolean hasBouncyCastleAlready = Security.getProvider(bouncyCastleProvider.getName()) != null;
@@ -48,6 +45,11 @@ public class JceProviderTestSupport
                 }
             }
         }
+    }
+
+    public void setDoReinitialize(boolean doReinitialize)
+    {
+        this.doReinitialize = doReinitialize;
     }
 
     public static interface RunnableTest
