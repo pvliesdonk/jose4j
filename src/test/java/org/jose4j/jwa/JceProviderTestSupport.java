@@ -1,29 +1,59 @@
 package org.jose4j.jwa;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.jose4j.jwe.ContentEncryptionAlgorithm;
+import org.jose4j.jwe.KeyManagementAlgorithm;
+import org.jose4j.jws.JsonWebSignatureAlgorithm;
 
 import java.security.Security;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
  */
 public class JceProviderTestSupport
 {
-    boolean doReinitialize = true;
+    private boolean doReinitialize = true;
+    private Set<String> signatureAlgs = Collections.emptySet();
+    private Set<String> keyManagementAlgs = Collections.emptySet();
+    private Set<String> encryptionAlgs = Collections.emptySet();
 
     private void reinitialize()
     {
         AlgorithmFactoryFactory.getInstance().reinitialize();
     }
 
-    public void runWithBouncyCastleProvider(RunnableTest test) throws Exception
+    public void runWithBouncyCastleProviderIfNeeded(RunnableTest test) throws Exception
     {
         BouncyCastleProvider bouncyCastleProvider = new BouncyCastleProvider();
-        boolean hasBouncyCastleAlready = Security.getProvider(bouncyCastleProvider.getName()) != null;
+        boolean needBouncyCastle = false;
+
+        AlgorithmFactoryFactory aff = AlgorithmFactoryFactory.getInstance();
+
+        AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory = aff.getJwsAlgorithmFactory();
+        if (!jwsAlgorithmFactory.getSupportedAlgorithms().containsAll(signatureAlgs))
+        {
+            needBouncyCastle = true;
+        }
+
+        AlgorithmFactory<KeyManagementAlgorithm> jweKeyMgmtAlgorithmFactory = aff.getJweKeyManagementAlgorithmFactory();
+        if (!jweKeyMgmtAlgorithmFactory.getSupportedAlgorithms().containsAll(keyManagementAlgs))
+        {
+            needBouncyCastle = true;
+        }
+
+        AlgorithmFactory<ContentEncryptionAlgorithm> jweEncAlgFactory = aff.getJweContentEncryptionAlgorithmFactory();
+        if (!jweEncAlgFactory.getSupportedAlgorithms().containsAll(encryptionAlgs))
+        {
+            needBouncyCastle = true;
+        }
 
         try
         {
-            if (!hasBouncyCastleAlready)
+            if (needBouncyCastle)
             {
                 Security.addProvider(bouncyCastleProvider);
                 if (doReinitialize)
@@ -36,7 +66,7 @@ public class JceProviderTestSupport
         }
         finally
         {
-            if (!hasBouncyCastleAlready)
+            if (needBouncyCastle)
             {
                 Security.removeProvider(bouncyCastleProvider.getName());
                 if (doReinitialize)
@@ -45,6 +75,21 @@ public class JceProviderTestSupport
                 }
             }
         }
+    }
+
+    public void setSignatureAlgsNeeded(String... algs)
+    {
+        signatureAlgs = new HashSet<>(Arrays.asList(algs));
+    }
+
+    public void setKeyManagementAlgsNeeded(String... algs)
+    {
+        keyManagementAlgs = new HashSet<>(Arrays.asList(algs));
+    }
+
+    public void setEncryptionAlgsNeeded(String... algs)
+    {
+        encryptionAlgs = new HashSet<>(Arrays.asList(algs));
     }
 
     public void setDoReinitialize(boolean doReinitialize)

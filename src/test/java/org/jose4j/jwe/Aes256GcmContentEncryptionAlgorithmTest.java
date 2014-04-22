@@ -18,8 +18,9 @@ public class Aes256GcmContentEncryptionAlgorithmTest
     {
         JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
         jceProviderTestSupport.setDoReinitialize(false);
+        jceProviderTestSupport.setEncryptionAlgsNeeded(ContentEncryptionAlgorithmIdentifiers.AES_256_GCM);
 
-        jceProviderTestSupport.runWithBouncyCastleProvider(new JceProviderTestSupport.RunnableTest()
+        jceProviderTestSupport.runWithBouncyCastleProviderIfNeeded(new JceProviderTestSupport.RunnableTest()
         {
             @Override
             public void runTest() throws Exception
