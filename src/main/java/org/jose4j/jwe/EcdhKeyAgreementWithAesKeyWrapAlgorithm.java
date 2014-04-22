@@ -68,8 +68,6 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithm extends AlgorithmInfo imple
         return ecdh.isAvailable() && keyWrap.isAvailable();
     }
 
-    /**
-     */
     public static class EcdhKeyAgreementWithAes128KeyWrapAlgorithm extends EcdhKeyAgreementWithAesKeyWrapAlgorithm implements KeyManagementAlgorithm
     {
         public EcdhKeyAgreementWithAes128KeyWrapAlgorithm()
@@ -78,8 +76,6 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithm extends AlgorithmInfo imple
         }
     }
 
-    /**
-     */
     public static class EcdhKeyAgreementWithAes192KeyWrapAlgorithm extends EcdhKeyAgreementWithAesKeyWrapAlgorithm implements KeyManagementAlgorithm
     {
         public EcdhKeyAgreementWithAes192KeyWrapAlgorithm()
@@ -88,8 +84,6 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithm extends AlgorithmInfo imple
         }
     }
 
-    /**
-     */
     public static class EcdhKeyAgreementWithAes256KeyWrapAlgorithm extends EcdhKeyAgreementWithAesKeyWrapAlgorithm implements KeyManagementAlgorithm
     {
         public EcdhKeyAgreementWithAes256KeyWrapAlgorithm()

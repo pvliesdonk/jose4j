@@ -65,8 +65,6 @@ public class AesGcmContentEncryptionAlgorithm extends AlgorithmInfo implements C
         return simpleAeadCipher.isAvailable(log, keyByteLength, IV_BYTE_LENGTH, getAlgorithmIdentifier());
     }
 
-    /**
-     */
     public static class Aes256Gcm extends AesGcmContentEncryptionAlgorithm
     {
         public Aes256Gcm()
@@ -75,9 +73,6 @@ public class AesGcmContentEncryptionAlgorithm extends AlgorithmInfo implements C
         }
     }
 
-    /**
-     *
-     */
     public static class Aes192Gcm extends AesGcmContentEncryptionAlgorithm
     {
         public Aes192Gcm()
@@ -86,9 +81,6 @@ public class AesGcmContentEncryptionAlgorithm extends AlgorithmInfo implements C
         }
     }
 
-    /**
-     *
-     */
     public static class Aes128Gcm extends AesGcmContentEncryptionAlgorithm
     {
         public Aes128Gcm()

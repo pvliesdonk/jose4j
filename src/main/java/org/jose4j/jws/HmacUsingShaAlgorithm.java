@@ -88,8 +88,6 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
         return AlgorithmAvailability.isAvailable("Mac", getJavaAlgorithm());
     }
 
-    /**
-     */
     public static class HmacSha256 extends HmacUsingShaAlgorithm
     {
         public HmacSha256()
@@ -98,8 +96,6 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
         }
     }
 
-    /**
-     */
     public static class HmacSha384 extends HmacUsingShaAlgorithm
     {
         public HmacSha384()
@@ -108,8 +104,6 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
         }
     }
 
-    /**
-     */
     public static class HmacSha512 extends HmacUsingShaAlgorithm
     {
         public HmacSha512()

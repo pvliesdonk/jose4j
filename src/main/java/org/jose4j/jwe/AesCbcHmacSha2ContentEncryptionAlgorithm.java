@@ -182,8 +182,6 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         return CipherStrengthSupport.isAvailable(getJavaAlgorithm(), aesByteKeyLength);
     }
 
-    /**
-     */
     public static class Aes128CbcHmacSha256
             extends AesCbcHmacSha2ContentEncryptionAlgorithm
             implements ContentEncryptionAlgorithm
@@ -196,8 +194,6 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         }
     }
 
-    /**
-     */
     public static class Aes192CbcHmacSha384
             extends AesCbcHmacSha2ContentEncryptionAlgorithm
             implements ContentEncryptionAlgorithm
@@ -210,8 +206,6 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         }
     }
 
-    /**
-     */
     public static class Aes256CbcHmacSha512
             extends AesCbcHmacSha2ContentEncryptionAlgorithm
             implements ContentEncryptionAlgorithm

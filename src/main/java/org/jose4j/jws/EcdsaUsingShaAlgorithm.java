@@ -235,8 +235,6 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
         return curveName;
     }
 
-    /**
-     */
     public static class EcdsaP256UsingSha256 extends EcdsaUsingShaAlgorithm
     {
         public EcdsaP256UsingSha256()
@@ -245,8 +243,6 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
         }
     }
 
-    /**
-     */
     public static class EcdsaP384UsingSha384 extends EcdsaUsingShaAlgorithm
     {
         public EcdsaP384UsingSha384()
@@ -255,8 +251,6 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
         }
     }
 
-    /**
-     */
     public static class EcdsaP521UsingSha512 extends EcdsaUsingShaAlgorithm
     {
         public EcdsaP521UsingSha512()

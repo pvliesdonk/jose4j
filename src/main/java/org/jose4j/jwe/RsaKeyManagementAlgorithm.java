@@ -40,8 +40,6 @@ public class RsaKeyManagementAlgorithm extends WrappingKeyManagementAlgorithm im
         return true; // todo maybe check about RSA though it's probably always there...
     }
 
-    /**
-     */
     public static class RsaOaep extends RsaKeyManagementAlgorithm implements KeyManagementAlgorithm
     {
         public RsaOaep()
@@ -50,8 +48,6 @@ public class RsaKeyManagementAlgorithm extends WrappingKeyManagementAlgorithm im
         }
     }
 
-    /**
-     */
     public static class Rsa1_5 extends RsaKeyManagementAlgorithm implements KeyManagementAlgorithm
     {
         public Rsa1_5()
