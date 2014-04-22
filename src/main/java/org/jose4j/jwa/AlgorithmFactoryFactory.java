@@ -50,7 +50,10 @@ public class AlgorithmFactoryFactory
 
     private void initialize()
     {
-        log.info("Initializing jose4j...");
+        String version = System.getProperty("java.version");
+        String vendor = System.getProperty("java.vendor");
+        String home = System.getProperty("java.home");
+        log.info("Initializing jose4j (running with Java "+version+" from "+vendor+" at "+home+")...");
         long startTime = System.currentTimeMillis();
         jwsAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ALGORITHM, JsonWebSignatureAlgorithm.class);
         jwsAlgorithmFactory.registerAlgorithm(new PlaintextNoneAlgorithm());
