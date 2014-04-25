@@ -25,20 +25,26 @@ import org.jose4j.jwk.JsonWebKeySet;
 import org.jose4j.jwk.Use;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleEcKeysFromJws;
+import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
+import org.junit.Test;
 
+import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Arrays;
 
 /**
  * There's probably a better way to do this but this is intended as a place to write and try and maintain
  * example code for the project wiki at https://bitbucket.org/b_c/jose4j/wiki/Home
  */
-public class ExamplesTest extends TestCase
+public class ExamplesTest
 {
 
-public void testJwsSigningExample() throws JoseException
+@Test
+public void jwsSigningExample() throws JoseException
 {
     //
     // An example of signing using JSON Web Signature (JWS)
@@ -71,7 +77,8 @@ public void testJwsSigningExample() throws JoseException
     System.out.println(jwsCompactSerialization);
 }
 
-public void testJwsVerificationExample() throws JoseException
+@Test
+public void jwsVerificationExample() throws JoseException
 {
     //
     // An example of signature verification using JSON Web Signature (JWS)
@@ -108,7 +115,8 @@ public void testJwsVerificationExample() throws JoseException
     System.out.println("JWS payload: " + payload);
 }
 
-public void testParseJwksAndVerifyJwsExample() throws JoseException
+@Test
+public void parseJwksAndVerifyJwsExample() throws JoseException
 {
     //
     // An example of signature verification using JSON Web Signature (JWS)
@@ -171,8 +179,8 @@ public void testParseJwksAndVerifyJwsExample() throws JoseException
     System.out.println("JWS payload: " + payload);
 }
 
-
-public void testJweRoundTripExample() throws JoseException
+@Test
+public void jweRoundTripExample() throws JoseException
 {
     //
     // An example showing the use of JSON Web Encryption (JWE) to encrypt and then decrypt some content
@@ -236,4 +244,20 @@ public void testJweRoundTripExample() throws JoseException
     System.out.println("plaintext: " + plaintext);
 }
 
+@Test
+public void helloWorld() throws JoseException
+{
+Key key = new AesKey(ByteUtil.randomBytes(16));
+JsonWebEncryption jwe = new JsonWebEncryption();
+jwe.setPayload("Hello World!");
+jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.A128KW);
+jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+jwe.setKey(key);
+String serializedJwe = jwe.getCompactSerialization();
+System.out.println("Serialized Encrypted JWE: " + serializedJwe);
+jwe = new JsonWebEncryption();
+jwe.setKey(key);
+jwe.setCompactSerialization(serializedJwe);
+System.out.println("Payload: " + jwe.getPayload());
+}
 }
