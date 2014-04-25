@@ -55,18 +55,6 @@ public class JwsPlaintextTest
     }
 
     @Test
-    public void testADecode() throws JoseException
-    {
-        String cs = "eyJhbGciOiJub25lIn0.eyJhdXRoX3RpbWUiOjEzMzk2MTMyNDgsImV4cCI6MTMzOTYxMzU0OCwiaXNzIjoiaHR0cHM6XC9cL2V4YW1wbGUuY29tIiwiYXVkIjoiYSIsImp0aSI6ImpJQThxYTM1QXJvVjZpUDJxNHdSQWwiLCJ1c2VyX2lkIjoiam9obiIsImlhdCI6MTMzOTYxMzI0OCwiYWNyIjozfQ.";
-        JsonWebSignature jws = new JsonWebSignature();
-        jws.setAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS);
-        jws.setCompactSerialization(cs);
-        assertTrue(jws.verifySignature());
-        String payload = jws.getPayload();
-        log.debug(payload);
-    }
-
-    @Test
     public void testExampleEncode() throws JoseException
     {
         JsonWebSignature jws = new JsonWebSignature();
@@ -113,5 +101,17 @@ public class JwsPlaintextTest
         jws.setAlgorithmConstraints(new AlgorithmConstraints(WHITELIST, NONE));
         jws.setCompactSerialization(JWS);
         assertThat(jws.verifySignature(), is(true));
+    }
+
+    @Test
+    public void testADecode() throws JoseException
+    {
+        String cs = "eyJhbGciOiJub25lIn0.eyJhdXRoX3RpbWUiOjEzMzk2MTMyNDgsImV4cCI6MTMzOTYxMzU0OCwiaXNzIjoiaHR0cHM6XC9cL2V4YW1wbGUuY29tIiwiYXVkIjoiYSIsImp0aSI6ImpJQThxYTM1QXJvVjZpUDJxNHdSQWwiLCJ1c2VyX2lkIjoiam9obiIsImlhdCI6MTMzOTYxMzI0OCwiYWNyIjozfQ.";
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS);
+        jws.setCompactSerialization(cs);
+        assertTrue(jws.verifySignature());
+        String payload = jws.getPayload();
+        log.debug(payload);
     }
 }
