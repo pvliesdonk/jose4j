@@ -23,7 +23,7 @@ import java.util.Random;
  */
 public class DefaultByteGenerator implements ByteGenerator
 {
-    private final Random random;
+    private final SecureRandom random;
 
     public DefaultByteGenerator()
     {
