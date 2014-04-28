@@ -23,17 +23,25 @@ import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 
 import java.security.*;
+import java.security.spec.AlgorithmParameterSpec;
 
 /**
  */
 public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements JsonWebSignatureAlgorithm
 {
+    private AlgorithmParameterSpec algorithmParameterSpec;
+
     public BaseSignatureAlgorithm(String id, String javaAlgo, String keyAlgo)
     {
         setAlgorithmIdentifier(id);
         setJavaAlgorithm(javaAlgo);
         setKeyPersuasion(KeyPersuasion.ASYMMETRIC);
         setKeyType(keyAlgo);
+    }
+
+    protected void setAlgorithmParameterSpec(AlgorithmParameterSpec algorithmParameterSpec)
+    {
+        this.algorithmParameterSpec = algorithmParameterSpec;
     }
 
     public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException
@@ -100,14 +108,26 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
 
     private Signature getSignature() throws JoseException
     {
+
         try
         {
-            return Signature.getInstance(getJavaAlgorithm());
+            Signature signature = Signature.getInstance(getJavaAlgorithm());
+            if (algorithmParameterSpec != null)
+            {
+                signature.setParameter(algorithmParameterSpec);
+            }
+            return signature;
         }
         catch (NoSuchAlgorithmException e)
         {
             throw new JoseException("Unable to get an implementation of algorithm name: " + getJavaAlgorithm(), e);
         }
+        catch (InvalidAlgorithmParameterException e)
+        {
+            throw new JoseException("Invalid algorithm parameter ("+algorithmParameterSpec+") for: " + getJavaAlgorithm(), e);
+        }
+
+
     }
 
     public abstract void validatePrivateKey(PrivateKey privateKey) throws InvalidKeyException;
