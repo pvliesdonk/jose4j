@@ -16,6 +16,9 @@
 
 package com.notsure;
 
+import java.security.Provider;
+import java.security.Security;
+
 /**
  * Just a sandbox for messing with stuff
  */
@@ -23,6 +26,23 @@ public class App
 {
     public static void main(String... meh) throws Exception
     {
-
+        dumpProviderInfo();
     }
+
+    public static void dumpProviderInfo()
+    {
+        String version = System.getProperty("java.version");
+        String vendor = System.getProperty("java.vendor");
+        String home = System.getProperty("java.home");
+        System.out.println("Java "+version+" from "+vendor+" at "+home+"");
+        for (Provider provider : Security.getProviders())
+        {
+            System.out.println("Provider: " + provider.getName());
+            for (Provider.Service service : provider.getServices())
+            {
+                System.out.println(" -> Algorithm: " + service.getAlgorithm());
+            }
+        }
+    }
+
 }
