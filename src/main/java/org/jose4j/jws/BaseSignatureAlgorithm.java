@@ -16,7 +16,6 @@
 
 package org.jose4j.jws;
 
-import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.InvalidKeyException;
@@ -126,8 +125,6 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
         {
             throw new JoseException("Invalid algorithm parameter ("+algorithmParameterSpec+") for: " + getJavaAlgorithm(), e);
         }
-
-
     }
 
     public abstract void validatePrivateKey(PrivateKey privateKey) throws InvalidKeyException;
@@ -175,6 +172,17 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
     @Override
     public boolean isAvailable()
     {
-        return AlgorithmAvailability.isAvailable("Signature", getJavaAlgorithm());
+        try
+        {
+            Signature signature = getSignature();
+            return signature != null;
+        }
+        catch (JoseException e)
+        {
+            log.debug(getAlgorithmIdentifier() + " vai " + getJavaAlgorithm() +
+                    " is NOT available from the underlying JCE (" + e + ").");
+            return false;
+
+        }
     }
 }
