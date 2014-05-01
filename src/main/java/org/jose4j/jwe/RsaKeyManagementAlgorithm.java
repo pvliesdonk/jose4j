@@ -4,6 +4,7 @@ import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.InvalidKeyException;
+import org.jose4j.lang.JoseException;
 
 import java.security.Key;
 import java.security.interfaces.RSAPrivateKey;
@@ -37,7 +38,14 @@ public class RsaKeyManagementAlgorithm extends WrappingKeyManagementAlgorithm im
     @Override
     public boolean isAvailable()
     {
-        return true; // todo maybe check about RSA though it's probably always there...
+        try
+        {
+             return CipherUtil.getCipher(getJavaAlgorithm()) != null;
+        }
+        catch (JoseException e)
+        {
+            return false;
+        }
     }
 
     public static class RsaOaep extends RsaKeyManagementAlgorithm implements KeyManagementAlgorithm
@@ -45,6 +53,15 @@ public class RsaKeyManagementAlgorithm extends WrappingKeyManagementAlgorithm im
         public RsaOaep()
         {
             super("RSA/ECB/OAEPWithSHA-1AndMGF1Padding", KeyManagementAlgorithmIdentifiers.RSA_OAEP);
+        }
+    }
+
+    public static class RsaOaep256 extends RsaKeyManagementAlgorithm implements KeyManagementAlgorithm
+    {
+        public RsaOaep256()
+        {
+            // don't know if OAEPParameterSpec is needed...
+            super("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", KeyManagementAlgorithmIdentifiers.RSA_OAEP_256);
         }
     }
 
