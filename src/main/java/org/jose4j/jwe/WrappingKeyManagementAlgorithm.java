@@ -19,7 +19,7 @@ import java.security.spec.AlgorithmParameterSpec;
  */
 public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo implements KeyManagementAlgorithm
 {
-    private final Log log = LogFactory.getLog(this.getClass());
+    protected final Log log = LogFactory.getLog(this.getClass());
 
     private AlgorithmParameterSpec algorithmParameterSpec;
 

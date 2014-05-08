@@ -5,6 +5,7 @@ import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.KeyPersuasion;
+import org.jose4j.lang.ExceptionHelp;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 
@@ -95,7 +96,7 @@ public class RsaKeyManagementAlgorithm extends WrappingKeyManagementAlgorithm im
             }
             catch (JoseException e)
             {
-                // TODO some kind of something to the logs
+                log.debug(getAlgorithmIdentifier() + " is not available due to " + ExceptionHelp.toStringWithCauses(e));
                 return false;
             }
         }
