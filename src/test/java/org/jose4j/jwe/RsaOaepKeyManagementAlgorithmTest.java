@@ -91,7 +91,6 @@ public class RsaOaepKeyManagementAlgorithmTest extends TestCase
                         "\"qi\":\"vy7XCwZ3jyMGik81TIZDAOQKC8FVUc0TG5KVYfti4tgwzUqFwtuB8Oc1ctCKRbE7uZUPwZh4OsCTLqIvqBQda_kaxOx" +
                         "o5EF7iXj6yHmZ2s8P_Z_u3JLuh-oAT_6kmbLx6CAO0DbtKtxp24Ivc1hDfqSwWORgN1AOrSRCmE3nwxg\"}";
                 RsaJsonWebKey jwk = (RsaJsonWebKey) PublicJsonWebKey.Factory.newPublicJwk(jwkJson);
-                System.out.println(jwk.toJson(JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE));
                 JsonWebEncryption jwe = new JsonWebEncryption();
                 jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.RSA_OAEP_256);
                 jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
@@ -99,12 +98,10 @@ public class RsaOaepKeyManagementAlgorithmTest extends TestCase
                 String payloadIn = "Well, as of this moment, they're on DOUBLE SECRET PROBATION!";
                 jwe.setPayload(payloadIn);
                 String compactSerialization = jwe.getCompactSerialization();
-                System.out.println(compactSerialization);
                 jwe = new JsonWebEncryption();
                 jwe.setCompactSerialization(compactSerialization);
                 jwe.setKey(jwk.getPrivateKey());
                 String payloadOut = jwe.getPayload();
-                System.out.println(payloadOut);
                 assertEquals(payloadIn, payloadOut);
             }
         });
