@@ -10,8 +10,10 @@ import org.jose4j.lang.JoseException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.spec.AlgorithmParameterSpec;
 
 /**
  */
@@ -19,10 +21,17 @@ public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo imple
 {
     private final Log log = LogFactory.getLog(this.getClass());
 
+    private AlgorithmParameterSpec algorithmParameterSpec;
+
     public WrappingKeyManagementAlgorithm(String javaAlg, String alg)
     {
         setJavaAlgorithm(javaAlg);
         setAlgorithmIdentifier(alg);
+    }
+
+    public void setAlgorithmParameterSpec(AlgorithmParameterSpec algorithmParameterSpec)
+    {
+        this.algorithmParameterSpec = algorithmParameterSpec;
     }
 
     public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride) throws JoseException
@@ -37,14 +46,26 @@ public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo imple
 
         try
         {
-            cipher.init(Cipher.WRAP_MODE, managementKey);
+            initCipher(cipher, Cipher.WRAP_MODE, managementKey);
             String contentEncryptionKeyAlgorithm = cekDesc.getContentEncryptionKeyAlgorithm();
             byte[] encryptedKey = cipher.wrap(new SecretKeySpec(contentEncryptionKey, contentEncryptionKeyAlgorithm));
             return new ContentEncryptionKeys(contentEncryptionKey, encryptedKey);
         }
-        catch (IllegalBlockSizeException | InvalidKeyException e)
+        catch (IllegalBlockSizeException | InvalidKeyException | InvalidAlgorithmParameterException e)
         {
             throw new JoseException("Unable to encrypt the Content Encryption Key: " + e, e);
+        }
+    }
+
+    void initCipher(Cipher cipher, int mode, Key key) throws InvalidAlgorithmParameterException, InvalidKeyException
+    {
+        if (algorithmParameterSpec == null)
+        {
+            cipher.init(mode, key);
+        }
+        else
+        {
+            cipher.init(mode, key, algorithmParameterSpec);
         }
     }
 
@@ -54,9 +75,9 @@ public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo imple
 
         try
         {
-            cipher.init(Cipher.UNWRAP_MODE, managementKey);
+            initCipher(cipher, Cipher.UNWRAP_MODE, managementKey);
         }
-        catch (InvalidKeyException e)
+        catch (InvalidKeyException | InvalidAlgorithmParameterException e)
         {
             throw new JoseException("Unable to initialize cipher for key decryption", e);
         }
