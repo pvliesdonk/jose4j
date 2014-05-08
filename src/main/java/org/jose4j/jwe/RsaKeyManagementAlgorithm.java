@@ -1,14 +1,19 @@
 package org.jose4j.jwe;
 
+import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jwx.KeyValidationSupport;
+import org.jose4j.keys.AesKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
 import java.security.Key;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.MGF1ParameterSpec;
 
 /**
  */
@@ -60,8 +65,39 @@ public class RsaKeyManagementAlgorithm extends WrappingKeyManagementAlgorithm im
     {
         public RsaOaep256()
         {
-            // don't know if OAEPParameterSpec is needed...
             super("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", KeyManagementAlgorithmIdentifiers.RSA_OAEP_256);
+            setAlgorithmParameterSpec(new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, PSource.PSpecified.DEFAULT));
+        }
+
+        @Override
+        public boolean isAvailable()
+        {
+            // The Sun/Oracle provider in Java 7 apparently has a defect and can’t do MGF1 with SHA-256
+            // . An exception like "java.security.InvalidKeyException: Wrapping failed … caused by
+            // javax.crypto.BadPaddingException: java.security.DigestException: Length must be at least 32 for SHA-256digests”
+            // is thrown from the wrap method on the “RSA/ECB/OAEPWithSHA-256AndMGF1Padding” Cipher initialized with an
+            // OAEPParameterSpec using MGF1ParameterSpec.SHA256. So actually trying it to see if it works seems like
+            // the most reliable way to check for availability. Which isn’t real pretty. But hey.
+            try
+            {
+                JsonWebKey jwk = JsonWebKey.Factory.newJwk(
+                    "{\"kty\":\"RSA\"," +
+                    "\"n\":\"sXchDaQebHnPiGvyDOAT4saGEUetSyo9MKLOoWFsueri23bOdgWp4Dy1Wl" +
+                    "UzewbgBHod5pcM9H95GQRV3JDXboIRROSBigeC5yjU1hGzHHyXss8UDpre" +
+                    "cbAYxknTcQkhslANGRUZmdTOQ5qTRsLAt6BTYuyvVRdhS8exSZEy_c4gs_" +
+                    "7svlJJQ4H9_NxsiIoLwAEk7-Q3UXERGYw_75IDrGA84-lA_-Ct4eTlXHBI" +
+                    "Y2EaV7t7LjJaynVJCpkv4LKjTTAumiGUIuQhrNhZLuF_RJLqHpM2kgWFLU" +
+                    "7-VTdL1VbC2tejvcI2BlMkEpk1BzBZI0KQB0GaDWFLN-aEAw3vRw\"," +
+                    "\"e\":\"AQAB\"}");
+                ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(16, AesKey.ALGORITHM);
+                ContentEncryptionKeys contentEncryptionKeys = manageForEncrypt(jwk.getKey(), cekDesc, null, null);
+                return contentEncryptionKeys != null;
+            }
+            catch (JoseException e)
+            {
+                // TODO some kind of something to the logs
+                return false;
+            }
         }
     }
 
