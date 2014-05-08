@@ -51,11 +51,13 @@ public class JceProviderTestSupport
             needBouncyCastle = true;
         }
 
+        boolean removeBouncyCastle = true;
         try
         {
             if (needBouncyCastle)
             {
-                Security.addProvider(bouncyCastleProvider);
+                int position = Security.insertProviderAt(bouncyCastleProvider, 1);
+                removeBouncyCastle = (position != -1);
                 if (doReinitialize)
                 {
                     reinitialize();
@@ -68,7 +70,11 @@ public class JceProviderTestSupport
         {
             if (needBouncyCastle)
             {
-                Security.removeProvider(bouncyCastleProvider.getName());
+                if (removeBouncyCastle)
+                {
+                    Security.removeProvider(bouncyCastleProvider.getName());
+                }
+
                 if (doReinitialize)
                 {
                     reinitialize();
