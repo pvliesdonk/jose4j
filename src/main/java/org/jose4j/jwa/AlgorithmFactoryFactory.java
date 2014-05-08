@@ -24,6 +24,9 @@ import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.zip.CompressionAlgorithm;
 import org.jose4j.zip.DeflateRFC1951CompressionAlgorithm;
 
+import java.security.Security;
+import java.util.Arrays;
+
 /**
  */
 public class AlgorithmFactoryFactory
@@ -53,7 +56,8 @@ public class AlgorithmFactoryFactory
         String version = System.getProperty("java.version");
         String vendor = System.getProperty("java.vendor");
         String home = System.getProperty("java.home");
-        log.info("Initializing jose4j (running with Java "+version+" from "+vendor+" at "+home+")...");
+        String providers = Arrays.toString(Security.getProviders());
+        log.info("Initializing jose4j (running with Java "+version+" from "+vendor+" at "+home+" with " + providers + " security providers installed)...");
         long startTime = System.currentTimeMillis();
         jwsAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ALGORITHM, JsonWebSignatureAlgorithm.class);
         jwsAlgorithmFactory.registerAlgorithm(new PlaintextNoneAlgorithm());
