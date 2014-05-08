@@ -18,6 +18,7 @@ package org.jose4j.jwe;
 import org.apache.commons.logging.Log;
 import org.jose4j.keys.AesKey;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.ExceptionHelp;
 import org.jose4j.lang.JoseException;
 
 import javax.crypto.BadPaddingException;
@@ -131,7 +132,7 @@ public class SimpleAeadCipher
             }
             catch (JoseException e)
             {
-                log.debug(joseAlg + " is not available (" + e + ").");
+                log.debug(joseAlg + " is not available (" + ExceptionHelp.toStringWithCauses(e) + ").");
             }
         }
         return isAvailable;
