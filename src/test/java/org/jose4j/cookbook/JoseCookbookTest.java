@@ -252,19 +252,19 @@ public class JoseCookbookTest
 
                 String cs =
                         "eyJhbGciOiJQUzM4NCIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZX" +
-                                "hhbXBsZSJ9" +
-                                "." +
-                                "SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IH" +
-                                "lvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBk" +
-                                "b24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcm" +
-                                "UgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4" +
-                                "." +
-                                "cu22eBqkYDKgIlTpzDXGvaFfz6WGoz7fUDcfT0kkOy42miAh2qyBzk1xEsnk2I" +
-                                "pN6-tPid6VrklHkqsGqDqHCdP6O8TTB5dDDItllVo6_1OLPpcbUrhiUSMxbbXU" +
-                                "vdvWXzg-UD8biiReQFlfz28zGWVsdiNAUf8ZnyPEgVFn442ZdNqiVJRmBqrYRX" +
-                                "e8P_ijQ7p8Vdz0TTrxUeT3lm8d9shnr2lfJT8ImUjvAA2Xez2Mlp8cBE5awDzT" +
-                                "0qI0n6uiP1aCN_2_jLAeQTlqRHtfa64QQSUmFAAjVKPbByi7xho0uTOcbH510a" +
-                                "6GYmJUAfmWjwZ6oD4ifKo8DYM-X72Eaw";
+                        "hhbXBsZSJ9" +
+                        "." +
+                        "SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IH" +
+                        "lvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBk" +
+                        "b24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcm" +
+                        "UgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4" +
+                        "." +
+                        "cu22eBqkYDKgIlTpzDXGvaFfz6WGoz7fUDcfT0kkOy42miAh2qyBzk1xEsnk2I" +
+                        "pN6-tPid6VrklHkqsGqDqHCdP6O8TTB5dDDItllVo6_1OLPpcbUrhiUSMxbbXU" +
+                        "vdvWXzg-UD8biiReQFlfz28zGWVsdiNAUf8ZnyPEgVFn442ZdNqiVJRmBqrYRX" +
+                        "e8P_ijQ7p8Vdz0TTrxUeT3lm8d9shnr2lfJT8ImUjvAA2Xez2Mlp8cBE5awDzT" +
+                        "0qI0n6uiP1aCN_2_jLAeQTlqRHtfa64QQSUmFAAjVKPbByi7xho0uTOcbH510a" +
+                        "6GYmJUAfmWjwZ6oD4ifKo8DYM-X72Eaw";
 
                 JsonWebSignature jws = new JsonWebSignature();
                 jws.setCompactSerialization(cs);
@@ -529,31 +529,31 @@ public class JoseCookbookTest
 
                 String jweCompactSerialization =
                         "eyJhbGciOiJSU0EtT0FFUCIsImtpZCI6InNhbXdpc2UuZ2FtZ2VlQGhvYmJpdG" +
-                                "9uLmV4YW1wbGUiLCJlbmMiOiJBMjU2R0NNIn0" +
-                                "." +
-                                "rT99rwrBTbTI7IJM8fU3Eli7226HEB7IchCxNuh7lCiud48LxeolRdtFF4nzQi" +
-                                "beYOl5S_PJsAXZwSXtDePz9hk-BbtsTBqC2UsPOdwjC9NhNupNNu9uHIVftDyu" +
-                                "cvI6hvALeZ6OGnhNV4v1zx2k7O1D89mAzfw-_kT3tkuorpDU-CpBENfIHX1Q58" +
-                                "-Aad3FzMuo3Fn9buEP2yXakLXYa15BUXQsupM4A1GD4_H4Bd7V3u9h8Gkg8Bpx" +
-                                "KdUV9ScfJQTcYm6eJEBz3aSwIaK4T3-dwWpuBOhROQXBosJzS1asnuHtVMt2pK" +
-                                "IIfux5BC6huIvmY7kzV7W7aIUrpYm_3H4zYvyMeq5pGqFmW2k8zpO878TRlZx7" +
-                                "pZfPYDSXZyS0CfKKkMozT_qiCwZTSz4duYnt8hS4Z9sGthXn9uDqd6wycMagnQ" +
-                                "fOTs_lycTWmY-aqWVDKhjYNRf03NiwRtb5BE-tOdFwCASQj3uuAgPGrO2AWBe3" +
-                                "8UjQb0lvXn1SpyvYZ3WFc7WOJYaTa7A8DRn6MC6T-xDmMuxC0G7S2rscw5lQQU" +
-                                "06MvZTlFOt0UvfuKBa03cxA_nIBIhLMjY2kOTxQMmpDPTr6Cbo8aKaOnx6ASE5" +
-                                "Jx9paBpnNmOOKH35j_QlrQhDWUN6A2Gg8iFayJ69xDEdHAVCGRzN3woEI2ozDR" +
-                                "s" +
-                                "." +
-                                "-nBoKLH0YkLZPSI9" +
-                                "." +
-                                "o4k2cnGN8rSSw3IDo1YuySkqeS_t2m1GXklSgqBdpACm6UJuJowOHC5ytjqYgR" +
-                                "L-I-soPlwqMUf4UgRWWeaOGNw6vGW-xyM01lTYxrXfVzIIaRdhYtEMRBvBWbEw" +
-                                "P7ua1DRfvaOjgZv6Ifa3brcAM64d8p5lhhNcizPersuhw5f-pGYzseva-TUaL8" +
-                                "iWnctc-sSwy7SQmRkfhDjwbz0fz6kFovEgj64X1I5s7E6GLp5fnbYGLa1QUiML" +
-                                "7Cc2GxgvI7zqWo0YIEc7aCflLG1-8BboVWFdZKLK9vNoycrYHumwzKluLWEbSV" +
-                                "maPpOslY2n525DxDfWaVFUfKQxMF56vn4B9QMpWAbnypNimbM8zVOw" +
-                                "." +
-                                "UCGiqJxhBI3IFVdPalHHvA";
+                        "9uLmV4YW1wbGUiLCJlbmMiOiJBMjU2R0NNIn0" +
+                        "." +
+                        "rT99rwrBTbTI7IJM8fU3Eli7226HEB7IchCxNuh7lCiud48LxeolRdtFF4nzQi" +
+                        "beYOl5S_PJsAXZwSXtDePz9hk-BbtsTBqC2UsPOdwjC9NhNupNNu9uHIVftDyu" +
+                        "cvI6hvALeZ6OGnhNV4v1zx2k7O1D89mAzfw-_kT3tkuorpDU-CpBENfIHX1Q58" +
+                        "-Aad3FzMuo3Fn9buEP2yXakLXYa15BUXQsupM4A1GD4_H4Bd7V3u9h8Gkg8Bpx" +
+                        "KdUV9ScfJQTcYm6eJEBz3aSwIaK4T3-dwWpuBOhROQXBosJzS1asnuHtVMt2pK" +
+                        "IIfux5BC6huIvmY7kzV7W7aIUrpYm_3H4zYvyMeq5pGqFmW2k8zpO878TRlZx7" +
+                        "pZfPYDSXZyS0CfKKkMozT_qiCwZTSz4duYnt8hS4Z9sGthXn9uDqd6wycMagnQ" +
+                        "fOTs_lycTWmY-aqWVDKhjYNRf03NiwRtb5BE-tOdFwCASQj3uuAgPGrO2AWBe3" +
+                        "8UjQb0lvXn1SpyvYZ3WFc7WOJYaTa7A8DRn6MC6T-xDmMuxC0G7S2rscw5lQQU" +
+                        "06MvZTlFOt0UvfuKBa03cxA_nIBIhLMjY2kOTxQMmpDPTr6Cbo8aKaOnx6ASE5" +
+                        "Jx9paBpnNmOOKH35j_QlrQhDWUN6A2Gg8iFayJ69xDEdHAVCGRzN3woEI2ozDR" +
+                        "s" +
+                        "." +
+                        "-nBoKLH0YkLZPSI9" +
+                        "." +
+                        "o4k2cnGN8rSSw3IDo1YuySkqeS_t2m1GXklSgqBdpACm6UJuJowOHC5ytjqYgR" +
+                        "L-I-soPlwqMUf4UgRWWeaOGNw6vGW-xyM01lTYxrXfVzIIaRdhYtEMRBvBWbEw" +
+                        "P7ua1DRfvaOjgZv6Ifa3brcAM64d8p5lhhNcizPersuhw5f-pGYzseva-TUaL8" +
+                        "iWnctc-sSwy7SQmRkfhDjwbz0fz6kFovEgj64X1I5s7E6GLp5fnbYGLa1QUiML" +
+                        "7Cc2GxgvI7zqWo0YIEc7aCflLG1-8BboVWFdZKLK9vNoycrYHumwzKluLWEbSV" +
+                        "maPpOslY2n525DxDfWaVFUfKQxMF56vn4B9QMpWAbnypNimbM8zVOw" +
+                        "." +
+                        "UCGiqJxhBI3IFVdPalHHvA";
 
                 PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(figure62RsaJwkJsonString);
 
@@ -649,43 +649,42 @@ public class JoseCookbookTest
             {
                 String jwkJsonString =
                         "{\n" +
-                                "  \"kty\": \"EC\",\n" +
-                                "  \"kid\": \"peregrin.took@tuckborough.example\",\n" +
-                                "  \"use\": \"enc\",\n" +
-                                "  \"crv\": \"P-384\",\n" +
-                                "  \"x\": \"YU4rRUzdmVqmRtWOs2OpDE_T5fsNIodcG8G5FWPrTPMyxpzsSOGaQL\n" +
-                                "      pe2FpxBmu2\",\n" +
-                                "  \"y\": \"A8-yxCHxkfBz3hKZfI1jUYMjUhsEveZ9THuwFjH2sCNdtksRJU7D5-\n" +
-                                "      SkgaFL1ETP\",\n" +
-                                "  \"d\": \"iTx2pk7wW-GqJkHcEkFQb2EFyYcO7RugmaW3mRrQVAOUiPommT0Idn\n" +
-                                "      YK2xDlZh-j\"\n" +
-                                "}";
+                        "  \"kty\": \"EC\",\n" +
+                        "  \"kid\": \"peregrin.took@tuckborough.example\",\n" +
+                        "  \"use\": \"enc\",\n" +
+                        "  \"crv\": \"P-384\",\n" +
+                        "  \"x\": \"YU4rRUzdmVqmRtWOs2OpDE_T5fsNIodcG8G5FWPrTPMyxpzsSOGaQL\n" +
+                        "      pe2FpxBmu2\",\n" +
+                        "  \"y\": \"A8-yxCHxkfBz3hKZfI1jUYMjUhsEveZ9THuwFjH2sCNdtksRJU7D5-\n" +
+                        "      SkgaFL1ETP\",\n" +
+                        "  \"d\": \"iTx2pk7wW-GqJkHcEkFQb2EFyYcO7RugmaW3mRrQVAOUiPommT0Idn\n" +
+                        "      YK2xDlZh-j\"\n" +
+                        "}";
 
 
                 String jweCompactSerialization =
                         "eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImtpZCI6InBlcmVncmluLnRvb2tAdH" +
-                                "Vja2Jvcm91Z2guZXhhbXBsZSIsImVwayI6eyJrdHkiOiJFQyIsImNydiI6IlAt" +
-                                "Mzg0IiwieCI6InVCbzRrSFB3Nmtiang1bDB4b3dyZF9vWXpCbWF6LUdLRlp1NH" +
-                                "hBRkZrYllpV2d1dEVLNml1RURzUTZ3TmROZzMiLCJ5Ijoic3AzcDVTR2haVkMy" +
-                                "ZmFYdW1JLWU5SlUyTW84S3BvWXJGRHI1eVBOVnRXNFBnRXdaT3lRVEEtSmRhWT" +
-                                "h0YjdFMCJ9LCJlbmMiOiJBMTI4R0NNIn0" +
-                                "." +
-                                "0DJjBXri_kBcC46IkU5_Jk9BqaQeHdv2" +
-                                "." +
-                                "mH-G2zVqgztUtnW_" +
-                                "." +
-                                "tkZuOO9h95OgHJmkkrfLBisku8rGf6nzVxhRM3sVOhXgz5NJ76oID7lpnAi_cP" +
-                                "WJRCjSpAaUZ5dOR3Spy7QuEkmKx8-3RCMhSYMzsXaEwDdXta9Mn5B7cCBoJKB0" +
-                                "IgEnj_qfo1hIi-uEkUpOZ8aLTZGHfpl05jMwbKkTe2yK3mjF6SBAsgicQDVCkc" +
-                                "Y9BLluzx1RmC3ORXaM0JaHPB93YcdSDGgpgBWMVrNU1ErkjcMqMoT_wtCex3w0" +
-                                "3XdLkjXIuEr2hWgeP-nkUZTPU9EoGSPj6fAS-bSz87RCPrxZdj_iVyC6QWcqAu" +
-                                "07WNhjzJEPc4jVntRJ6K53NgPQ5p99l3Z408OUqj4ioYezbS6vTPlQ" +
-                                "." +
-                                "WuGzxmcreYjpHGJoa17EBg";
+                        "Vja2Jvcm91Z2guZXhhbXBsZSIsImVwayI6eyJrdHkiOiJFQyIsImNydiI6IlAt" +
+                        "Mzg0IiwieCI6InVCbzRrSFB3Nmtiang1bDB4b3dyZF9vWXpCbWF6LUdLRlp1NH" +
+                        "hBRkZrYllpV2d1dEVLNml1RURzUTZ3TmROZzMiLCJ5Ijoic3AzcDVTR2haVkMy" +
+                        "ZmFYdW1JLWU5SlUyTW84S3BvWXJGRHI1eVBOVnRXNFBnRXdaT3lRVEEtSmRhWT" +
+                        "h0YjdFMCJ9LCJlbmMiOiJBMTI4R0NNIn0" +
+                        "." +
+                        "0DJjBXri_kBcC46IkU5_Jk9BqaQeHdv2" +
+                        "." +
+                        "mH-G2zVqgztUtnW_" +
+                        "." +
+                        "tkZuOO9h95OgHJmkkrfLBisku8rGf6nzVxhRM3sVOhXgz5NJ76oID7lpnAi_cP" +
+                        "WJRCjSpAaUZ5dOR3Spy7QuEkmKx8-3RCMhSYMzsXaEwDdXta9Mn5B7cCBoJKB0" +
+                        "IgEnj_qfo1hIi-uEkUpOZ8aLTZGHfpl05jMwbKkTe2yK3mjF6SBAsgicQDVCkc" +
+                        "Y9BLluzx1RmC3ORXaM0JaHPB93YcdSDGgpgBWMVrNU1ErkjcMqMoT_wtCex3w0" +
+                        "3XdLkjXIuEr2hWgeP-nkUZTPU9EoGSPj6fAS-bSz87RCPrxZdj_iVyC6QWcqAu" +
+                        "07WNhjzJEPc4jVntRJ6K53NgPQ5p99l3Z408OUqj4ioYezbS6vTPlQ" +
+                        "." +
+                        "WuGzxmcreYjpHGJoa17EBg";
 
                 final PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(jwkJsonString);
 
-                // verify that we can decrypt the encrypted key (no GCM yet so not decrypting the whole thing)
                 JsonWebEncryption jwe = new JsonWebEncryption();
                 jwe.setCompactSerialization(jweCompactSerialization);
                 jwe.setKey(jwk.getPrivateKey());
@@ -749,28 +748,28 @@ public class JoseCookbookTest
             {
                 JsonWebKey jwk = JsonWebKey.Factory.newJwk(
                         "   {\n" +
-                                "     \"kty\": \"oct\",\n" +
-                                "     \"kid\": \"77c7e2b8-6e13-45cf-8672-617b5b45243a\",\n" +
-                                "     \"use\": \"enc\",\n" +
-                                "     \"alg\": \"A128GCM\",\n" +
-                                "     \"k\": \"XctOhJAkA-pD9Lh7ZgW_2A\"\n" +
-                                "   }");
+                        "     \"kty\": \"oct\",\n" +
+                        "     \"kid\": \"77c7e2b8-6e13-45cf-8672-617b5b45243a\",\n" +
+                        "     \"use\": \"enc\",\n" +
+                        "     \"alg\": \"A128GCM\",\n" +
+                        "     \"k\": \"XctOhJAkA-pD9Lh7ZgW_2A\"\n" +
+                        "   }");
 
                 String cs =
                         "eyJhbGciOiJkaXIiLCJraWQiOiI3N2M3ZTJiOC02ZTEzLTQ1Y2YtODY3Mi02MT" +
-                                "diNWI0NTI0M2EiLCJlbmMiOiJBMTI4R0NNIn0" +
-                                "." +
-                                "." +
-                                "refa467QzzKx6QAB" +
-                                "." +
-                                "JW_i_f52hww_ELQPGaYyeAB6HYGcR559l9TYnSovc23XJoBcW29rHP8yZOZG7Y" +
-                                "hLpT1bjFuvZPjQS-m0IFtVcXkZXdH_lr_FrdYt9HRUYkshtrMmIUAyGmUnd9zM" +
-                                "DB2n0cRDIHAzFVeJUDxkUwVAE7_YGRPdcqMyiBoCO-FBdE-Nceb4h3-FtBP-c_" +
-                                "BIwCPTjb9o0SbdcdREEMJMyZBH8ySWMVi1gPD9yxi-aQpGbSv_F9N4IZAxscj5" +
-                                "g-NJsUPbjk29-s7LJAGb15wEBtXphVCgyy53CoIKLHHeJHXex45Uz9aKZSRSIn" +
-                                "ZI-wjsY0yu3cT4_aQ3i1o-tiE-F8Ios61EKgyIQ4CWao8PFMj8TTnp" +
-                                "." +
-                                "vbb32Xvllea2OtmHAdccRQ";
+                        "diNWI0NTI0M2EiLCJlbmMiOiJBMTI4R0NNIn0" +
+                        "." +
+                        "." +
+                        "refa467QzzKx6QAB" +
+                        "." +
+                        "JW_i_f52hww_ELQPGaYyeAB6HYGcR559l9TYnSovc23XJoBcW29rHP8yZOZG7Y" +
+                        "hLpT1bjFuvZPjQS-m0IFtVcXkZXdH_lr_FrdYt9HRUYkshtrMmIUAyGmUnd9zM" +
+                        "DB2n0cRDIHAzFVeJUDxkUwVAE7_YGRPdcqMyiBoCO-FBdE-Nceb4h3-FtBP-c_" +
+                        "BIwCPTjb9o0SbdcdREEMJMyZBH8ySWMVi1gPD9yxi-aQpGbSv_F9N4IZAxscj5" +
+                        "g-NJsUPbjk29-s7LJAGb15wEBtXphVCgyy53CoIKLHHeJHXex45Uz9aKZSRSIn" +
+                        "ZI-wjsY0yu3cT4_aQ3i1o-tiE-F8Ios61EKgyIQ4CWao8PFMj8TTnp" +
+                        "." +
+                        "vbb32Xvllea2OtmHAdccRQ";
 
                 JsonWebEncryption jwe = new JsonWebEncryption();
                 jwe.setKey(jwk.getKey());
@@ -792,32 +791,32 @@ public class JoseCookbookTest
             {
                 JsonWebKey jwk = JsonWebKey.Factory.newJwk(
                         "   {\n" +
-                                "     \"kty\": \"oct\",\n" +
-                                "     \"kid\": \"18ec08e1-bfa9-4d95-b205-2b4dd1d4321d\",\n" +
-                                "     \"use\": \"enc\",\n" +
-                                "     \"alg\": \"A256GCMKW\",\n" +
-                                "     \"k\": \"qC57l_uxcm7Nm3K-ct4GFjx8tM1U8CZ0NLBvdQstiS8\"\n" +
-                                "   }");
+                        "     \"kty\": \"oct\",\n" +
+                        "     \"kid\": \"18ec08e1-bfa9-4d95-b205-2b4dd1d4321d\",\n" +
+                        "     \"use\": \"enc\",\n" +
+                        "     \"alg\": \"A256GCMKW\",\n" +
+                        "     \"k\": \"qC57l_uxcm7Nm3K-ct4GFjx8tM1U8CZ0NLBvdQstiS8\"\n" +
+                        "   }");
 
                 String cs =
                         "eyJhbGciOiJBMjU2R0NNS1ciLCJraWQiOiIxOGVjMDhlMS1iZmE5LTRkOTUtYj" +
-                                "IwNS0yYjRkZDFkNDMyMWQiLCJ0YWciOiJrZlBkdVZRM1QzSDZ2bmV3dC0ta3N3" +
-                                "IiwiaXYiOiJLa1lUMEdYXzJqSGxmcU5fIiwiZW5jIjoiQTEyOENCQy1IUzI1Ni" +
-                                "J9" +
-                                "." +
-                                "lJf3HbOApxMEBkCMOoTnnABxs_CvTWUmZQ2ElLvYNok" +
-                                "." +
-                                "gz6NjyEFNm_vm8Gj6FwoFQ" +
-                                "." +
-                                "Jf5p9-ZhJlJy_IQ_byKFmI0Ro7w7G1QiaZpI8OaiVgD8EqoDZHyFKFBupS8iaE" +
-                                "eVIgMqWmsuJKuoVgzR3YfzoMd3GxEm3VxNhzWyWtZKX0gxKdy6HgLvqoGNbZCz" +
-                                "LjqcpDiF8q2_62EVAbr2uSc2oaxFmFuIQHLcqAHxy51449xkjZ7ewzZaGV3eFq" +
-                                "hpco8o4DijXaG5_7kp3h2cajRfDgymuxUbWgLqaeNQaJtvJmSMFuEOSAzw9Hde" +
-                                "b6yhdTynCRmu-kqtO5Dec4lT2OMZKpnxc_F1_4yDJFcqb5CiDSmA-psB2k0Jtj" +
-                                "xAj4UPI61oONK7zzFIu4gBfjJCndsZfdvG7h8wGjV98QhrKEnR7xKZ3KCr0_qR" +
-                                "1B-gxpNk3xWU" +
-                                "." +
-                                "DKW7jrb4WaRSNfbXVPlT5g";
+                        "IwNS0yYjRkZDFkNDMyMWQiLCJ0YWciOiJrZlBkdVZRM1QzSDZ2bmV3dC0ta3N3" +
+                        "IiwiaXYiOiJLa1lUMEdYXzJqSGxmcU5fIiwiZW5jIjoiQTEyOENCQy1IUzI1Ni" +
+                        "J9" +
+                        "." +
+                        "lJf3HbOApxMEBkCMOoTnnABxs_CvTWUmZQ2ElLvYNok" +
+                        "." +
+                        "gz6NjyEFNm_vm8Gj6FwoFQ" +
+                        "." +
+                        "Jf5p9-ZhJlJy_IQ_byKFmI0Ro7w7G1QiaZpI8OaiVgD8EqoDZHyFKFBupS8iaE" +
+                        "eVIgMqWmsuJKuoVgzR3YfzoMd3GxEm3VxNhzWyWtZKX0gxKdy6HgLvqoGNbZCz" +
+                        "LjqcpDiF8q2_62EVAbr2uSc2oaxFmFuIQHLcqAHxy51449xkjZ7ewzZaGV3eFq" +
+                        "hpco8o4DijXaG5_7kp3h2cajRfDgymuxUbWgLqaeNQaJtvJmSMFuEOSAzw9Hde" +
+                        "b6yhdTynCRmu-kqtO5Dec4lT2OMZKpnxc_F1_4yDJFcqb5CiDSmA-psB2k0Jtj" +
+                        "xAj4UPI61oONK7zzFIu4gBfjJCndsZfdvG7h8wGjV98QhrKEnR7xKZ3KCr0_qR" +
+                        "1B-gxpNk3xWU" +
+                        "." +
+                        "DKW7jrb4WaRSNfbXVPlT5g";
 
 
                 // verify recreating it (or what we can)
@@ -887,12 +886,12 @@ public class JoseCookbookTest
             {
                 JsonWebKey jwk = JsonWebKey.Factory.newJwk(
                         "   {\n" +
-                                "     \"kty\": \"oct\",\n" +
-                                "     \"kid\": \"81b20965-8332-43d9-a468-82160ad91ac8\",\n" +
-                                "     \"use\": \"enc\",\n" +
-                                "     \"alg\": \"A128KW\",\n" +
-                                "     \"k\": \"GZy6sIZ6wl9NJOKB-jnmVQ\"\n" +
-                                "   }\n");
+                        "     \"kty\": \"oct\",\n" +
+                        "     \"kid\": \"81b20965-8332-43d9-a468-82160ad91ac8\",\n" +
+                        "     \"use\": \"enc\",\n" +
+                        "     \"alg\": \"A128KW\",\n" +
+                        "     \"k\": \"GZy6sIZ6wl9NJOKB-jnmVQ\"\n" +
+                        "   }\n");
 
                 JsonWebEncryption jwe = new JsonWebEncryption();
                 jwe.setKey(jwk.getKey());
