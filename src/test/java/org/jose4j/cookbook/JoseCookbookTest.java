@@ -689,6 +689,7 @@ public class JoseCookbookTest
                 jwe.setCompactSerialization(jweCompactSerialization);
                 jwe.setKey(jwk.getPrivateKey());
                 assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
+                assertThat(KeyManagementAlgorithmIdentifiers.ECDH_ES_A128KW, equalTo(jwe.getAlgorithmHeaderValue()));
                 assertThat(ContentEncryptionAlgorithmIdentifiers.AES_128_GCM, equalTo(jwe.getEncryptionMethodHeaderParameter()));
             }
         });
