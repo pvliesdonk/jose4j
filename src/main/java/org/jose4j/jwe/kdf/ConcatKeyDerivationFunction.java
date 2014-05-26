@@ -10,6 +10,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
+ * An implementation of Concatenation Key Derivation Function (aka Concat KDF or ConcatKDF)
+ * from Section 5.8.1 of National Institute of Standards and Technology (NIST),
+ * "Recommendation for Pair-Wise Key Establishment Schemes Using Discrete Logarithm Cryptography",
+ * NIST Special Publication 800-56A, Revision 2, May 2013.
  */
 public class ConcatKeyDerivationFunction
 {
@@ -69,8 +73,7 @@ public class ConcatKeyDerivationFunction
         log.debug("derived key material: " + ByteUtil.toDebugString(derivedKeyMaterial));
         if (derivedKeyMaterial.length != keyDateLenInBytes)
         {
-            byte[] newKeyMaterial = new byte[keyDateLenInBytes];
-            System.arraycopy(derivedKeyMaterial, 0, newKeyMaterial, 0, keyDateLenInBytes);
+            byte[] newKeyMaterial  = ByteUtil.subArray(derivedKeyMaterial, 0, keyDateLenInBytes);
             log.debug("first "+keydatalen+" bits of derived key material: " + ByteUtil.toDebugString(newKeyMaterial));
             derivedKeyMaterial = newKeyMaterial;
         }
@@ -83,7 +86,7 @@ public class ConcatKeyDerivationFunction
     {
         double repsD = (float) keydatalen / (float) digestLength;
         repsD = Math.ceil(repsD);
-        return Math.round(repsD);
+        return (int) repsD;
     }
 
     private MessageDigest getMessageDigest(String digestMethod)
@@ -94,7 +97,7 @@ public class ConcatKeyDerivationFunction
        }
        catch (NoSuchAlgorithmException e)
        {
-           throw new UncheckedJoseException("Must have " + digestMethod + " but don't.", e);
+           throw new UncheckedJoseException("Must have " + digestMethod + " MessageDigest but don't.", e);
        }
     }
 }
