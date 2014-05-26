@@ -19,20 +19,9 @@ package org.jose4j.jwe.kdf;
 import junit.framework.TestCase;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
-import org.jose4j.jwe.JsonWebEncryption;
-import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
-import org.jose4j.jwk.EcJwkGenerator;
-import org.jose4j.jwk.EllipticCurveJsonWebKey;
-import org.jose4j.jwk.JsonWebKey;
-import org.jose4j.jwk.PublicJsonWebKey;
-import org.jose4j.keys.EllipticCurves;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.StringUtil;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 /**
