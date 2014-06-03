@@ -103,16 +103,31 @@
           <artifactId>maven-gpg-plugin</artifactId>
           <version>1.5</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.2.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.9.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.1</version>
+        </plugin>
       </plugins>
   </build>
 
   <profiles>
     <profile>
-      <id>release-sign-artifacts</id>
+      <id>release-profile</id>
       <activation>
         <!--This profile will be activated when the value of maven property performRelease is true.
             When you use maven-release-plugin and run mvn release:perform, the property value will be set to true.
-            The profile can also be explicitly specified using the -P CLI option like, mvn install -P release-sign-artifacts -->
+            The profile can also be explicitly specified using the -P CLI option like, mvn install -P release-profile -->
         <property>
           <name>performRelease</name>
           <value>true</value>
@@ -129,6 +144,32 @@
                 <phase>verify</phase>
                 <goals>
                   <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9.1</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
                 </goals>
               </execution>
             </executions>
