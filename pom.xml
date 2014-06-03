@@ -21,9 +21,10 @@
   <artifactId>jose4j</artifactId>
   <version>0.3.6-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>jose4j</name>
+  <name>org.jose4j:jose4j</name>
   <description>
-      The jose4j library is an open source implementation of JWS, JWE, JWA and JWK from the IETF JOSE Working Group.
+      The jose4j library is an open source implementation of JWS (JSON Web Signature), JWE (Encryption),
+      JWA (Algorithms) and JWK (Key) from the IETF JOSE (JavaScrip Object Signing and Encryption) Working Group.
       It is written in Java and relies solely on the JCA APIs for cryptography.
       Please see https://bitbucket.org/b_c/jose4j/wiki/Home for more info.</description>
   <url>https://bitbucket.org/b_c/jose4j/</url>
@@ -40,11 +41,6 @@
       <name>Brian Campbell</name>
       <email>brian.d.campbell@gmail.com</email>
       <url>https://plus.google.com/109358381977638517286/about</url>
-      <organization>Ping Identity Corporation</organization>
-      <organizationUrl>https://www.pingidentity.com</organizationUrl>
-      <roles>
-        <role>chief code monkey</role>
-      </roles>
     </developer>
   </developers>
 
@@ -104,8 +100,9 @@
           </configuration>
         </plugin>
         <plugin>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.0</version>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>1.5</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -122,6 +119,8 @@
 
   <scm>
     <connection>scm:git:https://bitbucket.org/b_c/jose4j.git</connection>
+    <developerConnection>scm:git:https://bitbucket.org/b_c/jose4j.git</developerConnection>
+    <url>https://bitbucket.org/b_c/jose4j</url>
   </scm>
 
   <distributionManagement>
