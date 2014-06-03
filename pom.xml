@@ -21,7 +21,12 @@
   <artifactId>jose4j</artifactId>
   <version>0.3.6-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>JOSE (JWS, JWE, JWK, JWA) for Java + a touch of JWT</name>
+  <name>jose4j</name>
+  <description>
+      The jose4j library is an open source implementation of JWS, JWE, JWA and JWK from the IETF JOSE Working Group.
+      It is written in Java and relies solely on the JCA APIs for cryptography.
+      Please see https://bitbucket.org/b_c/jose4j/wiki/Home for more info.</description>
+  <url>https://bitbucket.org/b_c/jose4j/</url>
 
   <licenses>
     <license>
@@ -43,14 +48,11 @@
     </developer>
   </developers>
 
-  <url>https://bitbucket.org/b_c/jose4j/</url>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
-    
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
