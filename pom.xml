@@ -17,11 +17,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>9</version>
+  </parent>
+
   <groupId>org.bitbucket.b_c</groupId>
   <artifactId>jose4j</artifactId>
   <version>0.3.6-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>org.jose4j:jose4j</name>
+  <name>jose4j</name>
   <description>
       The jose4j library is an open source implementation of JWS (JSON Web Signature), JWE (Encryption),
       JWA (Algorithms) and JWK (Key) from the IETF JOSE (JavaScrip Object Signing and Encryption) Working Group.
@@ -137,19 +143,6 @@
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
             <version>2.2.1</version>
             <executions>
@@ -174,6 +167,19 @@
               </execution>
             </executions>
           </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -194,11 +200,4 @@
     <developerConnection>scm:git:https://bitbucket.org/b_c/jose4j.git</developerConnection>
     <url>https://bitbucket.org/b_c/jose4j</url>
   </scm>
-
-  <distributionManagement>
-    <repository>
-      <id>maven-repository</id>
-      <url>file:///${basedir}/target/deploy</url>
-    </repository>
-  </distributionManagement>
 </project>                                                     
