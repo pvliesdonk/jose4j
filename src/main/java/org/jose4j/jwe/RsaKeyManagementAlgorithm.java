@@ -73,12 +73,12 @@ public class RsaKeyManagementAlgorithm extends WrappingKeyManagementAlgorithm im
         @Override
         public boolean isAvailable()
         {
-            // The Sun/Oracle provider in Java 7 apparently has a defect and can’t do MGF1 with SHA-256
-            // . An exception like "java.security.InvalidKeyException: Wrapping failed … caused by
+            // The Sun/Oracle provider in Java 7 apparently has a defect and can’t do MGF1 with SHA-256 .
+            // An exception like "java.security.InvalidKeyException: Wrapping failed ... caused by
             // javax.crypto.BadPaddingException: java.security.DigestException: Length must be at least 32 for SHA-256digests”
             // is thrown from the wrap method on the “RSA/ECB/OAEPWithSHA-256AndMGF1Padding” Cipher initialized with an
             // OAEPParameterSpec using MGF1ParameterSpec.SHA256. So actually trying it to see if it works seems like
-            // the most reliable way to check for availability. Which isn’t real pretty. But hey.
+            // the most reliable way to check for availability. Which isn’t real pretty. But hey, what can you do?
             try
             {
                 JsonWebKey jwk = JsonWebKey.Factory.newJwk(
