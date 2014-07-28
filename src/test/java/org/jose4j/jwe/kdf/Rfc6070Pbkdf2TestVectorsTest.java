@@ -1,6 +1,5 @@
 package org.jose4j.jwe.kdf;
 
-import org.apache.commons.codec.binary.Hex;
 import org.jose4j.lang.StringUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,8 +21,8 @@ public class Rfc6070Pbkdf2TestVectorsTest
         String s = "salt";
         int c = 1;
         int dkLen = 20;
-        String expectedOutputInHex = "0c60c80f961f0e71f3a9b524af6012062fe037a6";
-        testAndCompare(p, s, c, dkLen, expectedOutputInHex);
+        byte[] expectedOutput = new byte[] {12, 96, -56, 15, -106, 31, 14, 113, -13, -87, -75, 36, -81, 96, 18, 6, 47, -32, 55, -90};
+        testAndCompare(p, s, c, dkLen, expectedOutput);
     }
 
     @Test
@@ -33,8 +32,8 @@ public class Rfc6070Pbkdf2TestVectorsTest
         String s = "salt";
         int c = 2;
         int dkLen = 20;
-        String expectedOutputInHex = "ea6c014dc72d6f8ccd1ed92ace1d41f0d8de8957";
-        testAndCompare(p, s, c, dkLen, expectedOutputInHex);
+        byte[] expectedOutput = new byte[] {-22, 108, 1, 77, -57, 45, 111, -116, -51, 30, -39, 42, -50, 29, 65, -16, -40, -34, -119, 87};
+        testAndCompare(p, s, c, dkLen, expectedOutput);
     }
 
     @Test
@@ -44,19 +43,19 @@ public class Rfc6070Pbkdf2TestVectorsTest
         String s = "salt";
         int c = 4096;
         int dkLen = 20;
-        String expectedOutputInHex = "4b007901b765489abead49d926f721d065a429c1";
-        testAndCompare(p, s, c, dkLen, expectedOutputInHex);
+        byte[] expectedOutput = new byte[] {75, 0, 121, 1, -73, 101, 72, -102, -66, -83, 73, -39, 38, -9, 33, -48, 101, -92, 41, -63};
+        testAndCompare(p, s, c, dkLen, expectedOutput);
     }
 
-    //@Test  // this one takes too long to run b/c of the iteration count so don't run it normally
+    //@Test  // this one takes too darn long to run b/c of the iteration count so don't run it normally
     public void doRfc6070Test4() throws Exception
     {
         String p = "password";
         String s = "salt";
         int c = 16777216;
         int dkLen = 20;
-        String expectedOutputInHex = "eefe3d61cd4da4e4e9945b3d6ba2158c2634e984";
-        testAndCompare(p, s, c, dkLen, expectedOutputInHex);
+        byte[] expectedOutput = new byte[] {-18, -2, 61, 97, -51, 77, -92, -28, -23, -108, 91, 61, 107, -94, 21, -116, 38, 52, -23, -124};
+        testAndCompare(p, s, c, dkLen, expectedOutput);
     }
 
     @Test
@@ -67,8 +66,8 @@ public class Rfc6070Pbkdf2TestVectorsTest
         String s = "saltSALTsaltSALTsaltSALTsaltSALTsalt";
         int c = 4096;
         int dkLen = 25;
-        String expectedOutputInHex = "3d2eec4fe41c849b80c8d83662c0e44a8b291a964cf2f07038";
-        testAndCompare(p, s, c, dkLen, expectedOutputInHex);
+        byte[] expectedOutput = new byte[] {61, 46, -20, 79, -28, 28, -124, -101, -128, -56, -40, 54, 98, -64, -28, 74, -117, 41, 26, -106, 76, -14, -16, 112, 56};
+        testAndCompare(p, s, c, dkLen, expectedOutput);
     }
 
     @Test
@@ -78,15 +77,14 @@ public class Rfc6070Pbkdf2TestVectorsTest
         String s = "sa\0lt";
         int c = 4096;
         int dkLen = 16;
-        String expectedOutputInHex = "56fa6aa75548099dcc37d7f03425e0c3";
-        testAndCompare(p, s, c, dkLen, expectedOutputInHex);
+        byte[] expectedOutput = new byte[] {86, -6, 106, -89, 85, 72, 9, -99, -52, 55, -41, -16, 52, 37, -32, -61};
+        testAndCompare(p, s, c, dkLen, expectedOutput);
     }
 
-    void testAndCompare(String p, String s, int c, int dkLen, String expectedOutputInHex) throws Exception
+    void testAndCompare(String p, String s, int c, int dkLen, byte[] expectedOutput) throws Exception
     {
         PasswordBasedKeyDerivationFunction2 pbkdf2 = new PasswordBasedKeyDerivationFunction2("HmacSHA1");
         byte[] derived = pbkdf2.derive(StringUtil.getBytesUtf8(p), StringUtil.getBytesUtf8(s), c, dkLen);
-        byte[] expectedOutputInBytes = Hex.decodeHex(expectedOutputInHex.toCharArray());
-        Assert.assertArrayEquals(expectedOutputInBytes, derived);
+        Assert.assertArrayEquals(expectedOutput, derived);
     }
 }
