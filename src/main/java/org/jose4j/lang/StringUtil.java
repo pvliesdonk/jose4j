@@ -16,14 +16,14 @@
 
 package org.jose4j.lang;
 
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.binary.StringUtils;
+import java.io.UnsupportedEncodingException;
 
 /**
  */
 public class StringUtil
 {
-    public static final String UTF_8 = CharEncoding.UTF_8;
+    public static final String UTF_8 = "UTF-8";
+    public static final String US_ASCII = "US-ASCII";
 
     public static String newStringUtf8(byte[] bytes)
     {
@@ -32,7 +32,14 @@ public class StringUtil
 
     public static String newString(byte[] bytes, String charsetName)
     {
-        return StringUtils.newString(bytes, charsetName);
+        try
+        {
+            return (bytes == null) ? null : new String(bytes, charsetName);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw newISE(charsetName);
+        }
     }
 
     public static byte[] getBytesUtf8(String string)
@@ -42,11 +49,23 @@ public class StringUtil
 
     public static byte[] getBytesAscii(String string)
     {
-        return getBytesUnchecked(string, CharEncoding.US_ASCII);
+        return getBytesUnchecked(string, US_ASCII);
     }
 
     public static byte[] getBytesUnchecked(String string, String charsetName)
     {
-        return StringUtils.getBytesUnchecked(string, charsetName);
+        try
+        {
+            return (string == null) ? null : string.getBytes(charsetName);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw newISE(charsetName);
+        }
+    }
+
+    private static IllegalStateException newISE(String charsetName)
+    {
+        return new IllegalStateException("Unknown or unsupported character set name: " + charsetName);
     }
 }
