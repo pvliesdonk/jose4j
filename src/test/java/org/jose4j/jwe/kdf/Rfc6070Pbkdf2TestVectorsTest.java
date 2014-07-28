@@ -1,7 +1,7 @@
 package org.jose4j.jwe.kdf;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.binary.StringUtils;
+import org.jose4j.lang.StringUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -85,7 +85,7 @@ public class Rfc6070Pbkdf2TestVectorsTest
     void testAndCompare(String p, String s, int c, int dkLen, String expectedOutputInHex) throws Exception
     {
         PasswordBasedKeyDerivationFunction2 pbkdf2 = new PasswordBasedKeyDerivationFunction2("HmacSHA1");
-        byte[] derived = pbkdf2.derive(StringUtils.getBytesUtf8(p), StringUtils.getBytesUtf8(s), c, dkLen);
+        byte[] derived = pbkdf2.derive(StringUtil.getBytesUtf8(p), StringUtil.getBytesUtf8(s), c, dkLen);
         byte[] expectedOutputInBytes = Hex.decodeHex(expectedOutputInHex.toCharArray());
         Assert.assertArrayEquals(expectedOutputInBytes, derived);
     }
