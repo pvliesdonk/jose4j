@@ -574,14 +574,70 @@ public class JoseCookbookTest
                 assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
             }
         });
-
-
-
     }
 
     @Test
     public void encryptionPbes_4_3() throws JoseException
     {
+        String password = "entrap_o_peter_long_credit_tun";
+
+        String exampleCompactSerialization =
+                "eyJhbGciOiJQQkVTMi1IUzUxMitBMjU2S1ciLCJwMnMiOiI4UTFTemluYXNSM3" +
+                "hjaFl6NlpaY0hBIiwicDJjIjo4MTkyLCJjdHkiOiJqd2stc2V0K2pzb24iLCJl" +
+                "bmMiOiJBMTI4Q0JDLUhTMjU2In0" +
+                "." +
+                "pmKVzwf89K3dfkQqbERUTC0F2jGXD6tTQVmtnVpuKUK2J4Xx2RkkLw" +
+                "." +
+                "VBiCzVHNoLiR3F4V82uoTQ" +
+                "." +
+                "23i-Tb1AV4n0WKVSSgcQrdg6GRqsUKxjruHXYsTHAJLZ2nsnGIX86vMXqIi6IR" +
+                "sfywCRFzLxEcZBRnTvG3nhzPk0GDD7FMyXhUHpDjEYCNA_XOmzg8yZR9oyjo6l" +
+                "TF6si4q9FZ2EhzgFQCLO_6h5EVg3vR75_hkBsnuoqoM3dwejXBtIodN84PeqMb" +
+                "6asmas_dpSsz7H10fC5ni9xIz424givB1YLldF6exVmL93R3fOoOJbmk2GBQZL" +
+                "_SEGllv2cQsBgeprARsaQ7Bq99tT80coH8ItBjgV08AtzXFFsx9qKvC982KLKd" +
+                "PQMTlVJKkqtV4Ru5LEVpBZXBnZrtViSOgyg6AiuwaS-rCrcD_ePOGSuxvgtrok" +
+                "AKYPqmXUeRdjFJwafkYEkiuDCV9vWGAi1DH2xTafhJwcmywIyzi4BqRpmdn_N-" +
+                "zl5tuJYyuvKhjKv6ihbsV_k1hJGPGAxJ6wUpmwC4PTQ2izEm0TuSE8oMKdTw8V" +
+                "3kobXZ77ulMwDs4p" +
+                "." +
+                "0HlwodAhOCILG5SQ2LQ9dg";
+        String plaintext =
+                "{\"keys\":[" +
+                        "{\"kty\":\"oct\",\"kid\":\"77c7e2b8-6e13-45cf-8672-617b5b45243a\",\"use\":\"enc\",\"alg\":\"A128GCM\",\"k\":\"XctOhJAkA-pD9Lh7ZgW_2A\"}," +
+                        "{\"kty\":\"oct\",\"kid\":\"81b20965-8332-43d9-a468-82160ad91ac8\",\"use\":\"enc\",\"alg\":\"A128KW\",\"k\":\"GZy6sIZ6wl9NJOKB-jnmVQ\"}," +
+                        "{\"kty\":\"oct\",\"kid\":\"18ec08e1-bfa9-4d95-b205-2b4dd1d4321d\",\"use\":\"enc\",\"alg\":\"A256GCMKW\",\"k\":\"qC57l_uxcm7Nm3K-ct4GFjx8tM1U8CZ0NLBvdQstiS8\"}]}";
+
+        // verify that we can decrypt it
+        JsonWebEncryption jwe = new JsonWebEncryption();
+        jwe.setCompactSerialization(exampleCompactSerialization);
+        jwe.setKey(new PbkdfKey(password));
+        assertThat(plaintext, equalTo(jwe.getPlaintextString()));
+
+        // verify that we can reproduce it from the inputs
+        jwe = new JsonWebEncryption();
+        jwe.setPlaintext(plaintext);
+        jwe.setKey(new PbkdfKey(password));
+
+        jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.PBES2_HS512_A256KW);
+        Headers headers = jwe.getHeaders();
+        headers.setStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT, "8Q1SzinasR3xchYz6ZZcHA");
+        headers.setObjectHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT, 8192L);
+        headers.setStringHeaderValue("cty", "jwk-set+json");
+        jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+
+        // set the IV and cek per the example (you wouldn't usually do this but it makes the output
+        // more deterministic so it can be compared to the example)
+        jwe.setEncodedContentEncryptionKey("uwsjJXaBK407Qaf0_zpcpmr1Cs0CC50hIUEyGNEt3m0");
+        jwe.setEncodedIv("VBiCzVHNoLiR3F4V82uoTQ");
+
+        assertThat(jwe.getCompactSerialization(), equalTo(exampleCompactSerialization));
+    }
+
+    @Test
+    public void encryptionPbes_4_3_from_draft_2() throws JoseException
+    {
+        // draft -02 used, I think by accident, PBES2-HS256+A128KW, which was changed
+        // to PBES2-HS512+A256KW in -03 but the content from -02 is still a useful example so keeping it here
         String password = "entrap_o_peter_long_credit_tun";
 
         String exampleCompactSerialization =
