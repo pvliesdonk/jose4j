@@ -508,8 +508,8 @@ public class JoseCookbookTest
         String[] deserializedExample = CompactSerializer.deserialize(jweCompactSerialization);
         String[] deserializedResults = CompactSerializer.deserialize(jwe.getCompactSerialization());
         assertThat(deserializedExample[0], equalTo(deserializedResults[0]));
-        // RSA v1.5 is nondeterministic so the encrypted key will be different each time in the JWE we're producing
-        // and so can't compare to the example
+        // RSA v1.5, due to random bytes being used to pad, is nondeterministic so the encrypted key
+        // will be different each time in the JWE we're producing and so can't compare to the example
         assertThat(deserializedExample[2], equalTo(deserializedResults[2]));
         assertThat(deserializedExample[3], equalTo(deserializedResults[3]));
         assertThat(deserializedExample[4], equalTo(deserializedResults[4]));
@@ -525,8 +525,6 @@ public class JoseCookbookTest
             @Override
             public void runTest() throws Exception
             {
-
-
                 String jweCompactSerialization =
                         "eyJhbGciOiJSU0EtT0FFUCIsImtpZCI6InNhbXdpc2UuZ2FtZ2VlQGhvYmJpdG" +
                         "9uLmV4YW1wbGUiLCJlbmMiOiJBMjU2R0NNIn0" +
@@ -557,7 +555,7 @@ public class JoseCookbookTest
 
                 PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(figure62RsaJwkJsonString);
 
-                // verify that we can decrypt the encrypted key (no GCM yet so not decrypting the whole thing)
+                // verify that we can decrypt the encrypted key
                 JsonWebEncryption jwe = new JsonWebEncryption();
                 jwe.setCompactSerialization(jweCompactSerialization);
                 jwe.setKey(jwk.getPrivateKey());
@@ -571,7 +569,33 @@ public class JoseCookbookTest
                 String encodedExampleCek = "mYMfsggkTAm0TbvtlFh2hyoXnbEzJQjMxmgLN3d8xXA";
                 assertArrayEquals(cek.getEncoded(), Base64Url.decode(encodedExampleCek));
 
+                // and that we can decrypt the whole thing
                 assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
+
+
+                // verify that we can reproduce it (most/some of it) from the inputs
+                jwe = new JsonWebEncryption();
+                jwe.setPlaintext(jwePlaintext);
+                jwe.setKey(jwk.getPublicKey());
+                jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.RSA_OAEP);
+                jwe.setKeyIdHeaderValue(jwk.getKeyId());
+                jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_256_GCM);
+
+                // set the IV and cek per the example (you wouldn't usually do this but it makes the output more deterministic)
+                jwe.setEncodedIv("-nBoKLH0YkLZPSI9");
+                jwe.setEncodedContentEncryptionKey(encodedExampleCek);
+
+                // check that the header, iv, ciphertext and tag all match
+                String[] deserializedExample = CompactSerializer.deserialize(jweCompactSerialization);
+                String[] deserializedResults = CompactSerializer.deserialize(jwe.getCompactSerialization());
+                assertThat(deserializedExample[0], equalTo(deserializedResults[0]));
+                // Some of the algorithms, RSAES OAEP being one of them, are probabilistic encryption schemes which incorporate
+                // some element of randomness to yield a different output even when encrypting the same content multiple times.
+                // so the encrypted key will be different each time in the JWE we're producing and so can't compare to the example
+                // http://www.ietf.org/mail-archive/web/jose/current/msg04110.html
+                assertThat(deserializedExample[2], equalTo(deserializedResults[2]));
+                assertThat(deserializedExample[3], equalTo(deserializedResults[3]));
+                assertThat(deserializedExample[4], equalTo(deserializedResults[4]));
             }
         });
     }
@@ -795,10 +819,10 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void directEncryptiouUsingAESGCM_4_6() throws Exception
+    public void directEncryptionUsingAESGCM_4_6() throws Exception
     {
         JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
-        jceProviderTestSupport.setKeyManagementAlgsNeeded(KeyManagementAlgorithmIdentifiers.A128GCMKW);
+        jceProviderTestSupport.setEncryptionAlgsNeeded(ContentEncryptionAlgorithmIdentifiers.AES_128_GCM);
         jceProviderTestSupport.runWithBouncyCastleProviderIfNeeded(new RunnableTest()
         {
             @Override
@@ -829,16 +853,27 @@ public class JoseCookbookTest
                         "." +
                         "vbb32Xvllea2OtmHAdccRQ";
 
+                // decrypt the example
                 JsonWebEncryption jwe = new JsonWebEncryption();
                 jwe.setKey(jwk.getKey());
                 jwe.setCompactSerialization(cs);
                 assertThat(jwePlaintext, equalTo(jwe.getPlaintextString()));
+
+
+                // verify that we can reproduce it
+                jwe = new JsonWebEncryption();
+                jwe.setPlaintext(jwePlaintext);
+                jwe.setKey(jwk.getKey());
+                jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.DIRECT);
+                jwe.setKeyIdHeaderValue(jwk.getKeyId());
+                jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_GCM);
+
             }
         });
     }
 
     @Test
-    public void gcmKeyWrapWithAesCbcContentEncryption() throws Exception
+    public void gcmKeyWrapWithAesCbcContentEncryption_4_7() throws Exception
     {
         JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
         jceProviderTestSupport.setKeyManagementAlgsNeeded(KeyManagementAlgorithmIdentifiers.A256GCMKW);
