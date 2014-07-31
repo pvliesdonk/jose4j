@@ -232,7 +232,11 @@ public class JsonWebEncryption extends JsonWebStructure
         byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();
         byte[] contentEncryptionKey = contentEncryptionKeys.getContentEncryptionKey();
 
-        byte[] plaintextBytes = getPlaintextBytes();
+        byte[] plaintextBytes = this.plaintext;
+        if (plaintextBytes == null)
+        {
+            throw new NullPointerException("The plaintext payload for the JWE has not been set.");
+        }
 
         plaintextBytes = compress(getHeaders(), plaintextBytes);
 
