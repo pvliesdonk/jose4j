@@ -16,18 +16,26 @@
 
 package org.jose4j.jwk;
 
-import junit.framework.TestCase;
+import org.hamcrest.CoreMatchers;
+import org.jose4j.keys.AesKey;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.JoseException;
+import org.junit.Assert;
+import org.junit.Test;
 
+import java.security.Key;
 import java.util.Arrays;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.jose4j.jwk.JsonWebKey.OutputControlLevel.*;
+import static org.junit.Assert.*;
 
 /**
  */
-public class OctetSequenceJsonWebKeyTest extends TestCase
+public class OctetSequenceJsonWebKeyTest
 {
+    @Test
     public void testExampleFromJws() throws Exception
     {
         String base64UrlKey = "AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow";
@@ -52,5 +60,18 @@ public class OctetSequenceJsonWebKeyTest extends TestCase
         assertTrue(jwk.toJson(INCLUDE_PRIVATE).contains(base64UrlKey));
         assertTrue(jwk.toJson(INCLUDE_SYMMETRIC).contains(base64UrlKey));
         assertFalse(jwk.toJson(PUBLIC_ONLY).contains(base64UrlKey));
+    }
+
+    @Test
+    public void testLeadingAndTrailingZeros() throws JoseException
+    {
+        byte[] rawInputBytes = new byte[] {0,0,111,16,51,98,-4,0,-72,9,-111,60,41,-66,94,0};
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(new AesKey(rawInputBytes));
+        String json = jwk.toJson(INCLUDE_SYMMETRIC);
+
+        JsonWebKey jwkFromJson = JsonWebKey.Factory.newJwk(json);
+        byte[] encoded = jwkFromJson.getKey().getEncoded();
+        assertThat(rawInputBytes.length, is(equalTo(encoded.length)));
+        assertArrayEquals(rawInputBytes, encoded);
     }
 }
