@@ -1,7 +1,7 @@
 package org.jose4j.zip;
 
 import junit.framework.TestCase;
-import org.apache.commons.codec.binary.Base64;
+import org.jose4j.base64url.Base64Url;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 
@@ -25,8 +25,7 @@ public class DeflateRFC1951CompressionAlgorithmTest extends TestCase
     {
         String s ="q1bKLC5WslLKKCkpKLaK0Y/Rz0wp0EutSMwtyEnVS87PVdLhUkqtKFCyMjQ2NTcyNTW3sACKJJamoGgqRujJL0o" +
                 "H6ckqyQSqKMmNLIsMCzWqsPAp8zM3cjINjHdNTPbQizd1BClKTC4CKjICMYtLk4BMp6LMxDylWi4A";
-        Base64 base64 = new Base64();
-        byte[] decoded = base64.decode(s);
+        byte[] decoded = Base64Url.decode(s);
         CompressionAlgorithm ca = new DeflateRFC1951CompressionAlgorithm();
         byte[] decompress = ca.decompress(decoded);
         String decompedString = StringUtil.newStringUtf8(decompress);
