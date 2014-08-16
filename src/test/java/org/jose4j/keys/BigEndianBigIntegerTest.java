@@ -16,8 +16,6 @@
 
 package org.jose4j.keys;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.junit.Test;
 
 import java.math.BigInteger;
@@ -191,20 +189,19 @@ public class BigEndianBigIntegerTest
 
     private byte[] toByteArrayViaHex(BigInteger bigInteger)
     {
-        try
+        // ugly but a sanity check
+        int hexRadix = 16;
+        String hexString = bigInteger.toString(hexRadix);
+        hexString = (hexString.length() % 2 != 0) ? "0" + hexString : hexString;
+
+        byte[] bytes = new byte[hexString.length() / 2];
+        for (int idx = 0; idx < hexString.length(); idx+=2)
         {
-            // ugly but a sanity check
-            String hexString = bigInteger.toString(16);
-            if (hexString.length() % 2 != 0)
-            {
-                hexString = "0" + hexString;
-            }
-            return Hex.decodeHex(hexString.toCharArray());
+            String hexPart = hexString.substring(idx, idx+2);
+            bytes[idx/2] = (byte) Short.parseShort(hexPart, hexRadix);
         }
-        catch (DecoderException e)
-        {
-            throw new IllegalArgumentException("Problem converting BigInteger to byte array via hex.", e);
-        }
+
+        return bytes;
     }
 
     @Test
