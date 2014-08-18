@@ -74,3 +74,4 @@ public class StringUtil
         return new IllegalStateException("Unknown or unsupported character set name: " + charsetName);
     }
 }
+// todo look at StandardCharsets (new in java 7) to maybe simplify the unchecked stuff with known charsets
