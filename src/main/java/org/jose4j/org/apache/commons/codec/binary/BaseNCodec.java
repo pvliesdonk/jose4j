@@ -17,6 +17,18 @@ package org.jose4j.org.apache.commons.codec.binary;
  * limitations under the License.
  */
 
+ /*
+ * Base64 (+tests) and BaseNCodec were copied (and modified slightly to remove/replace dependencies) from
+ * version 1.9 of the Apache Commons Codec project.
+ *
+ * Base64 was the only codec being used.
+ *
+ * I'm a little uneasy about doing this but it has some benefits in that enables jose4j to have one
+ * less dependency and also ensures jose4j has a consistent Base64 interface and implementation
+ * regardless of where/how it's deployed. Codec is widely used and often already available on the
+ * deployment target but you'll see different versions. (Some versions of) Android, for example,
+ * have codec 1.2, which isn't compatible.
+ */
 
 import java.util.Arrays;
 

@@ -1,6 +1,6 @@
 package org.jose4j.org.apache.commons.codec.binary;
 
-/**
+/*
  * Base64 and BaseNCodec were copied (and modified slightly to remove/replace dependencies) from
  * version 1.9 of the Apache Commons Codec project.
  *
