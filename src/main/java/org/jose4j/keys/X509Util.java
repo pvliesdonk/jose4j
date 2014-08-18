@@ -16,7 +16,7 @@
 
 package org.jose4j.keys;
 
-import org.apache.commons.codec.binary.Base64;
+import org.jose4j.org.apache.commons.codec.binary.Base64;
 import org.jose4j.lang.JoseException;
 
 import java.io.ByteArrayInputStream;

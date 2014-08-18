@@ -16,7 +16,7 @@
 
 package org.jose4j.base64url;
 
-import org.apache.commons.codec.binary.Base64;
+import org.jose4j.org.apache.commons.codec.binary.Base64;
 import org.jose4j.lang.StringUtil;
 
 /**
