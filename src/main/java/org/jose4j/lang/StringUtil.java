@@ -30,6 +30,11 @@ public class StringUtil
         return newString(bytes, UTF_8);
     }
 
+    public static String newStringUsAscii(byte[] bytes)
+    {
+        return newString(bytes, US_ASCII);
+    }
+
     public static String newString(byte[] bytes, String charsetName)
     {
         try
