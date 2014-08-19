@@ -1,7 +1,7 @@
 package org.jose4j.jwx;
 
 import org.jose4j.base64url.Base64Url;
-import org.jose4j.json.JsonHeaderUtil;
+import org.jose4j.json.JsonUtil;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.JsonHelp;
@@ -23,7 +23,7 @@ public class Headers
     {
         if (header == null)
         {
-            header = JsonHeaderUtil.toJson(headerMap);
+            header = JsonUtil.toJson(headerMap);
         }
         return header;
     }
@@ -82,7 +82,7 @@ public class Headers
     {
         this.encodedHeader = null;
         this.header = header;
-        headerMap = JsonHeaderUtil.parseJson(header);
+        headerMap = JsonUtil.parseJson(header);
     }
 
     void setEncodedHeader(String encodedHeader) throws JoseException

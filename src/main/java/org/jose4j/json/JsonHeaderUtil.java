@@ -20,14 +20,22 @@ import org.jose4j.lang.JoseException;
 import java.util.Map;
 
 /**
+ * @deprecated as of 0.3.7 please use JsonUtil
+ *
  */
 public class JsonHeaderUtil
 {
+    /**
+     * @deprecated please use JsonUtil
+     */
     public static Map<String,Object> parseJson(String jsonString) throws JoseException
     {
         return JsonUtil.parseJson(jsonString);
     }
 
+    /**
+     * @deprecated please use JsonUtil
+     */
     public static String toJson(Map<String,?> map)
     {
         return JsonUtil.toJson(map);
