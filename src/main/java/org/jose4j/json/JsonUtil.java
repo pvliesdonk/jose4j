@@ -24,10 +24,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
@@ -37,12 +34,12 @@ public class JsonUtil
     {
         public List creatArrayContainer()
         {
-            return new LinkedList<Object>();
+            return new ArrayList<Object>();
         }
 
         public Map createObjectContainer()
         {
-            return new LinkedHashMap<String,Object>();
+            return new DupeKeyDisallowingLinkedHashMap();
         }
     };
 
@@ -51,9 +48,9 @@ public class JsonUtil
         try
         {
             JSONParser parser = new JSONParser();
-            return (Map<String,Object>)parser.parse(jsonString, CONTAINER_FACTORY);
+            return (DupeKeyDisallowingLinkedHashMap)parser.parse(jsonString, CONTAINER_FACTORY);
         }
-        catch (ParseException e)
+        catch (ParseException | IllegalArgumentException e)
         {
             throw new JoseException("Parsing error: " + e, e);
         }
@@ -67,5 +64,19 @@ public class JsonUtil
     public static void writeJson(Map<String,?> map, Writer w) throws IOException
     {
         JSONValue.writeJSONString(map, w);
+    }
+
+    static class DupeKeyDisallowingLinkedHashMap extends LinkedHashMap<String,Object>
+    {
+        @Override
+        public Object put(String key, Object value)
+        {
+            if (this.containsKey(key))
+            {
+                throw new IllegalArgumentException("An entry for '" + key + "' already exists. Parameter names must be unique.");
+            }
+
+            return super.put(key, value);
+        }
     }
 }
