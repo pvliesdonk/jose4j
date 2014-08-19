@@ -23,6 +23,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ public class JsonHeaderUtil
     {
         public List creatArrayContainer()
         {
-            throw new IllegalArgumentException("Headers should not contain json array entries.");
+            return new LinkedList<Object>();
         }
 
         public Map createObjectContainer()
@@ -50,13 +51,9 @@ public class JsonHeaderUtil
             JSONParser parser = new JSONParser();
             return (DupeKeyDisallowingLinkedHashMap)parser.parse(jsonString, CONTAINER_FACTORY);
         }
-        catch (ParseException e)
+        catch (ParseException | IllegalArgumentException e)
         {
             throw new JoseException("Parsing error: " + e, e);
-        }
-        catch (IllegalArgumentException e)
-        {
-            throw new JoseException("Parsing error: " + e, e);    
         }
     }
 
@@ -72,7 +69,7 @@ public class JsonHeaderUtil
         {
             if (this.containsKey(key))
             {
-                throw new IllegalArgumentException("An entry for '" + key + "' already exists.");
+                throw new IllegalArgumentException("An entry for '" + key + "' already exists. Parameter names must be unique.");
             }
             
             return super.put(key, value); 
