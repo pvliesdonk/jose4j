@@ -39,12 +39,13 @@ public class JsonHelp
 
     public static IntDate getIntDate(Map<String, Object> map, String name)
     {
-        long l = (Long)map.get(name);
+        long l = getLong(map, name);
         return IntDate.fromSeconds(l);
     }
 
-    public static Long getLong(Map<String, Object> map, String name)
+    public static Long getLong(Map<String, ?> map, String name)
     {
-        return (Long)map.get(name);
+        Object o = map.get(name);
+        return o != null ? ((Number) o).longValue() : null;
     }
 }
