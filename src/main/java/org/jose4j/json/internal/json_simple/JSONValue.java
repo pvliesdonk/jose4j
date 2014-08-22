@@ -112,10 +112,10 @@ public class JSONValue {
      * "this" as the first parameter, use JSONObject.writeJSONString(Map, Writer) or JSONArray.writeJSONString(List, Writer) instead. 
      * 
      * @see org.jose4j.json.internal.json_simple.JSONObject#writeJSONString(Map, Writer)
-     * @see org.jose4j.json.internal.json_simple.JSONArray#writeJSONString(List, Writer)
+     * @see org.jose4j.json.internal.json_simple.JSONArray#writeJSONString(Collection, Writer)
      * 
      * @param value
-     * @param writer
+     * @param out
      */
 	public static void writeJSONString(Object value, Writer out) throws IOException {
 		if(value == null){
@@ -233,7 +233,7 @@ public class JSONValue {
 	 * "this" as the parameter, use JSONObject.toJSONString(Map) or JSONArray.toJSONString(List) instead. 
 	 * 
 	 * @see org.jose4j.json.internal.json_simple.JSONObject#toJSONString(Map)
-	 * @see org.jose4j.json.internal.json_simple.JSONArray#toJSONString(List)
+	 * @see org.jose4j.json.internal.json_simple.JSONArray#toJSONString(Collection)
 	 * 
 	 * @param value
 	 * @return JSON text, or "null" if value is null or it's an NaN or an INF number.
