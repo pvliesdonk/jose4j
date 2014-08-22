@@ -69,7 +69,7 @@ public class ParseException extends Exception {
 	}
 	
 	public String getMessage() {
-		StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 		
 		switch(errorType){
 		case ERROR_UNEXPECTED_CHAR:
@@ -82,7 +82,7 @@ public class ParseException extends Exception {
 			sb.append("Unexpected exception at position ").append(position).append(": ").append(unexpectedObject);
 			break;
 		default:
-			sb.append("Unkown error at position ").append(position).append(".");
+			sb.append("Unknown error at position ").append(position).append(".");
 			break;
 		}
 		return sb.toString();

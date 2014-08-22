@@ -104,7 +104,7 @@ public class JSONObject extends HashMap implements Map, JSONAware, JSONStreamAwa
 	}
 
 	public static String toString(String key,Object value){
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append('\"');
         if(key == null)
             sb.append("null");

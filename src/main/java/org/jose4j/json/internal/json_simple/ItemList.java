@@ -122,7 +122,7 @@ public class ItemList {
 	}
 	
 	public String toString(String sp){
-		StringBuffer sb=new StringBuffer();
+		StringBuilder sb=new StringBuilder();
 		
 		for(int i=0;i<items.size();i++){
 			if(i==0)

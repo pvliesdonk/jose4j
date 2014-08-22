@@ -264,7 +264,7 @@ class Yylex {
   private boolean zzAtEOF;
 
   /* user code: */
-private StringBuffer sb=new StringBuffer();
+private StringBuilder sb=new StringBuilder();
 
 int getPosition(){
 	return yychar;
@@ -575,7 +575,7 @@ int getPosition(){
           }
         case 25: break;
         case 4: 
-          { sb = null; sb = new StringBuffer(); yybegin(STRING_BEGIN);
+          { sb = null; sb = new StringBuilder(); yybegin(STRING_BEGIN);
           }
         case 26: break;
         case 16: 
