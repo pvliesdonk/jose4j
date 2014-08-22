@@ -1,4 +1,4 @@
-package org.jose4j.org.apache.commons.codec.binary;
+package org.jose4j.base64url.internal.apache.commons.codec.binary;
 
 /*
  * Base64 and BaseNCodec were copied (and modified slightly to remove/replace dependencies) from

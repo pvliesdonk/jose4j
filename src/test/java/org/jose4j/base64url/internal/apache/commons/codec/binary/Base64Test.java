@@ -1,4 +1,4 @@
-package org.jose4j.org.apache.commons.codec.binary;
+package org.jose4j.base64url.internal.apache.commons.codec.binary;
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -42,7 +42,6 @@ import java.util.Random;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.jose4j.lang.StringUtil;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
