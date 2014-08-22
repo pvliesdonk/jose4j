@@ -16,7 +16,7 @@
 
 package org.jose4j.keys;
 
-import org.jose4j.base64url.internal.apache.commons.codec.binary.Base64;
+import org.jose4j.base64url.Base64;
 import org.jose4j.lang.JoseException;
 
 import java.io.ByteArrayInputStream;
@@ -30,7 +30,6 @@ public class X509Util
 
     private CertificateFactory certFactory;
 
-    private Base64 base64 = new Base64();
 
     public X509Util()
     {
@@ -49,7 +48,7 @@ public class X509Util
         try
         {
             byte[] der = x509Certificate.getEncoded();
-            return base64.encodeToString(der);
+            return Base64.encode(der);
         }
         catch (CertificateEncodingException e)
         {
@@ -59,7 +58,7 @@ public class X509Util
 
     public X509Certificate fromBase64Der(String b64EncodedDer) throws JoseException
     {
-        byte[] der = base64.decode(b64EncodedDer);
+        byte[] der = Base64.decode(b64EncodedDer);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(der);
         try
         {
