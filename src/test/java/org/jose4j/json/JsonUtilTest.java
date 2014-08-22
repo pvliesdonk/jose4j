@@ -82,4 +82,7 @@ public class JsonUtilTest extends TestCase
             // expected
         }
     }
+
+    //todo some general JSON tests?
+    // todo disallow extra trailing data (and leading?)
 }

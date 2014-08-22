@@ -16,17 +16,28 @@
 
 package org.jose4j.json;
 
+import org.jose4j.json.internal.json_simple.parser.ContainerFactory;
+import org.jose4j.json.internal.json_simple.parser.JSONParser;
+import org.jose4j.json.internal.json_simple.JSONValue;
+
+import org.jose4j.json.internal.json_simple.parser.ParseException;
 import org.jose4j.lang.JoseException;
-import org.json.simple.JSONValue;
-import org.json.simple.parser.ContainerFactory;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
 /**
+ * This class should be the point of contact for JSON processing.
+ *
+ * The code in the internal.json_simple package was originally taken from the Apache 2.0 licensed json-simple
+ * source code (changing the package). I'm a little uneasy about it. But json-simple hasn't changed much in years
+ * and jose4j only needs fairly basic JSON processing. Doing this lets me remove one more dependency
+ * and avoid any potential dependency conflicts. It also will let me to make changes to the JSON processing
+ * like not escaping forward slashes. There’s some risk in this but moving to a new/different processor
+ * in the future isn’t really made particularly more difficult by this (as long as this class is the touch point
+ * for JSON processing).
  */
 public class JsonUtil
 {

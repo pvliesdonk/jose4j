@@ -8,3 +8,7 @@ implementation. http://santuario.apache.org/
 
 The Base64 implementation in this software was derived from the
 Apache Commons Codec project. http://commons.apache.org/proper/commons-codec/
+
+JSON processing in this software was derived from the JSON.simple toolkit.
+https://code.google.com/p/json-simple/
+
