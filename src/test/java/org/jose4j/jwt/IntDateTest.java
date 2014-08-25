@@ -57,4 +57,26 @@ public class IntDateTest extends TestCase
         assertFalse(date1.equals(date2));
         assertFalse(date2.equals(date1));
     }
+
+    public void testAddSecs()
+    {
+        IntDate date = IntDate.fromMillis(0);
+        int seconds = 100;
+        date.addSeconds(seconds);
+        assertEquals(100, date.getValue());
+
+        date = IntDate.fromMillis(0);
+        long secondsLong = 100L;
+        date.addSeconds(secondsLong);
+        assertEquals(100, date.getValue());
+
+        date = IntDate.fromMillis(0);
+        date.addSeconds(100);
+        assertEquals(100, date.getValue());
+
+        date = IntDate.fromMillis(0);
+        date.addSeconds(100L);
+        assertEquals(100, date.getValue());
+    }
+
 }

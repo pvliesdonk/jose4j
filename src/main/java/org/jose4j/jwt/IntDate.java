@@ -50,6 +50,11 @@ public class IntDate
         value += seconds;
     }
 
+    public void addSeconds(int seconds)
+    {
+        addSeconds((long)seconds);
+    }
+
     /**
      * Retruns a numeric value representing the number of seconds from
      * 1970-01-01T0:0:0Z UTC until the given UTC date/time
