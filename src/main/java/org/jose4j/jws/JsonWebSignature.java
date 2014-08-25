@@ -43,7 +43,10 @@ public class JsonWebSignature extends JsonWebStructure
 
     public JsonWebSignature()
     {
-        setAlgorithmConstraints(AlgorithmConstraints.DISALLOW_NONE);
+        if (!Boolean.getBoolean("org.jose4j.jws.default-allow-none"))
+        {
+            setAlgorithmConstraints(AlgorithmConstraints.DISALLOW_NONE);
+        }
     }
 
     public void setPayload(String payload)

@@ -114,4 +114,35 @@ public class JwsPlaintextTest
         String payload = jws.getPayload();
         log.debug(payload);
     }
+
+    @Test
+    public void testSysPropForDefaultHandlingOfNone() throws JoseException
+    {
+        String propertyName = "org.jose4j.jws.default-allow-none";
+        try
+        {
+            System.setProperty(propertyName, "true");
+            JsonWebSignature jws = new JsonWebSignature();
+            jws.setPayload("meh");
+            jws.setAlgorithmHeaderValue(NONE);
+            jws.getCompactSerialization();
+        }
+        finally
+        {
+            System.clearProperty(propertyName);
+        }
+
+        try
+        {
+            JsonWebSignature jws = new JsonWebSignature();
+            jws.setPayload("meh");
+            jws.setAlgorithmHeaderValue(NONE);
+            jws.getCompactSerialization();
+            fail("none shouldn't have been allowed");
+        }
+        catch (InvalidAlgorithmException e)
+        {
+            // expected
+        }
+    }
 }
