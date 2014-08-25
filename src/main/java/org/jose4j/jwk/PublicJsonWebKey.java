@@ -86,7 +86,7 @@ public abstract class PublicJsonWebKey extends JsonWebKey
 
             for (X509Certificate cert : certificateChain)
             {
-               String b64EncodedDer = x509Util.toBase64Der(cert);
+               String b64EncodedDer = x509Util.toPem(cert);
                x5cStrings.add(b64EncodedDer);
             }
 

@@ -17,6 +17,9 @@
 package org.jose4j.keys;
 
 import junit.framework.TestCase;
+import org.jose4j.base64url.internal.apache.commons.codec.binary.BaseNCodec;
+import org.jose4j.jwk.JsonWebKey;
+import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.lang.JoseException;
 
 import java.security.cert.X509Certificate;
@@ -25,7 +28,7 @@ import java.security.cert.X509Certificate;
  */
 public class X509UtilTest extends TestCase
 {
-    public void testFromBase64Der() throws JoseException
+    public void testFromBase64DerAndBackAndMore() throws JoseException
     {
         String s =
                 "MIICUTCCAfugAwIBAgIBADANBgkqhkiG9w0BAQQFADBXMQswCQYDVQQGEwJDTjEL\n" +
@@ -45,6 +48,18 @@ public class X509UtilTest extends TestCase
         X509Util x5u = new X509Util();
         X509Certificate x509Certificate = x5u.fromBase64Der(s);
         assertTrue(x509Certificate.getSubjectDN().toString().contains("Yang"));
+
+        String pem = x5u.toPem(x509Certificate);
+        assertTrue(pem.charAt(BaseNCodec.PEM_CHUNK_SIZE) == '\r');
+        assertTrue(pem.charAt(BaseNCodec.PEM_CHUNK_SIZE + 1) == '\n');
+
+        PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(x509Certificate.getPublicKey());
+        jwk.setCertificateChain(x509Certificate);
+        String jsonJwk = jwk.toJson(JsonWebKey.OutputControlLevel.PUBLIC_ONLY);
+
+        PublicJsonWebKey jwkFromJson = PublicJsonWebKey.Factory.newPublicJwk(jsonJwk);
+        assertEquals(x509Certificate.getPublicKey(), jwkFromJson.getPublicKey());
+        assertEquals(x509Certificate, jwkFromJson.getLeafCertificate());
     }
 
     public void testFromGoogleEndpoint() throws JoseException
