@@ -63,6 +63,11 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
 
     void validateKey(Key key) throws InvalidKeyException
     {
+        if (key == null)
+        {
+            throw new InvalidKeyException("key is null");
+        }
+
         int length = ByteUtil.bitLength(key.getEncoded());
         if (length < minimumKeyLength)
         {
