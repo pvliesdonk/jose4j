@@ -131,7 +131,7 @@ public class JsonWebSignature extends JsonWebStructure
 
     public String getPayload() throws JoseException
     {
-        if (!verifySignature())
+        if (!Boolean.getBoolean("org.jose4j.jws.getPayload-skip-verify") && !verifySignature())
         {
             throw new IntegrityException("JWS signature is invalid.");
         }
