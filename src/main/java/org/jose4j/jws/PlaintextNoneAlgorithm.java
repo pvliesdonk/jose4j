@@ -26,6 +26,7 @@ import org.jose4j.lang.JoseException;
 import java.security.Key;
 
 /**
+ *  TODO as of http://tools.ietf.org/html/draft-ietf-jose-json-web-signature-32 the term Plaintext JWS was replace with Unsecured JWS and I'd like to change the name here to match but worry (a little) about compatibility
  */
 public class PlaintextNoneAlgorithm extends AlgorithmInfo implements JsonWebSignatureAlgorithm
 {
