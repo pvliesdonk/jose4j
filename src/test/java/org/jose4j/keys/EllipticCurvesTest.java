@@ -17,15 +17,24 @@
 package org.jose4j.keys;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
+import java.security.spec.ECGenParameterSpec;
+import java.security.spec.ECParameterSpec;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  */
-public class EllipticCurvesTest extends TestCase
+public class EllipticCurvesTest
 {
+    @Test
     public void testGetName() throws Exception
     {
         String b64d = "MIIBbjCCARKgAwIBAgIGAT0hzf2zMAwGCCqGSM49BAMCBQAwPDENMAsGA1UEBhMEbnVsbDErMCkGA1UEAxMiYXV0by1nZW5lcmF0ZWQgd3JhcHBlciBjZXJ0aWZpY2F0ZTAeFw0xMzAyMjgxNzE2MjBaFw0xNDAyMjgxNzE2MjBaMDwxDTALBgNVBAYTBG51bGwxKzApBgNVBAMTImF1dG8tZ2VuZXJhdGVkIHdyYXBwZXIgY2VydGlmaWNhdGUwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARwLMpLp9BHKkFoGUE25feUccsQMJQY8JlFV7DIC596FBdjvcbxvfiStEDkcA4WOZThyQnPZlrPKqc2A4QuQRDmMAwGCCqGSM49BAMCBQADSAAwRQIhAPladiFs6XVS7fqfuvC8DEY0kmaoKWuGE30AA88NsIYzAiB9gUEGxDjEiLrjgjl9ds7n+7iBDhS4C5V2MpTG2QND5A==";
@@ -35,6 +44,29 @@ public class EllipticCurvesTest extends TestCase
         PublicKey publicKey = x509Certificate.getPublicKey();
         ECPublicKey ecPublicKey = (ECPublicKey) publicKey;
         String name = EllipticCurves.getName(ecPublicKey.getParams().getCurve());
-        assertEquals(EllipticCurves.P_256, name);
+        Assert.assertEquals(EllipticCurves.P_256, name);
+    }
+
+    @Test
+    public void testNames() throws Exception
+    {
+        // Test my names and the EllipticCurves class against the 'standard name' which I didn't know about
+        // but someone pointed me to "Implementing ECC with Java Standard Edition 7" at http://www.academicpub.org/PaperInfo.aspx?PaperID=14496
+        // which educated me a bit
+        Map<String,String> names = new LinkedHashMap<>();
+        names.put("secp256r1", EllipticCurves.P_256);
+        names.put("secp384r1", EllipticCurves.P_384);
+        names.put("secp521r1", EllipticCurves.P_521);
+
+        for (Map.Entry<String,String> e : names.entrySet())
+        {
+            ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec(e.getKey());
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC");
+            kpg.initialize(ecGenParameterSpec);
+            KeyPair keyPair = kpg.generateKeyPair();
+            ECPublicKey ecpub = (ECPublicKey) keyPair.getPublic();
+            ECParameterSpec params = ecpub.getParams();
+            Assert.assertEquals(e.getValue(), EllipticCurves.getName(params.getCurve()));
+        }
     }
 }
