@@ -20,10 +20,7 @@ import org.jose4j.base64url.Base64Url;
 import org.jose4j.json.JsonUtil;
 import org.jose4j.jwa.JceProviderTestSupport;
 import org.jose4j.jwe.*;
-import org.jose4j.jwk.EllipticCurveJsonWebKey;
-import org.jose4j.jwk.JsonWebKey;
-import org.jose4j.jwk.PublicJsonWebKey;
-import org.jose4j.jwk.Use;
+import org.jose4j.jwk.*;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwx.CompactSerializer;
@@ -33,9 +30,11 @@ import org.jose4j.keys.AesKey;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.lang.JoseException;
+import org.jose4j.lang.JsonHelp;
 import org.junit.Test;
 
 import java.security.Key;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.jose4j.jwa.JceProviderTestSupport.*;
@@ -54,6 +53,8 @@ import static org.junit.Assert.*;
  *
  *  3.1.  EC Public Key
  *  3.2.  EC Private Key
+ *  3.3.  RSA Public Key
+ *  3.4.  RSA Private Key
  *
  * 4.1. RSA v1.5 Signature
  * 4.2. RSA-PSS Signature (via the the Bouncy Castle provider)
@@ -256,6 +257,122 @@ public class JoseCookbookTest
         String jsonOutput = jwk.toJson(JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE);
         // check the d in the output look the same (to ensure leading zero bytes are there, for example) and that it's there
         assertThat(jsonOutput, containsString("\"AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zbKipQrCW9CGZH3T4ubpnoTKLDYJ_fF3_rJt\""));
+    }
+
+    @Test
+    public void RSA_Public_Key_3_3() throws JoseException
+    {
+        String jwkJson =
+                "   {\n" +
+                "     \"kty\": \"RSA\",\n" +
+                "     \"kid\": \"bilbo.baggins@hobbiton.example\",\n" +
+                "     \"use\": \"sig\",\n" +
+                "     \"n\": \"n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT\n" +
+                "         -O-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqV\n" +
+                "         wGU_NsYOYL-QtiWN2lbzcEe6XC0dApr5ydQLrHqkHHig3RBordaZ6Aj-\n" +
+                "         oBHqFEHYpPe7Tpe-OfVfHd1E6cS6M1FZcD1NNLYD5lFHpPI9bTwJlsde\n" +
+                "         3uhGqC0ZCuEHg8lhzwOHrtIQbS0FVbb9k3-tVTU4fg_3L_vniUFAKwuC\n" +
+                "         LqKnS2BYwdq_mzSnbLY7h_qixoR7jig3__kRhuaxwUkRz5iaiQkqgc5g\n" +
+                "         HdrNP5zw\",\n" +
+                "     \"e\": \"AQAB\"\n" +
+                "   }";
+        commonRsaKey(jwkJson);
+
+    }
+
+    private RsaJsonWebKey commonRsaKey(String jwkJson) throws JoseException
+    {
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
+        assertThat(jwk.getKeyId(), is(equalTo("bilbo.baggins@hobbiton.example")));
+        assertThat(jwk.getUse(), is(equalTo(Use.SIGNATURE)));
+
+        // For a 2048-bit key, the field "n" value is 256 octets in length when decoded.
+        Key key = jwk.getKey();
+        JsonWebKey jwkFromKey = JsonWebKey.Factory.newJwk(key);
+        String jsonOutput = jwkFromKey.toJson(JsonWebKey.OutputControlLevel.PUBLIC_ONLY);
+        final Map<String,Object> params = JsonUtil.parseJson(jsonOutput);
+        // check the public key parts in the output look the same just 'cause
+        final String n = JsonHelp.getString(params, "n");
+        final String expectedN = "n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT-O-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqVwGU_NsYOYL-QtiWN2lbzcEe6XC0d" +
+                "Apr5ydQLrHqkHHig3RBordaZ6Aj-oBHqFEHYpPe7Tpe-OfVfHd1E6cS6M1FZcD1NNLYD5lFHpPI9bTwJlsde3uhGqC0ZCuEHg8lhzwOHrtIQbS0FVbb9k3-tVTU4fg_3L_vniUFAKwuCLqKnS2BYwdq_mzS" +
+                "nbLY7h_qixoR7jig3__kRhuaxwUkRz5iaiQkqgc5gHdrNP5zw";
+        assertThat(n, equalTo(expectedN));
+        assertThat(JsonHelp.getString(params, "e"), equalTo("AQAB"));
+        // make sure the private key parts aren't there
+        assertThat(params.get("d"), is(nullValue()));
+        assertThat(params.get("p"), is(nullValue()));
+        assertThat(params.get("q"), is(nullValue()));
+        assertThat(params.get("dp"), is(nullValue()));
+        assertThat(params.get("dq"), is(nullValue()));
+        assertThat(params.get("qi"), is(nullValue()));
+        return (RsaJsonWebKey) jwk;
+    }
+
+    @Test
+    public void RSA_Private_Key_3_4() throws JoseException
+    {
+        String jwkJson = "   {\n" +
+                "     \"kty\": \"RSA\",\n" +
+                "     \"kid\": \"bilbo.baggins@hobbiton.example\",\n" +
+                "     \"use\": \"sig\",\n" +
+                "     \"n\": \"n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT\n" +
+                "         -O-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqV\n" +
+                "         wGU_NsYOYL-QtiWN2lbzcEe6XC0dApr5ydQLrHqkHHig3RBordaZ6Aj-\n" +
+                "         oBHqFEHYpPe7Tpe-OfVfHd1E6cS6M1FZcD1NNLYD5lFHpPI9bTwJlsde\n" +
+                "         3uhGqC0ZCuEHg8lhzwOHrtIQbS0FVbb9k3-tVTU4fg_3L_vniUFAKwuC\n" +
+                "         LqKnS2BYwdq_mzSnbLY7h_qixoR7jig3__kRhuaxwUkRz5iaiQkqgc5g\n" +
+                "         HdrNP5zw\",\n" +
+                "     \"e\": \"AQAB\",\n" +
+                "     \"d\": \"bWUC9B-EFRIo8kpGfh0ZuyGPvMNKvYWNtB_ikiH9k20eT-O1q_I78e\n" +
+                "         iZkpXxXQ0UTEs2LsNRS-8uJbvQ-A1irkwMSMkK1J3XTGgdrhCku9gRld\n" +
+                "         Y7sNA_AKZGh-Q661_42rINLRCe8W-nZ34ui_qOfkLnK9QWDDqpaIsA-b\n" +
+                "         MwWWSDFu2MUBYwkHTMEzLYGqOe04noqeq1hExBTHBOBdkMXiuFhUq1BU\n" +
+                "         6l-DqEiWxqg82sXt2h-LMnT3046AOYJoRioz75tSUQfGCshWTBnP5uDj\n" +
+                "         d18kKhyv07lhfSJdrPdM5Plyl21hsFf4L_mHCuoFau7gdsPfHPxxjVOc\n" +
+                "         OpBrQzwQ\",\n" +
+                "     \"p\": \"3Slxg_DwTXJcb6095RoXygQCAZ5RnAvZlno1yhHtnUex_fp7AZ_9nR\n" +
+                "         aO7HX_-SFfGQeutao2TDjDAWU4Vupk8rw9JR0AzZ0N2fvuIAmr_WCsmG\n" +
+                "         peNqQnev1T7IyEsnh8UMt-n5CafhkikzhEsrmndH6LxOrvRJlsPp6Zv8\n" +
+                "         bUq0k\",\n" +
+                "     \"q\": \"uKE2dh-cTf6ERF4k4e_jy78GfPYUIaUyoSSJuBzp3Cubk3OCqs6grT\n" +
+                "         8bR_cu0Dm1MZwWmtdqDyI95HrUeq3MP15vMMON8lHTeZu2lmKvwqW7an\n" +
+                "         V5UzhM1iZ7z4yMkuUwFWoBvyY898EXvRD-hdqRxHlSqAZ192zB3pVFJ0\n" +
+                "         s7pFc\",\n" +
+                "     \"dp\": \"B8PVvXkvJrj2L-GYQ7v3y9r6Kw5g9SahXBwsWUzp19TVlgI-YV85q\n" +
+                "         1NIb1rxQtD-IsXXR3-TanevuRPRt5OBOdiMGQp8pbt26gljYfKU_E9xn\n" +
+                "         -RULHz0-ed9E9gXLKD4VGngpz-PfQ_q29pk5xWHoJp009Qf1HvChixRX\n" +
+                "         59ehik\",\n" +
+                "     \"dq\": \"CLDmDGduhylc9o7r84rEUVn7pzQ6PF83Y-iBZx5NT-TpnOZKF1pEr\n" +
+                "         AMVeKzFEl41DlHHqqBLSM0W1sOFbwTxYWZDm6sI6og5iTbwQGIC3gnJK\n" +
+                "         bi_7k_vJgGHwHxgPaX2PnvP-zyEkDERuf-ry4c_Z11Cq9AqC2yeL6kdK\n" +
+                "         T1cYF8\",\n" +
+                "     \"qi\": \"3PiqvXQN0zwMeE-sBvZgi289XP9XCQF3VWqPzMKnIgQp7_Tugo6-N\n" +
+                "         ZBKCQsMf3HaEGBjTVJs_jcK8-TRXvaKe-7ZMaQj8VfBdYkssbu0NKDDh\n" +
+                "         jJ-GtiseaDVWt7dcH0cfwxgFUHpQh7FoCrjFJ6h6ZEpMF6xmujs4qMpP\n" +
+                "         z8aaI4\"\n" +
+                "   }";
+        RsaJsonWebKey jwk = commonRsaKey(jwkJson);
+        String jsonOutput = jwk.toJson(JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE);
+        Map<String, Object> params = JsonUtil.parseJson(jsonOutput);
+        String expectedD = "bWUC9B-EFRIo8kpGfh0ZuyGPvMNKvYWNtB_ikiH9k20eT-O1q_I78eiZkpXxXQ0UTEs2LsNRS-8uJbvQ-A1irkwMSMkK1J3XTGgdrhCku9gRldY7sNA_AKZGh-Q661_" +
+                "42rINLRCe8W-nZ34ui_qOfkLnK9QWDDqpaIsA-bMwWWSDFu2MUBYwkHTMEzLYGqOe04noqeq1hExBTHBOBdkMXiuFhUq1BU6l-DqEiWxqg82sXt2h-LMnT3046AOYJoRioz75tSUQfGCshWTBnP5uDj" +
+                "d18kKhyv07lhfSJdrPdM5Plyl21hsFf4L_mHCuoFau7gdsPfHPxxjVOcOpBrQzwQ";
+        assertThat(JsonHelp.getString(params, "d"), is(equalTo(expectedD)));
+        String expectedP = "3Slxg_DwTXJcb6095RoXygQCAZ5RnAvZlno1yhHtnUex_fp7AZ_9nRaO7HX_-SFfGQeutao2TDjDAWU4Vupk8rw9JR0AzZ0N2fvuIAmr_WCsmG" +
+                "peNqQnev1T7IyEsnh8UMt-n5CafhkikzhEsrmndH6LxOrvRJlsPp6Zv8bUq0k";
+        assertThat(JsonHelp.getString(params, "p"), is(equalTo(expectedP)));
+        String expectedQ = "uKE2dh-cTf6ERF4k4e_jy78GfPYUIaUyoSSJuBzp3Cubk3OCqs6grT8bR_cu0Dm1MZwWmtdqDyI95HrUeq3MP15vMMON8lHTeZu2lmKvwqW7anV5UzhM1iZ7z4yMkuUwFWoBvyY" +
+                "898EXvRD-hdqRxHlSqAZ192zB3pVFJ0s7pFc";
+        assertThat(JsonHelp.getString(params, "q"), is(equalTo(expectedQ)));
+        String expectedDP = "B8PVvXkvJrj2L-GYQ7v3y9r6Kw5g9SahXBwsWUzp19TVlgI-YV85q1NIb1rxQtD-IsXXR3-TanevuRPRt5OBOdiMGQp8pbt26gljYfKU_E9xn" +
+                "-RULHz0-ed9E9gXLKD4VGngpz-PfQ_q29pk5xWHoJp009Qf1HvChixRX59ehik";
+        assertThat(JsonHelp.getString(params, "dp"), is(equalTo(expectedDP)));
+        String expectedDQ = "CLDmDGduhylc9o7r84rEUVn7pzQ6PF83Y-iBZx5NT-TpnOZKF1pErAMVeKzFEl41DlHHqqBLSM0W1sOFbwTxYWZDm6sI6og5iTbwQGIC3gnJK" +
+                "bi_7k_vJgGHwHxgPaX2PnvP-zyEkDERuf-ry4c_Z11Cq9AqC2yeL6kdKT1cYF8";
+        assertThat(JsonHelp.getString(params, "dq"), is(equalTo(expectedDQ)));
+        String expectedQI = "3PiqvXQN0zwMeE-sBvZgi289XP9XCQF3VWqPzMKnIgQp7_Tugo6-NZBKCQsMf3HaEGBjTVJs_jcK8-TRXvaKe-7ZMaQj8VfBdYkssbu0NKDDh" +
+                "jJ-GtiseaDVWt7dcH0cfwxgFUHpQh7FoCrjFJ6h6ZEpMF6xmujs4qMpPz8aaI4";
+        assertThat(JsonHelp.getString(params, "qi"), is(equalTo(expectedQI)));
     }
 
     @Test
