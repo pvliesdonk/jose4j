@@ -53,6 +53,7 @@ import static org.junit.Assert.*;
  * by -06 I got myself in there twice https://tools.ietf.org/html/draft-ietf-jose-cookbook-06#appendix-A
  *
  *  3.1.  EC Public Key
+ *  3.2.  EC Private Key
  *
  * 4.1. RSA v1.5 Signature
  * 4.2. RSA-PSS Signature (via the the Bouncy Castle provider)
@@ -215,6 +216,11 @@ public class JoseCookbookTest
                 "     \"y\": \"AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1\"\n" +
                 "   }";
 
+        commonEcKey(jwkJson);
+    }
+
+    private EllipticCurveJsonWebKey commonEcKey(String jwkJson) throws JoseException
+    {
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
         assertThat(jwk.getKeyId(), is(equalTo("bilbo.baggins@hobbiton.example")));
         assertThat(jwk.getUse(), is(equalTo(Use.SIGNATURE)));
@@ -228,6 +234,28 @@ public class JoseCookbookTest
         // check the x and y in the output look the same (to ensure leading zero bytes are there, for example)
         assertThat(jsonOutput, containsString("\"AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9A5RkTKqjqvjyekWF-7ytDyRXYgCF5cj0Kt\""));
         assertThat(jsonOutput, containsString("\"AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1\""));
+        // make sure the private key isn't there
+        assertThat(jsonOutput, not(containsString("AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zbKipQrCW9CGZH3T4ubpnoTKLDYJ_fF3_rJt")));
+        return ecJwk;
+    }
+
+    @Test
+    public void EC_Private_Key_3_2() throws JoseException
+    {
+        String jwkJson = "\n" +
+                "   {\n" +
+                "     \"kty\": \"EC\",\n" +
+                "     \"kid\": \"bilbo.baggins@hobbiton.example\",\n" +
+                "     \"use\": \"sig\",\n" +
+                "     \"crv\": \"P-521\",\n" +
+                "     \"x\": \"AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9A5RkTKqjqvjyekWF-7ytDyRXYgCF5cj0Kt\",\n" +
+                "     \"y\": \"AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1\",\n" +
+                "     \"d\": \"AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zbKipQrCW9CGZH3T4ubpnoTKLDYJ_fF3_rJt\"\n" +
+                "   }";
+        EllipticCurveJsonWebKey jwk = commonEcKey(jwkJson);
+        String jsonOutput = jwk.toJson(JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE);
+        // check the d in the output look the same (to ensure leading zero bytes are there, for example) and that it's there
+        assertThat(jsonOutput, containsString("\"AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zbKipQrCW9CGZH3T4ubpnoTKLDYJ_fF3_rJt\""));
     }
 
     @Test
