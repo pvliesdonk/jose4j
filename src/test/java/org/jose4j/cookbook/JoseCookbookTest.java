@@ -46,23 +46,27 @@ import static org.junit.Assert.*;
  * there's even acknowledgement of it
  * http://tools.ietf.org/html/draft-ietf-jose-cookbook-02#appendix-A
  *
- * 3.1. RSA v1.5 Signature
- * 3.2. RSA-PSS Signature (via the the Bouncy Castle provider)
- * 3.3. ECDSA Signature
- * 3.4. HMAC-SHA2 Integrity Protection
- * 3.5. Detached Signature
+ * by -06 I got myself in there twice https://tools.ietf.org/html/draft-ietf-jose-cookbook-06#appendix-A
  *
- * 4.1. Key Encryption using RSA v1.5 and AES-HMAC-SHA2
- * 4.2. Key Encryption using RSA-OAEP with A256GCM
- * 4.3. Key Wrap using PBES2-AES-KeyWrap with AES-CBC-HMAC-SHA2
- * 4.4. Key Agreement with Key Wrapping using ECDH-ES and AES-KeyWrap with AES-GCM
- * 4.5. Key Agreement using ECDH-ES with AES-CBC-HMAC-SHA2
- * 4.6. Direct Encryption using AES-GCM
- * 4.7. Key Wrap using AES-GCM KeyWrap with AES-CBC-HMAC-SHA2
- * 4.8. Key Wrap using AES-KeyWrap with AES-GCM
- * 4.9. Compressed Content
  *
- * 5. Nesting Signatures and Encryption
+ *
+ * 4.1. RSA v1.5 Signature
+ * 4.2. RSA-PSS Signature (via the the Bouncy Castle provider)
+ * 4.3. ECDSA Signature
+ * 4.4. HMAC-SHA2 Integrity Protection
+ * 4.5. Detached Signature
+ *
+ * 5.1. Key Encryption using RSA v1.5 and AES-HMAC-SHA2
+ * 5.2. Key Encryption using RSA-OAEP with A256GCM
+ * 5.3. Key Wrap using PBES2-AES-KeyWrap with AES-CBC-HMAC-SHA2
+ * 5.4. Key Agreement with Key Wrapping using ECDH-ES and AES-KeyWrap with AES-GCM
+ * 5.5. Key Agreement using ECDH-ES with AES-CBC-HMAC-SHA2
+ * 5.6. Direct Encryption using AES-GCM
+ * 5.7. Key Wrap using AES-GCM KeyWrap with AES-CBC-HMAC-SHA2
+ * 5.8. Key Wrap using AES-KeyWrap with AES-GCM
+ * 5.9. Compressed Content
+ *
+ * 6. Nesting Signatures and Encryption
  *
  */
 public class JoseCookbookTest
@@ -195,7 +199,7 @@ public class JoseCookbookTest
         "}";
 
     @Test
-    public void rsa_v1_5Signature_3_1() throws JoseException
+    public void rsa_v1_5Signature_4_1() throws JoseException
     {
         String jwsCompactSerialization =
                 "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZX" +
@@ -238,7 +242,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void rsaPssSignature_3_2() throws Exception
+    public void rsaPssSignature_4_2() throws Exception
     {
         final String rsaPssUsingSha384 = AlgorithmIdentifiers.RSA_PSS_USING_SHA384;
         JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
@@ -282,7 +286,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void ecdsaSignature_3_3() throws JoseException
+    public void ecdsaSignature_4_3() throws JoseException
     {
         String jwkJson = 
                 "{\n" +
@@ -332,7 +336,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void hmacSha2IntegrityProtection_3_4() throws JoseException
+    public void hmacSha2IntegrityProtection_4_4() throws JoseException
     {
         String jwkJson =
                "   {\n" +
@@ -376,7 +380,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void detached_3_5() throws JoseException
+    public void detached_4_5() throws JoseException
     {
         String jwkJsonString =
                 "   {\n" +
@@ -417,7 +421,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void encryptionRSAv1_5andAES_HMAC_SHA2_4_1() throws JoseException
+    public void encryptionRSAv1_5andAES_HMAC_SHA2_5_1() throws JoseException
     {
         String jwkJsonString =
                 "{\n" +
@@ -516,7 +520,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void encryptionRSA_OAEPandAesGcm_4_2() throws Exception
+    public void encryptionRSA_OAEPandAesGcm_5_2() throws Exception
     {
         JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
         jceProviderTestSupport.setEncryptionAlgsNeeded(ContentEncryptionAlgorithmIdentifiers.AES_256_GCM);
@@ -601,7 +605,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void encryptionPbes_4_3() throws JoseException
+    public void encryptionPbes_5_3() throws JoseException
     {
         String password = "entrap_o_peter_long_credit_tun";
 
@@ -658,7 +662,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void encryptionPbes_4_3_from_draft_2() throws JoseException
+    public void encryptionPbes_old_was_4_3_from_draft_2() throws JoseException
     {
         // draft -02 used, I think by accident, PBES2-HS256+A128KW, which was changed
         // to PBES2-HS512+A256KW in -03 but the content from -02 is still a useful example so keeping it here
@@ -718,7 +722,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void keyAgreementWithKeyWrapAndGcm4_4() throws Exception
+    public void keyAgreementWithKeyWrapAndGcm5_4() throws Exception
     {
         JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
         jceProviderTestSupport.setEncryptionAlgsNeeded(ContentEncryptionAlgorithmIdentifiers.AES_128_GCM);
@@ -776,7 +780,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void keyAgreementAndAesCbc_4_5() throws JoseException
+    public void keyAgreementAndAesCbc_5_5() throws JoseException
     {
         String jwkJson =
                 "{" +
@@ -819,7 +823,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void directEncryptionUsingAESGCM_4_6() throws Exception
+    public void directEncryptionUsingAESGCM_5_6() throws Exception
     {
         JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
         jceProviderTestSupport.setEncryptionAlgsNeeded(ContentEncryptionAlgorithmIdentifiers.AES_128_GCM);
@@ -873,7 +877,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void gcmKeyWrapWithAesCbcContentEncryption_4_7() throws Exception
+    public void gcmKeyWrapWithAesCbcContentEncryption_5_7() throws Exception
     {
         JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
         jceProviderTestSupport.setKeyManagementAlgsNeeded(KeyManagementAlgorithmIdentifiers.A256GCMKW);
@@ -946,7 +950,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void aesKeyWrapAESGCM_4_8() throws Exception
+    public void aesKeyWrapAESGCM_5_8() throws Exception
     {
         final String cs =
                 "eyJhbGciOiJBMTI4S1ciLCJraWQiOiI4MWIyMDk2NS04MzMyLTQzZDktYTQ2OC" +
@@ -965,10 +969,10 @@ public class JoseCookbookTest
                 "." +
                 "ER7MWJZ1FBI_NKvn7Zb1Lw";
 
-        common_4_8_and_4_9(cs);
+        common_5_8_and_5_9(cs);
     }
 
-    private void common_4_8_and_4_9(final String cs) throws Exception
+    private void common_5_8_and_5_9(final String cs) throws Exception
     {
         JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
         jceProviderTestSupport.setEncryptionAlgsNeeded(ContentEncryptionAlgorithmIdentifiers.AES_128_GCM);
@@ -995,7 +999,7 @@ public class JoseCookbookTest
     }
 
     @Test
-    public void aesKeyWrapAESGCMWithCompressedContent_4_9() throws Exception
+    public void aesKeyWrapAESGCMWithCompressedContent_5_9() throws Exception
     {
         String cs =
                 "eyJhbGciOiJBMTI4S1ciLCJraWQiOiI4MWIyMDk2NS04MzMyLTQzZDktYTQ2OC" +
@@ -1011,7 +1015,7 @@ public class JoseCookbookTest
                 "hpYA7qi3AyijnCJ7BP9rr3U8kxExCpG3mK420TjOw" +
                 "." +
                 "VILuUwuIxaLVmh5X-T7kmA";
-        common_4_8_and_4_9(cs);
+        common_5_8_and_5_9(cs);
     }
 
     @Test
