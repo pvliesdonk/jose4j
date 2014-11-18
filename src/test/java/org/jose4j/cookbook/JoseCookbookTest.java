@@ -17,16 +17,20 @@
 package org.jose4j.cookbook;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.json.JsonUtil;
 import org.jose4j.jwa.JceProviderTestSupport;
 import org.jose4j.jwe.*;
+import org.jose4j.jwk.EllipticCurveJsonWebKey;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
+import org.jose4j.jwk.Use;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
 import org.jose4j.keys.AesKey;
+import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.lang.JoseException;
 import org.junit.Test;
@@ -48,7 +52,7 @@ import static org.junit.Assert.*;
  *
  * by -06 I got myself in there twice https://tools.ietf.org/html/draft-ietf-jose-cookbook-06#appendix-A
  *
- *
+ *  3.1.  EC Public Key
  *
  * 4.1. RSA v1.5 Signature
  * 4.2. RSA-PSS Signature (via the the Bouncy Castle provider)
@@ -197,6 +201,34 @@ public class JoseCookbookTest
         "      UZxw9zsXww46wy0P6f9grnYp7t8LkyDDk8eoI4KX6SNMNVcyVS9IWjlq\n" +
         "      8EzqZEKIA\"\n" +
         "}";
+
+    @Test
+    public void EC_Public_Key_3_1() throws JoseException
+    {
+        String jwkJson =
+                "   {\n" +
+                "     \"kty\": \"EC\",\n" +
+                "     \"kid\": \"bilbo.baggins@hobbiton.example\",\n" +
+                "     \"use\": \"sig\",\n" +
+                "     \"crv\": \"P-521\",\n" +
+                "     \"x\": \"AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9A5RkTKqjqvjyekWF-7ytDyRXYgCF5cj0Kt\",\n" +
+                "     \"y\": \"AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1\"\n" +
+                "   }";
+
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
+        assertThat(jwk.getKeyId(), is(equalTo("bilbo.baggins@hobbiton.example")));
+        assertThat(jwk.getUse(), is(equalTo(Use.SIGNATURE)));
+        EllipticCurveJsonWebKey ecJwk = (EllipticCurveJsonWebKey) jwk;
+        String curveName = ecJwk.getCurveName();
+        assertThat(curveName, is(equalTo(EllipticCurves.P_521)));
+
+        Key key = jwk.getKey();
+        JsonWebKey jwkFromKey = JsonWebKey.Factory.newJwk(key);
+        String jsonOutput = jwkFromKey.toJson(JsonWebKey.OutputControlLevel.PUBLIC_ONLY);
+        // check the x and y in the output look the same (to ensure leading zero bytes are there, for example)
+        assertThat(jsonOutput, containsString("\"AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9A5RkTKqjqvjyekWF-7ytDyRXYgCF5cj0Kt\""));
+        assertThat(jsonOutput, containsString("\"AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1\""));
+    }
 
     @Test
     public void rsa_v1_5Signature_4_1() throws JoseException
