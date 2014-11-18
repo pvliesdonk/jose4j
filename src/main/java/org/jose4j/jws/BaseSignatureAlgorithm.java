@@ -18,6 +18,7 @@ package org.jose4j.jws;
 
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.KeyPersuasion;
+import org.jose4j.lang.ExceptionHelp;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 
@@ -107,7 +108,6 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
 
     private Signature getSignature() throws JoseException
     {
-
         try
         {
             Signature signature = Signature.getInstance(getJavaAlgorithm());
@@ -177,10 +177,10 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
             Signature signature = getSignature();
             return signature != null;
         }
-        catch (JoseException e)
+        catch (Exception e)
         {
             log.debug(getAlgorithmIdentifier() + " vai " + getJavaAlgorithm() +
-                    " is NOT available from the underlying JCE (" + e + ").");
+                    " is NOT available from the underlying JCE (" + ExceptionHelp.toStringWithCauses(e) + ").");
             return false;
 
         }

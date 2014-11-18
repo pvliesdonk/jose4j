@@ -18,6 +18,7 @@ package org.jose4j.jwa;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jose4j.lang.ExceptionHelp;
 import org.jose4j.lang.InvalidAlgorithmException;
 
 import java.util.Collections;
@@ -67,7 +68,7 @@ public class AlgorithmFactory<A extends Algorithm>
     public void registerAlgorithm(A algorithm)
     {
         String algId = algorithm.getAlgorithmIdentifier();
-        if (algorithm.isAvailable())
+        if (isAvailable(algorithm))
         {
             algorithms.put(algId, algorithm);
             log.info(algorithm + " registered for " + parameterName + " algorithm " + algId);
@@ -77,6 +78,20 @@ public class AlgorithmFactory<A extends Algorithm>
             log.info(algId + " is unavailable so will not be registered for " + parameterName + " algorithms.");
         }
     }
+
+    private boolean isAvailable(A algorithm)
+    {
+        try
+        {
+            return algorithm.isAvailable();
+        }
+        catch (Exception e)
+        {
+            log.debug("Unexpected problem checking for availability of " +algorithm.getAlgorithmIdentifier()+ " algorithm: " + ExceptionHelp.toStringWithCauses(e));
+            return false;
+        }
+    }
+
 
     public void unregisterAlgorithm(String algorithmIdentifier)
     {
