@@ -49,7 +49,8 @@ import static org.junit.Assert.*;
  * there's even acknowledgement of it
  * http://tools.ietf.org/html/draft-ietf-jose-cookbook-02#appendix-A
  *
- * by -06 I got myself in there twice https://tools.ietf.org/html/draft-ietf-jose-cookbook-06#appendix-A
+ * and by -06 I got myself in there twice!
+ * https://tools.ietf.org/html/draft-ietf-jose-cookbook-06#appendix-A
  *
  * 3.1.  EC Public Key
  * 3.2.  EC Private Key
