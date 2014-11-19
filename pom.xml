@@ -25,7 +25,7 @@
 
   <groupId>org.bitbucket.b_c</groupId>
   <artifactId>jose4j</artifactId>
-  <version>0.3.9-SNAPSHOT</version>
+  <version>0.3.9</version>
   <packaging>jar</packaging>
   <name>jose4j</name>
   <description>
