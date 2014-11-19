@@ -51,10 +51,12 @@ import static org.junit.Assert.*;
  *
  * by -06 I got myself in there twice https://tools.ietf.org/html/draft-ietf-jose-cookbook-06#appendix-A
  *
- *  3.1.  EC Public Key
- *  3.2.  EC Private Key
- *  3.3.  RSA Public Key
- *  3.4.  RSA Private Key
+ * 3.1.  EC Public Key
+ * 3.2.  EC Private Key
+ * 3.3.  RSA Public Key
+ * 3.4.  RSA Private Key
+ * 3.5.  Octet Key (MAC Computation)
+ * 3.6.  Octet Key (Encryption)
  *
  * 4.1. RSA v1.5 Signature
  * 4.2. RSA-PSS Signature (via the the Bouncy Castle provider)
@@ -373,6 +375,54 @@ public class JoseCookbookTest
         String expectedQI = "3PiqvXQN0zwMeE-sBvZgi289XP9XCQF3VWqPzMKnIgQp7_Tugo6-NZBKCQsMf3HaEGBjTVJs_jcK8-TRXvaKe-7ZMaQj8VfBdYkssbu0NKDDh" +
                 "jJ-GtiseaDVWt7dcH0cfwxgFUHpQh7FoCrjFJ6h6ZEpMF6xmujs4qMpPz8aaI4";
         assertThat(JsonHelp.getString(params, "qi"), is(equalTo(expectedQI)));
+    }
+
+    @Test
+    public void Octet_Key_MAC_3_5() throws JoseException
+    {
+        String jwkJson =
+                "   {\n" +
+                "     \"kty\": \"oct\",\n" +
+                "     \"kid\": \"018c0ae5-4d9b-471b-bfd6-eef314bc7037\",\n" +
+                "     \"use\": \"sig\",\n" +
+                "     \"alg\": \"HS256\",\n" +
+                "     \"k\": \"hJtXIZ2uSN5kbQfbtTNWbpdmhkV8FJG-Onbc6mxCcYg\"\n" +
+                "   }";
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
+        assertThat(jwk.getKeyId(), is(equalTo("018c0ae5-4d9b-471b-bfd6-eef314bc7037")));
+        assertThat(jwk.getUse(), is(equalTo(Use.SIGNATURE)));
+        assertThat(jwk.getAlgorithm(), is(equalTo(AlgorithmIdentifiers.HMAC_SHA256)));
+        OctetSequenceJsonWebKey octJwk = (OctetSequenceJsonWebKey) jwk;
+        byte[] octetSequence = octJwk.getOctetSequence();
+        assertThat(octetSequence.length, is(equalTo(32)));
+
+        jwk = JsonWebKey.Factory.newJwk(jwk.getKey());
+        String jsonOutput = jwk.toJson(JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE);
+        assertThat(jsonOutput, containsString("\"hJtXIZ2uSN5kbQfbtTNWbpdmhkV8FJG-Onbc6mxCcYg\""));
+    }
+
+    @Test
+    public void Octet_Key_Enc_3_6() throws JoseException
+    {
+        String jwkJson =
+                "   {\n" +
+                "     \"kty\": \"oct\",\n" +
+                "     \"kid\": \"1e571774-2e08-40da-8308-e8d68773842d\",\n" +
+                "     \"use\": \"enc\",\n" +
+                "     \"alg\": \"A256GCM\",\n" +
+                "     \"k\": \"AAPapAv4LbFbiVawEjagUBluYqN5rhna-8nuldDvOx8\"\n" +
+                "   }";
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
+        assertThat(jwk.getKeyId(), is(equalTo("1e571774-2e08-40da-8308-e8d68773842d")));
+        assertThat(jwk.getUse(), is(equalTo(Use.ENCRYPTION)));
+        assertThat(jwk.getAlgorithm(), is(equalTo(ContentEncryptionAlgorithmIdentifiers.AES_256_GCM)));
+        OctetSequenceJsonWebKey octJwk = (OctetSequenceJsonWebKey) jwk;
+        byte[] octetSequence = octJwk.getOctetSequence();
+        assertThat(octetSequence.length, is(equalTo(32)));
+        assertThat(octetSequence[0], is(equalTo((byte)0)));
+        jwk = JsonWebKey.Factory.newJwk(jwk.getKey());
+        String jsonOutput = jwk.toJson(JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE);
+        assertThat(jsonOutput, containsString("\"AAPapAv4LbFbiVawEjagUBluYqN5rhna-8nuldDvOx8\""));
     }
 
     @Test
