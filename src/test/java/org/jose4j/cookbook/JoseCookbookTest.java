@@ -31,11 +31,9 @@ import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.JsonHelp;
-import org.jose4j.lang.StringUtil;
 import org.junit.Test;
 
 import java.security.Key;
-import java.util.Arrays;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.*;
