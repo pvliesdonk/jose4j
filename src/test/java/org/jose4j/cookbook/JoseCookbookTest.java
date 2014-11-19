@@ -31,9 +31,11 @@ import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.JsonHelp;
+import org.jose4j.lang.StringUtil;
 import org.junit.Test;
 
 import java.security.Key;
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -835,14 +837,14 @@ public class JoseCookbookTest
     @Test
     public void encryptionPbes_5_3() throws JoseException
     {
-        String password = "entrap_o_peter_long_credit_tun";
+        String password = "entrap_o–peter_long–credit_tun";
 
         String exampleCompactSerialization =
                 "eyJhbGciOiJQQkVTMi1IUzUxMitBMjU2S1ciLCJwMnMiOiI4UTFTemluYXNSM3" +
                 "hjaFl6NlpaY0hBIiwicDJjIjo4MTkyLCJjdHkiOiJqd2stc2V0K2pzb24iLCJl" +
                 "bmMiOiJBMTI4Q0JDLUhTMjU2In0" +
                 "." +
-                "pmKVzwf89K3dfkQqbERUTC0F2jGXD6tTQVmtnVpuKUK2J4Xx2RkkLw" +
+                "d3qNhUWfqheyPp4H8sjOWsDYajoej4c5Je6rlUtFPWdgtURtmeDV1g" +
                 "." +
                 "VBiCzVHNoLiR3F4V82uoTQ" +
                 "." +
