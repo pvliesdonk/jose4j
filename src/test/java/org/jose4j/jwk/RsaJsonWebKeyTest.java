@@ -107,6 +107,48 @@ public class RsaJsonWebKeyTest
                 "     yR8O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU\",\n" +
                 "          \"alg\":\"RS256\",\n" +
                 "          \"kid\":\"2011-04-29\"}";
+        doKeyWithCrtPrivateAndBackAndAgain(json);
+    }
+
+    @Test
+    public void testFromCrtAndBackWithJwsAppendixA2() throws JoseException
+    {
+        String json =
+                "     {\"kty\":\"RSA\",\n" +
+                "      \"n\":\"ofgWCuLjybRlzo0tZWJjNiuSfb4p4fAkd_wWJcyQoTbji9k0l8W26mPddx\n" +
+                "           HmfHQp-Vaw-4qPCJrcS2mJPMEzP1Pt0Bm4d4QlL-yRT-SFd2lZS-pCgNMs\n" +
+                "           D1W_YpRPEwOWvG6b32690r2jZ47soMZo9wGzjb_7OMg0LOL-bSf63kpaSH\n" +
+                "           SXndS5z5rexMdbBYUsLA9e-KXBdQOS-UTo7WTBEMa2R2CapHg665xsmtdV\n" +
+                "           MTBQY4uDZlxvb3qCo5ZwKh9kG4LT6_I5IhlJH7aGhyxXFvUK-DWNmoudF8\n" +
+                "           NAco9_h9iaGNj8q2ethFkMLs91kzk2PAcDTW9gb54h4FRWyuXpoQ\",\n" +
+                "      \"e\":\"AQAB\",\n" +
+                "      \"d\":\"Eq5xpGnNCivDflJsRQBXHx1hdR1k6Ulwe2JZD50LpXyWPEAeP88vLNO97I\n" +
+                "           jlA7_GQ5sLKMgvfTeXZx9SE-7YwVol2NXOoAJe46sui395IW_GO-pWJ1O0\n" +
+                "           BkTGoVEn2bKVRUCgu-GjBVaYLU6f3l9kJfFNS3E0QbVdxzubSu3Mkqzjkn\n" +
+                "           439X0M_V51gfpRLI9JYanrC4D4qAdGcopV_0ZHHzQlBjudU2QvXt4ehNYT\n" +
+                "           CBr6XCLQUShb1juUO1ZdiYoFaFQT5Tw8bGUl_x_jTj3ccPDVZFD9pIuhLh\n" +
+                "           BOneufuBiB4cS98l2SR_RQyGWSeWjnczT0QU91p1DhOVRuOopznQ\",\n" +
+                "      \"p\":\"4BzEEOtIpmVdVEZNCqS7baC4crd0pqnRH_5IB3jw3bcxGn6QLvnEtfdUdi\n" +
+                "           YrqBdss1l58BQ3KhooKeQTa9AB0Hw_Py5PJdTJNPY8cQn7ouZ2KKDcmnPG\n" +
+                "           BY5t7yLc1QlQ5xHdwW1VhvKn-nXqhJTBgIPgtldC-KDV5z-y2XDwGUc\",\n" +
+                "      \"q\":\"uQPEfgmVtjL0Uyyx88GZFF1fOunH3-7cepKmtH4pxhtCoHqpWmT8YAmZxa\n" +
+                "           ewHgHAjLYsp1ZSe7zFYHj7C6ul7TjeLQeZD_YwD66t62wDmpe_HlB-TnBA\n" +
+                "           -njbglfIsRLtXlnDzQkv5dTltRJ11BKBBypeeF6689rjcJIDEz9RWdc\",\n" +
+                "      \"dp\":\"BwKfV3Akq5_MFZDFZCnW-wzl-CCo83WoZvnLQwCTeDv8uzluRSnm71I3Q\n" +
+                "           CLdhrqE2e9YkxvuxdBfpT_PI7Yz-FOKnu1R6HsJeDCjn12Sk3vmAktV2zb\n" +
+                "           34MCdy7cpdTh_YVr7tss2u6vneTwrA86rZtu5Mbr1C1XsmvkxHQAdYo0\",\n" +
+                "      \"dq\":\"h_96-mK1R_7glhsum81dZxjTnYynPbZpHziZjeeHcXYsXaaMwkOlODsWa\n" +
+                "           7I9xXDoRwbKgB719rrmI2oKr6N3Do9U0ajaHF-NKJnwgjMd2w9cjz3_-ky\n" +
+                "           NlxAr2v4IKhGNpmM5iIgOS1VZnOZ68m6_pbLBSp3nssTdlqvd0tIiTHU\",\n" +
+                "      \"qi\":\"IYd7DHOhrWvxkwPQsRM2tOgrjbcrfvtQJipd-DlcxyVuuM9sQLdgjVk2o\n" +
+                "           y26F0EmpScGLq2MowX7fhd_QJQ3ydy5cY7YIBi87w93IKLEdfnbJtoOPLU\n" +
+                "           W0ITrJReOgo1cq9SbsxYawBgfp_gh6A5603k2-ZQwVK0JKSHuLFkuQ3U\"\n" +
+                "     }";
+        doKeyWithCrtPrivateAndBackAndAgain(json);
+    }
+
+    private void doKeyWithCrtPrivateAndBackAndAgain(String json) throws JoseException
+    {
         PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(json);
 
         assertTrue(jwk.getPrivateKey() instanceof RSAPrivateCrtKey);
@@ -148,8 +190,9 @@ public class RsaJsonWebKeyTest
         assertTrue(jwkAgain.getPrivateKey() instanceof RSAPrivateCrtKey);
         assertEquals(jwk.getPrivateKey(), jwkAgain.getPrivateKey());
     }
-    
-	@Test
+
+
+    @Test
 	public void testToJsonWithPublicKeyOnlyJWKAndIncludePrivateSettings() throws JoseException
     {
         PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(ExampleRsaKeyFromJws.PUBLIC_KEY);
