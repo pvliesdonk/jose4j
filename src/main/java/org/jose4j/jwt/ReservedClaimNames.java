@@ -27,5 +27,9 @@ public class ReservedClaimNames
     public static final String AUDIENCE = "aud";
     public static final String SUBJECT = "sub";
     public static final String JWT_ID = "jti";
+
+    /**
+     * @deprecated typ went away as a claim name as of jwt draft -12 - it's only a header parameter name
+     */
     public static final String TYPE = "typ";
 }
