@@ -84,7 +84,7 @@ public class JsonUtil
         {
             if (this.containsKey(key))
             {
-                throw new IllegalArgumentException("An entry for '" + key + "' already exists. Parameter names must be unique.");
+                throw new IllegalArgumentException("An entry for '" + key + "' already exists. Names must be unique.");
             }
 
             return super.put(key, value);
