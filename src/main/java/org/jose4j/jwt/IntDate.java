@@ -18,6 +18,9 @@ package org.jose4j.jwt;
 
 import java.util.Date;
 
+// TODO in -26 the name changed from IntDate to NumericDate. So there's that. It'd be nice for names to track the spec. But this is being used so need to consider compatibility.
+// TODO Also "non-integer values can be represented" is there too though it looks like maybe that's always been possible. Not sure how much support is needed for that (other than not failing).
+
 /**
  */
 public class IntDate
