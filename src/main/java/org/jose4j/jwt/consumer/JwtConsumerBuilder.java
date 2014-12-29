@@ -13,6 +13,7 @@ public class JwtConsumerBuilder
 
     private AudValidator audValidator;
     private IssValidator issValidator;
+    private boolean requireSubject;
 
     public JwtConsumerBuilder setVerificationKey(Key verificationKey)
     {
@@ -61,6 +62,11 @@ public class JwtConsumerBuilder
         return setExpectedIssuer(true, expectedIssuer);
     }
 
+    public JwtConsumerBuilder setRequireSubject()
+    {
+        this.requireSubject = true;
+        return this;
+    }
 
     public JwtConsumer build()
     {
@@ -76,6 +82,8 @@ public class JwtConsumerBuilder
         {
             claimsValidators.add(issValidator);
         }
+
+        claimsValidators.add(new SubValidator(requireSubject));
 
         JwtConsumer jwtConsumer = new JwtConsumer();
         jwtConsumer.setClaimsValidators(claimsValidators);

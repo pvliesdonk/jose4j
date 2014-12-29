@@ -162,6 +162,31 @@ public class JwtConsumerTest
     }
 
     @Test
+    public void someBasicSubChecks() throws InvalidJwtException
+    {
+        JwtClaimsSet jwtClaimsSet = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\"}");
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder().build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtConsumer = new JwtConsumerBuilder().setRequireSubject().build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"name\":\"brian.d.campbell\"}");
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        jwtConsumer = new JwtConsumerBuilder().build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"sub\":724729}");
+        jwtConsumer = new JwtConsumerBuilder().setRequireSubject().build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"sub\":{\"values\":[\"one\", \"2\"]}}");
+        jwtConsumer = new JwtConsumerBuilder().build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+    }
+
+
+    @Test
     public void someBasicChecks() throws InvalidJwtException
     {
         JwtClaimsSet jcs = JwtClaimsSet.parse("{\"sub\":\"subject\", \"iss\":\"issuer\", \"aud\":\"audience\"}");
