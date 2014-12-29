@@ -14,6 +14,7 @@ public class JwtConsumerBuilder
     private AudValidator audValidator;
     private IssValidator issValidator;
     private boolean requireSubject;
+    private boolean requireJti;
 
     public JwtConsumerBuilder setVerificationKey(Key verificationKey)
     {
@@ -68,6 +69,13 @@ public class JwtConsumerBuilder
         return this;
     }
 
+    public JwtConsumerBuilder setRequireJwtId()
+    {
+        this.requireJti = true;
+        return this;
+    }
+
+
     public JwtConsumer build()
     {
         List<ClaimsValidator> claimsValidators = new ArrayList<>();
@@ -84,6 +92,7 @@ public class JwtConsumerBuilder
         }
 
         claimsValidators.add(new SubValidator(requireSubject));
+        claimsValidators.add(new JtiValidator(requireJti));
 
         JwtConsumer jwtConsumer = new JwtConsumer();
         jwtConsumer.setClaimsValidators(claimsValidators);

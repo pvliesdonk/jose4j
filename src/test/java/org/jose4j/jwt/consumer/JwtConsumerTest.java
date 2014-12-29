@@ -185,6 +185,30 @@ public class JwtConsumerTest
         expectValidationFailure(jwtClaimsSet, jwtConsumer);
     }
 
+    @Test
+    public void someBasicJtiChecks() throws InvalidJwtException
+    {
+        JwtClaimsSet jwtClaimsSet = JwtClaimsSet.parse("{\"jti\":\"1Y5iLSQfNgcSGt0A4is29\"}");
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder().build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtConsumer = new JwtConsumerBuilder().setRequireJwtId().build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"notjti\":\"lbZ_mLS6w3xBSlvW6ULmkV-uLCk\"}");
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        jwtConsumer = new JwtConsumerBuilder().build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"jti\":55581529751992}");
+        jwtConsumer = new JwtConsumerBuilder().setRequireJwtId().build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"jti\":[\"S0w3XbslvW6ULmk0\", \"5iLSQfNgcSGt7A4is\"]}");
+        jwtConsumer = new JwtConsumerBuilder().build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+    }
+
 
     @Test
     public void someBasicChecks() throws InvalidJwtException
