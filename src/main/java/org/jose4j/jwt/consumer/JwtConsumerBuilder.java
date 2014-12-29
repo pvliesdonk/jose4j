@@ -12,6 +12,7 @@ public class JwtConsumerBuilder
     private DecryptionKeyResolver decryptionKeyResolver = new SimpleKeyResolver(null);
 
     private AudValidator audValidator;
+    private IssValidator issValidator;
 
     public JwtConsumerBuilder setVerificationKey(Key verificationKey)
     {
@@ -49,6 +50,18 @@ public class JwtConsumerBuilder
         return this;
     }
 
+    public JwtConsumerBuilder setExpectedIssuer(boolean requireIssuer, String expectedIssuer)
+    {
+        issValidator = new IssValidator(expectedIssuer, requireIssuer);
+        return this;
+    }
+
+    public JwtConsumerBuilder setExpectedIssuer(String expectedIssuer)
+    {
+        return setExpectedIssuer(true, expectedIssuer);
+    }
+
+
     public JwtConsumer build()
     {
         List<ClaimsValidator> claimsValidators = new ArrayList<>();
@@ -59,11 +72,15 @@ public class JwtConsumerBuilder
         }
         claimsValidators.add(audValidator);
 
+        if (issValidator != null)
+        {
+            claimsValidators.add(issValidator);
+        }
 
         JwtConsumer jwtConsumer = new JwtConsumer();
+        jwtConsumer.setClaimsValidators(claimsValidators);
         jwtConsumer.setVerificationKeyResolver(verificationKeyResolver);
         jwtConsumer.setDecryptionKeyResolver(decryptionKeyResolver);
-        jwtConsumer.setClaimsValidators(claimsValidators);
         return jwtConsumer;
     }
 }

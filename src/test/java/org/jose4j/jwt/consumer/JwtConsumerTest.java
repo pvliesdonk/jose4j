@@ -100,7 +100,7 @@ public class JwtConsumerTest
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
         expectValidationFailure(jwtClaimsSet, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"aud\":[\"example.com\", \"usa.org\", , \"ca.ca\"]}");
+        jwtClaimsSet = JwtClaimsSet.parse("{\"aud\":[\"example.com\", \"usa.org\", \"ca.ca\"]}");
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
         expectValidationFailure(jwtClaimsSet, jwtConsumer);
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org", "some.other.junk").build();
@@ -123,6 +123,53 @@ public class JwtConsumerTest
         jwtClaimsSet = JwtClaimsSet.parse("{\"aud\":[\"example.com\", 47, false]}");
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
         expectValidationFailure(jwtClaimsSet, jwtConsumer);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"aud\":20475}");
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"aud\":{\"aud\":\"example.org\"}}");
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+    }
+
+    @Test
+    public void someBasicIssChecks() throws InvalidJwtException
+    {
+        JwtClaimsSet jwtClaimsSet = JwtClaimsSet.parse("{\"iss\":\"issuer.example.com\"}");
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder().build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer("issuer.example.com").build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer(false, "issuer.example.com").build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer("nope.example.com").build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"sub\":\"subject\"}");
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer("issuer.example.com").build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer(false, "issuer.example.com").build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"iss\":[\"issuer1\", \"other.one\", \"meh\"]}");
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer("issuer.example.com").build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+    }
+
+    @Test
+    public void someBasicChecks() throws InvalidJwtException
+    {
+        JwtClaimsSet jcs = JwtClaimsSet.parse("{\"sub\":\"subject\", \"iss\":\"issuer\", \"aud\":\"audience\"}");
+        JwtConsumer consumer = new JwtConsumerBuilder().setExpectedAudience("audience").setExpectedIssuer("issuer").build();
+        consumer.validateClaims(jcs);
+
+        consumer = new JwtConsumerBuilder().setExpectedAudience("nope").setExpectedIssuer("no way").build();
+        expectValidationFailure(jcs, consumer);
     }
 
     private void expectValidationFailure(JwtClaimsSet jwtClaimsSet, JwtConsumer jwtConsumer)
