@@ -217,7 +217,12 @@ public class JwtConsumerTest
         JwtConsumer consumer = new JwtConsumerBuilder().setExpectedAudience("audience").setExpectedIssuer("issuer").build();
         consumer.validateClaims(jcs);
 
-        consumer = new JwtConsumerBuilder().setExpectedAudience("nope").setExpectedIssuer("no way").build();
+        consumer = new JwtConsumerBuilder()
+                .setExpectedAudience("nope")
+                .setExpectedIssuer("no way")
+                .setRequireSubject()
+                .setRequireJwtId()
+                .build();
         expectValidationFailure(jcs, consumer);
     }
 
