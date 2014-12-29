@@ -119,6 +119,10 @@ public class JwtConsumerTest
         jwtConsumer.validateClaims(jwtClaimsSet);
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("usa.org", "ca.ca", "example.com").build();
         jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"aud\":[\"example.com\", 47, false]}");
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
     }
 
     private void expectValidationFailure(JwtClaimsSet jwtClaimsSet, JwtConsumer jwtConsumer)
