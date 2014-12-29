@@ -91,6 +91,10 @@ public class JwtConsumerBuilder
             claimsValidators.add(issValidator);
         }
 
+        // todo iat
+        // todo nbf
+        // todo exp
+
         claimsValidators.add(new SubValidator(requireSubject));
         claimsValidators.add(new JtiValidator(requireJti));
 
