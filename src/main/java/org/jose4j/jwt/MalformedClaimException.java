@@ -3,7 +3,7 @@ package org.jose4j.jwt;
 /**
  *
  */
-public class MalformedClaimException extends JwtException
+public class MalformedClaimException extends GeneralJwtException
 {
     public MalformedClaimException(String message)
     {

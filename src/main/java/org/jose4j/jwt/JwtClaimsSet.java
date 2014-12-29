@@ -2,6 +2,7 @@ package org.jose4j.jwt;
 
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.json.JsonUtil;
+import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 
@@ -20,7 +21,7 @@ public class JwtClaimsSet
         claimsMap = new LinkedHashMap<>();
     }
 
-    private JwtClaimsSet(String jsonClaims) throws JwtException
+    private JwtClaimsSet(String jsonClaims) throws InvalidJwtException
     {
         rawJson = jsonClaims;
         try
@@ -30,11 +31,11 @@ public class JwtClaimsSet
         }
         catch (JoseException e)
         {
-            throw new JwtException("Unable to parse JWT Claim Set JSON.", e);
+            throw new InvalidJwtException("Unable to parse JWT Claim Set JSON: " + jsonClaims, e);
         }
     }
 
-    public static JwtClaimsSet parse(String jsonClaims) throws JwtException
+    public static JwtClaimsSet parse(String jsonClaims) throws InvalidJwtException
     {
         return new JwtClaimsSet(jsonClaims);
     }
