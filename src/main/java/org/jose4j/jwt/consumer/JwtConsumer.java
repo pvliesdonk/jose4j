@@ -3,11 +3,13 @@ package org.jose4j.jwt.consumer;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,6 +20,8 @@ public class JwtConsumer
 {
     private VerificationKeyResolver verificationKeyResolver;
     private DecryptionKeyResolver decryptionKeyResolver;
+
+    private List<ClaimsValidator> claimsValidators;
 
     // TODO alg constraints (with resolvers? but meh)
 
@@ -33,6 +37,11 @@ public class JwtConsumer
     void setDecryptionKeyResolver(DecryptionKeyResolver decryptionKeyResolver)
     {
         this.decryptionKeyResolver = decryptionKeyResolver;
+    }
+
+    public void setClaimsValidators(List<ClaimsValidator> claimsValidators)
+    {
+        this.claimsValidators = claimsValidators;
     }
 
     public JwtClaimsSet processToClaims(String jwt) throws InvalidJwtException
@@ -86,9 +95,38 @@ public class JwtConsumer
             }
         }
 
-        // TODO validation etc.
+        validateClaims(processedJwt.jwtClaimsSet);
 
         return processedJwt;
+    }
+
+    void validateClaims(JwtClaimsSet jwtClaimsSet) throws InvalidJwtException
+    {
+        List<String> issues = new ArrayList<>();
+        for (ClaimsValidator validator : claimsValidators)
+        {
+            String validationResult;
+            try
+            {
+                validationResult  = validator.validate(jwtClaimsSet);
+            }
+            catch (MalformedClaimException e)
+            {
+                validationResult = e.getMessage();
+            }
+
+            if (validationResult != null)
+            {
+                issues.add(validationResult);
+            }
+        }
+
+        if (!issues.isEmpty())
+        {
+            InvalidJwtException invalidJwtException = new InvalidJwtException("JWT (claims->"+ jwtClaimsSet.getRawJson()+") rejected due to invalid claims." );
+            invalidJwtException.setDetails(issues);
+            throw invalidJwtException;
+        }
     }
 
     private boolean isNestedJwt(JsonWebStructure joseObject)
@@ -111,8 +149,6 @@ public class JwtConsumer
         {
             return joseObjects;
         }
-
-
     }
 
 }

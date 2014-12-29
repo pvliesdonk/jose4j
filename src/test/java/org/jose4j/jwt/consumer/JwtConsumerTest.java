@@ -1,5 +1,7 @@
 package org.jose4j.jwt.consumer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.IntDate;
@@ -20,6 +22,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
  */
 public class JwtConsumerTest
 {
+    Log log = LogFactory.getLog(this.getClass());
+
     @Test
     public void jwtA2ExampleNestedJWT() throws InvalidJwtException, MalformedClaimException
     {
@@ -64,5 +68,69 @@ public class JwtConsumerTest
         Assert.assertThat("joe", equalTo(jcs.getIssuer()));
         Assert.assertThat(IntDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
         Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
+    }
+
+    @Test
+    public void someBasicAudChecks() throws InvalidJwtException
+    {
+        JwtClaimsSet jwtClaimsSet = JwtClaimsSet.parse("{\"aud\":\"example.com\"}");
+
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder().build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.com").build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org", "example.com", "k8HiI26Y7").build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org", "nope", "nada").build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"sub\":\"subject\"}");
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience(false, "example.org", "www.example.org").build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience(true, "example.org", "www.example.org").build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"aud\":[\"example.com\", \"usa.org\", , \"ca.ca\"]}");
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org", "some.other.junk").build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("usa.org").build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("ca.ca").build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("ca.ca", "some.other.thing").build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("noway", "ca.ca", "some.other.thing").build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("usa.org", "ca.ca", "random").build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("usa.org", "ca.ca").build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+        jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("usa.org", "ca.ca", "example.com").build();
+        jwtConsumer.validateClaims(jwtClaimsSet);
+    }
+
+    private void expectValidationFailure(JwtClaimsSet jwtClaimsSet, JwtConsumer jwtConsumer)
+    {
+        try
+        {
+            jwtConsumer.validateClaims(jwtClaimsSet);
+            Assert.fail("claims validation should have thrown an exception");
+        }
+        catch (InvalidJwtException e)
+        {
+            log.debug("Expected exception: " + e);
+        }
     }
 }
