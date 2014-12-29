@@ -113,7 +113,7 @@ public class JwtConsumer
             catch (MalformedClaimException e)
             {
                 validationResult = e.getMessage();
-            }
+            }  // todo catch more here?
 
             if (validationResult != null)
             {
