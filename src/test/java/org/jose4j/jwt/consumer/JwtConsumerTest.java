@@ -159,6 +159,10 @@ public class JwtConsumerTest
         jwtClaimsSet = JwtClaimsSet.parse("{\"iss\":[\"issuer1\", \"other.one\", \"meh\"]}");
         jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer("issuer.example.com").build();
         expectValidationFailure(jwtClaimsSet, jwtConsumer);
+
+        jwtClaimsSet = JwtClaimsSet.parse("{\"iss\":[\"issuer1\", \"nope.not\"]}");
+        jwtConsumer = new JwtConsumerBuilder().build();
+        expectValidationFailure(jwtClaimsSet, jwtConsumer);
     }
 
     @Test

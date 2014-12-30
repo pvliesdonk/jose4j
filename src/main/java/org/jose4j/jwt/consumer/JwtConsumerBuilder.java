@@ -75,7 +75,6 @@ public class JwtConsumerBuilder
         return this;
     }
 
-
     public JwtConsumer build()
     {
         List<ClaimsValidator> claimsValidators = new ArrayList<>();
@@ -86,14 +85,11 @@ public class JwtConsumerBuilder
         }
         claimsValidators.add(audValidator);
 
-        if (issValidator != null)
+        if (issValidator == null)
         {
-            claimsValidators.add(issValidator);
+            issValidator = new IssValidator(null, false);
         }
-
-        // todo iat
-        // todo nbf
-        // todo exp
+        claimsValidators.add(issValidator);
 
         claimsValidators.add(new SubValidator(requireSubject));
         claimsValidators.add(new JtiValidator(requireJti));

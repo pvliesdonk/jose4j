@@ -27,7 +27,7 @@ public class IssValidator implements ClaimsValidator
             return requireIssuer ? "No Issuer (iss) claim present but was expecting " + expectedIssuer: null;
         }
 
-        if (!issuer.equals(expectedIssuer))
+        if (expectedIssuer != null && !issuer.equals(expectedIssuer))
         {
             return "Issuer (iss) claim value (" + issuer + ") doesn't match expected value of " + expectedIssuer;
         }
