@@ -44,8 +44,7 @@ public class JwtConsumerBuilder
 
     public JwtConsumerBuilder setVerificationKey(Key verificationKey)
     {
-        this.verificationKeyResolver = new SimpleKeyResolver(verificationKey);
-        return this;
+        return setVerificationKeyResolver(new SimpleKeyResolver(verificationKey));
     }
 
     public JwtConsumerBuilder setVerificationKeyResolver(VerificationKeyResolver  verificationKeyResolver)
@@ -56,8 +55,7 @@ public class JwtConsumerBuilder
 
     public JwtConsumerBuilder setDecryptionKey(Key decryptionKey)
     {
-        this.decryptionKeyResolver = new SimpleKeyResolver(decryptionKey);
-        return this;
+        return setDecryptionKeyResolver(new SimpleKeyResolver(decryptionKey));
     }
 
     public JwtConsumerBuilder setDecryptionKeyResolver(DecryptionKeyResolver  decryptionKeyResolver)
