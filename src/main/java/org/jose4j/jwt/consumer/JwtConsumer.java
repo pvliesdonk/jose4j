@@ -1,5 +1,6 @@
 package org.jose4j.jwt.consumer;
 
+import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaimsSet;
@@ -24,12 +25,29 @@ public class JwtConsumer
 
     private List<ClaimsValidator> claimsValidators;
 
-    // TODO alg constraints (with resolvers? but meh)
+    private AlgorithmConstraints jwsAlgorithmConstraints;
+    private AlgorithmConstraints jweAlgorithmConstraints;
+    private AlgorithmConstraints jweContentEncryptionAlgorithmConstraints;
 
     // todo other custom validators...
 
     JwtConsumer()
     {
+    }
+
+    void setJwsAlgorithmConstraints(AlgorithmConstraints constraints)
+    {
+        this.jwsAlgorithmConstraints = constraints;
+    }
+
+    void setJweAlgorithmConstraints(AlgorithmConstraints constraints)
+    {
+        this.jweAlgorithmConstraints = constraints;
+    }
+
+    void setJweContentEncryptionAlgorithmConstraints(AlgorithmConstraints constraints)
+    {
+        this.jweContentEncryptionAlgorithmConstraints = constraints;
     }
 
     void setVerificationKeyResolver(VerificationKeyResolver verificationKeyResolver)
@@ -42,7 +60,7 @@ public class JwtConsumer
         this.decryptionKeyResolver = decryptionKeyResolver;
     }
 
-    public void setClaimsValidators(List<ClaimsValidator> claimsValidators)
+    void setClaimsValidators(List<ClaimsValidator> claimsValidators)
     {
         this.claimsValidators = claimsValidators;
     }
@@ -68,6 +86,10 @@ public class JwtConsumer
                     JsonWebSignature jws = (JsonWebSignature) joseObject;
                     Key key = verificationKeyResolver.resolveKey(jws, processedJwt.getJoseObjects());
                     jws.setKey(key);
+                    if (jwsAlgorithmConstraints != null)
+                    {
+                        jws.setAlgorithmConstraints(jwsAlgorithmConstraints);
+                    }
                     if (!jws.verifySignature())
                     {
                         throw new InvalidJwtException("JWS signature is invalid.");
@@ -78,11 +100,20 @@ public class JwtConsumer
                     JsonWebEncryption jwe = (JsonWebEncryption) joseObject;
                     Key key = decryptionKeyResolver.resolveKey(jwe, processedJwt.getJoseObjects());
                     jwe.setKey(key);
+                    if (jweAlgorithmConstraints != null)
+                    {
+                        jwe.setAlgorithmConstraints(jweAlgorithmConstraints);
+                    }
+
+                    if (jweContentEncryptionAlgorithmConstraints != null)
+                    {
+                        jwe.setContentEncryptionAlgorithmConstraints(jweContentEncryptionAlgorithmConstraints);
+                    }
+
                 }
 
-                processedJwt.joseObjects.addFirst(joseObject);
-
                 String payload = joseObject.getPayload();
+
                 if (isNestedJwt(joseObject))
                 {
                     jwt = payload;
@@ -91,14 +122,30 @@ public class JwtConsumer
                 {
                     processedJwt.jwtClaimsSet = JwtClaimsSet.parse(payload);
                 }
+
+                processedJwt.joseObjects.addFirst(joseObject);
             }
             catch (JoseException e)
             {
-                throw new InvalidJwtException("Unable to process JOSE object (cause: "+e.getMessage()+"): " + jwt, e);
+                StringBuilder sb = new StringBuilder();
+                sb.append("Unable to process");
+                if (!processedJwt.getJoseObjects().isEmpty())
+                {
+                    sb.append(" nested");
+                }
+                sb.append(" JOSE object (cause: ").append(e.getMessage()).append("): ").append(jwt);
+                throw new InvalidJwtException(sb.toString(), e);
             }
             catch (Exception e)
             {
-                throw new InvalidJwtException("Unexpected exception encountered while process JOSE object(s) ("+e+"): " + jwt, e);
+                StringBuilder sb = new StringBuilder();
+                sb.append("Unexpected exception encountered while processing");
+                if (!processedJwt.getJoseObjects().isEmpty())
+                {
+                    sb.append(" nested");
+                }
+                sb.append(" JOSE object (").append(e).append("): ").append(jwt);
+                throw new InvalidJwtException(sb.toString(), e);
             }
         }
 

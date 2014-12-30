@@ -2,16 +2,25 @@ package org.jose4j.jwt.consumer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jose4j.jwa.AlgorithmConstraints;
+import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
+import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
+import org.jose4j.jwk.JsonWebKey;
+import org.jose4j.jwk.OctJwkGenerator;
+import org.jose4j.jwk.OctetSequenceJsonWebKey;
+import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaimsSet;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.NumericDate;
+import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.swing.text.Style;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
@@ -24,6 +33,49 @@ public class JwtConsumerTest
 {
     //TODO more tests - nested and non nested. Invalid sig. Bad AEAD. Wrong keys. Null keys. 'none' jws good and bad w/ and w/out keys. missing cty. alg constraints. other examples from specs that are JWTs moved here.
     Log log = LogFactory.getLog(this.getClass());
+
+    @Test
+    public void jwt61ExampleUnsecuredJwt() throws InvalidJwtException, MalformedClaimException
+    {
+        // an Example Unsecured JWT from https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-32#section-6.1
+        String jwt =
+                "eyJhbGciOiJub25lIn0" +
+                "." +
+                "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt" +
+                "cGxlLmNvbS9pc19yb290Ijp0cnVlfQ" +
+                ".";
+
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setVerificationKey(null)
+                .setExpectedIssuer("joe")
+                .setRequireExpirationTime()
+                .setEvaluationTime(NumericDate.fromSeconds(1300819343))
+                .setJwsAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS)
+                .build();
+
+        JwtClaimsSet jcs = consumer.processToClaims(jwt);
+        Assert.assertThat("joe", equalTo(jcs.getIssuer()));
+        Assert.assertThat(NumericDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
+        Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
+
+        consumer = new JwtConsumerBuilder()
+                .setVerificationKey(null)
+                .setExpectedIssuer("joe")
+                .setRequireExpirationTime()
+                .setEvaluationTime(NumericDate.fromSeconds(1300819343))
+                .build();
+         expectProcessingFailure(jwt, consumer);
+
+        consumer = new JwtConsumerBuilder()
+                .setVerificationKey(null)
+                .setExpectedIssuer("joe")
+                .setRequireExpirationTime()
+                .setEvaluationTime(NumericDate.fromSeconds(1300819343))
+                .setJwsAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.BLACKLIST, AlgorithmIdentifiers.NONE, AlgorithmIdentifiers.RSA_PSS_USING_SHA256))
+                .build();
+        expectProcessingFailure(jwt, consumer);
+
+    }
 
     @Test
     public void jwtA2ExampleNestedJWT() throws InvalidJwtException, MalformedClaimException
@@ -73,6 +125,77 @@ public class JwtConsumerTest
         Assert.assertThat("joe", equalTo(jcs.getIssuer()));
         Assert.assertThat(NumericDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
         Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
+    }
+
+    @Test
+    public void algConstraints() throws Exception
+    {
+        String jwt =
+                "eyJ6aXAiOiJERUYiLCJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiY3R5IjoiSldUIn0" +
+                ".DDyrirrztC88OaDtTkkNgNIyZqQd4gjWrab9KkiBnyOULjWZWt-IAg" +
+                ".Obun_t7l3FYqNUqyW46syg" +
+                ".ChlzoLTN1ovJP9PLHlirc-_yvP4ya_5gdhDSKiZnifS9MjCbeMYebkOCxSHexs09PBbPv30JwtIyM7caqkSNggA8HT_ub1moMpx0uOFhTE9dpdY4Wb4Ym6mqtIQhdwLymDVCI6vRn-NH88vdLluGSYYLhelgcL05qeWJQKzV3mxopgM-Q7N7LycXrodqTdvM" +
+                ".ay9pwehz96tJgRKvSwASDg";
+        JsonWebKey macKey = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"j-QRollN4PYjebWYcTl32YOGWfdpXi_YYHu03Ifp8K4\"}");
+        JsonWebKey wrapKey = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"sUMs42PKNsKn9jeGJ2szKA\"}");
+
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(wrapKey.getKey())
+                .setVerificationKey(macKey.getKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1419982016))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .build();
+        JwtClaimsSet jwtClaimsSet = consumer.processToClaims(jwt);
+        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+
+        consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(wrapKey.getKey())
+                .setVerificationKey(macKey.getKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1419982016))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .setJwsAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, AlgorithmIdentifiers.HMAC_SHA256))
+                .setJweAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, KeyManagementAlgorithmIdentifiers.A128KW))
+                .setJweContentEncryptionAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256))
+                .build();
+        jwtClaimsSet = consumer.processToClaims(jwt);
+        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+
+        consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(wrapKey.getKey())
+                .setVerificationKey(macKey.getKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1419982016))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .setJwsAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.BLACKLIST, AlgorithmIdentifiers.HMAC_SHA256))
+                .build();
+        expectProcessingFailure(jwt, consumer);
+
+        consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(wrapKey.getKey())
+                .setVerificationKey(macKey.getKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1419982016))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .setJweAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.BLACKLIST, KeyManagementAlgorithmIdentifiers.A128KW))
+                .build();
+        expectProcessingFailure(jwt, consumer);
+
+        consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(wrapKey.getKey())
+                .setVerificationKey(macKey.getKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1419982016))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .setJweContentEncryptionAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.BLACKLIST, ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256))
+                .build();
+        expectProcessingFailure(jwt, consumer);
     }
 
     @Test
@@ -296,6 +419,19 @@ public class JwtConsumerTest
                 .setRequireJwtId()
                 .build();
         expectValidationFailure(jcs, consumer);
+    }
+
+    private void expectProcessingFailure(String jwt, JwtConsumer jwtConsumer)
+    {
+        try
+        {
+            jwtConsumer.process(jwt);
+            Assert.fail("jwt process/validation should have thrown an exception");
+        }
+        catch (InvalidJwtException e)
+        {
+            log.debug("Expected exception: " + e);
+        }
     }
 
     private void expectValidationFailure(JwtClaimsSet jwtClaimsSet, JwtConsumer jwtConsumer)

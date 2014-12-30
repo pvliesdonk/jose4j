@@ -1,5 +1,6 @@
 package org.jose4j.jwt.consumer;
 
+import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwt.NumericDate;
 
 import java.security.Key;
@@ -13,11 +14,33 @@ public class JwtConsumerBuilder
     private VerificationKeyResolver verificationKeyResolver = new SimpleKeyResolver(null);
     private DecryptionKeyResolver decryptionKeyResolver = new SimpleKeyResolver(null);
 
+    private AlgorithmConstraints jwsAlgorithmConstraints;
+    private AlgorithmConstraints jweAlgorithmConstraints;
+    private AlgorithmConstraints jweContentEncryptionAlgorithmConstraints;
+
     private AudValidator audValidator;
     private IssValidator issValidator;
     private boolean requireSubject;
     private boolean requireJti;
     private NumericDateClaimsValidator dateClaimsValidator = new NumericDateClaimsValidator();
+
+    public JwtConsumerBuilder setJwsAlgorithmConstraints(AlgorithmConstraints constraints)
+    {
+        jwsAlgorithmConstraints = constraints;
+        return this;
+    }
+
+    public JwtConsumerBuilder setJweAlgorithmConstraints(AlgorithmConstraints constraints)
+    {
+        jweAlgorithmConstraints = constraints;
+        return this;
+    }
+
+    public JwtConsumerBuilder setJweContentEncryptionAlgorithmConstraints(AlgorithmConstraints constraints)
+    {
+        jweContentEncryptionAlgorithmConstraints = constraints;
+        return this;
+    }
 
     public JwtConsumerBuilder setVerificationKey(Key verificationKey)
     {
@@ -134,6 +157,11 @@ public class JwtConsumerBuilder
         jwtConsumer.setClaimsValidators(claimsValidators);
         jwtConsumer.setVerificationKeyResolver(verificationKeyResolver);
         jwtConsumer.setDecryptionKeyResolver(decryptionKeyResolver);
+
+        jwtConsumer.setJwsAlgorithmConstraints(jwsAlgorithmConstraints);
+        jwtConsumer.setJweAlgorithmConstraints(jweAlgorithmConstraints);
+        jwtConsumer.setJweContentEncryptionAlgorithmConstraints(jweContentEncryptionAlgorithmConstraints);
+
         return jwtConsumer;
     }
 }
