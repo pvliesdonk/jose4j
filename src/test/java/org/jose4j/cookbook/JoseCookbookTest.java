@@ -23,8 +23,8 @@ import org.jose4j.jwe.*;
 import org.jose4j.jwk.*;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
-import org.jose4j.jwt.IntDate;
 import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.NumericDate;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.jose4j.jwx.CompactSerializer;
@@ -35,7 +35,6 @@ import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.JsonHelp;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.security.Key;
@@ -1355,12 +1354,17 @@ public class JoseCookbookTest
                 assertThat(expectedPayload, equalTo(payload));
 
                 // also test this one w/ the jwt consumer stuff
-                JwtConsumerBuilder builder = new JwtConsumerBuilder().setVerificationKey(sigJwk.getPublicKey()).setDecryptionKey(encJwk.getPrivateKey());
-                JwtConsumer jwtConsumer = builder.build();
+                JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                        .setVerificationKey(sigJwk.getPublicKey())
+                        .setDecryptionKey(encJwk.getPrivateKey())
+                        .setRequireExpirationTime()
+                        .setExpectedIssuer("hobbiton.example")
+                        .setEvaluationTime(NumericDate.fromSeconds(1300819320))
+                        .build();
                 JwtClaimsSet jwtClaimsSet = jwtConsumer.processToClaims(jweCs);
 
                 assertThat("hobbiton.example", equalTo(jwtClaimsSet.getIssuer()));
-                assertThat(IntDate.fromSeconds(1300819380), equalTo(jwtClaimsSet.getExpirationTime()));
+                assertThat(NumericDate.fromSeconds(1300819380), equalTo(jwtClaimsSet.getExpirationTime()));
                 assertTrue(jwtClaimsSet.getClaimValue("http://example.com/is_root", Boolean.class));
             }
         });

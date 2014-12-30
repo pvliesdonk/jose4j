@@ -125,14 +125,14 @@ public class JwtClaimsSet
         return values;
     }
 
-    public IntDate getExpirationTime() throws MalformedClaimException
+    public NumericDate getExpirationTime() throws MalformedClaimException
     {
-        return getIntDateClaimValue(ReservedClaimNames.EXPIRATION_TIME);
+        return getNumericDateClaimValue(ReservedClaimNames.EXPIRATION_TIME);
     }
 
-    public void setExpirationTime(IntDate expirationTime)
+    public void setExpirationTime(NumericDate expirationTime)
     {
-        setIntDateClaim(ReservedClaimNames.EXPIRATION_TIME, expirationTime);
+        setNumericDateClaim(ReservedClaimNames.EXPIRATION_TIME, expirationTime);
     }
 
     public void setExpirationTimeMinutesInTheFuture(float minutes)
@@ -140,22 +140,22 @@ public class JwtClaimsSet
         setExpirationTime(offsetFromNow(minutes));
     }
 
-    private IntDate offsetFromNow(float offsetMinutes)
+    private NumericDate offsetFromNow(float offsetMinutes)
     {
-        final IntDate intDate = IntDate.now();
+        NumericDate numericDate = NumericDate.now();
         float secondsOffset = offsetMinutes * 60;
-        intDate.addSeconds((long)secondsOffset);
-        return intDate;
+        numericDate.addSeconds((long)secondsOffset);
+        return numericDate;
     }
 
-    public IntDate getNotBefore() throws MalformedClaimException
+    public NumericDate getNotBefore() throws MalformedClaimException
     {
-        return getIntDateClaimValue(ReservedClaimNames.NOT_BEFORE);
+        return getNumericDateClaimValue(ReservedClaimNames.NOT_BEFORE);
     }
 
-    public void setNotBefore(IntDate notBefore)
+    public void setNotBefore(NumericDate notBefore)
     {
-        setIntDateClaim(ReservedClaimNames.NOT_BEFORE, notBefore);
+        setNumericDateClaim(ReservedClaimNames.NOT_BEFORE, notBefore);
     }
 
     public void setNotBeforeMinutesInThePast(float minutes)
@@ -163,19 +163,19 @@ public class JwtClaimsSet
         setNotBefore(offsetFromNow(-1 * minutes));
     }
 
-    public IntDate getIssuedAt() throws MalformedClaimException
+    public NumericDate getIssuedAt() throws MalformedClaimException
     {
-        return getIntDateClaimValue(ReservedClaimNames.ISSUED_AT);
+        return getNumericDateClaimValue(ReservedClaimNames.ISSUED_AT);
     }
 
-    public void setIssuedAt(IntDate issuedAt)
+    public void setIssuedAt(NumericDate issuedAt)
     {
-        setIntDateClaim(ReservedClaimNames.ISSUED_AT, issuedAt);
+        setNumericDateClaim(ReservedClaimNames.ISSUED_AT, issuedAt);
     }
 
     public void setIssuedAtToNow()
     {
-        setIssuedAt(IntDate.now());
+        setIssuedAt(NumericDate.now());
     }
 
     public String getJwtId() throws MalformedClaimException
@@ -223,10 +223,10 @@ public class JwtClaimsSet
         return "(" + o + " - " +e.getMessage() + ")";
     }
 
-    public IntDate getIntDateClaimValue(String claimName) throws MalformedClaimException
+    public NumericDate getNumericDateClaimValue(String claimName) throws MalformedClaimException
     {
         Number number = getClaimValue(claimName, Number.class);
-        return number != null ? IntDate.fromSeconds(number.longValue()) : null;
+        return number != null ? NumericDate.fromSeconds(number.longValue()) : null;
     }
 
     public String getStringClaimValue(String claimName) throws MalformedClaimException
@@ -240,7 +240,7 @@ public class JwtClaimsSet
         return toStringList(listClaimValue, claimName);
     }
 
-    public void setIntDateClaim(String claimName, IntDate value)
+    public void setNumericDateClaim(String claimName, NumericDate value)
     {
         claimsMap.put(claimName, value != null ? value.getValue() : null);
     }

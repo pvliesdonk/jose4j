@@ -1,5 +1,7 @@
 package org.jose4j.jwt.consumer;
 
+import org.jose4j.jwt.NumericDate;
+
 import java.security.Key;
 import java.util.*;
 
@@ -15,6 +17,7 @@ public class JwtConsumerBuilder
     private IssValidator issValidator;
     private boolean requireSubject;
     private boolean requireJti;
+    private NumericDateClaimsValidator dateClaimsValidator = new NumericDateClaimsValidator();
 
     public JwtConsumerBuilder setVerificationKey(Key verificationKey)
     {
@@ -75,6 +78,37 @@ public class JwtConsumerBuilder
         return this;
     }
 
+    public JwtConsumerBuilder setRequireExpirationTime()
+    {
+        dateClaimsValidator.setRequireExp(true);
+        return this;
+    }
+
+    public JwtConsumerBuilder setRequireIssuedAt()
+    {
+        dateClaimsValidator.setRequireIat(true);
+        return this;
+    }
+
+    public JwtConsumerBuilder setRequireNotBefore()
+    {
+        dateClaimsValidator.setRequireNbf(true);
+        return this;
+    }
+
+    public JwtConsumerBuilder setEvaluationTime(NumericDate evaluationTime)
+    {
+        dateClaimsValidator.setEvaluationTime(evaluationTime);
+        return this;
+    }
+
+    public JwtConsumerBuilder setAllowedClockSkewInSeconds(int secondsOfAllowedClockSkew)
+    {
+        dateClaimsValidator.setAllowedClockSkewSeconds(secondsOfAllowedClockSkew);
+        return this;
+    }
+
+
     public JwtConsumer build()
     {
         List<ClaimsValidator> claimsValidators = new ArrayList<>();
@@ -90,6 +124,8 @@ public class JwtConsumerBuilder
             issValidator = new IssValidator(null, false);
         }
         claimsValidators.add(issValidator);
+
+        claimsValidators.add(dateClaimsValidator);
 
         claimsValidators.add(new SubValidator(requireSubject));
         claimsValidators.add(new JtiValidator(requireJti));

@@ -213,9 +213,9 @@ public class JwtClaimsSetTest
         claims.setAudience("audience");
         claims.setIssuer("issuer");
         claims.setJwtId("id");
-        claims.setExpirationTime(IntDate.fromSeconds(231458800));
-        claims.setIssuedAt(IntDate.fromSeconds(231459000));
-        claims.setNotBefore(IntDate.fromSeconds(231459600));
+        claims.setExpirationTime(NumericDate.fromSeconds(231458800));
+        claims.setIssuedAt(NumericDate.fromSeconds(231459000));
+        claims.setNotBefore(NumericDate.fromSeconds(231459600));
         String jsonClaims = claims.toJson();
 
         Assert.assertThat(jsonClaims, containsString("\"iss\":\"issuer\""));
@@ -303,13 +303,13 @@ public class JwtClaimsSetTest
         JwtClaimsSet jwtClaimsSet = new JwtClaimsSet();
         jwtClaimsSet.setExpirationTimeMinutesInTheFuture(0.167f);
         jwtClaimsSet = JwtClaimsSet.parse(jwtClaimsSet.toJson());
-        IntDate expirationTime = jwtClaimsSet.getExpirationTime();
-        IntDate checker = IntDate.now();
-        Assert.assertTrue(checker.before(expirationTime));
+        NumericDate expirationTime = jwtClaimsSet.getExpirationTime();
+        NumericDate checker = NumericDate.now();
+        Assert.assertTrue(checker.isBefore(expirationTime));
         checker.addSeconds(9);
-        Assert.assertTrue(checker.before(expirationTime));
+        Assert.assertTrue(checker.isBefore(expirationTime));
         checker.addSeconds(2);
-        Assert.assertTrue(checker.after(expirationTime));
+        Assert.assertFalse(checker.isBefore(expirationTime));
     }
 
     @Test
@@ -506,7 +506,7 @@ public class JwtClaimsSetTest
 
         JwtClaimsSet jcs = JwtClaimsSet.parse(json);
         Assert.assertThat("joe", equalTo(jcs.getIssuer()));
-        Assert.assertThat(IntDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
+        Assert.assertThat(NumericDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
         Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
     }
 }

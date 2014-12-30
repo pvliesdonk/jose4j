@@ -4,9 +4,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jws.JsonWebSignature;
-import org.jose4j.jwt.IntDate;
 import org.jose4j.jwt.JwtClaimsSet;
 import org.jose4j.jwt.MalformedClaimException;
+import org.jose4j.jwt.NumericDate;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.junit.Assert;
@@ -54,7 +54,11 @@ public class JwtConsumerTest
         RSAPublicKey verificationKey = ExampleRsaKeyFromJws.PUBLIC_KEY;
         JwtConsumerBuilder builder = new JwtConsumerBuilder()
                 .setDecryptionKey(decryptionKey)
-                .setVerificationKey(verificationKey);
+                .setVerificationKey(verificationKey)
+                .setRequireExpirationTime()
+                .setEvaluationTime(NumericDate.fromSeconds(1300819380))
+                .setAllowedClockSkewInSeconds(30)
+                .setExpectedIssuer("joe");
         JwtConsumer jwtConsumer = builder.build();
 
         JwtConsumer.ProcessedJwt processedJwt = jwtConsumer.process(jwt);
@@ -66,7 +70,7 @@ public class JwtConsumerTest
         JwtClaimsSet jcs = processedJwt.getJwtClaimsSet();
 
         Assert.assertThat("joe", equalTo(jcs.getIssuer()));
-        Assert.assertThat(IntDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
+        Assert.assertThat(NumericDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
         Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
     }
 
@@ -213,6 +217,69 @@ public class JwtConsumerTest
         expectValidationFailure(jwtClaimsSet, jwtConsumer);
     }
 
+    @Test
+    public void someBasicTimeChecks() throws InvalidJwtException, MalformedClaimException
+    {
+        JwtClaimsSet jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\"}");
+        JwtConsumer consumer = new JwtConsumerBuilder().build();
+        consumer.validateClaims(jcs);
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().build();
+        expectValidationFailure(jcs, consumer);
+        consumer = new JwtConsumerBuilder().setRequireIssuedAt().build();
+        expectValidationFailure(jcs, consumer);
+        consumer = new JwtConsumerBuilder().setRequireNotBefore().build();
+        expectValidationFailure(jcs, consumer);
+
+
+        jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"exp\":1430602000}");
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602000)).build();
+        expectValidationFailure(jcs, consumer);
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602000)).setAllowedClockSkewInSeconds(10).build();
+        consumer.validateClaims(jcs);
+        consumer = new JwtConsumerBuilder().setEvaluationTime(NumericDate.fromSeconds(1430601000)).build();
+        consumer.validateClaims(jcs);
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430601000)).setAllowedClockSkewInSeconds(6000).build();
+        consumer.validateClaims(jcs);
+        consumer = new JwtConsumerBuilder().setEvaluationTime(NumericDate.fromSeconds(1430602002)).build();
+        expectValidationFailure(jcs, consumer);
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602002)).setAllowedClockSkewInSeconds(1).build();
+        expectValidationFailure(jcs, consumer);
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602002)).setAllowedClockSkewInSeconds(2).build();
+        expectValidationFailure(jcs, consumer);
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602002)).setAllowedClockSkewInSeconds(3).build();
+        consumer.validateClaims(jcs);
+        consumer = new JwtConsumerBuilder().setEvaluationTime(NumericDate.fromSeconds(1430602065)).build();
+        expectValidationFailure(jcs, consumer);
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602065)).setAllowedClockSkewInSeconds(60).build();
+        expectValidationFailure(jcs, consumer);
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602065)).setAllowedClockSkewInSeconds(120).build();
+        consumer.validateClaims(jcs);
+
+
+        jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430602000}");
+        consumer = new JwtConsumerBuilder().setEvaluationTime(NumericDate.fromSeconds(1430602000)).build();
+        consumer.validateClaims(jcs);
+        consumer = new JwtConsumerBuilder().setEvaluationTime(NumericDate.fromSeconds(1430601999)).build();
+        expectValidationFailure(jcs, consumer);
+        consumer = new JwtConsumerBuilder().setEvaluationTime(NumericDate.fromSeconds(1430601983)).setAllowedClockSkewInSeconds(30).build();
+        consumer.validateClaims(jcs);
+        consumer = new JwtConsumerBuilder().setEvaluationTime(NumericDate.fromSeconds(1430601983)).setAllowedClockSkewInSeconds(3000).build();
+        consumer.validateClaims(jcs);
+
+        jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430602000, \"iat\":1430602060, \"exp\":1430602600 }");
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setRequireNotBefore().setRequireIssuedAt().setEvaluationTime(NumericDate.fromSeconds(1430602002)).build();
+        consumer.validateClaims(jcs);
+
+        jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430603000, \"iat\":1430602060, \"exp\":1430602600 }");
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602002)).build();
+        expectValidationFailure(jcs, consumer);
+
+
+        jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430602000, \"iat\":1430602660, \"exp\":1430602600 }");
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602002)).build();
+        expectValidationFailure(jcs, consumer);
+
+    }
 
     @Test
     public void someBasicChecks() throws InvalidJwtException

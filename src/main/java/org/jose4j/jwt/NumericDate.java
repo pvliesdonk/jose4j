@@ -16,32 +16,34 @@
 
 package org.jose4j.jwt;
 
+import java.text.DateFormat;
 import java.util.Date;
 
+// TODO the whole "non-integer values can be represented" thing is there though it looks like maybe that's always been possible and I just assumed not b/c of the former IntDate name. Not sure how much support is needed for that (other than not failing) but maybe...
+
 /**
- * @deprecated in draft -26 of the JWT spec the name changed from IntDate to NumericDate. Consistent with that change there is a new NumericDate class, which is similar to this.
  */
-public class IntDate
+public class NumericDate
 {
     private long value;
     private static final long CONVERSION = 1000L;
 
-    private IntDate(long value)
+    private NumericDate(long value)
     {
         this.value = value;
     }
 
-    public static IntDate now()
+    public static NumericDate now()
     {
-        return fromMillis(System.currentTimeMillis());
+        return fromMilliseconds(System.currentTimeMillis());
     }
 
-    public static IntDate fromSeconds(long secondsFromEpoch)
+    public static NumericDate fromSeconds(long secondsFromEpoch)
     {
-        return new IntDate(secondsFromEpoch);
+        return new NumericDate(secondsFromEpoch);
     }
 
-    public static IntDate fromMillis(long millisecondsFromEpoch)
+    public static NumericDate fromMilliseconds(long millisecondsFromEpoch)
     {
         return fromSeconds(millisecondsFromEpoch / CONVERSION);
     }
@@ -51,11 +53,11 @@ public class IntDate
         value += seconds;
     }
 
-    public void addSeconds(int seconds)
-    {
-        addSeconds((long)seconds);
-    }
-
+    /**
+     * Returns a numeric value representing the number of seconds from
+     * 1970-01-01T0:0:0Z UTC until the given UTC date/time
+     * @return value
+     */
     public long getValue()
     {
         return value;
@@ -66,12 +68,17 @@ public class IntDate
         return getValue() * CONVERSION;  
     }
 
-    public boolean before(IntDate when)
+    public boolean isBefore(NumericDate when)
     {
         return value < when.getValue();
     }
 
-    public boolean after(IntDate when)
+    public boolean isOnOrAfter(NumericDate when)
+    {
+        return !isBefore(when);
+    }
+
+    public boolean isAfter(NumericDate when)
     {
         return value > when.getValue();
     }
@@ -79,18 +86,17 @@ public class IntDate
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("IntDate");
-        sb.append("{").append(getValue()).append(" --> ");
-        sb.append(new Date(getValueInMillis()));
-        sb.append('}');                           
+        DateFormat df  = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG);
+        StringBuilder sb = new StringBuilder();
+        Date date = new Date(getValueInMillis());
+        sb.append("NumericDate").append("{").append(getValue()).append(" -> ").append(df.format(date)).append('}');
         return sb.toString();
     }
 
     @Override
     public boolean equals(Object other)
     {
-        return (this == other) || ((other instanceof IntDate) && (value == ((IntDate) other).value));
+        return (this == other) || ((other instanceof NumericDate) && (value == ((NumericDate) other).value));
     }
 
     @Override
