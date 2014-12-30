@@ -6,6 +6,7 @@ import org.jose4j.jwt.JwtClaimsSet;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
+import org.jose4j.lang.ExceptionHelp;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
@@ -95,6 +96,10 @@ public class JwtConsumer
             {
                 throw new InvalidJwtException("Unable to process JOSE object (cause: "+e.getMessage()+"): " + jwt, e);
             }
+            catch (Exception e)
+            {
+                throw new InvalidJwtException("Unexpected exception encountered while process JOSE object(s) ("+e+"): " + jwt, e);
+            }
         }
 
         validateClaims(processedJwt.jwtClaimsSet);
@@ -115,7 +120,11 @@ public class JwtConsumer
             catch (MalformedClaimException e)
             {
                 validationResult = e.getMessage();
-            }  // todo catch more here?
+            }
+            catch (Exception e)
+            {
+                validationResult = "Unexpected exception thrown from validator " + validator.getClass().getName() + ": " + ExceptionHelp.toStringWithCauses(e);
+            }
 
             if (validationResult != null)
             {

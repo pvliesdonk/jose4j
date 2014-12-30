@@ -3,6 +3,7 @@ package org.jose4j.jwt.consumer;
 
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwx.JsonWebStructure;
+import org.jose4j.lang.UnresolvableKeyException;
 
 import java.security.Key;
 import java.util.List;
@@ -12,5 +13,5 @@ import java.util.List;
  */
 public interface DecryptionKeyResolver
 {
-    Key resolveKey(JsonWebEncryption jwe, List<JsonWebStructure> nestingContext);
+    Key resolveKey(JsonWebEncryption jwe, List<JsonWebStructure> nestingContext) throws UnresolvableKeyException;
 }
