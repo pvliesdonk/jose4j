@@ -11,5 +11,5 @@ import java.util.List;
  */
 public interface VerificationKeyResolver
 {
-    Key resolveKey(JsonWebSignature jws, List<JsonWebStructure> nestingContext);
+    Key resolveKey(JsonWebSignature jws, List<JsonWebStructure> nestingContext);  // todo throws something here
 }

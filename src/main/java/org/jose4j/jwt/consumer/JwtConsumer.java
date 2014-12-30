@@ -25,6 +25,8 @@ public class JwtConsumer
 
     // TODO alg constraints (with resolvers? but meh)
 
+    // todo other custom validators...
+
     JwtConsumer()
     {
     }

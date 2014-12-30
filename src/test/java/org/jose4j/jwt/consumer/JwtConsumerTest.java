@@ -22,6 +22,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
  */
 public class JwtConsumerTest
 {
+    //TODO more tests - nested and non nested. Invalid sig. Bad AEAD. Wrong keys. Null keys. 'none' jws good and bad w/ and w/out keys. missing cty. alg constraints. other examples from specs that are JWTs moved here.
     Log log = LogFactory.getLog(this.getClass());
 
     @Test
