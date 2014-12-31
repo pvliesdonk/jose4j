@@ -22,7 +22,7 @@ public class ZipTest extends TestCase
         jwe.setPlaintext(plaintext);
         AesKey key = new AesKey(ByteUtil.randomBytes(32));
         jwe.setKey(key);
-        jwe.setHeader(HeaderParameterNames.ZIP, CompressionAlgorithmIdentifiers.DEFLATE);
+        jwe.enableDefaultCompression();
         jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.DIRECT);
         jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
 
@@ -45,6 +45,7 @@ public class ZipTest extends TestCase
         decryptingJwe.setCompactSerialization(csWithZip);
         String plaintextString = decryptingJwe.getPlaintextString();
         assertEquals(plaintext, plaintextString);
+        assertEquals(CompressionAlgorithmIdentifiers.DEFLATE, decryptingJwe.getCompressionAlgorithmHeaderParameter());
 
         decryptingJwe = new JsonWebEncryption();
         decryptingJwe.setKey(key);
@@ -60,7 +61,7 @@ public class ZipTest extends TestCase
         jwe.setPlaintext(plaintext);
         AesKey key = new AesKey(new byte[32]);
         jwe.setKey(key);
-        jwe.setHeader(HeaderParameterNames.ZIP, "bad");
+        jwe.setCompressionAlgorithmHeaderParameter("bad");
         jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.DIRECT);
         jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
 

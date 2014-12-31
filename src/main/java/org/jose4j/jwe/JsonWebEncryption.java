@@ -28,6 +28,7 @@ import org.jose4j.lang.InvalidAlgorithmException;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 import org.jose4j.zip.CompressionAlgorithm;
+import org.jose4j.zip.CompressionAlgorithmIdentifiers;
 
 import java.security.Key;
 
@@ -99,6 +100,21 @@ public class JsonWebEncryption extends JsonWebStructure
     public String getEncryptionMethodHeaderParameter()
     {
         return getHeader(HeaderParameterNames.ENCRYPTION_METHOD);
+    }
+
+    public void setCompressionAlgorithmHeaderParameter(String zip)
+    {
+        setHeader(HeaderParameterNames.ZIP, zip);
+    }
+
+    public String getCompressionAlgorithmHeaderParameter()
+    {
+        return getHeader(HeaderParameterNames.ZIP);
+    }
+
+    public void enableDefaultCompression()
+    {
+        setCompressionAlgorithmHeaderParameter(CompressionAlgorithmIdentifiers.DEFLATE);
     }
 
     public void setContentEncryptionAlgorithmConstraints(AlgorithmConstraints contentEncryptionAlgorithmConstraints)
