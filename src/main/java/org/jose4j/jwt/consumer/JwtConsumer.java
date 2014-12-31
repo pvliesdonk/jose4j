@@ -170,7 +170,7 @@ public class JwtConsumer
             }
             catch (Exception e)
             {
-                validationResult = "Unexpected exception thrown from validator " + validator.getClass().getName() + ": " + ExceptionHelp.toStringWithCauses(e);
+                validationResult = "Unexpected exception thrown from validator " + validator.getClass().getName() + ": " + ExceptionHelp.toStringWithCausesAndAbbreviatedStack(e, this.getClass());
             }
 
             if (validationResult != null)
