@@ -1,12 +1,11 @@
 package org.jose4j.jwt.consumer;
 
-import org.jose4j.jwt.JwtClaimsSet;
 import org.jose4j.jwt.MalformedClaimException;
 
 /**
  *
  */
-public class JtiValidator implements ClaimsValidator
+public class JtiValidator implements Validator
 {
     private boolean requireJti;
 
@@ -17,9 +16,9 @@ public class JtiValidator implements ClaimsValidator
     }
 
     @Override
-    public String validate(JwtClaimsSet jwtClaimsSet) throws MalformedClaimException
+    public String validate(JwtContext jwtContext) throws MalformedClaimException
     {
-        String subject = jwtClaimsSet.getJwtId();
+        String subject = jwtContext.getJwtClaimsSet().getJwtId();
         return (subject == null && requireJti) ?  "The JWT ID (jti) claim is not present." : null;
     }
 }

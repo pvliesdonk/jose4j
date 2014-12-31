@@ -1,12 +1,11 @@
 package org.jose4j.jwt.consumer;
 
-import org.jose4j.jwt.JwtClaimsSet;
 import org.jose4j.jwt.MalformedClaimException;
 
 /**
  *
  */
-public class IssValidator implements ClaimsValidator
+public class IssValidator implements Validator
 {
     private String expectedIssuer;
     private boolean requireIssuer;
@@ -18,9 +17,9 @@ public class IssValidator implements ClaimsValidator
     }
 
     @Override
-    public String validate(JwtClaimsSet jwtClaimsSet) throws MalformedClaimException
+    public String validate(JwtContext jwtContext) throws MalformedClaimException
     {
-        String issuer = jwtClaimsSet.getIssuer();
+        String issuer = jwtContext.getJwtClaimsSet().getIssuer();
 
         if (issuer == null)
         {

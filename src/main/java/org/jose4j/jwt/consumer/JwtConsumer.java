@@ -12,6 +12,7 @@ import org.jose4j.lang.JoseException;
 
 import java.security.Key;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,13 +24,11 @@ public class JwtConsumer
     private VerificationKeyResolver verificationKeyResolver;
     private DecryptionKeyResolver decryptionKeyResolver;
 
-    private List<ClaimsValidator> claimsValidators;
+    private List<Validator> validators;
 
     private AlgorithmConstraints jwsAlgorithmConstraints;
     private AlgorithmConstraints jweAlgorithmConstraints;
     private AlgorithmConstraints jweContentEncryptionAlgorithmConstraints;
-
-    // todo other custom validators...
 
     JwtConsumer()
     {
@@ -60,9 +59,9 @@ public class JwtConsumer
         this.decryptionKeyResolver = decryptionKeyResolver;
     }
 
-    void setClaimsValidators(List<ClaimsValidator> claimsValidators)
+    void setValidators(List<Validator> validators)
     {
-        this.claimsValidators = claimsValidators;
+        this.validators = validators;
     }
 
     public JwtClaimsSet processToClaims(String jwt) throws InvalidJwtException
@@ -70,11 +69,12 @@ public class JwtConsumer
         return process(jwt).getJwtClaimsSet();
     }
 
-    public ProcessedJwt process(String jwt) throws InvalidJwtException
+    public JwtContext process(String jwt) throws InvalidJwtException
     {
-        ProcessedJwt processedJwt = new ProcessedJwt();
+        JwtClaimsSet jwtClaimsSet = null;
+        LinkedList<JsonWebStructure> joseObjects = new LinkedList<>();
 
-        while (processedJwt.getJwtClaimsSet() == null)
+        while (jwtClaimsSet == null)
         {
             JsonWebStructure joseObject;
             try
@@ -84,7 +84,7 @@ public class JwtConsumer
                 if (joseObject instanceof JsonWebSignature)
                 {
                     JsonWebSignature jws = (JsonWebSignature) joseObject;
-                    Key key = verificationKeyResolver.resolveKey(jws, processedJwt.getJoseObjects());
+                    Key key = verificationKeyResolver.resolveKey(jws, Collections.unmodifiableList(joseObjects));
                     jws.setKey(key);
                     if (jwsAlgorithmConstraints != null)
                     {
@@ -98,7 +98,7 @@ public class JwtConsumer
                 else
                 {
                     JsonWebEncryption jwe = (JsonWebEncryption) joseObject;
-                    Key key = decryptionKeyResolver.resolveKey(jwe, processedJwt.getJoseObjects());
+                    Key key = decryptionKeyResolver.resolveKey(jwe, Collections.unmodifiableList(joseObjects));
                     jwe.setKey(key);
                     if (jweAlgorithmConstraints != null)
                     {
@@ -120,16 +120,16 @@ public class JwtConsumer
                 }
                 else
                 {
-                    processedJwt.jwtClaimsSet = JwtClaimsSet.parse(payload);
+                    jwtClaimsSet = JwtClaimsSet.parse(payload);
                 }
 
-                processedJwt.joseObjects.addFirst(joseObject);
+                joseObjects.addFirst(joseObject);
             }
             catch (JoseException e)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Unable to process");
-                if (!processedJwt.getJoseObjects().isEmpty())
+                if (!joseObjects.isEmpty())
                 {
                     sb.append(" nested");
                 }
@@ -140,7 +140,7 @@ public class JwtConsumer
             {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Unexpected exception encountered while processing");
-                if (!processedJwt.getJoseObjects().isEmpty())
+                if (!joseObjects.isEmpty())
                 {
                     sb.append(" nested");
                 }
@@ -149,20 +149,20 @@ public class JwtConsumer
             }
         }
 
-        validateClaims(processedJwt.jwtClaimsSet);
-
-        return processedJwt;
+        JwtContext jwtContext = new JwtContext(jwtClaimsSet, Collections.unmodifiableList(joseObjects));
+        validate(jwtContext);
+        return jwtContext;
     }
 
-    void validateClaims(JwtClaimsSet jwtClaimsSet) throws InvalidJwtException
+    void validate(JwtContext jwtCtx) throws InvalidJwtException
     {
         List<String> issues = new ArrayList<>();
-        for (ClaimsValidator validator : claimsValidators)
+        for (Validator validator : validators)
         {
             String validationResult;
             try
             {
-                validationResult  = validator.validate(jwtClaimsSet);
+                validationResult  = validator.validate(jwtCtx);
             }
             catch (MalformedClaimException e)
             {
@@ -181,7 +181,7 @@ public class JwtConsumer
 
         if (!issues.isEmpty())
         {
-            InvalidJwtException invalidJwtException = new InvalidJwtException("JWT (claims->"+ jwtClaimsSet.getRawJson()+") rejected due to invalid claims." );
+            InvalidJwtException invalidJwtException = new InvalidJwtException("JWT (claims->"+ jwtCtx.getJwtClaimsSet().getRawJson()+") rejected due to invalid claims.");
             invalidJwtException.setDetails(issues);
             throw invalidJwtException;
         }
@@ -191,22 +191,6 @@ public class JwtConsumer
     {
         String cty = joseObject.getHeaders().getStringHeaderValue(HeaderParameterNames.CONTENT_TYPE);
         return cty != null && (cty.equalsIgnoreCase("jwt") || cty.equalsIgnoreCase("application/jwt"));
-    }
-
-    public static class ProcessedJwt
-    {
-        private JwtClaimsSet jwtClaimsSet;
-        private LinkedList<JsonWebStructure> joseObjects = new LinkedList<>();
-
-        public JwtClaimsSet getJwtClaimsSet()
-        {
-            return jwtClaimsSet;
-        }
-
-        public List<JsonWebStructure> getJoseObjects()
-        {
-            return joseObjects;
-        }
     }
 
 }

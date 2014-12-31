@@ -1,6 +1,5 @@
 package org.jose4j.jwt.consumer;
 
-import org.jose4j.jwt.JwtClaimsSet;
 import org.jose4j.jwt.MalformedClaimException;
 
 import java.util.List;
@@ -9,7 +8,7 @@ import java.util.Set;
 /**
  *
  */
-public class AudValidator implements ClaimsValidator
+public class AudValidator implements Validator
 {
     private Set<String> acceptableAudiences;
     private boolean requireAudience;
@@ -21,9 +20,9 @@ public class AudValidator implements ClaimsValidator
     }
 
     @Override
-    public String validate(JwtClaimsSet jwtClaimsSet) throws MalformedClaimException
+    public String validate(JwtContext jwtContext) throws MalformedClaimException
     {
-        List<String> audiences = jwtClaimsSet.getAudience();
+        List<String> audiences = jwtContext.getJwtClaimsSet().getAudience();
 
         if (audiences == null)
         {

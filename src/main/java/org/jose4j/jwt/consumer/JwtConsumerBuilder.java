@@ -11,6 +11,9 @@ import java.util.*;
  */
 public class JwtConsumerBuilder
 {
+    // todo other custom validators with new ones or expand the current interface...
+    // todo override or unset existing validators?
+
     private VerificationKeyResolver verificationKeyResolver = new SimpleKeyResolver(null);
     private DecryptionKeyResolver decryptionKeyResolver = new SimpleKeyResolver(null);
 
@@ -22,7 +25,7 @@ public class JwtConsumerBuilder
     private IssValidator issValidator;
     private boolean requireSubject;
     private boolean requireJti;
-    private NumericDateClaimsValidator dateClaimsValidator = new NumericDateClaimsValidator();
+    private NumericDateValidator dateClaimsValidator = new NumericDateValidator();
 
     public JwtConsumerBuilder setJwsAlgorithmConstraints(AlgorithmConstraints constraints)
     {
@@ -132,27 +135,27 @@ public class JwtConsumerBuilder
 
     public JwtConsumer build()
     {
-        List<ClaimsValidator> claimsValidators = new ArrayList<>();
+        List<Validator> validators = new ArrayList<>();
 
         if (audValidator == null)
         {
             audValidator = new AudValidator(Collections.<String>emptySet(), false);
         }
-        claimsValidators.add(audValidator);
+        validators.add(audValidator);
 
         if (issValidator == null)
         {
             issValidator = new IssValidator(null, false);
         }
-        claimsValidators.add(issValidator);
+        validators.add(issValidator);
 
-        claimsValidators.add(dateClaimsValidator);
+        validators.add(dateClaimsValidator);
 
-        claimsValidators.add(new SubValidator(requireSubject));
-        claimsValidators.add(new JtiValidator(requireJti));
+        validators.add(new SubValidator(requireSubject));
+        validators.add(new JtiValidator(requireJti));
 
         JwtConsumer jwtConsumer = new JwtConsumer();
-        jwtConsumer.setClaimsValidators(claimsValidators);
+        jwtConsumer.setValidators(validators);
         jwtConsumer.setVerificationKeyResolver(verificationKeyResolver);
         jwtConsumer.setDecryptionKeyResolver(decryptionKeyResolver);
 
