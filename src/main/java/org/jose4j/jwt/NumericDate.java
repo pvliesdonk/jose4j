@@ -19,12 +19,18 @@ package org.jose4j.jwt;
 import java.text.DateFormat;
 import java.util.Date;
 
-// TODO the whole "non-integer values can be represented" thing is there though it looks like maybe that's always been possible and I just assumed not b/c of the former IntDate name. Not sure how much support is needed for that (other than not failing) but maybe...
-
 /**
  */
 public class NumericDate
 {
+    // JWT's NumericDate says that "non-integer values can be represented"
+    // https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-32#section-2
+    // I always just assumed that it could only be integers (maybe b/c of the former IntDate name )
+    // but looking at the text again it looks like maybe fractional values has always been possible.
+    // I'm not sure I see value in truly supporting sub-second accuracy (right now, anyway) but do want to
+    // ensure that we handle such values reasonably, if we receive them. The  testNonIntegerNumericDates test
+    // in JwtClaimsSetTest checks that we don't fail and just truncate the sub-second part.
+
     private long value;
     private static final long CONVERSION = 1000L;
 

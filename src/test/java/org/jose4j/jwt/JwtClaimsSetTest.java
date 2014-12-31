@@ -509,4 +509,21 @@ public class JwtClaimsSetTest
         Assert.assertThat(NumericDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
         Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
     }
+
+    @Test
+    public void testNonIntegerNumericDates() throws InvalidJwtException, MalformedClaimException
+    {
+        // JWT's NumericDate says that "non-integer values can be represented"
+        // https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-32#section-2
+        // I always just assumed that it could only be integers (maybe b/c of the former IntDate name )
+        // but looking at the text again it looks like maybe fractional values has always been possible.
+        // I'm not sure I see value in truly supporting sub-second accuracy (right now, anyway) but do want to
+        // ensure that we handle such values reasonably, if we receive them. This test checks that we don't fail
+        // and just truncate the sub-second part.
+
+        JwtClaimsSet jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430602000.173, \"iat\":1430602060.5, \"exp\":1430602600.77}");
+        Assert.assertThat(NumericDate.fromSeconds(1430602600), equalTo(jcs.getExpirationTime()));
+        Assert.assertThat(NumericDate.fromSeconds(1430602060), equalTo(jcs.getIssuedAt()));
+        Assert.assertThat(NumericDate.fromSeconds(1430602000), equalTo(jcs.getNotBefore()));
+    }
 }
