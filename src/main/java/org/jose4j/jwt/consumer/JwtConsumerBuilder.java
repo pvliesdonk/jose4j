@@ -11,9 +11,6 @@ import java.util.*;
  */
 public class JwtConsumerBuilder
 {
-    // todo other custom validators with new ones or expand the current interface...
-    // todo override or unset existing validators?
-
     private VerificationKeyResolver verificationKeyResolver = new SimpleKeyResolver(null);
     private DecryptionKeyResolver decryptionKeyResolver = new SimpleKeyResolver(null);
 
@@ -26,6 +23,9 @@ public class JwtConsumerBuilder
     private boolean requireSubject;
     private boolean requireJti;
     private NumericDateValidator dateClaimsValidator = new NumericDateValidator();
+
+    private List<Validator> customValidators = new ArrayList<>();
+
 
     public JwtConsumerBuilder setJwsAlgorithmConstraints(AlgorithmConstraints constraints)
     {
@@ -132,11 +132,15 @@ public class JwtConsumerBuilder
         return this;
     }
 
+    public JwtConsumerBuilder registerValidator(Validator validator)
+    {
+        customValidators.add(validator);
+        return this;
+    }
 
     public JwtConsumer build()
     {
         List<Validator> validators = new ArrayList<>();
-
         if (audValidator == null)
         {
             audValidator = new AudValidator(Collections.<String>emptySet(), false);
@@ -153,6 +157,8 @@ public class JwtConsumerBuilder
 
         validators.add(new SubValidator(requireSubject));
         validators.add(new JtiValidator(requireJti));
+
+        validators.addAll(customValidators);
 
         JwtConsumer jwtConsumer = new JwtConsumer();
         jwtConsumer.setValidators(validators);

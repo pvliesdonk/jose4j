@@ -21,6 +21,8 @@ import org.junit.Test;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
@@ -195,6 +197,99 @@ public class JwtConsumerTest
                 .build();
         expectProcessingFailure(jwt, consumer);
     }
+
+    @Test
+    public void customValidatorTest() throws Exception
+    {
+        // {"iss":"same","aud":"same","exp":1420046060}
+        String jwt = "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzYW1lIiwiYXVkIjoic2FtZSIsImV4cCI6MTQyMDA0NjA2MH0.O1w_nkfQMZvEEvJ0Pach0gPmJUMW8o4aFlA1f2c8m-I";
+        JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"IWlxz1h43wKzyigIXNn-dTRBu89M9L8wmJK4zZmUXrQ\"}");
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setEvaluationTime(NumericDate.fromSeconds(1420046040))
+                .setExpectedAudience("same", "different")
+                .setExpectedIssuer("same")
+                .setRequireExpirationTime()
+                .setVerificationKey(jsonWebKey.getKey())
+                .build();
+
+        JwtContext process = consumer.process(jwt);
+        Assert.assertThat(1, equalTo(process.getJoseObjects().size()));
+
+        consumer = new JwtConsumerBuilder()
+                .setEvaluationTime(NumericDate.fromSeconds(1420046040))
+                .setExpectedAudience("same", "different")
+                .setExpectedIssuer("same")
+                .setRequireExpirationTime()
+                .setVerificationKey(jsonWebKey.getKey())
+                .registerValidator(new Validator()
+                {
+                    @Override
+                    public String validate(JwtContext jwtContext) throws MalformedClaimException
+                    {
+                        JwtClaimsSet jcs = jwtContext.getJwtClaimsSet();
+                        String audience = jcs.getAudience().iterator().next();
+                        String issuer = jcs.getIssuer();
+
+                        if (issuer.equals(audience))
+                        {
+                            return "You can go blind issuing tokens to yourself...";
+                        }
+
+                        return null;
+                    }
+                })
+                .build();
+
+        expectProcessingFailure(jwt, consumer);
+    }
+
+    @Test
+    public void wrappedNpeFromCustomValidatorTest() throws Exception
+    {
+        String jwt = "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzYW1lIiwiZXhwIjoxNDIwMDQ2ODE0fQ.LUViXhiMJRZa5veg6ayZCDQaIc0GfVDJDx-878WbFzg";
+        JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"Ek1bHgP9uYyEtB5-V6oAzT_wB4mUnvCpirPqO4MyFwE\"}");
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setEvaluationTime(NumericDate.fromSeconds(1420046767))
+                .setExpectedAudience(false, "other", "different")
+                .setExpectedIssuer("same")
+                .setRequireExpirationTime()
+                .setVerificationKey(jsonWebKey.getKey())
+                .build();
+
+        JwtContext process = consumer.process(jwt);
+        Assert.assertThat(1, equalTo(process.getJoseObjects().size()));
+
+        consumer = new JwtConsumerBuilder()
+                .setEvaluationTime(NumericDate.fromSeconds(1420046768))
+                .setExpectedAudience(false, "other", "different")
+                .setExpectedIssuer("same")
+                .setRequireExpirationTime()
+                .setVerificationKey(jsonWebKey.getKey())
+                .registerValidator(new Validator()
+                {
+                    @Override
+                    public String validate(JwtContext jwtContext) throws MalformedClaimException
+                    {
+                        try
+                        {
+                            JwtClaimsSet jcs = jwtContext.getJwtClaimsSet();
+                            List<String> audience = jcs.getAudience();
+                            Iterator<String> iterator = audience.iterator();  // this will NPE
+                            iterator.next();
+
+                            return null;
+                        }
+                        catch (Exception e)
+                        {
+                            throw new RuntimeException("Something bad happened.", e);
+                        }
+                    }
+                })
+                .build();
+
+        expectProcessingFailure(jwt, consumer);
+    }
+
 
     @Test
     public void someBasicAudChecks() throws InvalidJwtException
