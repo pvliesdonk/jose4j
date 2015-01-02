@@ -21,7 +21,6 @@ import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaimsSet;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.NumericDate;
-import org.jose4j.jwt.consumer.*;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.UnresolvableKeyException;
