@@ -68,6 +68,7 @@ public class ExamplesFromOpenIdConnectTest
         jws.setCompactSerialization(requestObject);
         jws.setKey(jwk.getKey());
         assertThat(jws.verifySignature(), is(true));
+        System.out.println(jws.getPayload());
     }
 
 

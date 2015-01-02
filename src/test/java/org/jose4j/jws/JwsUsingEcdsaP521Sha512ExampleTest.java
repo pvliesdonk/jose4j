@@ -25,6 +25,7 @@ import org.jose4j.lang.JoseException;
  */
 public class JwsUsingEcdsaP521Sha512ExampleTest extends TestCase
 {
+    // http://tools.ietf.org/html/draft-ietf-jose-json-web-signature-39#appendix-A.4
     String JWS = "eyJhbGciOiJFUzUxMiJ9.UGF5bG9hZA.AdwMgeerwtHoh-l192l60hp9wAHZFVJbLfD_UxMi70cwnZOYaRI1bKPWROc-mZZqwqT2SI-KGDKB34XO0aw_7XdtAG8GaSwFKdCAPZgoXD2YBJZCPEX3xKpRwcdOO8KpEHwJjyqOgzDO7iKvU8vcnwNrmxYbSW9ERBXukOXolLzeO_Jn";
 
     public void testVerifyExample() throws JoseException
@@ -37,6 +38,7 @@ public class JwsUsingEcdsaP521Sha512ExampleTest extends TestCase
 
     public void testVerifyExampleFromDraft14() throws JoseException
     {
+        // http://www.ietf.org/mail-archive/web/jose/current/msg03018.html
         String jwsCs = "eyJhbGciOiJFUzUxMiJ9" +
                 "." +
 //                "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt" +
