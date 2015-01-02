@@ -17,9 +17,19 @@
 package org.jose4j.jws;
 
 import org.jose4j.jwk.JsonWebKey;
+import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.MalformedClaimException;
+import org.jose4j.jwt.NumericDate;
+import org.jose4j.jwt.consumer.*;
+import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.JoseException;
+import org.jose4j.lang.UnresolvableKeyException;
 import org.junit.Test;
 
+import java.security.Key;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -28,7 +38,7 @@ import static org.junit.Assert.assertThat;
 public class ExamplesFromOpenIdConnectTest
 {
     @Test
-    public void verifySignedRequestObject() throws JoseException
+    public void verifySignedRequestObject() throws Exception
     {
         // OpenID Connect Core 1.0 - draft 15
         // 5.1.  Passing a Request Object by Value has a JWS JWT with a JWK
@@ -69,11 +79,18 @@ public class ExamplesFromOpenIdConnectTest
         jws.setKey(jwk.getKey());
         assertThat(jws.verifySignature(), is(true));
         System.out.println(jws.getPayload());
+
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                .setVerificationKey(jwk.getKey())
+                .build();
+
+        JwtClaimsSet jwtClaimsSet = jwtConsumer.processToClaims(requestObject);
+        assertThat("https://client.example.org/cb", equalTo(jwtClaimsSet.getStringClaimValue("redirect_uri")));
     }
 
 
     @Test
-    public void verifyIdTokens() throws JoseException
+    public void verifyIdTokens() throws JoseException, InvalidJwtException, MalformedClaimException
     {
         // OpenID Connect Core 1.0 - draft 15
         // Appendix A.  Authorization Examples has several singed ID Tokens and a JWK
@@ -147,11 +164,22 @@ public class ExamplesFromOpenIdConnectTest
             jws.setCompactSerialization(idToken);
             jws.setKey(jwk.getKey());
             assertThat(jws.verifySignature(), is(true));
+
+            JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                    .setExpectedIssuer("http://server.example.com")
+                    .setExpectedAudience("s6BhdRkqt3")
+                    .setRequireSubject()
+                    .setEvaluationTime(NumericDate.fromSeconds(1311280978))
+                    .setVerificationKey(jwk.getKey())
+                    .build();
+
+            JwtClaimsSet jwtClaimsSet = jwtConsumer.processToClaims(idToken);
+            assertThat("248289761001", equalTo(jwtClaimsSet.getSubject()));
         }
     }
 
     @Test
-    public void verifyIdTokensWithKid() throws JoseException
+    public void verifyIdTokensWithKid() throws Exception
     {
         // OpenID Connect Core 1.0 - draft 15 ** with my changes to have a kid per http://lists.openid.net/pipermail/openid-specs-ab/Week-of-Mon-20131104/004310.html**
         // Appendix A.  Authorization Examples has several singed ID Tokens and a JWK
@@ -220,7 +248,7 @@ public class ExamplesFromOpenIdConnectTest
                 "   \"e\":\"AQAB\"\n" +
                 "  }";
 
-        JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
+        final JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkJson);
 
         for (String idToken : new String[] {idTokenA2, idTokenA3, idTokenA4, idTokenA6})
         {
@@ -228,6 +256,29 @@ public class ExamplesFromOpenIdConnectTest
             jws.setCompactSerialization(idToken);
             jws.setKey(jwk.getKey());
             assertThat(jws.verifySignature(), is(true));
+
+            JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                    .setExpectedIssuer("http://server.example.com")
+                    .setExpectedAudience("s6BhdRkqt3")
+                    .setRequireSubject()
+                    .setEvaluationTime(NumericDate.fromSeconds(1311280978))
+                    .setVerificationKeyResolver(new VerificationKeyResolver()
+                    {
+                        @Override
+                        public Key resolveKey(JsonWebSignature jws, List<JsonWebStructure> nestingContext) throws UnresolvableKeyException
+                        {
+                            String kid = jws.getKeyIdHeaderValue();
+                            if (jwk.getKeyId().equals(kid))
+                            {
+                                return jwk.getKey();
+                            }
+                            throw new UnresolvableKeyException("Can't find key w/ kid=" + kid);
+                        }
+                    })
+                    .build();
+
+            JwtClaimsSet jwtClaimsSet = jwtConsumer.processToClaims(idToken);
+            assertThat("248289761001", equalTo(jwtClaimsSet.getSubject()));
         }
     }
 }
