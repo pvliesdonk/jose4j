@@ -78,7 +78,6 @@ public class ExamplesFromOpenIdConnectTest
         jws.setCompactSerialization(requestObject);
         jws.setKey(jwk.getKey());
         assertThat(jws.verifySignature(), is(true));
-        System.out.println(jws.getPayload());
 
         JwtConsumer jwtConsumer = new JwtConsumerBuilder()
                 .setVerificationKey(jwk.getKey())
