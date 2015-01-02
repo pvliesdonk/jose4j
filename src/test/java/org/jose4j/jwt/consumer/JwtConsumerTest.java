@@ -123,6 +123,7 @@ public class JwtConsumerTest
         Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
         String expectedPayload = "{\"iss\":\"joe\",\r\n \"exp\":1300819380,\r\n \"http://example.com/is_root\":true}";
         assertThat(jcs.getRawJson(), equalTo(expectedPayload));
+        assertThat(1, equalTo(context.getJoseObjects().size()));
     }
 
     @Test
@@ -173,6 +174,27 @@ public class JwtConsumerTest
         Assert.assertThat("joe", equalTo(jcs.getIssuer()));
         Assert.assertThat(NumericDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
         Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
+    }
+
+    @Test
+    public void jwtSec31ExampleJWT() throws Exception
+    {
+        // https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-32#section-3.1
+        String jwt = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9." +
+                "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ." +
+                "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
+        String jwk = "{\"kty\":\"oct\",\"k\":\"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow\"}";
+
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setVerificationKey(JsonWebKey.Factory.newJwk(jwk).getKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1300819372))
+                .setExpectedIssuer("joe")
+                .setRequireExpirationTime()
+                .build();
+
+        JwtContext context = consumer.process(jwt);
+        Assert.assertTrue(context.getJwtClaimsSet().getClaimValue("http://example.com/is_root", Boolean.class));
+        assertThat(1, equalTo(context.getJoseObjects().size()));
     }
 
     @Test
