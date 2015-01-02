@@ -34,6 +34,8 @@ public class HeaderParameterNames
 
     public static final String X509_CERTIFICATE_THUMBPRINT = "x5t";
 
+    public static final String X509_CERTIFICATE_SHA256_THUMBPRINT = "x5t#S256";
+
     public static final String X509_URL = "x5u";
 
     public static final String EPHEMERAL_PUBLIC_KEY = "epk";
