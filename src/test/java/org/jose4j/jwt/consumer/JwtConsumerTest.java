@@ -32,9 +32,12 @@ import org.jose4j.jwt.NumericDate;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
+import org.jose4j.keys.PbkdfKey;
+import org.jose4j.lang.UnresolvableKeyException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.security.Key;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Collections;
@@ -50,7 +53,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class JwtConsumerTest
 {
-    //TODO more tests - nested and non nested. Unexpected exceptions. Bad AEAD. Wrong keys. Null keys.
+    //TODO more tests - Unexpected exceptions. Bad AEAD. Wrong keys. Null keys.
     Log log = LogFactory.getLog(this.getClass());
 
     @Test
@@ -518,6 +521,42 @@ public class JwtConsumerTest
         assertThat(2, equalTo(joseObjects.size()));
         assertTrue(joseObjects.get(0) instanceof JsonWebEncryption);
         assertTrue(joseObjects.get(1) instanceof JsonWebSignature);
+
+    }
+
+    @Test
+    public void tripleNesting() throws Exception
+    {
+        // a JOT that's a JWE inside a JWS, which is unusual but legal
+        String jwt = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiY3R5Ijoiand0IiwicDJjIjo4MTkyLCJwMnMiOiJiWE13N0F3YUtITWZ4cWRNIn0.5Qo4mtR0E6AnTsiq-hcH9_RJoZwmWiMl0se_riEr1sdz2IXA-vCkrw.iA7lBH3Tzs4uIJVtekZEfg.jkdleffS8GIen_xt_g3QHAc0cat6UBAODpv6WLJ_ytMw-h0dtV0F77d7k1oWxBQ68Ff83v3Pxsyiqf6K9BQUVyzmI6rZafDStQm1IdTS-rvsiB4qDrx9juMqzu1udPy5N7JGs_CDV31Ky3fWEveAy4kBX46-axdyhP5XFg6xMfJ614mcf_bfo5hIJByZFwqNolNwsHLUTuiUBa4Mdg-tfob692-ox8B2c6w4RqRrLOVA_M3gENoxbLIJGL0WL1OkdQb7fyEsaMzR3urJL1t8LI5Q1pD8wjbiv4VKvc1BqoJSM0h9mLm_GNhTdQGPmevBwWVZ1k1tWJjQw0nU2eFZJi1STDGzK1GRDBD91rZSYD763WHADbxcqxrcri92jtyZrxB22pJXEgkpMlUkxqjCFATV20WSM8aSW4Od9Of9MCnrNTIby_3np4zEq5EpFEkVmH-9PzalKWo5gOHR8Zqnldyz6xcOamP34o_lEh5ddEwAFjGTlJWrDkssMeBjOog3_CXHZhutD9IfCKmIHu6Wk10XkELamiKPmNCe_CMDEdx6o6LrCtfyheOfgpDaZeZZc3Y-TF1o9J3RmCZqB-oHgLEc9mZQrGU6r5UZ4lYyfrAJl2y7Rya87LBGsUjSs7SuIyQKYkH5ek8j_9rhm_3nZhivDchkiWx5J3Pzso5Q3p6hjUfvhpgO2ywtnii45iINi5UAL6O8xqUhxZUJSoMxt1XKwx92bmC9kOoF1ljLm-w.VP_VFGef9SGdxoHCZ01FxQ";
+
+        PublicJsonWebKey sigKey = PublicJsonWebKey.Factory.newPublicJwk("{\"kty\":\"EC\",\"x\":\"HVDkXtG_j_JQUm_mNaRPSbsEhr6gdK0a6H4EURypTU0\",\"y\":\"NxdYFS2hl1w8VKf5UTpGXh2YR7KQ8gSBIHu64W0mK8M\",\"crv\":\"P-256\",\"d\":\"ToqTlgJLhI7AQYNLesI2i-08JuaYm2wxTCDiF-VxY4A\"}");
+        final PublicJsonWebKey encKey = PublicJsonWebKey.Factory.newPublicJwk("{\"kty\":\"EC\",\"x\":\"7kaETHB4U9pCdsErbjw11HGv8xcQUmFy3NMuBa_J7Os\",\"y\":\"FZK-vSMpKk9gLWC5wdFjG1W_C7vgJtdm1YfNPZevmCw\",\"crv\":\"P-256\",\"d\":\"spOxtF0qiKrrCTaUs_G04RISjCx7HEgje_I7aihXVMY\"}");
+        final Key passwordIsTaco = new PbkdfKey("taco");
+
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setDecryptionKeyResolver(new DecryptionKeyResolver()
+                {
+                    @Override
+                    public Key resolveKey(JsonWebEncryption jwe, List<JsonWebStructure> nestingContext) throws UnresolvableKeyException
+                    {
+                        return nestingContext.isEmpty() ? passwordIsTaco : encKey.getPrivateKey();
+                    }
+                })
+                .setVerificationKey(sigKey.getPublicKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1420229816))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .build();
+        JwtContext context = consumer.process(jwt);
+        JwtClaimsSet jwtClaimsSet = context.getJwtClaimsSet();
+        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+        List<JsonWebStructure> joseObjects = context.getJoseObjects();
+        assertThat(3, equalTo(joseObjects.size()));
+        assertTrue(joseObjects.get(2) instanceof JsonWebEncryption);
+        assertTrue(joseObjects.get(1) instanceof JsonWebEncryption);
+        assertTrue(joseObjects.get(0) instanceof JsonWebSignature);
 
     }
 
