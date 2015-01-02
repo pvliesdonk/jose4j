@@ -37,7 +37,7 @@ public class JsonWebKeySet
         keys = new ArrayList<>(jwkParamMapList.size());
         for (Map<String,Object> jwkParamsMap : jwkParamMapList)
         {
-            keys.add(JsonWebKey.Factory.newJwk(jwkParamsMap));
+            keys.add(JsonWebKey.Factory.newJwk(jwkParamsMap));  // todo look at handling errors on individual keys
         }
     }
 
@@ -66,6 +66,7 @@ public class JsonWebKeySet
         return found.isEmpty() ? null : found.iterator().next();
     }
 
+    // todo better/easier/more flexible way to search for keys in a key set
     public List<JsonWebKey> findJsonWebKeys(String keyId, String keyType, String use, String algorithm)
     {
         List<JsonWebKey> found = new ArrayList<JsonWebKey>();
