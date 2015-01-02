@@ -125,7 +125,7 @@ public class JwtConsumer
                     }
                     if (!jws.verifySignature())
                     {
-                        throw new InvalidJwtSignatureException("JWS signature is invalid.");
+                        throw new InvalidJwtSignatureException("JWS signature is invalid: " + jwt);
                     }
 
                     if (!jws.getAlgorithmHeaderValue().equals(AlgorithmIdentifiers.NONE))
@@ -172,7 +172,7 @@ public class JwtConsumer
                 {
                     sb.append(" nested");
                 }
-                sb.append(" JOSE object (cause: ").append(e.getMessage()).append("): ").append(jwt);
+                sb.append(" JOSE object (cause: ").append(e).append("): ").append(jwt);
                 throw new InvalidJwtException(sb.toString(), e);
             }
             catch (InvalidJwtException e)

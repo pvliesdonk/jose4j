@@ -53,7 +53,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class JwtConsumerTest
 {
-    //TODO more tests - Unexpected exceptions. Bad AEAD. Wrong keys. Null keys.
     Log log = LogFactory.getLog(this.getClass());
 
     @Test
@@ -202,6 +201,52 @@ public class JwtConsumerTest
         Assert.assertThat("joe", equalTo(jcs.getIssuer()));
         Assert.assertThat(NumericDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
         Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
+
+
+        // then some negative tests w/ null or wrong keys
+        builder = new JwtConsumerBuilder()
+                .setDecryptionKey(null)
+                .setEnableRequireEncryption()
+                .setVerificationKey(verificationKey)
+                .setRequireExpirationTime()
+                .setEvaluationTime(NumericDate.fromSeconds(1300819380))
+                .setAllowedClockSkewInSeconds(30)
+                .setExpectedIssuer("joe");
+        jwtConsumer = builder.build();
+        expectProcessingFailure(jwt, jwtConsumer);
+
+        builder = new JwtConsumerBuilder()
+                .setDecryptionKey(decryptionKey)
+                .setEnableRequireEncryption()
+                .setVerificationKey(null)
+                .setRequireExpirationTime()
+                .setEvaluationTime(NumericDate.fromSeconds(1300819380))
+                .setAllowedClockSkewInSeconds(30)
+                .setExpectedIssuer("joe");
+        jwtConsumer = builder.build();
+        expectProcessingFailure(jwt, jwtConsumer);
+
+        builder = new JwtConsumerBuilder()
+                .setDecryptionKey(decryptionKey)
+                .setEnableRequireEncryption()
+                .setVerificationKey(ExampleRsaJwksFromJwe.APPENDIX_A_1.getPublicKey())
+                .setRequireExpirationTime()
+                .setEvaluationTime(NumericDate.fromSeconds(1300819380))
+                .setAllowedClockSkewInSeconds(30)
+                .setExpectedIssuer("joe");
+        jwtConsumer = builder.build();
+        expectProcessingFailure(jwt, jwtConsumer);
+
+        builder = new JwtConsumerBuilder()
+                .setDecryptionKey(ExampleRsaKeyFromJws.PRIVATE_KEY)
+                .setEnableRequireEncryption()
+                .setVerificationKey(verificationKey)
+                .setRequireExpirationTime()
+                .setEvaluationTime(NumericDate.fromSeconds(1300819380))
+                .setAllowedClockSkewInSeconds(30)
+                .setExpectedIssuer("joe");
+        jwtConsumer = builder.build();
+        expectProcessingFailure(jwt, jwtConsumer);
     }
 
     @Test
@@ -415,6 +460,46 @@ public class JwtConsumerTest
     }
 
     @Test
+    public void someExpectedAndUnexpectedEx() throws Exception
+    {
+        // https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-32#section-3.1
+        String jwt = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9." +
+                "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ." +
+                "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
+        String jwk = "{\"kty\":\"oct\",\"k\":\"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow\"}";
+
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setVerificationKeyResolver(new VerificationKeyResolver()
+                {
+                    @Override
+                    public Key resolveKey(JsonWebSignature jws, List<JsonWebStructure> nestingContext) throws UnresolvableKeyException
+                    {
+                        throw new UnresolvableKeyException("Can't do it!");
+                    }
+                })
+                .setEvaluationTime(NumericDate.fromSeconds(1300819372))
+                .setExpectedIssuer("joe")
+                .setRequireExpirationTime()
+                .build();
+        expectProcessingFailure(jwt, consumer);
+
+        consumer = new JwtConsumerBuilder()
+                .setVerificationKeyResolver(new VerificationKeyResolver()
+                {
+                    @Override
+                    public Key resolveKey(JsonWebSignature jws, List<JsonWebStructure> nestingContext) throws UnresolvableKeyException
+                    {
+                        throw new IllegalArgumentException("Stuff happens...");
+                    }
+                })
+                .setEvaluationTime(NumericDate.fromSeconds(1300819372))
+                .setExpectedIssuer("joe")
+                .setRequireExpirationTime()
+                .build();
+        expectProcessingFailure(jwt, consumer);
+    }
+
+    @Test
     public void missingCtyInNested() throws Exception
     {
         // Nested jwt without "cty":"JWT" -> expect failure here as the cty is a MUST for nesting. But, in the future, we may consider making an effort to deal
@@ -594,6 +679,31 @@ public class JwtConsumerTest
         JwtContext context = consumer.process(jwt);
         JwtClaimsSet jwtClaimsSet = context.getJwtClaimsSet();
         Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+    }
+
+    @Test
+    public void encOnlyWithIntegrityIssues() throws Exception
+    {
+        String jwt = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..zWNzKpA-QA0BboVl02nz-A.oSy4V6cQ6EnuIMyazDCqc9jEZMC7k8LwLKkrC12Pf-wpFRyDtQjGdIZ_Ndq9JMAnrCbx0bgFSxjKISbXbcnHiA.QsGX3JhHP1Pwy4zQ8Ha9FQ";
+        JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"30WEMkbhwHPBkg_fIfm_4GuzIz5pPZB7_BSfI3dHbbQ\"}");
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(jsonWebKey.getKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1420230888))
+                .setExpectedAudience("me")
+                .setExpectedIssuer("me")
+                .setRequireExpirationTime()
+                .setDisableRequireSignature()
+                .build();
+
+        JwtClaimsSet jwtClaimsSet = consumer.processToClaims(jwt);
+        Assert.assertThat("value", equalTo(jwtClaimsSet.getStringClaimValue("name")));
+
+        // change some things and make sure it fails
+        jwt = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..zWNzKpA-QA0BboVl02nz-A.eyJpc3MiOiJtZSIsImF1ZCI6Im1lIiwiZXhwIjoxNDIwMjMxNjA2LCJuYW1lIjoidmFsdWUifQ.QsGX3JhHP1Pwy4zQ8Ha9FQ";
+        expectProcessingFailure(jwt, consumer);
+
+        jwt = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..zWNzKpA-QA0BboVl02nz-A.u1D7JCpDFeRl69G1L-h3IRrmcOXiWLnhr23ugO2kkDqKVNcO1YQ4Xvl9Sag4aYOnkqUbqe6Wdz8KK3d9q178tA.QsGX3JhHP1Pwy4zQ8Ha9FQ";
+        expectProcessingFailure(jwt, consumer);
     }
 
     @Test
