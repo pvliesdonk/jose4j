@@ -43,6 +43,7 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -493,6 +494,32 @@ public class JwtConsumerTest
         Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
     }
 
+    @Test
+    public void nestedBackwards() throws Exception
+    {
+        // a JOT that's a JWE inside a JWS, which is unusual but legal
+        String jwt = "eyJjdHkiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.ZXlKNmFYQWlPaUpFUlVZaUxDSmhiR2NpT2lKRlEwUklMVVZUSWl3aVpXNWpJam9pUVRFeU9FTkNReTFJVXpJMU5pSXNJbVZ3YXlJNmV5SnJkSGtpT2lKRlF5SXNJbmdpT2lKYVIwczNWbkZOUzNKV1VGcEphRXc1UkRsT05tTnpNV0ZhYlU5MVpqbHlUWGhtUm1kRFVURjFaREJuSWl3aWVTSTZJbTAyZW01VlQybEtjMnMwTlRaRVVWb3RjVTEzZEVKblpqQkRNVXh4VDB0dk5HYzNjakpGUTBkQllUZ2lMQ0pqY25ZaU9pSlFMVEkxTmlKOWZRLi4xSndRWThoVFJVczdUMFNpOWM1VE9RLkFOdUpNcFowTU1KLTBrbVdvVHhvRDlxLTA1YUxrMkpvRzMxLXdVZ01ZakdaaWZiWG96SDEzZGRuaXZpWXNtenhMcFdVNU1lQnptN3J3TExTeUlCdjB3LmVEb1lFTEhFWXBnMHFpRzBaeHUtWEE.NctFu0mNSArPnMXakIMQKagWyU4v7733dNhDNK3KwiFP2MahpfaH0LA7x0knRk0sjASRxDuEIW6UZGfPTFOjkw";
+
+        PublicJsonWebKey sigKey = PublicJsonWebKey.Factory.newPublicJwk("{\"kty\":\"EC\",\"x\":\"HVDkXtG_j_JQUm_mNaRPSbsEhr6gdK0a6H4EURypTU0\",\"y\":\"NxdYFS2hl1w8VKf5UTpGXh2YR7KQ8gSBIHu64W0mK8M\",\"crv\":\"P-256\",\"d\":\"ToqTlgJLhI7AQYNLesI2i-08JuaYm2wxTCDiF-VxY4A\"}");
+        PublicJsonWebKey encKey = PublicJsonWebKey.Factory.newPublicJwk("{\"kty\":\"EC\",\"x\":\"7kaETHB4U9pCdsErbjw11HGv8xcQUmFy3NMuBa_J7Os\",\"y\":\"FZK-vSMpKk9gLWC5wdFjG1W_C7vgJtdm1YfNPZevmCw\",\"crv\":\"P-256\",\"d\":\"spOxtF0qiKrrCTaUs_G04RISjCx7HEgje_I7aihXVMY\"}");
+
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(encKey.getPrivateKey())
+                .setVerificationKey(sigKey.getPublicKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1420226222))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .build();
+        JwtContext context = consumer.process(jwt);
+        JwtClaimsSet jwtClaimsSet = context.getJwtClaimsSet();
+        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+        List<JsonWebStructure> joseObjects = context.getJoseObjects();
+        assertThat(2, equalTo(joseObjects.size()));
+        assertTrue(joseObjects.get(0) instanceof JsonWebEncryption);
+        assertTrue(joseObjects.get(1) instanceof JsonWebSignature);
+
+    }
 
     @Test
     public void testOnlyEncrypted() throws Exception
