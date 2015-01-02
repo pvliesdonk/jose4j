@@ -42,6 +42,21 @@ public class JwtConsumerBuilder
 
     private List<Validator> customValidators = new ArrayList<>();
 
+    private boolean requireSignature = true;
+    private boolean requireEncryption;
+
+    public JwtConsumerBuilder setEnableRequireEncryption()
+    {
+        requireEncryption = true;
+        return this;
+    }
+
+    public JwtConsumerBuilder setDisableRequireSignature()
+    {
+        requireSignature = false;
+        return this;
+    }
+
 
     public JwtConsumerBuilder setJwsAlgorithmConstraints(AlgorithmConstraints constraints)
     {
@@ -184,6 +199,9 @@ public class JwtConsumerBuilder
         jwtConsumer.setJwsAlgorithmConstraints(jwsAlgorithmConstraints);
         jwtConsumer.setJweAlgorithmConstraints(jweAlgorithmConstraints);
         jwtConsumer.setJweContentEncryptionAlgorithmConstraints(jweContentEncryptionAlgorithmConstraints);
+
+        jwtConsumer.setRequireSignature(requireSignature);
+        jwtConsumer.setRequireEncryption(requireEncryption);
 
         return jwtConsumer;
     }

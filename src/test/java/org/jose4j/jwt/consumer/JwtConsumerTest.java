@@ -63,13 +63,14 @@ public class JwtConsumerTest
                 "cGxlLmNvbS9pc19yb290Ijp0cnVlfQ" +
                 ".";
 
-        // works w/ 'NO_CONSTRAINTS' and null key
+        // works w/ 'NO_CONSTRAINTS' and setDisableRequireSignature() and null key
         JwtConsumer consumer = new JwtConsumerBuilder()
                 .setVerificationKey(null)
                 .setExpectedIssuer("joe")
                 .setRequireExpirationTime()
                 .setEvaluationTime(NumericDate.fromSeconds(1300819343))
                 .setJwsAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS)
+                .setDisableRequireSignature()
                 .build();
         JwtClaimsSet jcs = consumer.processToClaims(jwt);
         Assert.assertThat("joe", equalTo(jcs.getIssuer()));
@@ -106,13 +107,20 @@ public class JwtConsumerTest
                 .setJwsAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS)
                 .build();
         expectProcessingFailure(jwt, consumer);
+
+        // fail w/ 'NO_CONSTRAINTS' and no key but sig required (by default)
+        consumer = new JwtConsumerBuilder()
+                .setExpectedIssuer("joe")
+                .setRequireExpirationTime()
+                .setEvaluationTime(NumericDate.fromSeconds(1300819343))
+                .setJwsAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS)
+                .build();
+        expectProcessingFailure(jwt, consumer);
     }
 
     @Test
     public void jwtA1ExampleEncryptedJWT() throws InvalidJwtException, MalformedClaimException
     {
-        // todo consider explicit way to say that sig and/or enc is required
-
         // https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-32#appendix-A.1
         String jwt = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." +
                 "QR1Owv2ug2WyPBnbQrRARTeEk9kDO2w8qDcjiHnSJflSdv1iNqhWXaKH4MqAkQtM" +
@@ -170,6 +178,7 @@ public class JwtConsumerTest
         RSAPublicKey verificationKey = ExampleRsaKeyFromJws.PUBLIC_KEY;
         JwtConsumerBuilder builder = new JwtConsumerBuilder()
                 .setDecryptionKey(decryptionKey)
+                .setEnableRequireEncryption()
                 .setVerificationKey(verificationKey)
                 .setRequireExpirationTime()
                 .setEvaluationTime(NumericDate.fromSeconds(1300819380))
@@ -205,10 +214,19 @@ public class JwtConsumerTest
                 .setExpectedIssuer("joe")
                 .setRequireExpirationTime()
                 .build();
-
         JwtContext context = consumer.process(jwt);
         Assert.assertTrue(context.getJwtClaimsSet().getClaimValue("http://example.com/is_root", Boolean.class));
         assertThat(1, equalTo(context.getJoseObjects().size()));
+
+        // require encryption and it will fail
+        consumer = new JwtConsumerBuilder()
+                .setEnableRequireEncryption()
+                .setVerificationKey(JsonWebKey.Factory.newJwk(jwk).getKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1300819372))
+                .setExpectedIssuer("joe")
+                .setRequireExpirationTime()
+                .build();
+        expectProcessingFailure(jwt, consumer);
     }
 
     @Test
@@ -454,6 +472,43 @@ public class JwtConsumerTest
                 .build();
         context = consumer.process(jwt);
         jwtClaimsSet = context.getJwtClaimsSet();
+        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+    }
+
+
+    @Test
+    public void testOnlyEncrypted() throws Exception
+    {
+        // there are legitimate cases where a JWT need only be encrypted but the majority of time a mac'd or signed JWS is needed
+        // by default the JwtConsumer should not accept a JWE only JWT to protect against cases where integrity protection might
+        // be accidentally inferred
+
+        PublicJsonWebKey sigKey = PublicJsonWebKey.Factory.newPublicJwk("{\"kty\":\"EC\",\"x\":\"HVDkXtG_j_JQUm_mNaRPSbsEhr6gdK0a6H4EURypTU0\",\"y\":\"NxdYFS2hl1w8VKf5UTpGXh2YR7KQ8gSBIHu64W0mK8M\",\"crv\":\"P-256\",\"d\":\"ToqTlgJLhI7AQYNLesI2i-08JuaYm2wxTCDiF-VxY4A\"}");
+        PublicJsonWebKey encKey = PublicJsonWebKey.Factory.newPublicJwk("{\"kty\":\"EC\",\"x\":\"7kaETHB4U9pCdsErbjw11HGv8xcQUmFy3NMuBa_J7Os\",\"y\":\"FZK-vSMpKk9gLWC5wdFjG1W_C7vgJtdm1YfNPZevmCw\",\"crv\":\"P-256\",\"d\":\"spOxtF0qiKrrCTaUs_G04RISjCx7HEgje_I7aihXVMY\"}");
+
+        String jwt = "eyJ6aXAiOiJERUYiLCJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJ3UXdIa1RUci1tUFpaZURDYU8wRjEwNi1NTkg0aFBfX0xrTW5MaElkTVhVIiwieSI6IkF4Ul9VNW1EN1FhMnFia3R5WS0tU1dsMng0N1gxTWJ5S2Rxb1JteUFVS1UiLCJjcnYiOiJQLTI1NiJ9fQ..oeYI_sIoU1LWIUw3z16V_g.J_BlS-qDJnAqw9wzngIQQioTbTGbyFnorVRq1WTO3leFXKKuBmqoWPHqoVSZdzsVeiFkI-F1DesY489MltwGYg.egjQH2w4oHpMgfjg8saXxQ";
+
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(encKey.getPrivateKey())
+                .setVerificationKey(sigKey.getPublicKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1420219088))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .build();
+        expectProcessingFailure(jwt, consumer);
+
+        consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(encKey.getPrivateKey())
+                .setVerificationKey(sigKey.getPublicKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1420219088))
+                .setExpectedAudience("canada")
+                .setDisableRequireSignature()
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .build();
+        JwtContext context = consumer.process(jwt);
+        JwtClaimsSet jwtClaimsSet = context.getJwtClaimsSet();
         Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
     }
 

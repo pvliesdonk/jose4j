@@ -18,6 +18,7 @@ package org.jose4j.jwt.consumer;
 
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwe.JsonWebEncryption;
+import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaimsSet;
 import org.jose4j.jwt.MalformedClaimException;
@@ -45,6 +46,9 @@ public class JwtConsumer
     private AlgorithmConstraints jwsAlgorithmConstraints;
     private AlgorithmConstraints jweAlgorithmConstraints;
     private AlgorithmConstraints jweContentEncryptionAlgorithmConstraints;
+
+    private boolean requireSignature = true;
+    private boolean requireEncryption;
 
     JwtConsumer()
     {
@@ -80,6 +84,16 @@ public class JwtConsumer
         this.validators = validators;
     }
 
+    void setRequireSignature(boolean requireSignature)
+    {
+        this.requireSignature = requireSignature;
+    }
+
+    void setRequireEncryption(boolean requireEncryption)
+    {
+        this.requireEncryption = requireEncryption;
+    }
+
     public JwtClaimsSet processToClaims(String jwt) throws InvalidJwtException
     {
         return process(jwt).getJwtClaimsSet();
@@ -89,6 +103,9 @@ public class JwtConsumer
     {
         JwtClaimsSet jwtClaimsSet = null;
         LinkedList<JsonWebStructure> joseObjects = new LinkedList<>();
+
+        boolean hasSignature = false;
+        boolean hasEncryption = false;
 
         while (jwtClaimsSet == null)
         {
@@ -110,6 +127,11 @@ public class JwtConsumer
                     {
                         throw new InvalidJwtSignatureException("JWS signature is invalid.");
                     }
+
+                    if (!jws.getAlgorithmHeaderValue().equals(AlgorithmIdentifiers.NONE))
+                    {
+                        hasSignature = true;
+                    }
                 }
                 else
                 {
@@ -126,6 +148,7 @@ public class JwtConsumer
                         jwe.setContentEncryptionAlgorithmConstraints(jweContentEncryptionAlgorithmConstraints);
                     }
 
+                    hasEncryption = true;
                 }
 
                 String payload = joseObject.getPayload();
@@ -163,6 +186,16 @@ public class JwtConsumer
                 sb.append(" JOSE object (").append(e).append("): ").append(jwt);
                 throw new InvalidJwtException(sb.toString(), e);
             }
+        }
+
+        if (requireSignature && !hasSignature)
+        {
+            throw new InvalidJwtException("The JWT has no signature but the JWT Consumer is configured to require one: " + jwt);
+        }
+
+        if (requireEncryption && !hasEncryption)
+        {
+            throw new InvalidJwtException("The JWT has no encryption but the JWT Consumer is configured to require it: " + jwt);
         }
 
         JwtContext jwtContext = new JwtContext(jwtClaimsSet, Collections.unmodifiableList(joseObjects));
