@@ -108,7 +108,7 @@ public class JwtConsumer
                     }
                     if (!jws.verifySignature())
                     {
-                        throw new InvalidJwtException("JWS signature is invalid.");
+                        throw new InvalidJwtSignatureException("JWS signature is invalid.");
                     }
                 }
                 else
