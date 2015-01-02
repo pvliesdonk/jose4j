@@ -41,6 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 /**
  *
@@ -91,6 +92,37 @@ public class JwtConsumerTest
                 .build();
         expectProcessingFailure(jwt, consumer);
 
+    }
+
+    @Test
+    public void jwtA1ExampleEncryptedJWT() throws InvalidJwtException, MalformedClaimException
+    {
+        // todo consider explicit way to say that sig and/or enc is required
+
+        // https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-32#appendix-A.1
+        String jwt = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." +
+                "QR1Owv2ug2WyPBnbQrRARTeEk9kDO2w8qDcjiHnSJflSdv1iNqhWXaKH4MqAkQtM" +
+                "oNfABIPJaZm0HaA415sv3aeuBWnD8J-Ui7Ah6cWafs3ZwwFKDFUUsWHSK-IPKxLG" +
+                "TkND09XyjORj_CHAgOPJ-Sd8ONQRnJvWn_hXV1BNMHzUjPyYwEsRhDhzjAD26ima" +
+                "sOTsgruobpYGoQcXUwFDn7moXPRfDE8-NoQX7N7ZYMmpUDkR-Cx9obNGwJQ3nM52" +
+                "YCitxoQVPzjbl7WBuB7AohdBoZOdZ24WlN1lVIeh8v1K4krB8xgKvRU8kgFrEn_a" +
+                "1rZgN5TiysnmzTROF869lQ." +
+                "AxY8DCtDaGlsbGljb3RoZQ." +
+                "MKOle7UQrG6nSxTLX6Mqwt0orbHvAKeWnDYvpIAeZ72deHxz3roJDXQyhxx0wKaM" +
+                "HDjUEOKIwrtkHthpqEanSBNYHZgmNOV7sln1Eu9g3J8." +
+                "fiK51VwhsxJ-siBMR-YFiA";
+
+        JwtConsumer c = new JwtConsumerBuilder()
+                .setExpectedIssuer("joe")
+                .setEvaluationTime(NumericDate.fromSeconds(1300819300))
+                .setDecryptionKey(ExampleRsaJwksFromJwe.APPENDIX_A_2.getPrivateKey())
+                .build();
+
+        JwtContext context = c.process(jwt);
+        JwtClaimsSet jcs = context.getJwtClaimsSet();
+        Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
+        String expectedPayload = "{\"iss\":\"joe\",\r\n \"exp\":1300819380,\r\n \"http://example.com/is_root\":true}";
+        assertThat(jcs.getRawJson(), equalTo(expectedPayload));
     }
 
     @Test
