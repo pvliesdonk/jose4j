@@ -23,6 +23,7 @@ import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.jwk.JsonWebKey;
+import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaimsSet;
@@ -48,7 +49,7 @@ import static org.junit.Assert.assertThat;
  */
 public class JwtConsumerTest
 {
-    //TODO more tests - nested and non nested. Unexpected exceptions. Invalid sig. Bad AEAD. Wrong keys. Null keys. 'none' jws good and bad w/ and w/out keys. missing cty. alg constraints. other examples from specs that are JWTs moved here.
+    //TODO more tests - nested and non nested. Unexpected exceptions. Invalid sig. Bad AEAD. Wrong keys. Null keys.
     Log log = LogFactory.getLog(this.getClass());
 
     @Test
@@ -62,6 +63,7 @@ public class JwtConsumerTest
                 "cGxlLmNvbS9pc19yb290Ijp0cnVlfQ" +
                 ".";
 
+        // works w/ 'NO_CONSTRAINTS' and null key
         JwtConsumer consumer = new JwtConsumerBuilder()
                 .setVerificationKey(null)
                 .setExpectedIssuer("joe")
@@ -69,12 +71,13 @@ public class JwtConsumerTest
                 .setEvaluationTime(NumericDate.fromSeconds(1300819343))
                 .setJwsAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS)
                 .build();
-
         JwtClaimsSet jcs = consumer.processToClaims(jwt);
         Assert.assertThat("joe", equalTo(jcs.getIssuer()));
         Assert.assertThat(NumericDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
         Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
 
+
+        // fails w/ default constraints
         consumer = new JwtConsumerBuilder()
                 .setVerificationKey(null)
                 .setExpectedIssuer("joe")
@@ -83,6 +86,7 @@ public class JwtConsumerTest
                 .build();
          expectProcessingFailure(jwt, consumer);
 
+        // fails w/ explicit constraints
         consumer = new JwtConsumerBuilder()
                 .setVerificationKey(null)
                 .setExpectedIssuer("joe")
@@ -92,6 +96,16 @@ public class JwtConsumerTest
                 .build();
         expectProcessingFailure(jwt, consumer);
 
+
+        // fail w/ 'NO_CONSTRAINTS' but a key provided
+        consumer = new JwtConsumerBuilder()
+                .setVerificationKey(ExampleRsaJwksFromJwe.APPENDIX_A_1.getKey())
+                .setExpectedIssuer("joe")
+                .setRequireExpirationTime()
+                .setEvaluationTime(NumericDate.fromSeconds(1300819343))
+                .setJwsAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS)
+                .build();
+        expectProcessingFailure(jwt, consumer);
     }
 
     @Test
@@ -360,6 +374,88 @@ public class JwtConsumerTest
         expectProcessingFailure(jwt, consumer);
     }
 
+    @Test
+    public void missingCtyInNested() throws Exception
+    {
+        // Nested jwt without "cty":"JWT" -> expect failure here as the cty is a MUST for nesting. But, in the future, we may consider making an effort to deal
+        // with the content even when cty isn't specified
+
+        String jwt = "eyJ6aXAiOiJERUYiLCJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImVwayI6eyJrdHkiOiJFQyIsIngiOiIwRGk0VTBZQ0R2NHAtS2hETUZwUThvY0FsZzA2SEwzSHR6UldRbzlDLWV3IiwieSI6IjBfVFJjR1Y3Qy05d0xseFJZSExJOFlKTXlET2hWNW5YeHVPMGdRVmVxd0EiLCJjcnYiOiJQLTI1NiJ9fQ..xw5H8Kztd_sqzbXjt4GKUg.YNa163HLj7MwlvjzGihbOHnJ2PC3NOTnnvVOanuk1O9XFJ97pbbHHQzEeEwG6jfvDgdmlrLjcIJkSu1U8qRby7Xr4gzP6CkaDPbKwvLveETZSNdmZh37XKfnQ4LvKgiko6OQzyLYG1gc97kUOeikXTYVaYaeV1838Bi4q3DsIG-j4ZESg0-ePQesw56A80AEE3j6wXwZ4vqugPP9_ogZzkPFcHf1lt3-A4amNMjDbV8.u-JJCoakXI55BG2rz_kBlg";
+        PublicJsonWebKey sigKey = PublicJsonWebKey.Factory.newPublicJwk("{\"kty\":\"EC\",\"x\":\"loF6m9WAW_GKrhoh48ctg_d78fbIsmUb02XDOwJj59c\",\"y\":\"kDCHDkCbWjeX8DjD9feQKcndJyerdsLJ4VZ5YSTWCoU\",\"crv\":\"P-256\",\"d\":\"6D1C9gJsT9KXNtTNyqgpdyQuIrK-qzo0_QJOVe9DqJg\"}");
+        PublicJsonWebKey encKey = PublicJsonWebKey.Factory.newPublicJwk("{\"kty\":\"EC\",\"x\":\"PNbMydlpYRBFTYn_XDFvvRAFqE4e0EJmK6-zULTVERs\",\"y\":\"dyO9wGVgKS3gtP5bx0PE8__MOV_HLSpiwK-mP1RGZgk\",\"crv\":\"P-256\",\"d\":\"FIs8wVojHBdl7vkiZVnLBPw5S9lbn4JF2WWY1OTupic\"}");
+
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(encKey.getPrivateKey())
+                .setVerificationKey(sigKey.getPublicKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1420219088))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .build();
+        expectProcessingFailure(jwt, consumer);
+    }
+
+    @Test
+    public void ctyValueVariationsInNested() throws Exception
+    {
+        // Nested jwt with variations on "cty":"JWT" like jwt, application/jwt, application/JWT ...
+
+        PublicJsonWebKey sigKey = PublicJsonWebKey.Factory.newPublicJwk("{\"kty\":\"EC\",\"x\":\"HVDkXtG_j_JQUm_mNaRPSbsEhr6gdK0a6H4EURypTU0\",\"y\":\"NxdYFS2hl1w8VKf5UTpGXh2YR7KQ8gSBIHu64W0mK8M\",\"crv\":\"P-256\",\"d\":\"ToqTlgJLhI7AQYNLesI2i-08JuaYm2wxTCDiF-VxY4A\"}");
+        PublicJsonWebKey encKey = PublicJsonWebKey.Factory.newPublicJwk("{\"kty\":\"EC\",\"x\":\"7kaETHB4U9pCdsErbjw11HGv8xcQUmFy3NMuBa_J7Os\",\"y\":\"FZK-vSMpKk9gLWC5wdFjG1W_C7vgJtdm1YfNPZevmCw\",\"crv\":\"P-256\",\"d\":\"spOxtF0qiKrrCTaUs_G04RISjCx7HEgje_I7aihXVMY\"}");
+
+        String jwt;
+        jwt = "eyJ6aXAiOiJERUYiLCJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImN0eSI6ImFwcGxpY2F0aW9uL2p3dCIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJCOUhPbG82UV9LV0NiQjZLbk1RMDFfaHcyRXdaQWNEMmNucEdYYVl5WFBBIiwieSI6InJYS2s3VzM4UXhVOHl4YWZZc3NsUjFWU2JLbDI5T0FNSWxROFBCWXVZcUEiLCJjcnYiOiJQLTI1NiJ9fQ..LcIG9_bnPb43aaps32H6yQ.rsV7ItJWWfNafDJmeLHluKhiwmsU0Mlwut2jwD6y96KpjD-hz_5zBxpXtj6mk8yGZwg2L26XLo8npt_82bhKnMYqlKSRM-3ge2Deg5WPmBCx6Fj0NyCMnoR8oJTn-oxh0OHZICK_85Xz3GptopeA3Hj8ESdsJEI6D4WbXQ7HfGeg8ID9uvTaL8NGOHT4BGY0bB-6nl3qNIY5ULpg-a4a1ou5k9HnM6SRSpVRwpBBUsk.1vqvwv9XAzsQfvragyMXZQ";
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(encKey.getPrivateKey())
+                .setVerificationKey(sigKey.getPublicKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1420219088))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .build();
+        JwtContext context = consumer.process(jwt);
+        JwtClaimsSet jwtClaimsSet = context.getJwtClaimsSet();
+        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+
+        jwt = "eyJ6aXAiOiJERUYiLCJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImN0eSI6ImFwcGxpY2F0aW9uL0pXVCIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJxelBlRUl0ZXJmQ0dhTFBpbDU3UmRudERHQVdwdVlBRGtVLUJubkkyTXowIiwieSI6ImNmWUxlc1dneGlfVndCdzdvSzNPT3dabGNrbVRCVmMzcEdnMTNRZ3V5WjQiLCJjcnYiOiJQLTI1NiJ9fQ..ftNMf4CqUSCq8p3L1Y7K1A.Z9K1YIJmSY9du5LUuSs0szCj1PUzq0ZnsEppT8yVPdGVDkDi0elEcsM8dCq8CvYrXG8OFuyp0s8dd2u_fIw4RjMc-aVMBT4ikWDmqb4CA17nC2Hxm6dZFPy3Xx3GnqjiGUIB2JiMOxj6mBZtTSvkKAUvs3Rh4G-87v2hJFpqdLSySqd-rQXL7Dhqxl0Cbu9nZFcYEIk58lpC0H2TN9aP5GtuQYa3BlNuEoEDzIcLhc4.N6VFQ0_UgNqyBsPLyE6MQQ";
+        consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(encKey.getPrivateKey())
+                .setVerificationKey(sigKey.getPublicKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1420219095))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .build();
+        context = consumer.process(jwt);
+        jwtClaimsSet = context.getJwtClaimsSet();
+        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+
+        jwt = "eyJ6aXAiOiJERUYiLCJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImN0eSI6Imp3dCIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJoTm5zTlRXZWN3TEVRUGVRMlFjZ05WSDJLX0dzTkFUZXNVaENhY2x2OVAwIiwieSI6ImI2V1lSR1V5Z1NBUGo5a0lFYktYTm5ZaDhEbmNrRXB2NDFYbUVnanA4VE0iLCJjcnYiOiJQLTI1NiJ9fQ..VGTURmPYERdJ7q9_5wlENA.91m_JN65XNlp9WsFHaHihhGB7soKNUdeBNpmODVcIiinhPClH00-GTMwfT08VmXEU2djW3Aw_eBAoU7rI_M0ovYbbmAy7UnVRUyCTbkGsQpv7OxYIznemMVMraFuHNmTAF_MU7oM4gPkqKzwuBa0uwd4JhN00bq-jEcLifMPgMvyGvfJ19SXAyrIVA4Otjuii347V5u1GwlB5VBqMiqtBnbMMzR1Fe3X-4-sEgT9BrM.4T3uLGa4Bm5_r-ZNKPzEWg";
+        consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(encKey.getPrivateKey())
+                .setVerificationKey(sigKey.getPublicKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1420219099))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .build();
+        context = consumer.process(jwt);
+        jwtClaimsSet = context.getJwtClaimsSet();
+        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+
+        jwt = "eyJ6aXAiOiJERUYiLCJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImN0eSI6ImpXdCIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJmYTlJVEh6cEROSG1uV2NDSDVvWGtFYjJ1SncwTXNOU2stQjdFb091WUEwIiwieSI6IkZ1U0RaVXdmb1EtQXB6dEFQRUc1dk40QmZRR2sxWnRMT0FzM1o0a19obmciLCJjcnYiOiJQLTI1NiJ9fQ..FmuORwLWIoNBbRh0XcBzJQ.pSr58DMuRstF3A6xj24yM4KvNgWxtb_QDKuldesTCD-R00BNFwIVx4F51VL5DwR54ITgBZBKdAT4pN6eM-td5VrWBCnSWxFjNrBoDnnRkDfFgq8OjOBaR7k_4zUk41bBikDZ0JOQDWuiaODYBk7PWq0mgotvLPbJ9oc7zfp6lbHqaYXjbzfuD56W_kDYO8zSjiZUGLcYgJDYnO3F8K-QhP02v-0OEpAGrm5SKKV3Txk.Ecojfru8KbkqIw4QvYS3qA";
+        consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(encKey.getPrivateKey())
+                .setVerificationKey(sigKey.getPublicKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1420220122))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .build();
+        context = consumer.process(jwt);
+        jwtClaimsSet = context.getJwtClaimsSet();
+        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+    }
 
     @Test
     public void someBasicAudChecks() throws InvalidJwtException
