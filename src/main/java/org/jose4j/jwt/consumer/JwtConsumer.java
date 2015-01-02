@@ -175,6 +175,10 @@ public class JwtConsumer
                 sb.append(" JOSE object (cause: ").append(e.getMessage()).append("): ").append(jwt);
                 throw new InvalidJwtException(sb.toString(), e);
             }
+            catch (InvalidJwtException e)
+            {
+                throw e;
+            }
             catch (Exception e)
             {
                 StringBuilder sb = new StringBuilder();

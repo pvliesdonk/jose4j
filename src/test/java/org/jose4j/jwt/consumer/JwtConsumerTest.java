@@ -49,7 +49,7 @@ import static org.junit.Assert.assertThat;
  */
 public class JwtConsumerTest
 {
-    //TODO more tests - nested and non nested. Unexpected exceptions. Invalid sig. Bad AEAD. Wrong keys. Null keys.
+    //TODO more tests - nested and non nested. Unexpected exceptions. Bad AEAD. Wrong keys. Null keys.
     Log log = LogFactory.getLog(this.getClass());
 
     @Test
@@ -138,6 +138,7 @@ public class JwtConsumerTest
                 .setExpectedIssuer("joe")
                 .setEvaluationTime(NumericDate.fromSeconds(1300819300))
                 .setDecryptionKey(ExampleRsaJwksFromJwe.APPENDIX_A_2.getPrivateKey())
+                .setDisableRequireSignature()
                 .build();
 
         JwtContext context = c.process(jwt);
@@ -227,6 +228,23 @@ public class JwtConsumerTest
                 .setRequireExpirationTime()
                 .build();
         expectProcessingFailure(jwt, consumer);
+    }
+
+    @Test (expected = InvalidJwtSignatureException.class)
+    public void jwtBadSig() throws Exception
+    {
+        String jwt = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9." +
+                "eyJpc3MiOiJqb2UiLAogImV4cCI6MTkwMDgxOTM4MCwKICJodHRwOi8vZXhhbXBsZS5jb20vaXNfcm9vdCI6dHJ1ZX0." +
+                "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
+        String jwk = "{\"kty\":\"oct\",\"k\":\"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow\"}";
+
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setVerificationKey(JsonWebKey.Factory.newJwk(jwk).getKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1900000380))
+                .setExpectedIssuer("joe")
+                .setRequireExpirationTime()
+                .build();
+        consumer.process(jwt);
     }
 
     @Test
