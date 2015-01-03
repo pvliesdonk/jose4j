@@ -145,7 +145,18 @@ public abstract class JsonWebStructure
 
     public void setKey(Key key)
     {
+        boolean same = (key == null ? this.key == null : key.equals(this.key));
+        if (!same)
+        {
+            onNewKey();
+        }
+
         this.key = key;
+    }
+
+    protected void onNewKey()
+    {
+        // just a hook that subclasses can override
     }
 
     protected byte[] getIntegrity()

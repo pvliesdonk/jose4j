@@ -86,6 +86,12 @@ public class JsonWebSignature extends JsonWebStructure
         setSignature(signatureBytes);
     }
 
+    @Override
+    protected void onNewKey()
+    {
+        validSignature = null;
+    }
+
     public boolean verifySignature() throws JoseException
     {
         if (validSignature == null)
