@@ -16,10 +16,14 @@
 
 package org.jose4j.keys;
 
+import org.jose4j.base64url.Base64Url;
 import org.jose4j.base64url.SimplePEMEncoder;
 import org.jose4j.lang.JoseException;
+import org.jose4j.lang.UncheckedJoseException;
 
 import java.io.ByteArrayInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.*;
 
 /**
@@ -71,5 +75,41 @@ public class X509Util
         }
     }
 
+    public static String x5t(X509Certificate certificate)
+    {
+        return thumbprint(certificate, "SHA-1");
+    }
 
+    public static String x5tS256(X509Certificate certificate)
+    {
+        return thumbprint(certificate, "SHA-256");
+    }
+
+    private static String thumbprint(X509Certificate certificate, String hashAlg)
+    {
+        MessageDigest msgDigest = getMessageDigest(hashAlg);
+        byte[] certificateEncoded;
+        try
+        {
+            certificateEncoded = certificate.getEncoded();
+        }
+        catch (CertificateEncodingException e)
+        {
+            throw new UncheckedJoseException("Unable to get certificate thumbprint due to unexpected certificate encoding exception.", e);
+        }
+        byte[] digest = msgDigest.digest(certificateEncoded);
+        return Base64Url.encode(digest);
+    }
+
+    private static MessageDigest getMessageDigest(String alg)
+    {
+        try
+        {
+            return MessageDigest.getInstance(alg);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new UncheckedJoseException("Unable to get MessageDigest instance with " + alg);
+        }
+    }
 }
