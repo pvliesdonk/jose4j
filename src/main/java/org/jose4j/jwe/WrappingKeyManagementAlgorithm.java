@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.Headers;
 import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.ExceptionHelp;
 import org.jose4j.lang.JoseException;
 
 import javax.crypto.Cipher;
@@ -108,19 +109,18 @@ public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo imple
         {
             if (log.isDebugEnabled())
             {
-                log.debug("Key unwrap failed. Substituting a randomly generated CEK and proceeding.", e);
+                String flatStack = ExceptionHelp.toStringWithCausesAndAbbreviatedStack(e, JsonWebEncryption.class);
+                log.debug("Key unwrap failed. Substituting a randomly generated CEK and proceeding. " + flatStack);
             }
+            /* https://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-39#section-11.5
+                   and doing this should also result in the same type of error for different types of problems as suggested 11.4
 
-            /*
-                TODO - is this good enough for step 10 from
-                http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-14#section-5.2
-                ?  And should it be doing this for the other key wrapping/encrypting algs? OAEP and AES Key wrap?
-                    To mitigate the attacks described in RFC 3218 [RFC3218], the
-                    recipient MUST NOT distinguish between format, padding, and
-                    length errors of encrypted keys.  It is strongly recommended, in
-                    the event of receiving an improperly formatted key, that the
-                    receiver substitute a randomly generated CEK and proceed to the
-                    next step, to mitigate timing attacks.
+               To mitigate the attacks described in RFC 3218 [RFC3218], the
+               recipient MUST NOT distinguish between format, padding, and length
+               errors of encrypted keys.  It is strongly recommended, in the event
+               of receiving an improperly formatted key, that the recipient
+               substitute a randomly generated CEK and proceed to the next step, to
+               mitigate timing attacks.
              */
             byte[] bytes = ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength());
             return new SecretKeySpec(bytes, cekAlg);
