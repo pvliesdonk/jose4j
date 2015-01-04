@@ -83,7 +83,7 @@ public class KeyValidationSupport
         if (!AesKey.ALGORITHM.equals(alg))
         {
             throw new InvalidKeyException("Invalid key for JWE " + joseAlg + ", expected an "
-                    + AesKey.ALGORITHM+ " key but an " + alg + " bit key was provided.");
+                    + AesKey.ALGORITHM+ " key but an " + alg + " key was provided.");
         }
 
         int managementKeyByteLength = managementKey.getEncoded().length;
