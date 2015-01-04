@@ -20,15 +20,15 @@ import org.apache.commons.logging.LogFactory;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.keys.X509Util;
+import org.jose4j.lang.ExceptionHelp;
+import org.jose4j.lang.JoseException;
 import org.jose4j.lang.UncheckedJoseException;
 import org.jose4j.lang.UnresolvableKeyException;
 
 import java.security.Key;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.jose4j.jwx.HeaderParameterNames.X509_CERTIFICATE_SHA256_THUMBPRINT;
 import static org.jose4j.jwx.HeaderParameterNames.X509_CERTIFICATE_THUMBPRINT;
@@ -40,13 +40,15 @@ public class X509VerificationKeyResolver implements VerificationKeyResolver
 {
     final static Log log = LogFactory.getLog(X509VerificationKeyResolver.class);
 
-    Map<String,X509Certificate> x5tMap;
-    Map<String,X509Certificate> x5tS256Map;
+    private Map<String,X509Certificate> x5tMap;
+    private Map<String,X509Certificate> x5tS256Map;
+
+    private boolean tryAllOnNoThumbHeader;
 
     public X509VerificationKeyResolver(List<X509Certificate> certificates)
     {
-        x5tMap = new HashMap<>();
-        x5tS256Map = new HashMap<>();
+        x5tMap = new LinkedHashMap<>();
+        x5tS256Map = new LinkedHashMap<>();
 
         for (X509Certificate cert : certificates)
         {
@@ -70,6 +72,11 @@ public class X509VerificationKeyResolver implements VerificationKeyResolver
         this(Arrays.asList(certificates));
     }
 
+    public void setTryAllOnNoThumbHeader(boolean tryAllOnNoThumbHeader)
+    {
+        this.tryAllOnNoThumbHeader = tryAllOnNoThumbHeader;
+    }
+
     @Override
     public Key resolveKey(JsonWebSignature jws, List<JsonWebStructure> nestingContext) throws UnresolvableKeyException
     {
@@ -78,6 +85,10 @@ public class X509VerificationKeyResolver implements VerificationKeyResolver
 
         if (x5t == null && x5tS256 == null)
         {
+            if (tryAllOnNoThumbHeader)
+            {
+                return attemptAll(jws);
+            }
             throw new UnresolvableKeyException("Neither the " + X509_CERTIFICATE_THUMBPRINT + " header nor the " + X509_CERTIFICATE_SHA256_THUMBPRINT + " header are present in the JWS.");
         }
 
@@ -109,5 +120,31 @@ public class X509VerificationKeyResolver implements VerificationKeyResolver
         }
 
         return x509Certificate.getPublicKey();
+    }
+
+    private Key attemptAll(JsonWebSignature jws) throws UnresolvableKeyException
+    {
+        for (X509Certificate certificate : x5tMap.values())
+        {
+            PublicKey publicKey = certificate.getPublicKey();
+            jws.setKey(publicKey);
+
+            try
+            {
+                if (jws.verifySignature())
+                {
+                    return publicKey;
+                }
+            }
+            catch (JoseException e)
+            {
+                log.debug("Verify signature didn't work: " + ExceptionHelp.toStringWithCauses(e));
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("Unable to verify the signature with any of the provided keys - SHA-1 thumbs of provided certificates: ");
+        sb.append(x5tMap.keySet());
+        sb.append(".");
+        throw new UnresolvableKeyException(sb.toString());
     }
 }

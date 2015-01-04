@@ -20,6 +20,7 @@ import org.hamcrest.CoreMatchers;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.NumericDate;
 import org.jose4j.keys.X509Util;
 import org.jose4j.lang.JoseException;
@@ -29,11 +30,9 @@ import org.junit.Test;
 
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import static org.jose4j.jwx.HeaderParameterNames.X509_CERTIFICATE_SHA256_THUMBPRINT;
-import static org.jose4j.jwx.HeaderParameterNames.X509_CERTIFICATE_THUMBPRINT;
 
 /**
  *
@@ -201,11 +200,44 @@ public class X509VerificationKeyResolverInJwtConsumerTest
     }
 
     @Test
-    public void noThumbHeader()
+    public void noThumbHeader() throws InvalidJwtException, MalformedClaimException
     {
+        // signed w/ 1
         String jwt = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJtZSIsImF1ZCI6InlvdSIsImV4cCI6MTQyMDI5ODk3OSwic3ViIjoiYWJvdXQifQ.HtKEtmJOb5mmhHni5iJ0FUAEoNStpPZuFmQh7dtw-A7gIYsIUgdLumKCMgjG4OX_hDjvoSGl1XvHwYuzM24AohOJAaSdhLBnxTLZ4NumVwGLWp1uSjSy6stwkZrA3c9qLohLvib3RuX_x20ziOfA6YOMWwaAG66u93VwgG2upXBPwnySUuQYSPbFbSCTacoyJ9jTFu8ggeuI57dH34TyNXJK1F1Kow5IRfsioyVHsT4mP4HRk6xLXOIclf3vsfPoAG9GR8jxpDYxKZXBrDqt8gnKefGcOe6lqQv1zS7Vrb6NO8ejVo5g5tkw5-Kbpu775ShB0-mHrMocrw1n8NmQlA";
         JwtConsumer jwtConsumer = new JwtConsumerBuilder()
                 .setVerificationKeyResolver(new X509VerificationKeyResolver(CERT_LIST.get(0), CERT_LIST.get(1)))
+                .setEvaluationTime(NumericDate.fromSeconds(1420298972))
+                .setExpectedAudience("you")
+                .build();
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, jwtConsumer);
+
+        List<X509Certificate> certificates = new ArrayList<>(CERT_LIST);
+        Collections.reverse(certificates);
+        List<List<X509Certificate>> certificateListList = new ArrayList<>();
+        certificateListList.add(certificates);
+        certificateListList.add(Arrays.asList(CERT_LIST.get(2), CERT_LIST.get(1), CERT_LIST.get(0)));
+        certificateListList.add(Arrays.asList(CERT_LIST.get(1), CERT_LIST.get(0)));
+        certificateListList.add(Arrays.asList(CERT_LIST.get(0), CERT_LIST.get(1)));
+        certificateListList.add(Arrays.asList(CERT_LIST.get(1)));
+        certificateListList.add(Arrays.asList(CERT_LIST.get(3), CERT_LIST.get(1)));
+
+        for (List<X509Certificate> certificateList : certificateListList)
+        {
+            X509VerificationKeyResolver verificationKeyResolver = new X509VerificationKeyResolver(certificateList);
+            verificationKeyResolver.setTryAllOnNoThumbHeader(true);
+            jwtConsumer = new JwtConsumerBuilder()
+                    .setVerificationKeyResolver(verificationKeyResolver)
+                    .setEvaluationTime(NumericDate.fromSeconds(1420298972))
+                    .setExpectedAudience("you")
+                    .build();
+            JwtClaimsSet jwtClaimsSet = jwtConsumer.processToClaims(jwt);
+            Assert.assertThat("about", CoreMatchers.equalTo(jwtClaimsSet.getSubject()));
+        }
+
+        X509VerificationKeyResolver verificationKeyResolver = new X509VerificationKeyResolver(CERT_LIST.get(0), CERT_LIST.get(2)); // but 1 was the signer
+        verificationKeyResolver.setTryAllOnNoThumbHeader(true);
+        jwtConsumer = new JwtConsumerBuilder()
+                .setVerificationKeyResolver(verificationKeyResolver)
                 .setEvaluationTime(NumericDate.fromSeconds(1420298972))
                 .setExpectedAudience("you")
                 .build();
