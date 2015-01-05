@@ -283,7 +283,7 @@ public class Base64 extends BaseNCodec {
         super(BYTES_PER_UNENCODED_BLOCK, BYTES_PER_ENCODED_BLOCK,
                 lineLength,
                 lineSeparator == null ? 0 : lineSeparator.length);
-        // TODO could be simplified if there is no requirement to reject invalid line sep when length <=0
+        // codecTODO could be simplified if there is no requirement to reject invalid line sep when length <=0
         // @see test case Base64Test.testConstructors()
         if (lineSeparator != null) {
             if (containsAlphabetOrPad(lineSeparator)) {
@@ -476,7 +476,7 @@ public class Base64 extends BaseNCodec {
             switch (context.modulus) {
 //              case 0 : // impossible, as excluded above
                 case 1 : // 6 bits - ignore entirely
-                    // TODO not currently tested; perhaps it is impossible?
+                    // codecTODO not currently tested; perhaps it is impossible?
                     break;
                 case 2 : // 12 bits = 8 + 4
                     context.ibitWorkArea = context.ibitWorkArea >> 4; // dump the extra 4 bits
