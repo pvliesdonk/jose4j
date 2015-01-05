@@ -2,6 +2,8 @@
 
 package org.jose4j.json.internal.json_simple.parser;
 
+import java.math.BigInteger;
+
 class Yylex {
 
   /** This character denotes the end of file */
@@ -657,7 +659,18 @@ int getPosition(){
           }
         case 44: break;
         case 2: 
-          { Long val=Long.valueOf(yytext()); return new Yytoken(Yytoken.TYPE_VALUE, val);  // todo deal with values bigger than Long can handle
+          {
+              String yytext = yytext();
+              try
+              {
+                  Long val=Long.valueOf(yytext);
+                  return new Yytoken(Yytoken.TYPE_VALUE, val);
+              }
+              catch (NumberFormatException e)  //  deal with values bigger than Long can handle
+              {
+                  BigInteger val = new BigInteger(yytext);
+                  return new Yytoken(Yytoken.TYPE_VALUE, val);
+              }
           }
         case 45: break;
         case 18: 

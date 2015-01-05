@@ -83,6 +83,13 @@ public class JsonUtilTest extends TestCase
         }
     }
 
+    public void testBiggerThanLong() throws Exception
+    {
+        String json = "{\"key\":\"value\",\"number\":90210, \"big number\":99990193716474719874987981237498321343555513331108571735145}";
+        Map<String, Object> parsed = JsonUtil.parseJson(json);
+        assertEquals(3, parsed.size());
+    }
+
     //todo some general JSON tests?
     // todo disallow extra trailing data (and leading?)
 }
