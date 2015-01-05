@@ -17,6 +17,8 @@
 package org.jose4j.lang;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  */
@@ -27,12 +29,12 @@ public class StringUtil
 
     public static String newStringUtf8(byte[] bytes)
     {
-        return newString(bytes, UTF_8);
+        return newString(bytes, StandardCharsets.UTF_8);
     }
 
     public static String newStringUsAscii(byte[] bytes)
     {
-        return newString(bytes, US_ASCII);
+        return newString(bytes, StandardCharsets.US_ASCII);
     }
 
     public static String newString(byte[] bytes, String charsetName)
@@ -47,14 +49,24 @@ public class StringUtil
         }
     }
 
+    public static String newString(byte[] bytes, Charset charset)
+    {
+        return (bytes == null) ? null : new String(bytes, charset);
+    }
+
     public static byte[] getBytesUtf8(String string)
     {
-        return getBytesUnchecked(string, UTF_8);
+        return getBytes(string, StandardCharsets.UTF_8);
     }
 
     public static byte[] getBytesAscii(String string)
     {
-        return getBytesUnchecked(string, US_ASCII);
+        return getBytes(string, StandardCharsets.US_ASCII);
+    }
+
+    public static byte[] getBytes(String string, Charset charset)
+    {
+        return (string == null) ? null : string.getBytes(charset);
     }
 
     public static byte[] getBytesUnchecked(String string, String charsetName)
@@ -74,4 +86,3 @@ public class StringUtil
         return new IllegalStateException("Unknown or unsupported character set name: " + charsetName);
     }
 }
-// todo look at StandardCharsets (new in java 7) to maybe simplify the unchecked stuff with known charsets
