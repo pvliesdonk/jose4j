@@ -16,6 +16,8 @@
 
 package org.jose4j.jwk;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jose4j.json.JsonUtil;
 import org.jose4j.lang.JoseException;
 
@@ -25,6 +27,8 @@ import java.util.*;
  */
 public class JsonWebKeySet
 {
+    private final Log log = LogFactory.getLog(this.getClass());
+
     public static final String JWK_SET_MEMBER_NAME = "keys";
 
     private List<JsonWebKey> keys;
@@ -37,7 +41,18 @@ public class JsonWebKeySet
         keys = new ArrayList<>(jwkParamMapList.size());
         for (Map<String,Object> jwkParamsMap : jwkParamMapList)
         {
-            keys.add(JsonWebKey.Factory.newJwk(jwkParamsMap));  // todo look at handling errors on individual keys
+            try
+            {
+                JsonWebKey jwk = JsonWebKey.Factory.newJwk(jwkParamsMap);
+                keys.add(jwk);
+            }
+            catch (Exception e)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Ignoring an individual JWK in a JWKS due to a problem processing it. JWK params:" );
+                sb.append(jwkParamsMap).append(" and the full JWKS content: ").append(json);
+                log.debug(sb.toString(), e);
+            }
         }
     }
 
