@@ -50,6 +50,8 @@ public class JwtConsumer
     private boolean requireSignature = true;
     private boolean requireEncryption;
 
+    private boolean liberalContentTypeHandling;
+
     JwtConsumer()
     {
     }
@@ -92,6 +94,11 @@ public class JwtConsumer
     void setRequireEncryption(boolean requireEncryption)
     {
         this.requireEncryption = requireEncryption;
+    }
+
+    void setLiberalContentTypeHandling(boolean liberalContentTypeHandling)
+    {
+        this.liberalContentTypeHandling = liberalContentTypeHandling;
     }
 
     public JwtClaimsSet processToClaims(String jwt) throws InvalidJwtException
@@ -159,7 +166,29 @@ public class JwtConsumer
                 }
                 else
                 {
-                    jwtClaimsSet = JwtClaimsSet.parse(payload);
+                    try
+                    {
+                        jwtClaimsSet = JwtClaimsSet.parse(payload);
+                    }
+                    catch (InvalidJwtException ije)
+                    {
+                        if (liberalContentTypeHandling)
+                        {
+                            try
+                            {
+                                JsonWebStructure.fromCompactSerialization(jwt);
+                                jwt = payload;
+                            }
+                            catch (JoseException je)
+                            {
+                                throw ije;
+                            }
+                        }
+                        else
+                        {
+                            throw ije;
+                        }
+                    }
                 }
 
                 joseObjects.addFirst(joseObject);

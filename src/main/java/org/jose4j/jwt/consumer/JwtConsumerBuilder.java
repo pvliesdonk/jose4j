@@ -45,6 +45,8 @@ public class JwtConsumerBuilder
     private boolean requireSignature = true;
     private boolean requireEncryption;
 
+    private boolean liberalContentTypeHandling;
+
     public JwtConsumerBuilder setEnableRequireEncryption()
     {
         requireEncryption = true;
@@ -57,6 +59,11 @@ public class JwtConsumerBuilder
         return this;
     }
 
+    public JwtConsumerBuilder setEnableLiberalContentTypeHandling()
+    {
+        liberalContentTypeHandling = true;
+        return this;
+    }
 
     public JwtConsumerBuilder setJwsAlgorithmConstraints(AlgorithmConstraints constraints)
     {
@@ -202,6 +209,8 @@ public class JwtConsumerBuilder
 
         jwtConsumer.setRequireSignature(requireSignature);
         jwtConsumer.setRequireEncryption(requireEncryption);
+
+        jwtConsumer.setLiberalContentTypeHandling(liberalContentTypeHandling);
 
         return jwtConsumer;
     }

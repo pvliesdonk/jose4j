@@ -28,6 +28,7 @@ import org.jose4j.jwt.JwtClaimsSet;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.NumericDate;
 import org.jose4j.jwx.JsonWebStructure;
+import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.keys.PbkdfKey;
@@ -497,8 +498,8 @@ public class JwtConsumerTest
     @Test
     public void missingCtyInNested() throws Exception
     {
-        // Nested jwt without "cty":"JWT" -> expect failure here as the cty is a MUST for nesting. But, in the future, we may consider making an effort to deal
-        // with the content even when cty isn't specified
+        // Nested jwt without "cty":"JWT" -> expect failure here as the cty is a MUST for nesting
+        // setEnableLiberalContentTypeHandling() on the builder will enable a best effort to deal with the content even when cty isn't specified
 
         String jwt = "eyJ6aXAiOiJERUYiLCJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImVwayI6eyJrdHkiOiJFQyIsIngiOiIwRGk0VTBZQ0R2NHAtS2hETUZwUThvY0FsZzA2SEwzSHR6UldRbzlDLWV3IiwieSI6IjBfVFJjR1Y3Qy05d0xseFJZSExJOFlKTXlET2hWNW5YeHVPMGdRVmVxd0EiLCJjcnYiOiJQLTI1NiJ9fQ..xw5H8Kztd_sqzbXjt4GKUg.YNa163HLj7MwlvjzGihbOHnJ2PC3NOTnnvVOanuk1O9XFJ97pbbHHQzEeEwG6jfvDgdmlrLjcIJkSu1U8qRby7Xr4gzP6CkaDPbKwvLveETZSNdmZh37XKfnQ4LvKgiko6OQzyLYG1gc97kUOeikXTYVaYaeV1838Bi4q3DsIG-j4ZESg0-ePQesw56A80AEE3j6wXwZ4vqugPP9_ogZzkPFcHf1lt3-A4amNMjDbV8.u-JJCoakXI55BG2rz_kBlg";
         PublicJsonWebKey sigKey = PublicJsonWebKey.Factory.newPublicJwk("{\"kty\":\"EC\",\"x\":\"loF6m9WAW_GKrhoh48ctg_d78fbIsmUb02XDOwJj59c\",\"y\":\"kDCHDkCbWjeX8DjD9feQKcndJyerdsLJ4VZ5YSTWCoU\",\"crv\":\"P-256\",\"d\":\"6D1C9gJsT9KXNtTNyqgpdyQuIrK-qzo0_QJOVe9DqJg\"}");
@@ -513,6 +514,59 @@ public class JwtConsumerTest
                 .setRequireExpirationTime()
                 .build();
         SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, consumer);
+
+        consumer = new JwtConsumerBuilder()
+                .setEnableLiberalContentTypeHandling()
+                .setDecryptionKey(encKey.getPrivateKey())
+                .setVerificationKey(sigKey.getPublicKey())
+                .setEvaluationTime(NumericDate.fromSeconds(1420219088))
+                .setExpectedAudience("canada")
+                .setExpectedIssuer("usa")
+                .setRequireExpirationTime()
+                .build();
+        JwtContext context = consumer.process(jwt);
+        JwtClaimsSet jwtClaimsSet = context.getJwtClaimsSet();
+        System.out.println(jwtClaimsSet.toJson());
+        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+        List<JsonWebStructure> joseObjects = context.getJoseObjects();
+        assertThat(2, equalTo(joseObjects.size()));
+        assertTrue(joseObjects.get(0) instanceof JsonWebSignature);
+        assertTrue(joseObjects.get(1) instanceof JsonWebEncryption);
+    }
+
+    @Test
+    public void missingCtyInNestedViaNimbusExample() throws Exception
+    {
+        // "Signed and encrypted JSON Web Token (JWT)" example JWT made from http://connect2id.com/products/nimbus-jose-jwt/examples/signed-and-encrypted-jwt
+        // didn't have "cty":"JWT" at the time of writing (1/5/15 - https://twitter.com/__b_c/status/552105927512301568) but it made me think
+        // allowing more liberal processing might be a good idea
+        // keys and enc alg were changed from the example to produce this jwt
+        final String jwt =
+                "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." +
+                "IAseIHBLnv7hFKz_V3-o-Of3Mf2DIGzFnSh_8sLZgujPaNIG8NlZmA." +
+                "fwbuvibqYUlDzTXTtsB6yw." +
+                "5T70ZVMqOTl4q_tYegL0bgJpT2wTUlSvnJ2QAB8KfpNO_J3StiK8oHvSmVOPOrCQJai_XffZGUpmAO2fnGnUajKmQpxm_iaJUZtzexwqeNlVzAr-swLUZDmW0lh3NgDB" +
+                    "EAgY4khN7v1L_etToKuuEI6P-UGsg34BqaNuZEkj7ylsY1McZg73t5x9C4Q9dsBbsPLFPPUxxvA2abJhAq1Hew." +
+                "D1hDq8pD6nQ42yvez-yjlQ\n";
+
+        final JwtConsumer consumer = new JwtConsumerBuilder()
+                .setEnableLiberalContentTypeHandling() // this will try nested content as JOSE if JSON paring fails
+                .setDecryptionKey(new AesKey(new byte[16]))
+                .setVerificationKey(new AesKey(new byte[32]))
+                .setEvaluationTime(NumericDate.fromSeconds(1420467806))
+                .setExpectedIssuer("https://c2id.com")
+                .setRequireIssuedAt()
+                .build();
+
+        JwtContext context = consumer.process(jwt);
+        JwtClaimsSet jwtClaimsSet = context.getJwtClaimsSet();
+        Assert.assertThat("alice", equalTo(jwtClaimsSet.getSubject()));
+        List<JsonWebStructure> joseObjects = context.getJoseObjects();
+        assertThat(2, equalTo(joseObjects.size()));
+        assertTrue(joseObjects.get(0) instanceof JsonWebSignature);
+        assertTrue(joseObjects.get(1) instanceof JsonWebEncryption);
+
+
     }
 
     @Test
