@@ -155,9 +155,9 @@ public abstract class PublicJsonWebKey extends JsonWebKey
         setCertificateChain(Arrays.asList(certificates));
     }
 
-    BigInteger getBigIntFromBase64UrlEncodedParam(Map<String, Object> params, String parameterName)
+    BigInteger getBigIntFromBase64UrlEncodedParam(Map<String, Object> params, String parameterName, boolean required) throws JoseException
     {
-        String base64UrlValue = JsonHelp.getString(params, parameterName);
+        String base64UrlValue = getString(params, parameterName, required);
         return BigEndianBigInteger.fromBase64Url(base64UrlValue);
     }
 

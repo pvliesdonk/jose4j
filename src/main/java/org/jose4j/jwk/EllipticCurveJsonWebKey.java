@@ -19,7 +19,6 @@ package org.jose4j.jwk;
 import org.jose4j.keys.EcKeyUtil;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.lang.JoseException;
-import org.jose4j.lang.JsonHelp;
 
 import java.math.BigInteger;
 import java.security.interfaces.ECPrivateKey;
@@ -56,12 +55,12 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
     {
         super(params);
 
-        curveName = JsonHelp.getString(params, CURVE_MEMBER_NAME);
+        curveName = getString(params, CURVE_MEMBER_NAME, true);
         ECParameterSpec curve = EllipticCurves.getSpec(curveName);
 
-        BigInteger x = getBigIntFromBase64UrlEncodedParam(params, X_MEMBER_NAME);
+        BigInteger x = getBigIntFromBase64UrlEncodedParam(params, X_MEMBER_NAME, true);
 
-        BigInteger y =  getBigIntFromBase64UrlEncodedParam(params, Y_MEMBER_NAME);
+        BigInteger y =  getBigIntFromBase64UrlEncodedParam(params, Y_MEMBER_NAME, true);
 
         EcKeyUtil keyUtil = new EcKeyUtil();
         key = keyUtil.publicKey(x, y, curve);
@@ -69,7 +68,7 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
 
         if (params.containsKey(PRIVATE_KEY_MEMBER_NAME))
         {
-            BigInteger d = getBigIntFromBase64UrlEncodedParam(params, PRIVATE_KEY_MEMBER_NAME);
+            BigInteger d = getBigIntFromBase64UrlEncodedParam(params, PRIVATE_KEY_MEMBER_NAME, false);
             privateKey = keyUtil.privateKey(d, curve);
         }
     }

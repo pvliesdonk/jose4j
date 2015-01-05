@@ -57,9 +57,9 @@ public class RsaJsonWebKey extends PublicJsonWebKey
     {
         super(params);
 
-        BigInteger modulus = getBigIntFromBase64UrlEncodedParam(params, MODULUS_MEMBER_NAME);
+        BigInteger modulus = getBigIntFromBase64UrlEncodedParam(params, MODULUS_MEMBER_NAME, true);
 
-        BigInteger publicExponent = getBigIntFromBase64UrlEncodedParam(params, EXPONENT_MEMBER_NAME);
+        BigInteger publicExponent = getBigIntFromBase64UrlEncodedParam(params, EXPONENT_MEMBER_NAME, true);
 
         RsaKeyUtil rsaKeyUtil = new RsaKeyUtil();
         key = rsaKeyUtil.publicKey(modulus, publicExponent);
@@ -67,15 +67,15 @@ public class RsaJsonWebKey extends PublicJsonWebKey
 
         if (params.containsKey(PRIVATE_EXPONENT_MEMBER_NAME))
         {
-            BigInteger d = getBigIntFromBase64UrlEncodedParam(params, PRIVATE_EXPONENT_MEMBER_NAME);
+            BigInteger d = getBigIntFromBase64UrlEncodedParam(params, PRIVATE_EXPONENT_MEMBER_NAME, false);
 
             if (params.containsKey(FIRST_PRIME_FACTOR_MEMBER_NAME))
             {
-                BigInteger p = getBigIntFromBase64UrlEncodedParam(params, FIRST_PRIME_FACTOR_MEMBER_NAME);
-                BigInteger q = getBigIntFromBase64UrlEncodedParam(params, SECOND_PRIME_FACTOR_MEMBER_NAME);
-                BigInteger dp = getBigIntFromBase64UrlEncodedParam(params, FIRST_FACTOR_CRT_EXPONENT_MEMBER_NAME);
-                BigInteger dq = getBigIntFromBase64UrlEncodedParam(params, SECOND_FACTOR_CRT_EXPONENT_MEMBER_NAME);
-                BigInteger qi = getBigIntFromBase64UrlEncodedParam(params, FIRST_CRT_COEFFICIENT_MEMBER_NAME);
+                BigInteger p = getBigIntFromBase64UrlEncodedParam(params, FIRST_PRIME_FACTOR_MEMBER_NAME, false);
+                BigInteger q = getBigIntFromBase64UrlEncodedParam(params, SECOND_PRIME_FACTOR_MEMBER_NAME, false);
+                BigInteger dp = getBigIntFromBase64UrlEncodedParam(params, FIRST_FACTOR_CRT_EXPONENT_MEMBER_NAME, false);
+                BigInteger dq = getBigIntFromBase64UrlEncodedParam(params, SECOND_FACTOR_CRT_EXPONENT_MEMBER_NAME, false);
+                BigInteger qi = getBigIntFromBase64UrlEncodedParam(params, FIRST_CRT_COEFFICIENT_MEMBER_NAME, false);
                 privateKey = rsaKeyUtil.privateKey(modulus, publicExponent, d, p, q, dp, dq, qi);
             }
             else

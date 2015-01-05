@@ -52,9 +52,9 @@ public abstract class JsonWebKey implements Serializable
 
     protected JsonWebKey(Map<String, Object> params)
     {
-        setUse(JsonHelp.getString(params, USE_PARAMETER));
-        setKeyId(JsonHelp.getString(params, KEY_ID_PARAMETER));
-        setAlgorithm(JsonHelp.getString(params, ALGORITHM_PARAMETER));
+        setUse(getString(params, USE_PARAMETER));
+        setKeyId(getString(params, KEY_ID_PARAMETER));
+        setAlgorithm(getString(params, ALGORITHM_PARAMETER));
     }
 
     public abstract String getKeyType();
@@ -146,11 +146,32 @@ public abstract class JsonWebKey implements Serializable
         }
     }
 
+    protected static String getString(Map<String, Object> params, String name)
+    {
+        return JsonHelp.getString(params, name);
+    }
+
+    protected static String getStringRequired(Map<String, Object> params, String name) throws JoseException
+    {
+        return getString(params, name, true);
+    }
+
+    protected static String getString(Map<String, Object> params, String name, boolean required) throws JoseException
+    {
+        String value = getString(params, name);
+        if (value == null && required)
+        {
+            throw new JoseException("Missing required '" + name + "' parameter.");
+        }
+
+        return value;
+    }
+
     public static class Factory
     {
         public static JsonWebKey newJwk(Map<String,Object> params) throws JoseException
         {
-            String kty = JsonHelp.getString(params, KEY_TYPE_PARAMETER);
+            String kty = getStringRequired(params, KEY_TYPE_PARAMETER);
 
             if (RsaJsonWebKey.KEY_TYPE.equals(kty))
             {

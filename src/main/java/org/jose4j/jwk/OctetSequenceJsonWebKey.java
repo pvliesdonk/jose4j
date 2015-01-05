@@ -18,7 +18,7 @@ package org.jose4j.jwk;
 
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.keys.AesKey;
-import org.jose4j.lang.JsonHelp;
+import org.jose4j.lang.JoseException;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -39,11 +39,11 @@ public class OctetSequenceJsonWebKey extends JsonWebKey
         octetSequence = key.getEncoded();
     }
 
-    public OctetSequenceJsonWebKey(Map<String, Object> params)
+    public OctetSequenceJsonWebKey(Map<String, Object> params) throws JoseException
     {
         super(params);
         Base64Url base64Url = new Base64Url();
-        String b64KeyBytes = JsonHelp.getString(params, KEY_VALUE_MEMBER_NAME);
+        String b64KeyBytes = getStringRequired(params, KEY_VALUE_MEMBER_NAME);
         octetSequence = base64Url.base64UrlDecode(b64KeyBytes);
         // um... how could I know the alg? I don't see a reliable way to know.
         // Maybe infer from the alg parameter but it's optional.
