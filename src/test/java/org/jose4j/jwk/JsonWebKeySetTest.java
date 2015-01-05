@@ -17,12 +17,14 @@
 package org.jose4j.jwk;
 
 import junit.framework.TestCase;
+import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.JoseException;
 
+import java.security.Key;
 import java.security.interfaces.ECPublicKey;
 import java.util.*;
 
@@ -159,6 +161,44 @@ public class JsonWebKeySetTest extends TestCase
         String json = jwkSet.toJson();
         assertNotNull(json);
         assertTrue(json.contains("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx"));
+    }
+
+    public void testParseExampleSymmetricKeys() throws JoseException
+    {
+        // from https://tools.ietf.org/html/draft-ietf-jose-json-web-key Appendix A.3
+        String jwkJson = "{\"keys\":\n" +
+                "       [\n" +
+                "         {\"kty\":\"oct\",\n" +
+                "          \"alg\":\"A128KW\",\n" +
+                "          \"k\":\"GawgguFyGrWKav7AX4VKUg\"},\n" +
+                "\n" +
+                "         {\"kty\":\"oct\",\n" +
+                "          \"k\":\"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75\n" +
+                "     aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow\",\n" +
+                "          \"kid\":\"HMAC key used in JWS A.1 example\"}\n" +
+                "       ]\n" +
+                "     }\n";
+
+        JsonWebKeySet jwkSet = new JsonWebKeySet(jwkJson);
+        Collection<JsonWebKey> jwks = jwkSet.getJsonWebKeys();
+
+        assertEquals(2, jwks.size());
+
+        Iterator<JsonWebKey> iterator = jwks.iterator();
+        assertTrue(iterator.next() instanceof OctetSequenceJsonWebKey);
+        assertTrue(iterator.next() instanceof OctetSequenceJsonWebKey);
+        assertFalse(iterator.hasNext());
+
+        JsonWebKey jwk2 = jwkSet.findJsonWebKey("HMAC key used in JWS A.1 example", null, null, null);
+        Key key2 = jwk2.getKey();
+        assertNotNull(key2);
+        assertEquals(64, key2.getEncoded().length);
+
+        JsonWebKey jwk1 = jwkSet.findJsonWebKey(null, null, null, KeyManagementAlgorithmIdentifiers.A128KW);
+        Key key1 = jwk1.getKey();
+        assertNotNull(key1);
+        assertEquals(16, key1.getEncoded().length);
+
     }
 
 
