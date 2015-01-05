@@ -30,8 +30,9 @@ import java.util.*;
  */
 public class JsonWebKeySetTest extends TestCase
 {
-    public void testParseExample() throws JoseException
+    public void testParseExamplePublicKeys() throws JoseException
     {
+        // from https://tools.ietf.org/html/draft-ietf-jose-json-web-key Appendix A.1
         String jwkJson = "{\"keys\":\n" +
                 "     [\n" +
                 "       {\"kty\":\"EC\",\n" +
@@ -67,9 +68,12 @@ public class JsonWebKeySetTest extends TestCase
         assertTrue(webKey1 instanceof EllipticCurveJsonWebKey);
         assertEquals(Use.ENCRYPTION, webKey1.getUse());
         assertNotNull(webKey1.getKey());
+        assertNull(((PublicJsonWebKey) webKey1).getPrivateKey());
         JsonWebKey webKey2011 = jwkSet.findJsonWebKey("2011-04-29", null, null, null);
         assertTrue(webKey2011 instanceof RsaJsonWebKey);
         assertNotNull(webKey2011.getKey());
+        assertNull(((PublicJsonWebKey) webKey2011).getPrivateKey());
+
         assertEquals(AlgorithmIdentifiers.RSA_USING_SHA256, webKey2011.getAlgorithm());
 
         assertEquals(Use.ENCRYPTION, jwkSet.findJsonWebKey("1", null, null, null).getUse());
@@ -80,6 +84,83 @@ public class JsonWebKeySetTest extends TestCase
         assertNotNull(json);
         assertTrue(json.contains("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx"));
     }
+
+    public void testParseExamplePrivateKeys() throws JoseException
+    {
+        // from https://tools.ietf.org/html/draft-ietf-jose-json-web-key Appendix A.2
+        String jwkJson = "{\"keys\":\n" +
+                "       [\n" +
+                "         {\"kty\":\"EC\",\n" +
+                "          \"crv\":\"P-256\",\n" +
+                "          \"x\":\"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4\",\n" +
+                "          \"y\":\"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM\",\n" +
+                "          \"d\":\"870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE\",\n" +
+                "          \"use\":\"enc\",\n" +
+                "          \"kid\":\"1\"},\n" +
+                "\n" +
+                "         {\"kty\":\"RSA\",\n" +
+                "          \"n\":\"0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4\n" +
+                "     cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMst\n" +
+                "     n64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2Q\n" +
+                "     vzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbIS\n" +
+                "     D08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw\n" +
+                "     0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw\",\n" +
+                "          \"e\":\"AQAB\",\n" +
+                "          \"d\":\"X4cTteJY_gn4FYPsXB8rdXix5vwsg1FLN5E3EaG6RJoVH-HLLKD9\n" +
+                "     M7dx5oo7GURknchnrRweUkC7hT5fJLM0WbFAKNLWY2vv7B6NqXSzUvxT0_YSfqij\n" +
+                "     wp3RTzlBaCxWp4doFk5N2o8Gy_nHNKroADIkJ46pRUohsXywbReAdYaMwFs9tv8d\n" +
+                "     _cPVY3i07a3t8MN6TNwm0dSawm9v47UiCl3Sk5ZiG7xojPLu4sbg1U2jx4IBTNBz\n" +
+                "     nbJSzFHK66jT8bgkuqsk0GjskDJk19Z4qwjwbsnn4j2WBii3RL-Us2lGVkY8fkFz\n" +
+                "     me1z0HbIkfz0Y6mqnOYtqc0X4jfcKoAC8Q\",\n" +
+                "          \"p\":\"83i-7IvMGXoMXCskv73TKr8637FiO7Z27zv8oj6pbWUQyLPQBQxtPV\n" +
+                "     nwD20R-60eTDmD2ujnMt5PoqMrm8RfmNhVWDtjjMmCMjOpSXicFHj7XOuVIYQyqV\n" +
+                "     WlWEh6dN36GVZYk93N8Bc9vY41xy8B9RzzOGVQzXvNEvn7O0nVbfs\",\n" +
+                "          \"q\":\"3dfOR9cuYq-0S-mkFLzgItgMEfFzB2q3hWehMuG0oCuqnb3vobLyum\n" +
+                "     qjVZQO1dIrdwgTnCdpYzBcOfW5r370AFXjiWft_NGEiovonizhKpo9VVS78TzFgx\n" +
+                "     kIdrecRezsZ-1kYd_s1qDbxtkDEgfAITAG9LUnADun4vIcb6yelxk\",\n" +
+                "          \"dp\":\"G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oim\n" +
+                "     YwxIi2emTAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_Nmtu\n" +
+                "     YZc3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0\",\n" +
+                "          \"dq\":\"s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUU\n" +
+                "     vMfBcMpn8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9\n" +
+                "     GF4Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk\",\n" +
+                "          \"qi\":\"GyM_p6JrXySiz1toFgKbWV-JdI3jQ4ypu9rbMWx3rQJBfmt0FoYzg\n" +
+                "     UIZEVFEcOqwemRN81zoDAaa-Bk0KWNGDjJHZDdDmFhW3AN7lI-puxk_mHZGJ11rx\n" +
+                "     yR8O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU\",\n" +
+                "          \"alg\":\"RS256\",\n" +
+                "          \"kid\":\"2011-04-29\"}\n" +
+                "       ]\n" +
+                "     }\n";
+
+        JsonWebKeySet jwkSet = new JsonWebKeySet(jwkJson);
+        Collection<JsonWebKey> jwks = jwkSet.getJsonWebKeys();
+
+        assertEquals(2, jwks.size());
+
+        Iterator<JsonWebKey> iterator = jwks.iterator();
+        assertTrue(iterator.next() instanceof EllipticCurveJsonWebKey);
+        assertTrue(iterator.next() instanceof RsaJsonWebKey);
+
+        JsonWebKey webKey1 = jwkSet.findJsonWebKey("1", null, null, null);
+        assertTrue(webKey1 instanceof EllipticCurveJsonWebKey);
+        assertEquals(Use.ENCRYPTION, webKey1.getUse());
+        assertNotNull(webKey1.getKey());
+        assertNotNull(((PublicJsonWebKey) webKey1).getPrivateKey());
+        JsonWebKey webKey2011 = jwkSet.findJsonWebKey("2011-04-29", null, null, null);
+        assertTrue(webKey2011 instanceof RsaJsonWebKey);
+        assertNotNull(webKey2011.getKey());
+        assertEquals(AlgorithmIdentifiers.RSA_USING_SHA256, webKey2011.getAlgorithm());
+        assertNotNull(((PublicJsonWebKey) webKey2011).getPrivateKey());
+
+        assertEquals(Use.ENCRYPTION, jwkSet.findJsonWebKey("1", null, null, null).getUse());
+
+        assertNull(jwkSet.findJsonWebKey("nope", null, null, null));
+
+        String json = jwkSet.toJson();
+        assertNotNull(json);
+        assertTrue(json.contains("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx"));
+    }
+
 
     public void testFromRsaPublicKeyAndBack() throws JoseException
     {
