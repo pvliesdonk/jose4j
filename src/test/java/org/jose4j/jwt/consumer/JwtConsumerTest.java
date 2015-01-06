@@ -462,7 +462,6 @@ public class JwtConsumerTest
         String jwt = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9." +
                 "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ." +
                 "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
-        String jwk = "{\"kty\":\"oct\",\"k\":\"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow\"}";
 
         JwtConsumer consumer = new JwtConsumerBuilder()
                 .setVerificationKeyResolver(new VerificationKeyResolver()
@@ -961,6 +960,16 @@ public class JwtConsumerTest
         consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602002)).build();
         SimpleJwtConsumerTestHelp.expectValidationFailure(jcs, consumer);
 
+
+        jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"exp\":1430607201}");
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430600000)).build();
+        SimpleJwtConsumerTestHelp.goodValidate(jcs, consumer);
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430600000)).setMaxFutureValidityInMinutes(90).build();
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jcs, consumer);
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430600000)).setMaxFutureValidityInMinutes(120).build();
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jcs, consumer);
+        consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430600000)).setMaxFutureValidityInMinutes(120).setAllowedClockSkewInSeconds(20).build();
+        SimpleJwtConsumerTestHelp.goodValidate(jcs, consumer);
     }
 
     @Test

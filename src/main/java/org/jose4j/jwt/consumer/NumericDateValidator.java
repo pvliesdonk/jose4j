@@ -30,6 +30,7 @@ public class NumericDateValidator implements Validator
     private boolean requireNbf;
     private NumericDate evaluationTime = NumericDate.now();
     private int allowedClockSkewSeconds = 0;
+    private int maxFutureValidityInMinutes = 0;
 
     public void setRequireExp(boolean requireExp)
     {
@@ -54,6 +55,11 @@ public class NumericDateValidator implements Validator
     public void setAllowedClockSkewSeconds(int allowedClockSkewSeconds)
     {
         this.allowedClockSkewSeconds = allowedClockSkewSeconds;
+    }
+
+    public void setMaxFutureValidityInMinutes(int maxFutureValidityInMinutes)
+    {
+        this.maxFutureValidityInMinutes = maxFutureValidityInMinutes;
     }
 
     @Override
@@ -95,6 +101,16 @@ public class NumericDateValidator implements Validator
             if (notBefore != null && expirationTime.isBefore(notBefore))
             {
                 return "The Expiration Time (exp="+expirationTime+") claim value cannot be before the Not Before (nbf="+notBefore+") claim value.";
+            }
+
+            if (maxFutureValidityInMinutes > 0)
+            {
+                long deltaInSeconds = (expirationTime.getValue() - allowedClockSkewSeconds) - evaluationTime.getValue();
+                if (deltaInSeconds > (maxFutureValidityInMinutes * 60))
+                {
+                    return "The Expiration Time (exp="+expirationTime+") claim value cannot be more than " + maxFutureValidityInMinutes
+                            + " minutes in the future relative to the evaluation time " + evaluationTime + skewMessage();
+                }
             }
         }
 

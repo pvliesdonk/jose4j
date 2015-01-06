@@ -170,6 +170,13 @@ public class JwtConsumerBuilder
         return this;
     }
 
+    public JwtConsumerBuilder setMaxFutureValidityInMinutes(int maxFutureValidityInMinutes)
+    {
+        dateClaimsValidator.setMaxFutureValidityInMinutes(maxFutureValidityInMinutes);
+        return this;
+    }
+
+
     public JwtConsumerBuilder registerValidator(Validator validator)
     {
         customValidators.add(validator);
