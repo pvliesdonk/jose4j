@@ -36,17 +36,18 @@ import java.util.Map;
  */
 public abstract class PublicJsonWebKey extends JsonWebKey
 {
-
     public static final String X509_CERTIFICATE_CHAIN_PARAMETER = "x5c";
-
-    // todo x5others
     public static final String X509_THUMBPRINT_PARAMETER = "x5t";
+    public static final String X509_SHA256_THUMBPRINT_PARAMETER = "x5t#S256";
     public static final String X509_URL_PARAMETER = "x5u";
 
     protected boolean writeOutPrivateKeyToJson;
     protected PrivateKey privateKey;
 
     private List<X509Certificate> certificateChain;
+    private String x5t;
+    private String x5tS256;
+    private String x5u;
 
     protected PublicJsonWebKey(PublicKey publicKey)
     {
@@ -70,6 +71,11 @@ public abstract class PublicJsonWebKey extends JsonWebKey
                 certificateChain.add(x509Certificate);
             }
         }
+
+        x5t = getString(params, X509_THUMBPRINT_PARAMETER);
+        x5tS256 = getString(params, X509_SHA256_THUMBPRINT_PARAMETER);
+
+        x5u = getString(params, X509_URL_PARAMETER);
     }
 
     protected abstract void fillPublicTypeSpecificParams(Map<String,Object> params);
@@ -92,6 +98,10 @@ public abstract class PublicJsonWebKey extends JsonWebKey
 
             params.put(X509_CERTIFICATE_CHAIN_PARAMETER, x5cStrings);
         }
+
+        putIfNotNull(X509_THUMBPRINT_PARAMETER, x5t, params);
+        putIfNotNull(X509_SHA256_THUMBPRINT_PARAMETER, x5tS256, params);
+        putIfNotNull(X509_URL_PARAMETER, x5u, params);
 
         if (writeOutPrivateKeyToJson || outputLevel == OutputControlLevel.INCLUDE_PRIVATE)
         {
@@ -132,11 +142,41 @@ public abstract class PublicJsonWebKey extends JsonWebKey
         return (certificateChain != null && !certificateChain.isEmpty()) ? certificateChain.get(0) : null;
     }
 
+    public String getX509CertificateSha1Thumbprint()
+    {
+        return x5t;
+    }
+
+    public String getX509CertificateSha256Thumbprint()
+    {
+        return x5tS256;
+    }
+
+    public String getX509Url()
+    {
+        return x5u;
+    }
+
     public void setCertificateChain(List<X509Certificate> certificateChain)
     {
         checkForBareKeyCertMismatch();
 
         this.certificateChain = certificateChain;
+    }
+
+    public void setX509CertificateSha1Thumbprint(String x5t)
+    {
+        this.x5t = x5t;
+    }
+
+    public void setX509CertificateSha256Thumbprint(String x5tS2)
+    {
+        x5tS256 = x5tS2;
+    }
+
+    public void setX509Url(String x5u)
+    {
+        this.x5u = x5u;
     }
 
     void checkForBareKeyCertMismatch()
