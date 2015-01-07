@@ -80,8 +80,8 @@ public class X509VerificationKeyResolver implements VerificationKeyResolver
     @Override
     public Key resolveKey(JsonWebSignature jws, List<JsonWebStructure> nestingContext) throws UnresolvableKeyException
     {
-        String x5t = jws.getHeader(X509_CERTIFICATE_THUMBPRINT);
-        String x5tS256 = jws.getHeader(X509_CERTIFICATE_SHA256_THUMBPRINT);
+        String x5t = jws.getX509CertSha1ThumbprintHeaderValue();
+        String x5tS256 = jws.getX509CertSha256ThumbprintHeaderValue();
 
         if (x5t == null && x5tS256 == null)
         {

@@ -24,6 +24,9 @@ import org.jose4j.lang.JoseException;
 
 import java.security.Key;
 
+import static org.jose4j.jwx.HeaderParameterNames.X509_CERTIFICATE_SHA256_THUMBPRINT;
+import static org.jose4j.jwx.HeaderParameterNames.X509_CERTIFICATE_THUMBPRINT;
+
 /**
  */
 public abstract class JsonWebStructure
@@ -136,6 +139,26 @@ public abstract class JsonWebStructure
     public String getKeyIdHeaderValue()
     {
         return getHeader(HeaderParameterNames.KEY_ID);
+    }
+
+    public String getX509CertSha1ThumbprintHeaderValue()
+    {
+        return getHeader(X509_CERTIFICATE_THUMBPRINT);
+    }
+
+    public void setX509CertSha1ThumbprintHeaderValue(String x5t)
+    {
+        setHeader(X509_CERTIFICATE_THUMBPRINT, x5t);
+    }
+
+    public String getX509CertSha256ThumbprintHeaderValue()
+    {
+        return getHeader(X509_CERTIFICATE_SHA256_THUMBPRINT);
+    }
+
+    public void setX509CertSha256ThumbprintHeaderValue(String x5tS256)
+    {
+        setHeader(X509_CERTIFICATE_SHA256_THUMBPRINT, x5tS256);
     }
 
     public Key getKey()
