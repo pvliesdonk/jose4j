@@ -69,6 +69,13 @@ public class X5cTest extends TestCase
         PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(jwkJson);
         List<X509Certificate> certificateChain = jwk.getCertificateChain();
         assertFalse(certificateChain.isEmpty());
+        assertNull(jwk.getX509CertificateSha1Thumbprint());
+        assertNull(jwk.getX509CertificateSha1Thumbprint(false));
+        assertNotNull(jwk.getX509CertificateSha1Thumbprint(true));
+
+        assertNull(jwk.getX509CertificateSha256Thumbprint());
+        assertNull(jwk.getX509CertificateSha256Thumbprint(false));
+        assertNotNull(jwk.getX509CertificateSha256Thumbprint(true));
     }
 
     public void testSomeChainThingsKinda() throws JoseException

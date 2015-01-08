@@ -144,12 +144,42 @@ public abstract class PublicJsonWebKey extends JsonWebKey
 
     public String getX509CertificateSha1Thumbprint()
     {
-        return x5t;
+        return getX509CertificateSha1Thumbprint(false);
+    }
+
+    public String getX509CertificateSha1Thumbprint(boolean allowFallbackDeriveFromX5c)
+    {
+        String result = x5t;
+        if (result == null && allowFallbackDeriveFromX5c)
+        {
+            X509Certificate leafCertificate = getLeafCertificate();
+            if (leafCertificate != null)
+            {
+                result = X509Util.x5t(leafCertificate);
+            }
+        }
+
+        return result;
     }
 
     public String getX509CertificateSha256Thumbprint()
     {
-        return x5tS256;
+        return getX509CertificateSha256Thumbprint(false);
+    }
+
+    public String getX509CertificateSha256Thumbprint(boolean allowFallbackDeriveFromX5c)
+    {
+        String result = x5tS256;
+        if (result == null && allowFallbackDeriveFromX5c)
+        {
+            X509Certificate leafCertificate = getLeafCertificate();
+            if (leafCertificate != null)
+            {
+                result = X509Util.x5tS256(leafCertificate);
+            }
+        }
+
+        return result;
     }
 
     public String getX509Url()
