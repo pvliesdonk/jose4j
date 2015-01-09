@@ -1,6 +1,8 @@
 package org.jose4j.jwk;
 
+import org.jose4j.jws.EcdsaUsingShaAlgorithm;
 import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.jws.JsonWebSignatureAlgorithm;
 import org.jose4j.lang.JoseException;
 
 import java.util.Collection;
@@ -35,8 +37,29 @@ public class VerificationJwkSelector
         String keyType = jws.getKeyType();
         filter.setKty(keyType);
         filter.setUse(Use.SIGNATURE, SimpleJwkFilter.OMITTED_OKAY);
-        return filter.filter(keys);
+        List<JsonWebKey> filtered = filter.filter(keys);
 
-        // todo -> if zero or >1, try harder...
+        if (hasMoreThanOne(filtered))
+        {
+            filter.setAlg(jws.getAlgorithmHeaderValue(), SimpleJwkFilter.OMITTED_OKAY);
+            filtered = filter.filter(filtered);
+        }
+
+        if (hasMoreThanOne(filtered) && EllipticCurveJsonWebKey.KEY_TYPE.equals(keyType))
+        {
+            JsonWebSignatureAlgorithm algorithm = jws.getAlgorithm();
+            EcdsaUsingShaAlgorithm ecdsaAlgorithm = (EcdsaUsingShaAlgorithm) algorithm;
+            filter.setCrv(ecdsaAlgorithm.getCurveName(), SimpleJwkFilter.OMITTED_OKAY);
+            filtered = filter.filter(filtered);
+        }
+
+        return filtered;
+
+        // todo -> if >1, try even harder... maybe
+    }
+
+    private boolean hasMoreThanOne(List<JsonWebKey> filtered)
+    {
+        return filtered.size() > 1;
     }
 }

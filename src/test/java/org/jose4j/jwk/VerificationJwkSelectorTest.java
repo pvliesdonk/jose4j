@@ -2,6 +2,7 @@ package org.jose4j.jwk;
 
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.X509Util;
 import org.jose4j.lang.JoseException;
 import org.junit.Test;
@@ -429,9 +430,6 @@ public class VerificationJwkSelectorTest
         assertThat(1, equalTo(selected.size()));
         assertThat("3", equalTo(selected.get(0).getKeyId()));
 
-        PublicJsonWebKey publicJsonWebKey = (PublicJsonWebKey) selected.get(0);
-        System.out.println(publicJsonWebKey.getX509CertificateSha256Thumbprint(true));
-
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
         jws.setKeyIdHeaderValue("4");
@@ -605,5 +603,288 @@ public class VerificationJwkSelectorTest
         assertThat("a3rMUgMFv9tPclLa6yF3zAkfquE", equalTo(jsonWebKey.getKeyId()));
         PublicJsonWebKey publicJsonWebKey = (PublicJsonWebKey) jsonWebKey;
         assertThat("a3rMUgMFv9tPclLa6yF3zAkfquE", equalTo(publicJsonWebKey.getX509CertificateSha1Thumbprint()));
+    }
+
+    @Test
+    public void notUniqueKidSoDisambiguateByAlgUseKtyTests() throws JoseException
+    {
+        // JSON content from a PingFederate JWKS endpoint modified by hand to fake up some semi-plausible cases (same kid used for different key types and algs)
+        String json = "{" +
+                "  \"keys\": [" +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"3\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"AAib8AfuP9X2esxxZXJUH0oggizKpaIhf9ou3taXkQ6-nNoUfZNHllwaQMWzkVSusHe_LiRLf-9MJ51grtFRCMeC\"," +
+                "      \"y\": \"ARdAq_upn_rh4DRonyfopZbCdeJKhy7_jycKW9wceFFrvP2ZGC8uX1cH9IbEpcmHzXI2yAx3UZS8JiMueU6J_YEI\"," +
+                "      \"crv\": \"P-521\"" +
+                "      \"alg\": \"ES521\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"3\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"wwxLXWB-6zA06R6hs2GZQMezXpsql8piHuuz2uy_p8cJ1UDBXEjIblC2g2K0jqVR\"," +
+                "      \"y\": \"Bt0HwjlM4RoyCfq7DM9j34ujq_r45axa0S33YWLdQvHIwTj5bW1z81jqpPw0F_Xm\"," +
+                "      \"crv\": \"P-384\"" +
+                "      \"alg\": \"ES384\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"3\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"9aKnpWa5Fnhvao2cWprEj4tpWCJpY06n2DsaxjJ6vbU\"," +
+                "      \"y\": \"ZlAzvRY_PP0lTJ3nkxIP6HUW9KgzzxE4WWicXQuvf6w\"," +
+                "      \"crv\": \"P-256\"" +
+                "      \"alg\": \"ES256\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"RSA\"," +
+                "      \"kid\": \"3\"," +
+                "      \"use\": \"sig\"," +
+                "      \"n\": \"qqqF-eYSGLzU_ieAreTxa3Jj7zOy4uVKCpL6PeV5D85jHskPbaL7-SXzW6LlWSW6KUAW1Uwx_nohCZ7D5r24pW1tuQBnL20pfRs8gPpL28zsrK2SYg_AYyTJwmFTyYF5wfE8HZNGapF9-oHO794lSsWx_SpKQrH_vH_yqo8Bv_06Kf730VWIuREyW1kQS7sz56Aae5eH5oBnC45U4GqvshYLzd7CUvPNJWU7pumq_rzlr_MSMHjJs49CHXtqpezQgQvxQWfaOi691yrgLRl1QcrOqXwHNimrR1IOQyXx6_6isXLvGifZup48GmpzWQWyJ4t4Ud95ugc1HLeNlkHtBQ\"," +
+                "      \"e\": \"AQAB\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"2\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"Aeu8Jbm9XTwhwHcq19BthU6VIz4HU7qDG7CNae81RujWu3aSEWoX1aAVRh_ZMABfMKWCtXvhh2FEpSAcQRiKilfG\"," +
+                "      \"y\": \"AOlx2rRLBLI3nh3eAlWI1ciFKWaw-6XEJw4o6nLXHRBVo92ADYJBItvRdKcBk-BYb4Cewma7KtNuIK8zZ2HEen6d\"," +
+                "      \"crv\": \"P-521\"" +
+                "      \"alg\": \"ES521\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"2\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"gcqegh2wqsLgmikkGF1137rVf5QPhJb0hF7zwWNwSM5jyWwfwTlhNMc4V8FO01Jt\"," +
+                "      \"y\": \"-bO4V5xtasOgWsrCGs_bydqT0o3O29cA-5Sl7aqSfB7Z5-N3Dki5Ed2RZEU0Q7g0\"," +
+                "      \"crv\": \"P-384\"" +
+                "      \"alg\": \"ES384\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"2\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"6elUcv15VpXlU995KVHZ3Jx6V8Cq7rCoodyIaXbQxS8\"," +
+                "      \"y\": \"mHnmwkt-jhxWKjzx75egxVx2B25QiRzi5l0jNDF9hu8\"," +
+                "      \"crv\": \"P-256\"" +
+                "      \"alg\": \"ES256\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"RSA\"," +
+                "      \"kid\": \"2\"," +
+                "      \"use\": \"sig\"," +
+                "      \"n\": \"wbcVJs-T_yP6TEWmdAqTo3qFsdtpffUEqVbxtaWr-PiXs4DTWtig6kYO1Hwim0j780f6pBgWTKAOBhGm4e3RQH86cGA-kC6uD1931OLM1tcRhoaEsz9jrGWn31dSLBX9H_4YqR-a1V3fov09BmfODE7MRVEqmZXHRxGUxXLGZn294LxZDRGEKwflTo3QZDG-Yirzf4UnbPERmSJsz6KE5FkO1k1YWCh1JnPlE9suQZC6OXIFRYwVHUP_xo5vRxQ0tTO0z1YHfjNNpycLlCNOoxbuN3f7_vUD08U2v5YnXs8DPGCO_nG0gXDzeioqVDa2cvDKhOtSugbI_nVtPZgWSQ\"," +
+                "      \"e\": \"AQAB\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"1\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"AeRkafLScUO4UclozSPJpxJDknmB_SM70lA4MLGY9AGwHIu1tTl-x9WjttYZNrQ6eE0bAWGb_0jgVccvz0SD7es-\"," +
+                "      \"y\": \"AdIP5LQzH3oNFTZGO-CVnkvD35F3Cd611zYjts5frAeqlxVbB_l8UdiLFqIJVuVLoi-kFJ9htMBIo1b2-dKdhI5T\"," +
+                "      \"crv\": \"P-521\"" +
+                "      \"alg\": \"ES521\"" +
+
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"1\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"cLP7G_dHWU7CGlB3h2Rt-yr4cuT2-ybk6Aq5zoBmzUo5jNrQR_IvrllfvdVfF1ub\"," +
+                "      \"y\": \"-OzAuuaPViw3my3UAE3WiXOYlaa5MYz7dbMBSZjZhretKm118itVnCI_WRAkWMa7\"," +
+                "      \"crv\": \"P-384\"" +
+                "      \"alg\": \"ES384\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"1\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"IUk0VFdRVnVVmdCfZxREU0pXmUk9fub4JVnqVZ5DTmI\"," +
+                "      \"y\": \"DNr82q7z1vfvIjp5a73t1yKg2vhcUDKqdsKh_FFbBZs\"," +
+                "      \"crv\": \"P-256\"" +
+                "      \"alg\": \"ES256\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"RSA\"," +
+                "      \"kid\": \"1\"," +
+                "      \"use\": \"sig\"," +
+                "      \"n\": \"lMRL3ng10Ahvh2ILcpEiKNi31ykHP8Iq7AENbwvsUzfag4ZBtid6RFBsfBMRrS_dGx1Ajjkpgj3igGlKiu0ZsSeu3zDK2e4apJGonxOQr7W2Bpv0bltU3bVRUb6i3-jv5sok33l2lKD6q7_UYRCmuo1ui2FGpwhorNVRFMe24HE895lvzGqDXUzsDKtMmZIt6Cj1WfJ68ZQ0gNByg-GVRtZ_BgZmyQwfTmPYxN_0uQ8usHz6kuSEysarzW_mUX1VEdzJ2dKBxmNwQlTW9v1UDvhUd2VXbGk1BvbJzFYL7z6GbxwhCynN-1bNb2rCFtRSI3UB2MgPbRkyjS97B7j34w\"," +
+                "      \"e\": \"AQAB\"" +
+                "    }" +
+                "  ]" +
+                "}";
+
+        JsonWebKeySet jwks = new JsonWebKeySet(json);
+
+        VerificationJwkSelector verificationJwkSelector = new VerificationJwkSelector();
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
+        jws.setKeyIdHeaderValue("1");
+        List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
+        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        assertThat(1, equalTo(selected.size()));
+        assertThat("1", equalTo(selected.get(0).getKeyId()));
+
+        jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
+        jws.setKeyIdHeaderValue("2");
+        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        assertThat(1, equalTo(selected.size()));
+        assertThat("2", equalTo(selected.get(0).getKeyId()));
+        JsonWebKey jsonWebKey = selected.get(0);
+        EllipticCurveJsonWebKey ellipticCurveJsonWebKey = (EllipticCurveJsonWebKey) jsonWebKey;
+        assertThat("2", equalTo(jsonWebKey.getKeyId()));
+        assertThat(EllipticCurves.P_256, equalTo(ellipticCurveJsonWebKey.getCurveName()));
+    }
+
+    @Test
+    public void notUniqueKidSoDisambiguateByUseKtyTests() throws JoseException
+    {
+        // JSON content from a PingFederate JWKS endpoint modified by hand to fake up some semi-plausible cases (same kid used for different key types - no algs so crv is used on ECs)
+        String json = "{" +
+                "  \"keys\": [" +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"3\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"AAib8AfuP9X2esxxZXJUH0oggizKpaIhf9ou3taXkQ6-nNoUfZNHllwaQMWzkVSusHe_LiRLf-9MJ51grtFRCMeC\"," +
+                "      \"y\": \"ARdAq_upn_rh4DRonyfopZbCdeJKhy7_jycKW9wceFFrvP2ZGC8uX1cH9IbEpcmHzXI2yAx3UZS8JiMueU6J_YEI\"," +
+                "      \"crv\": \"P-521\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"3\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"wwxLXWB-6zA06R6hs2GZQMezXpsql8piHuuz2uy_p8cJ1UDBXEjIblC2g2K0jqVR\"," +
+                "      \"y\": \"Bt0HwjlM4RoyCfq7DM9j34ujq_r45axa0S33YWLdQvHIwTj5bW1z81jqpPw0F_Xm\"," +
+                "      \"crv\": \"P-384\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"3\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"9aKnpWa5Fnhvao2cWprEj4tpWCJpY06n2DsaxjJ6vbU\"," +
+                "      \"y\": \"ZlAzvRY_PP0lTJ3nkxIP6HUW9KgzzxE4WWicXQuvf6w\"," +
+                "      \"crv\": \"P-256\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"RSA\"," +
+                "      \"kid\": \"3\"," +
+                "      \"use\": \"sig\"," +
+                "      \"n\": \"qqqF-eYSGLzU_ieAreTxa3Jj7zOy4uVKCpL6PeV5D85jHskPbaL7-SXzW6LlWSW6KUAW1Uwx_nohCZ7D5r24pW1tuQBnL20pfRs8gPpL28zsrK2SYg_AYyTJwmFTyYF5wfE8HZNGapF9-oHO794lSsWx_SpKQrH_vH_yqo8Bv_06Kf730VWIuREyW1kQS7sz56Aae5eH5oBnC45U4GqvshYLzd7CUvPNJWU7pumq_rzlr_MSMHjJs49CHXtqpezQgQvxQWfaOi691yrgLRl1QcrOqXwHNimrR1IOQyXx6_6isXLvGifZup48GmpzWQWyJ4t4Ud95ugc1HLeNlkHtBQ\"," +
+                "      \"e\": \"AQAB\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"2\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"Aeu8Jbm9XTwhwHcq19BthU6VIz4HU7qDG7CNae81RujWu3aSEWoX1aAVRh_ZMABfMKWCtXvhh2FEpSAcQRiKilfG\"," +
+                "      \"y\": \"AOlx2rRLBLI3nh3eAlWI1ciFKWaw-6XEJw4o6nLXHRBVo92ADYJBItvRdKcBk-BYb4Cewma7KtNuIK8zZ2HEen6d\"," +
+                "      \"crv\": \"P-521\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"2\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"gcqegh2wqsLgmikkGF1137rVf5QPhJb0hF7zwWNwSM5jyWwfwTlhNMc4V8FO01Jt\"," +
+                "      \"y\": \"-bO4V5xtasOgWsrCGs_bydqT0o3O29cA-5Sl7aqSfB7Z5-N3Dki5Ed2RZEU0Q7g0\"," +
+                "      \"crv\": \"P-384\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"2\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"6elUcv15VpXlU995KVHZ3Jx6V8Cq7rCoodyIaXbQxS8\"," +
+                "      \"y\": \"mHnmwkt-jhxWKjzx75egxVx2B25QiRzi5l0jNDF9hu8\"," +
+                "      \"crv\": \"P-256\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"RSA\"," +
+                "      \"kid\": \"2\"," +
+                "      \"use\": \"sig\"," +
+                "      \"n\": \"wbcVJs-T_yP6TEWmdAqTo3qFsdtpffUEqVbxtaWr-PiXs4DTWtig6kYO1Hwim0j780f6pBgWTKAOBhGm4e3RQH86cGA-kC6uD1931OLM1tcRhoaEsz9jrGWn31dSLBX9H_4YqR-a1V3fov09BmfODE7MRVEqmZXHRxGUxXLGZn294LxZDRGEKwflTo3QZDG-Yirzf4UnbPERmSJsz6KE5FkO1k1YWCh1JnPlE9suQZC6OXIFRYwVHUP_xo5vRxQ0tTO0z1YHfjNNpycLlCNOoxbuN3f7_vUD08U2v5YnXs8DPGCO_nG0gXDzeioqVDa2cvDKhOtSugbI_nVtPZgWSQ\"," +
+                "      \"e\": \"AQAB\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"1\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"AeRkafLScUO4UclozSPJpxJDknmB_SM70lA4MLGY9AGwHIu1tTl-x9WjttYZNrQ6eE0bAWGb_0jgVccvz0SD7es-\"," +
+                "      \"y\": \"AdIP5LQzH3oNFTZGO-CVnkvD35F3Cd611zYjts5frAeqlxVbB_l8UdiLFqIJVuVLoi-kFJ9htMBIo1b2-dKdhI5T\"," +
+                "      \"crv\": \"P-521\"" +
+
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"1\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"cLP7G_dHWU7CGlB3h2Rt-yr4cuT2-ybk6Aq5zoBmzUo5jNrQR_IvrllfvdVfF1ub\"," +
+                "      \"y\": \"-OzAuuaPViw3my3UAE3WiXOYlaa5MYz7dbMBSZjZhretKm118itVnCI_WRAkWMa7\"," +
+                "      \"crv\": \"P-384\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"kid\": \"1\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"IUk0VFdRVnVVmdCfZxREU0pXmUk9fub4JVnqVZ5DTmI\"," +
+                "      \"y\": \"DNr82q7z1vfvIjp5a73t1yKg2vhcUDKqdsKh_FFbBZs\"," +
+                "      \"crv\": \"P-256\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"RSA\"," +
+                "      \"kid\": \"1\"," +
+                "      \"use\": \"sig\"," +
+                "      \"n\": \"lMRL3ng10Ahvh2ILcpEiKNi31ykHP8Iq7AENbwvsUzfag4ZBtid6RFBsfBMRrS_dGx1Ajjkpgj3igGlKiu0ZsSeu3zDK2e4apJGonxOQr7W2Bpv0bltU3bVRUb6i3-jv5sok33l2lKD6q7_UYRCmuo1ui2FGpwhorNVRFMe24HE895lvzGqDXUzsDKtMmZIt6Cj1WfJ68ZQ0gNByg-GVRtZ_BgZmyQwfTmPYxN_0uQ8usHz6kuSEysarzW_mUX1VEdzJ2dKBxmNwQlTW9v1UDvhUd2VXbGk1BvbJzFYL7z6GbxwhCynN-1bNb2rCFtRSI3UB2MgPbRkyjS97B7j34w\"," +
+                "      \"e\": \"AQAB\"" +
+                "    }" +
+                "  ]" +
+                "}";
+
+        JsonWebKeySet jwks = new JsonWebKeySet(json);
+
+        VerificationJwkSelector verificationJwkSelector = new VerificationJwkSelector();
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
+        jws.setKeyIdHeaderValue("1");
+        List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
+        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        assertThat(1, equalTo(selected.size()));
+
+        assertThat("1", equalTo(selected.get(0).getKeyId()));
+
+        jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
+        jws.setKeyIdHeaderValue("2");
+        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        assertThat(1, equalTo(selected.size()));
+        JsonWebKey jsonWebKey = selected.get(0);
+        EllipticCurveJsonWebKey ellipticCurveJsonWebKey = (EllipticCurveJsonWebKey) jsonWebKey;
+        assertThat("2", equalTo(jsonWebKey.getKeyId()));
+        assertThat(EllipticCurves.P_256, equalTo(ellipticCurveJsonWebKey.getCurveName()));
+
+        jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P521_CURVE_AND_SHA512);
+        jws.setKeyIdHeaderValue("2");
+        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        assertThat(1, equalTo(selected.size()));
+        jsonWebKey = selected.get(0);
+        ellipticCurveJsonWebKey = (EllipticCurveJsonWebKey) jsonWebKey;
+        assertThat("2", equalTo(jsonWebKey.getKeyId()));
+        assertThat(EllipticCurves.P_521, equalTo(ellipticCurveJsonWebKey.getCurveName()));
+
+
+        jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384);
+        jws.setKeyIdHeaderValue("2");
+        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        assertThat(1, equalTo(selected.size()));
+        jsonWebKey = selected.get(0);
+        ellipticCurveJsonWebKey = (EllipticCurveJsonWebKey) jsonWebKey;
+        assertThat("2", equalTo(jsonWebKey.getKeyId()));
+        assertThat(EllipticCurves.P_384, equalTo(ellipticCurveJsonWebKey.getCurveName()));
+
     }
 }

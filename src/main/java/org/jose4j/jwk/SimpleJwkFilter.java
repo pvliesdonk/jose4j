@@ -21,6 +21,8 @@ public class SimpleJwkFilter
     private Criteria x5tS256;
     private boolean allowThumbsFallbackDeriveFromX5c;
 
+    private Criteria crv;
+
     public void setKid(String expectedKid, boolean omittedValueAcceptable)
     {
         kid = new Criteria(expectedKid, omittedValueAcceptable);
@@ -56,6 +58,11 @@ public class SimpleJwkFilter
         this.allowThumbsFallbackDeriveFromX5c = allow;
     }
 
+    public void setCrv(String expectedCrv, boolean omittedValueAcceptable)
+    {
+        this.crv = new Criteria(expectedCrv, omittedValueAcceptable);
+    }
+
     public List<JsonWebKey> filter(Collection<JsonWebKey> jsonWebKeys)
     {
         List<JsonWebKey> filtered = new LinkedList<>();
@@ -68,6 +75,7 @@ public class SimpleJwkFilter
             String[] thumbs = getThumbs(jwk, allowThumbsFallbackDeriveFromX5c);
             match &= isMatch(x5t, thumbs[0]);
             match &= isMatch(x5tS256, thumbs[1]);
+            match &= isMatch(crv, getCrv(jwk));
 
             if (match)
             {
@@ -81,6 +89,19 @@ public class SimpleJwkFilter
     {
         return (criteria == null) || criteria.meetsCriteria(value);
     }
+
+    String getCrv(JsonWebKey jwk)
+    {
+        try
+        {
+            return ((EllipticCurveJsonWebKey) jwk).getCurveName();
+        }
+        catch (ClassCastException e)
+        {
+            return null;
+        }
+    }
+
 
     String[] getThumbs(JsonWebKey jwk, boolean allowFallbackDeriveFromX5c) // todo
     {
