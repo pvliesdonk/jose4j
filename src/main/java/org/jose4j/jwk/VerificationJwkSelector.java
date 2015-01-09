@@ -13,7 +13,13 @@ import java.util.List;
  */
 public class VerificationJwkSelector
 {
-    public List<JsonWebKey> selectForVerify(JsonWebSignature jws, Collection<JsonWebKey> keys) throws JoseException
+    public JsonWebKey select(JsonWebSignature jws, Collection<JsonWebKey> keys) throws JoseException
+    {
+        List<JsonWebKey> jsonWebKeys = selectList(jws, keys);
+        return jsonWebKeys.isEmpty() ? null : jsonWebKeys.get(0);
+    }
+
+    public List<JsonWebKey> selectList(JsonWebSignature jws, Collection<JsonWebKey> keys) throws JoseException
     {
         SimpleJwkFilter filter = new SimpleJwkFilter();
         String kid = jws.getKeyIdHeaderValue();
@@ -55,7 +61,7 @@ public class VerificationJwkSelector
 
         return filtered;
 
-        // todo -> if >1, try even harder... maybe
+        // todo -> if >1, try even harder... maybe. But are there actually realistic cases where this will happen?
     }
 
     private boolean hasMoreThanOne(List<JsonWebKey> filtered)

@@ -126,14 +126,14 @@ public class VerificationJwkSelectorTest
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("zq2yb");
         List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
-        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        List<JsonWebKey> selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("zq2yb", equalTo(selected.get(0).getKeyId()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA512);
         jws.setKeyIdHeaderValue("zq2yf");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("zq2yf", equalTo(selected.get(0).getKeyId()));
 
@@ -141,27 +141,27 @@ public class VerificationJwkSelectorTest
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("nope");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(0, equalTo(selected.size()));
 
         // a kid that is in there but for the wrong key type
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("zq2yg");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(0, equalTo(selected.size()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
         jws.setKeyIdHeaderValue("zq2yi");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("zq2yi", equalTo(selected.get(0).getKeyId()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384);
         jws.setKeyIdHeaderValue("zq2yh");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("zq2yh", equalTo(selected.get(0).getKeyId()));
 
@@ -169,14 +169,14 @@ public class VerificationJwkSelectorTest
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
         jws.setKeyIdHeaderValue("zq2yj");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(0, equalTo(selected.size()));
 
         // what would likely be the next kid
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
         jws.setKeyIdHeaderValue("zq2y0");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(0, equalTo(selected.size()));
     }
 
@@ -213,14 +213,14 @@ public class VerificationJwkSelectorTest
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("da522f3b66777ff6af63460d2b549ad43b6660d6");
         List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
-        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        List<JsonWebKey> selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("da522f3b66777ff6af63460d2b549ad43b6660d6", equalTo(selected.get(0).getKeyId()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("3b2b4413738f55cb2405ee30334082be07e0fcc0");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("3b2b4413738f55cb2405ee30334082be07e0fcc0", equalTo(selected.get(0).getKeyId()));
 
@@ -228,7 +228,7 @@ public class VerificationJwkSelectorTest
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("nope");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(0, equalTo(selected.size()));
     }
 
@@ -254,21 +254,21 @@ public class VerificationJwkSelectorTest
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("188");
         List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
-        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        List<JsonWebKey> selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("188", equalTo(selected.get(0).getKeyId()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("194");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("194", equalTo(selected.get(0).getKeyId()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("190");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("190", equalTo(selected.get(0).getKeyId()));
     }
@@ -288,7 +288,7 @@ public class VerificationJwkSelectorTest
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("kriMPdmBvx68skT8-mPAB3BseeA");
         List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
-        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        List<JsonWebKey> selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("kriMPdmBvx68skT8-mPAB3BseeA", equalTo(selected.get(0).getKeyId()));
 
@@ -303,7 +303,7 @@ public class VerificationJwkSelectorTest
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("MnC_VZcATfM5pOYiJHMba9goEKY");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("MnC_VZcATfM5pOYiJHMba9goEKY", equalTo(selected.get(0).getKeyId()));
         publicJsonWebKey = (PublicJsonWebKey) selected.get(0);
@@ -316,7 +316,7 @@ public class VerificationJwkSelectorTest
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setX509CertSha1ThumbprintHeaderValue("MnC_VZcATfM5pOYiJHMba9goEKY");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("MnC_VZcATfM5pOYiJHMba9goEKY", equalTo(selected.get(0).getKeyId()));
         publicJsonWebKey = (PublicJsonWebKey) selected.get(0);
@@ -329,7 +329,7 @@ public class VerificationJwkSelectorTest
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setX509CertSha1ThumbprintHeaderValue("kriMPdmBvx68skT8-mPAB3BseeA");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("kriMPdmBvx68skT8-mPAB3BseeA", equalTo(selected.get(0).getKeyId()));
         publicJsonWebKey = (PublicJsonWebKey) selected.get(0);
@@ -412,42 +412,42 @@ public class VerificationJwkSelectorTest
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("1");
         List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
-        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        List<JsonWebKey> selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("1", equalTo(selected.get(0).getKeyId()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA384);
         jws.setKeyIdHeaderValue("2");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("2", equalTo(selected.get(0).getKeyId()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA512);
         jws.setKeyIdHeaderValue("3");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("3", equalTo(selected.get(0).getKeyId()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
         jws.setKeyIdHeaderValue("4");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("4", equalTo(selected.get(0).getKeyId()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384);
         jws.setKeyIdHeaderValue("5");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("5", equalTo(selected.get(0).getKeyId()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P521_CURVE_AND_SHA512);
         jws.setKeyIdHeaderValue("6");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("6", equalTo(selected.get(0).getKeyId()));
 
@@ -455,14 +455,14 @@ public class VerificationJwkSelectorTest
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA512);
         jws.setX509CertSha256ThumbprintHeaderValue("Xm5kcmgZp3dZmZc_-K31CzStJl5pH3QjRp45D8uhinM");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("3", equalTo(selected.get(0).getKeyId()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA512);
         jws.setX509CertSha256ThumbprintHeaderValue("NOPENOPE3dZmZc_-K31CzStJl5pH3QjRp45D8uhinM");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertTrue(selected.isEmpty());
     }
 
@@ -479,7 +479,7 @@ public class VerificationJwkSelectorTest
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("fb301b61-9b8a-4c34-9212-5d6fb9df1a57");
         List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
-        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        List<JsonWebKey> selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("fb301b61-9b8a-4c34-9212-5d6fb9df1a57", equalTo(selected.get(0).getKeyId()));
     }
@@ -499,7 +499,7 @@ public class VerificationJwkSelectorTest
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("rsa1");
         List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
-        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        List<JsonWebKey> selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("rsa1", equalTo(selected.get(0).getKeyId()));
     }
@@ -526,7 +526,7 @@ public class VerificationJwkSelectorTest
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA384);
         jws.setKeyIdHeaderValue("ABOP-00");
         List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
-        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        List<JsonWebKey> selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("ABOP-00", equalTo(selected.get(0).getKeyId()));
     }
@@ -547,7 +547,7 @@ public class VerificationJwkSelectorTest
         JsonWebSignature jws = new JsonWebSignature();
         jws.setCompactSerialization("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nvbm5lY3Qtb3AuaGVyb2t1YXBwLmNvbSIsInN1YiI6IjZiOTYyYzk1Nzk4NThkNzJjNjY0M2FiZjhkN2E2ZWJjIiwiYXVkIjoiZGIwZTdmYTNmNmQwN2ZhMjYzMjZhNzE4NjQwMGVhOTEiLCJleHAiOjE0MjA3NTI0NzAsImlhdCI6MTQyMDczMDg3MCwibm9uY2UiOiJiOGU1OTlhM2JkYTRkNDExYzhiMDc0OGM1MGQwZjQxNyJ9.FNyq7K90vW7eLmsjzUPQ8eTnTreOWXVt_WKyqS686_D_kZ9tl3_uE3tKBw004XyFwMYd-4zWhvXaDPkhFGJ6BPy_woxnQdiTobNE-jyQscp6-6keg3QRkjV-Te7F48Pyfzl-lwvzhb76ygjuv7v_1Nf49fHZb-SiQ2KmapabHpIfVvuqTQ_MZjU613XJIW0tMqFv4__fgaZD-JU6qCkVbkXpvIMg_tZDafsipJ6ZYH9_9JuXQqjzmsM6vHN53MiQZaDtwb6nLDFln6YPqmVPXJV6SLvM_vn0g5w6jvmfsPGZL-xo-iqWbYtnMK-dX4HmnLpK4JVba_OnA9NQfj2DRQ");
         List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
-        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        List<JsonWebKey> selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         JsonWebKey jsonWebKey = selected.get(0);
         jws.setKey(jsonWebKey.getKey());
@@ -590,14 +590,14 @@ public class VerificationJwkSelectorTest
         JsonWebSignature jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("a3rMUgMFv9tPclLa6yF3zAkfquE");
-        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        List<JsonWebKey> selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("a3rMUgMFv9tPclLa6yF3zAkfquE", equalTo(selected.get(0).getKeyId()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setX509CertSha1ThumbprintHeaderValue("a3rMUgMFv9tPclLa6yF3zAkfquE");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         JsonWebKey jsonWebKey = selected.get(0);
         assertThat("a3rMUgMFv9tPclLa6yF3zAkfquE", equalTo(jsonWebKey.getKeyId()));
@@ -724,14 +724,14 @@ public class VerificationJwkSelectorTest
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("1");
         List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
-        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        List<JsonWebKey> selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("1", equalTo(selected.get(0).getKeyId()));
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
         jws.setKeyIdHeaderValue("2");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("2", equalTo(selected.get(0).getKeyId()));
         JsonWebKey jsonWebKey = selected.get(0);
@@ -850,7 +850,7 @@ public class VerificationJwkSelectorTest
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         jws.setKeyIdHeaderValue("1");
         List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
-        List<JsonWebKey> selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        List<JsonWebKey> selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
 
         assertThat("1", equalTo(selected.get(0).getKeyId()));
@@ -858,7 +858,7 @@ public class VerificationJwkSelectorTest
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
         jws.setKeyIdHeaderValue("2");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         JsonWebKey jsonWebKey = selected.get(0);
         EllipticCurveJsonWebKey ellipticCurveJsonWebKey = (EllipticCurveJsonWebKey) jsonWebKey;
@@ -868,7 +868,7 @@ public class VerificationJwkSelectorTest
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P521_CURVE_AND_SHA512);
         jws.setKeyIdHeaderValue("2");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         jsonWebKey = selected.get(0);
         ellipticCurveJsonWebKey = (EllipticCurveJsonWebKey) jsonWebKey;
@@ -879,12 +879,18 @@ public class VerificationJwkSelectorTest
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384);
         jws.setKeyIdHeaderValue("2");
-        selected = verificationJwkSelector.selectForVerify(jws, jsonWebKeys);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         jsonWebKey = selected.get(0);
         ellipticCurveJsonWebKey = (EllipticCurveJsonWebKey) jsonWebKey;
         assertThat("2", equalTo(jsonWebKey.getKeyId()));
         assertThat(EllipticCurves.P_384, equalTo(ellipticCurveJsonWebKey.getCurveName()));
 
+        JsonWebKey selectedJwk = verificationJwkSelector.select(jws, jsonWebKeys);
+        assertThat(selectedJwk.getKey(), equalTo(ellipticCurveJsonWebKey.getKey()));
+
+        jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        assertNull(verificationJwkSelector.select(jws, jsonWebKeys));
     }
 }
