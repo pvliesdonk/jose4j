@@ -34,6 +34,7 @@ public class X5cTest extends TestCase
 {
     public void testParseExampleFromJWK() throws JoseException
     {
+        // https://tools.ietf.org/html/draft-ietf-jose-json-web-key-39#appendix-B
         String jwkJson =
                 "{\"kty\":\"RSA\",\n" +
                 " \"use\":\"sig\",\n" +
@@ -80,6 +81,7 @@ public class X5cTest extends TestCase
 
     public void testSomeChainThingsKinda() throws JoseException
     {
+        // https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-39#appendix-B
         String x5cFromJws =
         "{\"x5c\":[\"MIIE3jCCA8agAwIBAgICAwEwDQYJKoZIhvcNAQEFBQAwYzELMAkGA1UEBhMCVVM\n" +
         "  xITAfBgNVBAoTGFRoZSBHbyBEYWRkeSBHcm91cCwgSW5jLjExMC8GA1UECxMoR2\n" +
