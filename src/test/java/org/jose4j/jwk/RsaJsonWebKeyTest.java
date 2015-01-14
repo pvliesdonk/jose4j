@@ -185,6 +185,10 @@ public class RsaJsonWebKeyTest
         assertTrue(jsonOut.contains("\"dq\""));
         assertTrue(jsonOut.contains("\"qi\""));
 
+        JsonWebKeyTest.checkEncoding(jsonOut, RsaJsonWebKey.MODULUS_MEMBER_NAME ,RsaJsonWebKey.EXPONENT_MEMBER_NAME,
+                RsaJsonWebKey.PRIVATE_EXPONENT_MEMBER_NAME, RsaJsonWebKey.FIRST_PRIME_FACTOR_MEMBER_NAME, RsaJsonWebKey.SECOND_PRIME_FACTOR_MEMBER_NAME,
+                RsaJsonWebKey.FIRST_FACTOR_CRT_EXPONENT_MEMBER_NAME, RsaJsonWebKey.SECOND_FACTOR_CRT_EXPONENT_MEMBER_NAME, RsaJsonWebKey.FIRST_CRT_COEFFICIENT_MEMBER_NAME);
+
         PublicJsonWebKey jwkAgain = PublicJsonWebKey.Factory.newPublicJwk(jsonOut);
 
         assertTrue(jwkAgain.getPrivateKey() instanceof RSAPrivateCrtKey);

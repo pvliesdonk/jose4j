@@ -91,6 +91,8 @@ public class EllipticCurveJsonWebKeyTest
         assertEquals(ExampleEcKeysFromJws.PRIVATE_521, pubJwk.getPrivateKey());
         assertEquals(ExampleEcKeysFromJws.PUBLIC_521, pubJwk.getPublicKey());
         assertEquals(EllipticCurves.P_521, ((EllipticCurveJsonWebKey)jwk).getCurveName());
+
+        JsonWebKeyTest.checkEncoding(pubJwk.toJson(INCLUDE_PRIVATE), EllipticCurveJsonWebKey.X_MEMBER_NAME, EllipticCurveJsonWebKey.Y_MEMBER_NAME, EllipticCurveJsonWebKey.PRIVATE_KEY_MEMBER_NAME);
     }
 
 	@Test

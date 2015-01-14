@@ -77,6 +77,13 @@ public class X5cTest extends TestCase
         assertNull(jwk.getX509CertificateSha256Thumbprint());
         assertNull(jwk.getX509CertificateSha256Thumbprint(false));
         assertNotNull(jwk.getX509CertificateSha256Thumbprint(true));
+
+        Map<String,Object> parsed = JsonUtil.parseJson(jwk.toJson(JsonWebKey.OutputControlLevel.PUBLIC_ONLY));
+        List<String> x5cStrings = (List<String>) parsed.get(PublicJsonWebKey.X509_CERTIFICATE_CHAIN_PARAMETER);
+        String  x5cValue = x5cStrings.get(0);
+        assertEquals(-1, x5cValue.indexOf('\r'));
+        assertEquals(-1, x5cValue.indexOf('\n'));
+        assertTrue(x5cValue.indexOf('=') > 0);  // we know this one has padding
     }
 
     public void testSomeChainThingsKinda() throws JoseException

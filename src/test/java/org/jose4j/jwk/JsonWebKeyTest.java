@@ -17,12 +17,15 @@
 package org.jose4j.jwk;
 
 import junit.framework.TestCase;
+import org.jose4j.json.JsonUtil;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.JoseException;
 
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -70,6 +73,8 @@ public class JsonWebKeyTest extends TestCase
         String jsonOut = jwk.toJson();
         JsonWebKey jwk2 = JsonWebKey.Factory.newJwk(jsonOut);
         assertIsEllipticCurve(jwk2);
+
+        checkEncoding(jsonOut, EllipticCurveJsonWebKey.X_MEMBER_NAME, EllipticCurveJsonWebKey.Y_MEMBER_NAME);
     }
 
     public void testRsaSingleJwkToAndFromJson() throws JoseException
@@ -90,6 +95,24 @@ public class JsonWebKeyTest extends TestCase
 
         String jsonOut = jwk.toJson();
         JsonWebKey jwk2 = JsonWebKey.Factory.newJwk(jsonOut);
-        assertIsRsa(jwk2); 
+        assertIsRsa(jwk2);
+
+        checkEncoding(jwk.toJson(JsonWebKey.OutputControlLevel.PUBLIC_ONLY), RsaJsonWebKey.MODULUS_MEMBER_NAME);
     }
+
+    static void checkEncoding(String jwkJson, String... members) throws JoseException
+    {
+        Map<String,Object> parsed = JsonUtil.parseJson(jwkJson);
+        for (String name : members)
+        {
+            // not base64
+            String value = (String)parsed.get(name);
+            assertEquals(-1, value.indexOf('\r'));
+            assertEquals(-1, value.indexOf('\n'));
+            assertEquals(-1, value.indexOf('='));
+            assertEquals(-1, value.indexOf('+'));
+            assertEquals(-1, value.indexOf('/'));
+        }
+    }
+
 }
