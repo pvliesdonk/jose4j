@@ -18,11 +18,14 @@ package org.jose4j.keys;
 
 import junit.framework.TestCase;
 import org.jose4j.base64url.internal.apache.commons.codec.binary.BaseNCodec;
+import org.jose4j.json.JsonUtil;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.lang.JoseException;
 
 import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -53,9 +56,19 @@ public class X509UtilTest extends TestCase
         assertTrue(pem.charAt(BaseNCodec.PEM_CHUNK_SIZE) == '\r');
         assertTrue(pem.charAt(BaseNCodec.PEM_CHUNK_SIZE + 1) == '\n');
 
+        String encoded = x5u.toBase64(x509Certificate);
+        assertEquals(-1, encoded.indexOf('\r'));
+        assertEquals(-1, encoded.indexOf('\n'));
+
         PublicJsonWebKey jwk = PublicJsonWebKey.Factory.newPublicJwk(x509Certificate.getPublicKey());
         jwk.setCertificateChain(x509Certificate);
         String jsonJwk = jwk.toJson(JsonWebKey.OutputControlLevel.PUBLIC_ONLY);
+
+        Map<String,Object> parsed = JsonUtil.parseJson(jsonJwk);
+        List<String> x5cStrings = (List<String>) parsed.get(PublicJsonWebKey.X509_CERTIFICATE_CHAIN_PARAMETER);
+        String  x5cValue = x5cStrings.get(0);
+        assertEquals(-1, x5cValue.indexOf('\r'));
+        assertEquals(-1, x5cValue.indexOf('\n'));
 
         PublicJsonWebKey jwkFromJson = PublicJsonWebKey.Factory.newPublicJwk(jsonJwk);
         assertEquals(x509Certificate.getPublicKey(), jwkFromJson.getPublicKey());

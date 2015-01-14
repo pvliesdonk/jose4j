@@ -16,6 +16,7 @@
 
 package org.jose4j.keys;
 
+import org.jose4j.base64url.Base64;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.base64url.SimplePEMEncoder;
 import org.jose4j.lang.JoseException;
@@ -47,6 +48,19 @@ public class X509Util
         }
     }
 
+    public String toBase64(X509Certificate x509Certificate)
+    {
+        try
+        {
+            byte[] der = x509Certificate.getEncoded();
+            return Base64.encode(der);
+        }
+        catch (CertificateEncodingException e)
+        {
+            throw new IllegalStateException("Unexpected problem getting encoded certificate.", e);
+        }
+    }
+
     public String toPem(X509Certificate x509Certificate)
     {
         try
@@ -62,7 +76,7 @@ public class X509Util
 
     public X509Certificate fromBase64Der(String b64EncodedDer) throws JoseException
     {
-        byte[] der = SimplePEMEncoder.decode(b64EncodedDer);
+        byte[] der = Base64.decode(b64EncodedDer);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(der);
         try
         {
@@ -77,15 +91,15 @@ public class X509Util
 
     public static String x5t(X509Certificate certificate)
     {
-        return thumbprint(certificate, "SHA-1");
+        return base64urlThumbprint(certificate, "SHA-1");
     }
 
     public static String x5tS256(X509Certificate certificate)
     {
-        return thumbprint(certificate, "SHA-256");
+        return base64urlThumbprint(certificate, "SHA-256");
     }
 
-    private static String thumbprint(X509Certificate certificate, String hashAlg)
+    private static String base64urlThumbprint(X509Certificate certificate, String hashAlg)
     {
         MessageDigest msgDigest = getMessageDigest(hashAlg);
         byte[] certificateEncoded;
