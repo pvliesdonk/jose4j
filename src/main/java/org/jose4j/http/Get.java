@@ -63,24 +63,11 @@ public class Get implements SimpleGet
         {
             try
             {
-
                 URLConnection urlConnection = url.openConnection();
                 urlConnection.setConnectTimeout(connectTimeout);
                 urlConnection.setReadTimeout(readTimeout);
 
-                if (urlConnection instanceof HttpsURLConnection)
-                {
-                    HttpsURLConnection httpsUrlConnection = (HttpsURLConnection) urlConnection;
-                    if (sslSocketFactory != null)
-                    {
-                        httpsUrlConnection.setSSLSocketFactory(sslSocketFactory);
-                    }
-
-                    if(hostnameVerifier != null)
-                    {
-                        httpsUrlConnection.setHostnameVerifier(hostnameVerifier);
-                    }
-                }
+                setUpTls(urlConnection);
 
                 HttpURLConnection httpUrlConnection = (HttpURLConnection) urlConnection;
                 int code = httpUrlConnection.getResponseCode();
@@ -91,40 +78,9 @@ public class Get implements SimpleGet
                     throw new IOException("Non 200 status code ("+ code + " " + msg +") returned from " + url);
                 }
 
-                String contentType = urlConnection.getHeaderField("Content-Type");
-                String charset = StringUtil.UTF_8;
-                try
-                {
-                    if (contentType != null)
-                    {
-                        for (String part : contentType.replace(" ", "").split(";")) {
-                            String prefix = "charset=";
-                            if (part.startsWith(prefix)) {
-                                charset = part.substring(prefix.length());
-                                break;
-                            }
-                        }
-                        Charset.forName(charset);
-                    }
-                }
-                catch (Exception e)
-                {
-                    if (log.isDebugEnabled()) { log.debug("Unexpected problem attempted to determine the charset from the Content-Type (" +contentType+") so will default to using UTF8" + e);}
-                    charset = StringUtil.UTF_8;
-                }
+                String charset = getCharset(urlConnection);
 
-                StringWriter writer = new StringWriter();
-                try (InputStream is = urlConnection.getInputStream();
-                     InputStreamReader isr = new InputStreamReader(is, charset))
-                {
-                    char[] buffer = new char[1024];
-                    int n;
-                    while (-1 != (n = isr.read(buffer)))
-                    {
-                        writer.write(buffer, 0, n);
-                    }
-                }
-                String body = writer.toString();
+                String body = getBody(urlConnection, charset);
 
                 Map<String,List<String>> headers = httpUrlConnection.getHeaderFields();
                 return new SimpleResponse(code, msg, headers, body);
@@ -147,6 +103,65 @@ public class Get implements SimpleGet
         }
     }
 
+    private String getBody(URLConnection urlConnection, String charset) throws IOException
+    {
+        StringWriter writer = new StringWriter();
+        try (InputStream is = urlConnection.getInputStream();
+             InputStreamReader isr = new InputStreamReader(is, charset))
+        {
+            char[] buffer = new char[1024];
+            int n;
+            while (-1 != (n = isr.read(buffer)))
+            {
+                writer.write(buffer, 0, n);
+            }
+        }
+        return writer.toString();
+    }
+
+    private void setUpTls(URLConnection urlConnection)
+    {
+        if (urlConnection instanceof HttpsURLConnection)
+        {
+            HttpsURLConnection httpsUrlConnection = (HttpsURLConnection) urlConnection;
+            if (sslSocketFactory != null)
+            {
+                httpsUrlConnection.setSSLSocketFactory(sslSocketFactory);
+            }
+
+            if(hostnameVerifier != null)
+            {
+                httpsUrlConnection.setHostnameVerifier(hostnameVerifier);
+            }
+        }
+    }
+
+    private String getCharset(URLConnection urlConnection)
+    {
+        String contentType = urlConnection.getHeaderField("Content-Type");
+        String charset = StringUtil.UTF_8;
+        try
+        {
+            if (contentType != null)
+            {
+                for (String part : contentType.replace(" ", "").split(";")) {
+                    String prefix = "charset=";
+                    if (part.startsWith(prefix)) {
+                        charset = part.substring(prefix.length());
+                        break;
+                    }
+                }
+                Charset.forName(charset);
+            }
+        }
+        catch (Exception e)
+        {
+            if (log.isDebugEnabled()) { log.debug("Unexpected problem attempted to determine the charset from the Content-Type (" +contentType+") so will default to using UTF8" + e);}
+            charset = StringUtil.UTF_8;
+        }
+        return charset;
+    }
+
     private long getRetryWaitTime(int attempt)
     {
         if (progressiveRetryWait)
@@ -161,11 +176,19 @@ public class Get implements SimpleGet
         }
     }
 
+    /**
+     *
+     * @param connectTimeout in milliseconds
+     */
     public void setConnectTimeout(int connectTimeout)
     {
         this.connectTimeout = connectTimeout;
     }
 
+    /**
+     *
+     * @param readTimeout in milliseconds
+     */
     public void setReadTimeout(int readTimeout)
     {
         this.readTimeout = readTimeout;
@@ -191,6 +214,10 @@ public class Get implements SimpleGet
         this.progressiveRetryWait = progressiveRetryWait;
     }
 
+    /**
+     *
+     * @param initialRetryWaitTime in milliseconds
+     */
     public void setInitialRetryWaitTime(long initialRetryWaitTime)
     {
 
