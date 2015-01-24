@@ -1,5 +1,7 @@
 package org.jose4j.http;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +19,12 @@ public class SimpleResponse
     {
         this.statusCode = statusCode;
         this.statusMessage = statusMessage;
-        this.headers = headers;
+        this.headers = new HashMap<>();
+        for (Map.Entry<String,List<String>> header : headers.entrySet())
+        {
+            String name = normalizeHeaderName(header.getKey());
+            this.headers.put(name, header.getValue());
+        }
         this.body = body;
     }
 
@@ -31,14 +38,25 @@ public class SimpleResponse
         return statusMessage;
     }
 
-    public Map<String, List<String>> getHeaders()
+    public Collection<String> getHeaderNames()
     {
-        return headers;
+        return headers.keySet();
+    }
+
+    public List<String> getHeaderValues(String name)
+    {
+        name = normalizeHeaderName(name);
+        return headers.get(name);
     }
 
     public String getBody()
     {
         return body;
+    }
+
+    private String normalizeHeaderName(String name)
+    {
+        return name != null ? name.toLowerCase().trim() : null;
     }
 
     @Override
