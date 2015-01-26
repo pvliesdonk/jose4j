@@ -16,6 +16,8 @@
 
 package com.notsure;
 
+import org.jose4j.base64url.Base64;
+import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
@@ -24,13 +26,19 @@ import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaimsSet;
 import org.jose4j.jwx.HeaderParameterNames;
+import org.jose4j.keys.BigEndianBigInteger;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.keys.PbkdfKey;
+import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.StringUtil;
 import org.jose4j.zip.CompressionAlgorithm;
 import org.jose4j.zip.CompressionAlgorithmIdentifiers;
 
+import java.security.MessageDigest;
 import java.security.Provider;
+import java.security.PublicKey;
 import java.security.Security;
+import java.security.interfaces.RSAPublicKey;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,42 +49,69 @@ public class App
 {
     public static void main(String... meh) throws Exception
     {
-        JwtClaimsSet jcs = new JwtClaimsSet();
-        jcs.setIssuer("usa");
-        jcs.setAudience("canada");
-        jcs.setExpirationTimeMinutesInTheFuture(30);
-        jcs.setClaim("message", "eh");
-        String claims = jcs.toJson();
-        JsonWebSignature jws = new JsonWebSignature();
-        jws.setPayload(claims);
-        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
-        OctetSequenceJsonWebKey macKey = OctJwkGenerator.generateJwk(256);
-        jws.setKey(macKey.getKey());
-        String jwscs = jws.getCompactSerialization();
-        System.out.println(claims);
-        System.out.println(macKey.toJson(JsonWebKey.OutputControlLevel.INCLUDE_SYMMETRIC));
-        System.out.println(jwscs);
+       String json = "     {\n" +
+               "      \"kty\": \"RSA\",\n" +
+               "      \"n\": \"0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAt\n" +
+               "            VT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn6\n" +
+               "            4tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FD\n" +
+               "            W2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n9\n" +
+               "            1CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINH\n" +
+               "            aQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw\",\n" +
+               "      \"e\": \"AQAB\",\n" +
+               "      \"alg\": \"RS256\",\n" +
+               "      \"kid\": \"2011-04-29\"\n" +
+               "     }";
 
-        OctetSequenceJsonWebKey wrapKey = OctJwkGenerator.generateJwk(128);
+        RsaJsonWebKey jwk = (RsaJsonWebKey)PublicJsonWebKey.Factory.newPublicJwk(json);
 
-        JsonWebEncryption jwe = new JsonWebEncryption();
-        jwe.setPayload(jwscs);
-        jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.A128KW);
-        jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
-        System.out.println(wrapKey.toJson(JsonWebKey.OutputControlLevel.INCLUDE_SYMMETRIC));
-        jwe.setKey(wrapKey.getKey());
-        jwe.setHeader(HeaderParameterNames.CONTENT_TYPE, "JWT");
-        System.out.println(jwe.getCompactSerialization());
+        String template = "{\"e\":\"%s\",\"kty\":\"RSA\",\"n\":\"%s\"}";
+        RSAPublicKey rsaPublicKey = jwk.getRsaPublicKey();
+        String e = BigEndianBigInteger.toBase64Url(rsaPublicKey.getPublicExponent());
+        String n = BigEndianBigInteger.toBase64Url(rsaPublicKey.getModulus());
+        String formated = String.format(template, e, n);
+        byte[] bytesUtf8 = StringUtil.getBytesUtf8(formated);
+        MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+        byte[] digest = sha256.digest(bytesUtf8);
+        String encode = Base64Url.encode(digest);
+        System.out.println(encode);
+        System.out.println("NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs".equals(encode));
 
-        jwe = new JsonWebEncryption();
-        jwe.setHeader(HeaderParameterNames.ZIP, CompressionAlgorithmIdentifiers.DEFLATE);
-        jwe.setPayload(jwscs);
-        jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.A128KW);
-        jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
-        System.out.println(wrapKey.toJson(JsonWebKey.OutputControlLevel.INCLUDE_SYMMETRIC));
-        jwe.setKey(wrapKey.getKey());
-        jwe.setHeader(HeaderParameterNames.CONTENT_TYPE, "JWT");
-        System.out.println(jwe.getCompactSerialization());
+//        JwtClaimsSet jcs = new JwtClaimsSet();
+//        jcs.setIssuer("usa");
+//        jcs.setAudience("canada");
+//        jcs.setExpirationTimeMinutesInTheFuture(30);
+//        jcs.setClaim("message", "eh");
+//        String claims = jcs.toJson();
+//        JsonWebSignature jws = new JsonWebSignature();
+//        jws.setPayload(claims);
+//        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+//        OctetSequenceJsonWebKey macKey = OctJwkGenerator.generateJwk(256);
+//        jws.setKey(macKey.getKey());
+//        String jwscs = jws.getCompactSerialization();
+//        System.out.println(claims);
+//        System.out.println(macKey.toJson(JsonWebKey.OutputControlLevel.INCLUDE_SYMMETRIC));
+//        System.out.println(jwscs);
+//
+//        OctetSequenceJsonWebKey wrapKey = OctJwkGenerator.generateJwk(128);
+//
+//        JsonWebEncryption jwe = new JsonWebEncryption();
+//        jwe.setPayload(jwscs);
+//        jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.A128KW);
+//        jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+//        System.out.println(wrapKey.toJson(JsonWebKey.OutputControlLevel.INCLUDE_SYMMETRIC));
+//        jwe.setKey(wrapKey.getKey());
+//        jwe.setHeader(HeaderParameterNames.CONTENT_TYPE, "JWT");
+//        System.out.println(jwe.getCompactSerialization());
+//
+//        jwe = new JsonWebEncryption();
+//        jwe.setHeader(HeaderParameterNames.ZIP, CompressionAlgorithmIdentifiers.DEFLATE);
+//        jwe.setPayload(jwscs);
+//        jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.A128KW);
+//        jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+//        System.out.println(wrapKey.toJson(JsonWebKey.OutputControlLevel.INCLUDE_SYMMETRIC));
+//        jwe.setKey(wrapKey.getKey());
+//        jwe.setHeader(HeaderParameterNames.CONTENT_TYPE, "JWT");
+//        System.out.println(jwe.getCompactSerialization());
 
 
 //String jwksJson =
