@@ -71,18 +71,18 @@ public class App
         X509Util x509Util = new X509Util();
         X509Certificate certificate = x509Util.fromBase64Der(
                 "MIICUDCCAbkCBETczdcwDQYJKoZIhvcNAQEFBQAwbzELMAkGA1UEBhMCVVMxCzAJ\n" +
-                        "BgNVBAgTAkNPMQ8wDQYDVQQHEwZEZW52ZXIxFTATBgNVBAoTDFBpbmdJZGVudGl0\n" +
-                        "eTEXMBUGA1UECxMOQnJpYW4gQ2FtcGJlbGwxEjAQBgNVBAMTCWxvY2FsaG9zdDAe\n" +
-                        "Fw0wNjA4MTExODM1MDNaFw0zMzEyMjcxODM1MDNaMG8xCzAJBgNVBAYTAlVTMQsw\n" +
-                        "CQYDVQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRUwEwYDVQQKEwxQaW5nSWRlbnRp\n" +
-                        "dHkxFzAVBgNVBAsTDkJyaWFuIENhbXBiZWxsMRIwEAYDVQQDEwlsb2NhbGhvc3Qw\n" +
-                        "gZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAJLrpeiY/Ai2gGFxNY8Tm/QSO8qg\n" +
-                        "POGKDMAT08QMyHRlxW8fpezfBTAtKcEsztPzwYTLWmf6opfJT+5N6cJKacxWchn/\n" +
-                        "dRrzV2BoNuz1uo7wlpRqwcaOoi6yHuopNuNO1ms1vmlv3POq5qzMe6c1LRGADyZh\n" +
-                        "i0KejDX6+jVaDiUTAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAMojbPEYJiIWgQzZc\n" +
-                        "QJCQeodtKSJl5+lA8MWBBFFyZmvZ6jUYglIQdLlc8Pu6JF2j/hZEeTI87z/DOT6U\n" +
-                        "uqZA83gZcy6re4wMnZvY2kWX9CsVWDCaZhnyhjBNYfhcOf0ZychoKShaEpTQ5UAG\n" +
-                        "wvYYcbqIWC04GAZYVsZxlPl9hoA=\n");
+                "BgNVBAgTAkNPMQ8wDQYDVQQHEwZEZW52ZXIxFTATBgNVBAoTDFBpbmdJZGVudGl0\n" +
+                "eTEXMBUGA1UECxMOQnJpYW4gQ2FtcGJlbGwxEjAQBgNVBAMTCWxvY2FsaG9zdDAe\n" +
+                "Fw0wNjA4MTExODM1MDNaFw0zMzEyMjcxODM1MDNaMG8xCzAJBgNVBAYTAlVTMQsw\n" +
+                "CQYDVQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRUwEwYDVQQKEwxQaW5nSWRlbnRp\n" +
+                "dHkxFzAVBgNVBAsTDkJyaWFuIENhbXBiZWxsMRIwEAYDVQQDEwlsb2NhbGhvc3Qw\n" +
+                "gZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAJLrpeiY/Ai2gGFxNY8Tm/QSO8qg\n" +
+                "POGKDMAT08QMyHRlxW8fpezfBTAtKcEsztPzwYTLWmf6opfJT+5N6cJKacxWchn/\n" +
+                "dRrzV2BoNuz1uo7wlpRqwcaOoi6yHuopNuNO1ms1vmlv3POq5qzMe6c1LRGADyZh\n" +
+                "i0KejDX6+jVaDiUTAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAMojbPEYJiIWgQzZc\n" +
+                "QJCQeodtKSJl5+lA8MWBBFFyZmvZ6jUYglIQdLlc8Pu6JF2j/hZEeTI87z/DOT6U\n" +
+                "uqZA83gZcy6re4wMnZvY2kWX9CsVWDCaZhnyhjBNYfhcOf0ZychoKShaEpTQ5UAG\n" +
+                "wvYYcbqIWC04GAZYVsZxlPl9hoA=\n");
 
 
         String location = "https://localhost:9031/pf/JWKS";
@@ -94,44 +94,80 @@ public class App
         get.setProgressiveRetryWait(true);
         get.setInitialRetryWaitTime(500);
 
-        HttpsJsonWebKeySet httpsJwks = new HttpsJsonWebKeySet(location);
+        final HttpsJsonWebKeySet httpsJwks = new HttpsJsonWebKeySet(location);
         httpsJwks.setSimpleHttpGet(get);
-        httpsJwks.setDefaultCacheDuration(10);
+        httpsJwks.setDefaultCacheDuration(4);
 
-        while (true)
+        int threads = 10;
+        for (int i = 0; i < threads; i++)
         {
-            httpsJwks.getJsonWebKeys();
+            Runnable r = new Runnable()
+            {
+                public void run()
+                {
+
+                    while (true)
+                    {
+                        try
+                        {
+                            try
+                            {
+                                long millis = (long) (Math.random() * 100);
+                                Thread.sleep(millis);
+                            }
+                            catch (InterruptedException e)
+                            {
+                                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                            }
+                            httpsJwks.getJsonWebKeys();
+
+                        }
+                        catch (JoseException | IOException e)
+                        {
+                            throw new RuntimeException("pow!", e);
+                        }
+                    }
+                }
+
+            };
+
+            Thread t = new Thread(r);
+            t.setDaemon(false);
+            t.start();
         }
+
+
     }
 
     public static void main(String... meh) throws Exception
     {
-       String json = "     {\n" +
-               "      \"kty\": \"RSA\",\n" +
-               "      \"n\": \"0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAt\n" +
-               "            VT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn6\n" +
-               "            4tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FD\n" +
-               "            W2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n9\n" +
-               "            1CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINH\n" +
-               "            aQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw\",\n" +
-               "      \"e\": \"AQAB\",\n" +
-               "      \"alg\": \"RS256\",\n" +
-               "      \"kid\": \"2011-04-29\"\n" +
-               "     }";
-
-        RsaJsonWebKey jwk = (RsaJsonWebKey)PublicJsonWebKey.Factory.newPublicJwk(json);
-
-        String template = "{\"e\":\"%s\",\"kty\":\"RSA\",\"n\":\"%s\"}";
-        RSAPublicKey rsaPublicKey = jwk.getRsaPublicKey();
-        String e = BigEndianBigInteger.toBase64Url(rsaPublicKey.getPublicExponent());
-        String n = BigEndianBigInteger.toBase64Url(rsaPublicKey.getModulus());
-        String formated = String.format(template, e, n);
-        byte[] bytesUtf8 = StringUtil.getBytesUtf8(formated);
-        MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
-        byte[] digest = sha256.digest(bytesUtf8);
-        String encode = Base64Url.encode(digest);
-        System.out.println(encode);
-        System.out.println("NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs".equals(encode));
+       new App().testPFC();
+//       String json = "     {\n" +
+//               "      \"kty\": \"RSA\",\n" +
+//               "      \"n\": \"0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAt\n" +
+//               "            VT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn6\n" +
+//               "            4tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FD\n" +
+//               "            W2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n9\n" +
+//               "            1CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINH\n" +
+//               "            aQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw\",\n" +
+//               "      \"e\": \"AQAB\",\n" +
+//               "      \"alg\": \"RS256\",\n" +
+//               "      \"kid\": \"2011-04-29\"\n" +
+//               "     }";
+//
+//        RsaJsonWebKey jwk = (RsaJsonWebKey)PublicJsonWebKey.Factory.newPublicJwk(json);
+//
+//        String template = "{\"e\":\"%s\",\"kty\":\"RSA\",\"n\":\"%s\"}";
+//        RSAPublicKey rsaPublicKey = jwk.getRsaPublicKey();
+//        String e = BigEndianBigInteger.toBase64Url(rsaPublicKey.getPublicExponent());
+//        String n = BigEndianBigInteger.toBase64Url(rsaPublicKey.getModulus());
+//        String formated = String.format(template, e, n);
+//        byte[] bytesUtf8 = StringUtil.getBytesUtf8(formated);
+//        MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+//        byte[] digest = sha256.digest(bytesUtf8);
+//        String encode = Base64Url.encode(digest);
+//        System.out.println(encode);
+//        System.out.println("NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs".equals(encode));
 
 //        JwtClaimsSet jcs = new JwtClaimsSet();
 //        jcs.setIssuer("usa");
