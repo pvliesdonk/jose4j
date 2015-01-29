@@ -38,6 +38,11 @@ public class JsonWebKeySet
         Map<String,Object> parsed = JsonUtil.parseJson(json);
         List<Map<String,Object>> jwkParamMapList = (List<Map<String,Object>>) parsed.get(JWK_SET_MEMBER_NAME);
 
+        if (jwkParamMapList == null)
+        {
+            throw new JoseException("The JSON JWKS content does not include the " + JWK_SET_MEMBER_NAME + " member.");
+        }
+
         keys = new ArrayList<>(jwkParamMapList.size());
         for (Map<String,Object> jwkParamsMap : jwkParamMapList)
         {
