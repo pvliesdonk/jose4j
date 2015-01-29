@@ -65,6 +65,11 @@ public class HttpsJsonWebKeySet
         this.simpleHttpGet = simpleHttpGet;
     }
 
+    public URL getLocation()
+    {
+        return location;
+    }
+
     public List<JsonWebKey> getJsonWebKeys() throws JoseException, IOException
     {
         if (cache.getExp() < System.currentTimeMillis())
@@ -76,7 +81,7 @@ public class HttpsJsonWebKeySet
 
     public void refresh() throws JoseException, IOException
     {
-        if (log.isDebugEnabled()) {log.debug("Refreshing JWKS from " + location);}
+        if (log.isDebugEnabled()) {log.debug("Refreshing/loading JWKS from " + location);}
         SimpleResponse simpleResponse = simpleHttpGet.get(location);
         JsonWebKeySet jwks = new JsonWebKeySet(simpleResponse.getBody());
         List<JsonWebKey> keys = jwks.getJsonWebKeys();
