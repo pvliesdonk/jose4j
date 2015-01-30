@@ -404,4 +404,10 @@ public class JwtClaimsSet
     {
         return rawJson;
     }
+
+    @Override
+    public String toString()
+    {
+        return "JWT Claims Set:" + claimsMap;
+    }
 }
