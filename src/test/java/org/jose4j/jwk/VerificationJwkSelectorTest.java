@@ -934,8 +934,5 @@ public class VerificationJwkSelectorTest
         selectedJwk = verificationJwkSelector.select(jws, jwks.getJsonWebKeys());
         jws.setKey(selectedJwk.getKey());
         assertTrue(jws.verifySignature());
-
-        System.out.println(jws.getPayload());
     }
-
 }
