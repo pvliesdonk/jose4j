@@ -16,13 +16,12 @@
 
 package org.jose4j.examples;
 
-import junit.framework.TestCase;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.JsonWebKeySet;
-import org.jose4j.jwk.Use;
+import org.jose4j.jwk.VerificationJwkSelector;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.keys.AesKey;
@@ -34,7 +33,6 @@ import org.junit.Test;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.Arrays;
 
 /**
  * There's probably a better way to do this but this is intended as a place to write and try and maintain
@@ -42,6 +40,12 @@ import java.util.Arrays;
  */
 public class ExamplesTest
 {
+
+@Test
+public void jwtConsumerExample() throws JoseException
+{
+ // todo
+}
 
 @Test
 public void jwsSigningExample() throws JoseException
@@ -153,15 +157,14 @@ public void parseJwksAndVerifyJwsExample() throws JoseException
     // Create a new JsonWebKeySet object with the JWK Set JSON
     JsonWebKeySet jsonWebKeySet = new JsonWebKeySet(jsonWebKeySetJson);
 
-    // The JWS header contains a Key ID, which  is a hint indicating which key
-    // was used to secure the JWS. In this case (as will hopefully often be the case) the JWS Key ID
-    // corresponds directly to   the Key ID in the JWK Set.
-    String keyId = jws.getKeyIdHeaderValue();
-
-
-    // Find a JWK from the JWK Set that has the same Key ID, uses the same Key Type (EC)
-    // and is designated to be used for signatures.
-    JsonWebKey jwk = jsonWebKeySet.findJsonWebKey(keyId, jws.getKeyType(), Use.SIGNATURE, null);
+    // The JWS header contains information indicating which key was used to secure the JWS.
+    // In this case (as will hopefully often be the case) the JWS Key ID
+    // corresponds directly to the Key ID in the JWK Set.
+    // The VerificationJwkSelector looks at Key ID, Key Type, designated use (signatures vs. encryption),
+    // and the designated algorithm in order to select the appropriate key for verification from
+    // a set of JWKs.
+    VerificationJwkSelector jwkSelector = new VerificationJwkSelector();
+    JsonWebKey jwk = jwkSelector.select(jws, jsonWebKeySet.getJsonWebKeys());
 
     // The verification key on the JWS is the public key from the JWK we pulled from the JWK Set.
     jws.setKey(jwk.getKey());
