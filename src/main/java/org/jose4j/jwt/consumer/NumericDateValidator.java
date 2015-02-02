@@ -16,7 +16,7 @@
 
 package org.jose4j.jwt.consumer;
 
-import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.NumericDate;
 
@@ -65,10 +65,10 @@ public class NumericDateValidator implements Validator
     @Override
     public String validate(JwtContext jwtContext) throws MalformedClaimException
     {
-        JwtClaimsSet jwtClaimsSet = jwtContext.getJwtClaimsSet();
-        NumericDate expirationTime = jwtClaimsSet.getExpirationTime();
-        NumericDate issuedAt = jwtClaimsSet.getIssuedAt();
-        NumericDate notBefore = jwtClaimsSet.getNotBefore();
+        JwtClaims jwtClaims = jwtContext.getJwtClaims();
+        NumericDate expirationTime = jwtClaims.getExpirationTime();
+        NumericDate issuedAt = jwtClaims.getIssuedAt();
+        NumericDate notBefore = jwtClaims.getNotBefore();
 
         if (requireExp && expirationTime == null)
         {

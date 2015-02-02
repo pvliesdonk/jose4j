@@ -17,7 +17,7 @@ package org.jose4j.jwt.consumer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwx.JsonWebStructure;
 import org.junit.Assert;
 
@@ -43,16 +43,16 @@ public class SimpleJwtConsumerTestHelp
         }
     }
 
-    static void goodValidate(JwtClaimsSet jwtClaimsSet, JwtConsumer jwtConsumer) throws InvalidJwtException
+    static void goodValidate(JwtClaims jwtClaims, JwtConsumer jwtConsumer) throws InvalidJwtException
     {
-        jwtConsumer.validate(new JwtContext(jwtClaimsSet, Collections.<JsonWebStructure>emptyList()));
+        jwtConsumer.validate(new JwtContext(jwtClaims, Collections.<JsonWebStructure>emptyList()));
     }
 
-    static void expectValidationFailure(JwtClaimsSet jwtClaimsSet, JwtConsumer jwtConsumer)
+    static void expectValidationFailure(JwtClaims jwtClaims, JwtConsumer jwtConsumer)
     {
         try
         {
-            jwtConsumer.validate(new JwtContext(jwtClaimsSet, Collections.<JsonWebStructure>emptyList()));
+            jwtConsumer.validate(new JwtContext(jwtClaims, Collections.<JsonWebStructure>emptyList()));
             Assert.fail("claims validation should have thrown an exception");
         }
         catch (InvalidJwtException e)

@@ -19,7 +19,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.hamcrest.CoreMatchers;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwk.PublicJsonWebKey;
-import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.NumericDate;
 import org.jose4j.keys.X509Util;
@@ -139,8 +139,8 @@ public class X509VerificationKeyResolverInJwtConsumerTest
                 "FO7ednGcRGx8bnSerqqrbBuM9ZUUt93sIXuneJHYRKlh0Tt9mCXISv1H4OMEueXOJhck-JPgLPfLDqIPa8t93SULKTQtLvs8KEby2uJOL" +
                 "8vIy-a-lFp9irCWwTnd0QRidpuLAPLr428LPNPycEVqD2TpY7y_xaQJh49oqoq_AmQCmIn3CpZLDLqD1wpEPxLQyd1vbvgQ583y2XJ95_" +
                 "QufjbRd2Oshv3Z3JxpIm9Yie6yQ";
-        JwtClaimsSet jwtClaimsSet = jwtConsumer.processToClaims(jwt);
-        Assert.assertThat("about", CoreMatchers.equalTo(jwtClaimsSet.getSubject()));
+        JwtClaims jwtClaims = jwtConsumer.processToClaims(jwt);
+        Assert.assertThat("about", CoreMatchers.equalTo(jwtClaims.getSubject()));
 
         jwtConsumer = new JwtConsumerBuilder()
                 .setVerificationKeyResolver(new X509VerificationKeyResolver(CERT_LIST.get(0), CERT_LIST.get(2), CERT_LIST.get(3), CERT_LIST.get(4)))
@@ -163,8 +163,8 @@ public class X509VerificationKeyResolverInJwtConsumerTest
         String jwt = "eyJ4NXQjUzI1NiI6IkZTcU90QjV2UHFaNGtqWXAwOUZqQnBrbVhIMFZxRURtLXdFY1Rjb3g2RUUiLCJhbGciOiJFUzI1NiJ9." +
                 "eyJpc3MiOiJtZSIsImF1ZCI6InlvdSIsImV4cCI6MTQyMDI5OTUzOSwic3ViIjoiYWJvdXQifQ." +
                 "9Nj3UG8N9u7Eyu0wupR-eVS4Mf0ItwwHBZzwLcY2KUCJeWoPRPT7zC4MqMbHfLj6PzFi09iC3q3PniSJwmWJTA";
-        JwtClaimsSet jwtClaimsSet = jwtConsumer.processToClaims(jwt);
-        Assert.assertThat("about", CoreMatchers.equalTo(jwtClaimsSet.getSubject()));
+        JwtClaims jwtClaims = jwtConsumer.processToClaims(jwt);
+        Assert.assertThat("about", CoreMatchers.equalTo(jwtClaims.getSubject()));
 
         jwtConsumer = new JwtConsumerBuilder()
                 .setVerificationKeyResolver(new X509VerificationKeyResolver(CERT_LIST.get(0),CERT_LIST.get(1), CERT_LIST.get(2), CERT_LIST.get(3)))
@@ -187,8 +187,8 @@ public class X509VerificationKeyResolverInJwtConsumerTest
         String jwt = "eyJ4NXQjUzI1NiI6InFTX2JYTlNfSklYQ3JuUmdha2I2b3RFS3Utd0xlb3R6N0tBWjN4UVVPcUUiLCJ4NXQiOiJpSFFLdVNHZVdVR1laQ2c0X1JHSlNJQzBORFEiLCJhbGciOiJFUzI1NiJ9." +
                 "eyJpc3MiOiJtZSIsImF1ZCI6InlvdSIsImV4cCI6MTQyMDI5OTc2MSwic3ViIjoiYWJvdXQifQ." +
                 "04qPYooLJN2G0q0LYVepaydszTuhY7jKjqi5IGkNBAWZ-IBlW_pWzkurR1MkO48SbJQK2swmy7Ogfihi1ClAlA";
-        JwtClaimsSet jwtClaimsSet = jwtConsumer.processToClaims(jwt);
-        Assert.assertThat("about", CoreMatchers.equalTo(jwtClaimsSet.getSubject()));
+        JwtClaims jwtClaims = jwtConsumer.processToClaims(jwt);
+        Assert.assertThat("about", CoreMatchers.equalTo(jwtClaims.getSubject()));
 
         jwtConsumer = new JwtConsumerBuilder()
                 .setVerificationKeyResolver(new X509VerificationKeyResolver(CERT_LIST.get(0),CERT_LIST.get(1), CERT_LIST.get(2), CERT_LIST.get(4)))
@@ -230,8 +230,8 @@ public class X509VerificationKeyResolverInJwtConsumerTest
                     .setEvaluationTime(NumericDate.fromSeconds(1420298972))
                     .setExpectedAudience("you")
                     .build();
-            JwtClaimsSet jwtClaimsSet = jwtConsumer.processToClaims(jwt);
-            Assert.assertThat("about", CoreMatchers.equalTo(jwtClaimsSet.getSubject()));
+            JwtClaims jwtClaims = jwtConsumer.processToClaims(jwt);
+            Assert.assertThat("about", CoreMatchers.equalTo(jwtClaims.getSubject()));
         }
 
         X509VerificationKeyResolver verificationKeyResolver = new X509VerificationKeyResolver(CERT_LIST.get(0), CERT_LIST.get(2)); // but 1 was the signer

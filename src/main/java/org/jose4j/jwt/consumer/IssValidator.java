@@ -35,7 +35,7 @@ public class IssValidator implements Validator
     @Override
     public String validate(JwtContext jwtContext) throws MalformedClaimException
     {
-        String issuer = jwtContext.getJwtClaimsSet().getIssuer();
+        String issuer = jwtContext.getJwtClaims().getIssuer();
 
         if (issuer == null)
         {

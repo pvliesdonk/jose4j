@@ -17,7 +17,7 @@ package org.jose4j.jwt.consumer;
 
 import org.apache.commons.logging.LogFactory;
 import org.jose4j.jwk.JsonWebKeySet;
-import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.NumericDate;
 import org.junit.Test;
 
@@ -72,12 +72,12 @@ public class JwksVerificationKeyResolverTest
                 setVerificationKeyResolver(verificationKeyResolver).build();
 
         JwtContext ctx = jwtConsumer.process(jwt);
-        JwtClaimsSet jwtClaimsSet = ctx.getJwtClaimsSet();
-        assertThat(jwtClaimsSet.getSubject(), equalTo("hailie"));
+        JwtClaims jwtClaims = ctx.getJwtClaims();
+        assertThat(jwtClaims.getSubject(), equalTo("hailie"));
 
         ctx = jwtConsumer.process(jwt2);
-        jwtClaimsSet = ctx.getJwtClaimsSet();
-        assertThat(jwtClaimsSet.getSubject(), equalTo("hailie"));
+        jwtClaims = ctx.getJwtClaims();
+        assertThat(jwtClaims.getSubject(), equalTo("hailie"));
 
         String badJwt = "eyJhbGciOiJFUzI1NiIsImtpZCI6IjhhMTBsIn0." +
                 "eyJzdWIiOiJoYWlsaWUiLCJhdWQiOiJhIiwianRpIjoiRmUwZ1h1UGpmcHoxSHEzdzRaaUZIQiIsImlzcyI6Imh0dHBzOlwvXC9sb2NhbGhvc3Q6OTAzMSIsImlhdCI6MTQyMTA5Mzg1OSwiZXhwIjoxNDIxMDk0NDU5LCJub25jZSI6ImZmcyIsImFjciI6InVybjp" +
@@ -86,8 +86,8 @@ public class JwksVerificationKeyResolverTest
 
         try
         {
-            jwtClaimsSet = jwtConsumer.processToClaims(badJwt);
-            fail("shouldn't have processed/validated but got " + jwtClaimsSet);
+            jwtClaims = jwtConsumer.processToClaims(badJwt);
+            fail("shouldn't have processed/validated but got " + jwtClaims);
         }
         catch (InvalidJwtException e)
         {

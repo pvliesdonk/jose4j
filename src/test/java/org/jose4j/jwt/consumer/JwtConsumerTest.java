@@ -24,7 +24,7 @@ import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
-import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.NumericDate;
 import org.jose4j.jwx.JsonWebStructure;
@@ -71,7 +71,7 @@ public class JwtConsumerTest
                 .setJwsAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS)
                 .setDisableRequireSignature()
                 .build();
-        JwtClaimsSet jcs = consumer.processToClaims(jwt);
+        JwtClaims jcs = consumer.processToClaims(jwt);
         Assert.assertThat("joe", equalTo(jcs.getIssuer()));
         Assert.assertThat(NumericDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
         Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
@@ -141,7 +141,7 @@ public class JwtConsumerTest
                 .build();
 
         JwtContext context = c.process(jwt);
-        JwtClaimsSet jcs = context.getJwtClaimsSet();
+        JwtClaims jcs = context.getJwtClaims();
         Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
         String expectedPayload = "{\"iss\":\"joe\",\r\n \"exp\":1300819380,\r\n \"http://example.com/is_root\":true}";
         assertThat(jcs.getRawJson(), equalTo(expectedPayload));
@@ -192,7 +192,7 @@ public class JwtConsumerTest
         Assert.assertTrue(jwtInfo.getJoseObjects().get(0) instanceof JsonWebSignature);
         Assert.assertTrue(jwtInfo.getJoseObjects().get(1) instanceof JsonWebEncryption);
 
-        JwtClaimsSet jcs = jwtInfo.getJwtClaimsSet();
+        JwtClaims jcs = jwtInfo.getJwtClaims();
 
         Assert.assertThat("joe", equalTo(jcs.getIssuer()));
         Assert.assertThat(NumericDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
@@ -261,7 +261,7 @@ public class JwtConsumerTest
                 .setRequireExpirationTime()
                 .build();
         JwtContext context = consumer.process(jwt);
-        Assert.assertTrue(context.getJwtClaimsSet().getClaimValue("http://example.com/is_root", Boolean.class));
+        Assert.assertTrue(context.getJwtClaims().getClaimValue("http://example.com/is_root", Boolean.class));
         assertThat(1, equalTo(context.getJoseObjects().size()));
 
         // require encryption and it will fail
@@ -312,8 +312,8 @@ public class JwtConsumerTest
                 .setExpectedIssuer("usa")
                 .setRequireExpirationTime()
                 .build();
-        JwtClaimsSet jwtClaimsSet = consumer.processToClaims(jwt);
-        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+        JwtClaims jwtClaims = consumer.processToClaims(jwt);
+        Assert.assertThat("eh", equalTo(jwtClaims.getStringClaimValue("message")));
 
         consumer = new JwtConsumerBuilder()
                 .setDecryptionKey(wrapKey.getKey())
@@ -326,8 +326,8 @@ public class JwtConsumerTest
                 .setJweAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, KeyManagementAlgorithmIdentifiers.A128KW))
                 .setJweContentEncryptionAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256))
                 .build();
-        jwtClaimsSet = consumer.processToClaims(jwt);
-        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+        jwtClaims = consumer.processToClaims(jwt);
+        Assert.assertThat("eh", equalTo(jwtClaims.getStringClaimValue("message")));
 
         consumer = new JwtConsumerBuilder()
                 .setDecryptionKey(wrapKey.getKey())
@@ -391,7 +391,7 @@ public class JwtConsumerTest
                     @Override
                     public String validate(JwtContext jwtContext) throws MalformedClaimException
                     {
-                        JwtClaimsSet jcs = jwtContext.getJwtClaimsSet();
+                        JwtClaims jcs = jwtContext.getJwtClaims();
                         String audience = jcs.getAudience().iterator().next();
                         String issuer = jcs.getIssuer();
 
@@ -437,7 +437,7 @@ public class JwtConsumerTest
                     {
                         try
                         {
-                            JwtClaimsSet jcs = jwtContext.getJwtClaimsSet();
+                            JwtClaims jcs = jwtContext.getJwtClaims();
                             List<String> audience = jcs.getAudience();
                             Iterator<String> iterator = audience.iterator();  // this will NPE
                             iterator.next();
@@ -524,9 +524,9 @@ public class JwtConsumerTest
                 .setRequireExpirationTime()
                 .build();
         JwtContext context = consumer.process(jwt);
-        JwtClaimsSet jwtClaimsSet = context.getJwtClaimsSet();
-        System.out.println(jwtClaimsSet.toJson());
-        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+        JwtClaims jwtClaims = context.getJwtClaims();
+        System.out.println(jwtClaims.toJson());
+        Assert.assertThat("eh", equalTo(jwtClaims.getStringClaimValue("message")));
         List<JsonWebStructure> joseObjects = context.getJoseObjects();
         assertThat(2, equalTo(joseObjects.size()));
         assertTrue(joseObjects.get(0) instanceof JsonWebSignature);
@@ -558,8 +558,8 @@ public class JwtConsumerTest
                 .build();
 
         JwtContext context = consumer.process(jwt);
-        JwtClaimsSet jwtClaimsSet = context.getJwtClaimsSet();
-        Assert.assertThat("alice", equalTo(jwtClaimsSet.getSubject()));
+        JwtClaims jwtClaims = context.getJwtClaims();
+        Assert.assertThat("alice", equalTo(jwtClaims.getSubject()));
         List<JsonWebStructure> joseObjects = context.getJoseObjects();
         assertThat(2, equalTo(joseObjects.size()));
         assertTrue(joseObjects.get(0) instanceof JsonWebSignature);
@@ -587,8 +587,8 @@ public class JwtConsumerTest
                 .setRequireExpirationTime()
                 .build();
         JwtContext context = consumer.process(jwt);
-        JwtClaimsSet jwtClaimsSet = context.getJwtClaimsSet();
-        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+        JwtClaims jwtClaims = context.getJwtClaims();
+        Assert.assertThat("eh", equalTo(jwtClaims.getStringClaimValue("message")));
 
         jwt = "eyJ6aXAiOiJERUYiLCJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImN0eSI6ImFwcGxpY2F0aW9uL0pXVCIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJxelBlRUl0ZXJmQ0dhTFBpbDU3UmRudERHQVdwdVlBRGtVLUJubkkyTXowIiwieSI6ImNmWUxlc1dneGlfVndCdzdvSzNPT3dabGNrbVRCVmMzcEdnMTNRZ3V5WjQiLCJjcnYiOiJQLTI1NiJ9fQ..ftNMf4CqUSCq8p3L1Y7K1A.Z9K1YIJmSY9du5LUuSs0szCj1PUzq0ZnsEppT8yVPdGVDkDi0elEcsM8dCq8CvYrXG8OFuyp0s8dd2u_fIw4RjMc-aVMBT4ikWDmqb4CA17nC2Hxm6dZFPy3Xx3GnqjiGUIB2JiMOxj6mBZtTSvkKAUvs3Rh4G-87v2hJFpqdLSySqd-rQXL7Dhqxl0Cbu9nZFcYEIk58lpC0H2TN9aP5GtuQYa3BlNuEoEDzIcLhc4.N6VFQ0_UgNqyBsPLyE6MQQ";
         consumer = new JwtConsumerBuilder()
@@ -600,8 +600,8 @@ public class JwtConsumerTest
                 .setRequireExpirationTime()
                 .build();
         context = consumer.process(jwt);
-        jwtClaimsSet = context.getJwtClaimsSet();
-        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+        jwtClaims = context.getJwtClaims();
+        Assert.assertThat("eh", equalTo(jwtClaims.getStringClaimValue("message")));
 
         jwt = "eyJ6aXAiOiJERUYiLCJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImN0eSI6Imp3dCIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJoTm5zTlRXZWN3TEVRUGVRMlFjZ05WSDJLX0dzTkFUZXNVaENhY2x2OVAwIiwieSI6ImI2V1lSR1V5Z1NBUGo5a0lFYktYTm5ZaDhEbmNrRXB2NDFYbUVnanA4VE0iLCJjcnYiOiJQLTI1NiJ9fQ..VGTURmPYERdJ7q9_5wlENA.91m_JN65XNlp9WsFHaHihhGB7soKNUdeBNpmODVcIiinhPClH00-GTMwfT08VmXEU2djW3Aw_eBAoU7rI_M0ovYbbmAy7UnVRUyCTbkGsQpv7OxYIznemMVMraFuHNmTAF_MU7oM4gPkqKzwuBa0uwd4JhN00bq-jEcLifMPgMvyGvfJ19SXAyrIVA4Otjuii347V5u1GwlB5VBqMiqtBnbMMzR1Fe3X-4-sEgT9BrM.4T3uLGa4Bm5_r-ZNKPzEWg";
         consumer = new JwtConsumerBuilder()
@@ -613,8 +613,8 @@ public class JwtConsumerTest
                 .setRequireExpirationTime()
                 .build();
         context = consumer.process(jwt);
-        jwtClaimsSet = context.getJwtClaimsSet();
-        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+        jwtClaims = context.getJwtClaims();
+        Assert.assertThat("eh", equalTo(jwtClaims.getStringClaimValue("message")));
 
         jwt = "eyJ6aXAiOiJERUYiLCJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImN0eSI6ImpXdCIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJmYTlJVEh6cEROSG1uV2NDSDVvWGtFYjJ1SncwTXNOU2stQjdFb091WUEwIiwieSI6IkZ1U0RaVXdmb1EtQXB6dEFQRUc1dk40QmZRR2sxWnRMT0FzM1o0a19obmciLCJjcnYiOiJQLTI1NiJ9fQ..FmuORwLWIoNBbRh0XcBzJQ.pSr58DMuRstF3A6xj24yM4KvNgWxtb_QDKuldesTCD-R00BNFwIVx4F51VL5DwR54ITgBZBKdAT4pN6eM-td5VrWBCnSWxFjNrBoDnnRkDfFgq8OjOBaR7k_4zUk41bBikDZ0JOQDWuiaODYBk7PWq0mgotvLPbJ9oc7zfp6lbHqaYXjbzfuD56W_kDYO8zSjiZUGLcYgJDYnO3F8K-QhP02v-0OEpAGrm5SKKV3Txk.Ecojfru8KbkqIw4QvYS3qA";
         consumer = new JwtConsumerBuilder()
@@ -626,8 +626,8 @@ public class JwtConsumerTest
                 .setRequireExpirationTime()
                 .build();
         context = consumer.process(jwt);
-        jwtClaimsSet = context.getJwtClaimsSet();
-        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+        jwtClaims = context.getJwtClaims();
+        Assert.assertThat("eh", equalTo(jwtClaims.getStringClaimValue("message")));
     }
 
     @Test
@@ -648,8 +648,8 @@ public class JwtConsumerTest
                 .setRequireExpirationTime()
                 .build();
         JwtContext context = consumer.process(jwt);
-        JwtClaimsSet jwtClaimsSet = context.getJwtClaimsSet();
-        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+        JwtClaims jwtClaims = context.getJwtClaims();
+        Assert.assertThat("eh", equalTo(jwtClaims.getStringClaimValue("message")));
         List<JsonWebStructure> joseObjects = context.getJoseObjects();
         assertThat(2, equalTo(joseObjects.size()));
         assertTrue(joseObjects.get(0) instanceof JsonWebEncryption);
@@ -683,8 +683,8 @@ public class JwtConsumerTest
                 .setRequireExpirationTime()
                 .build();
         JwtContext context = consumer.process(jwt);
-        JwtClaimsSet jwtClaimsSet = context.getJwtClaimsSet();
-        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+        JwtClaims jwtClaims = context.getJwtClaims();
+        Assert.assertThat("eh", equalTo(jwtClaims.getStringClaimValue("message")));
         List<JsonWebStructure> joseObjects = context.getJoseObjects();
         assertThat(3, equalTo(joseObjects.size()));
         assertTrue(joseObjects.get(2) instanceof JsonWebEncryption);
@@ -725,8 +725,8 @@ public class JwtConsumerTest
                 .setRequireExpirationTime()
                 .build();
         JwtContext context = consumer.process(jwt);
-        JwtClaimsSet jwtClaimsSet = context.getJwtClaimsSet();
-        Assert.assertThat("eh", equalTo(jwtClaimsSet.getStringClaimValue("message")));
+        JwtClaims jwtClaims = context.getJwtClaims();
+        Assert.assertThat("eh", equalTo(jwtClaims.getStringClaimValue("message")));
     }
 
     @Test
@@ -743,8 +743,8 @@ public class JwtConsumerTest
                 .setDisableRequireSignature()
                 .build();
 
-        JwtClaimsSet jwtClaimsSet = consumer.processToClaims(jwt);
-        Assert.assertThat("value", equalTo(jwtClaimsSet.getStringClaimValue("name")));
+        JwtClaims jwtClaims = consumer.processToClaims(jwt);
+        Assert.assertThat("value", equalTo(jwtClaims.getStringClaimValue("name")));
 
         // change some things and make sure it fails
         jwt = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..zWNzKpA-QA0BboVl02nz-A.eyJpc3MiOiJtZSIsImF1ZCI6Im1lIiwiZXhwIjoxNDIwMjMxNjA2LCJuYW1lIjoidmFsdWUifQ.QsGX3JhHP1Pwy4zQ8Ha9FQ";
@@ -757,151 +757,151 @@ public class JwtConsumerTest
     @Test
     public void someBasicAudChecks() throws InvalidJwtException
     {
-        JwtClaimsSet jwtClaimsSet = JwtClaimsSet.parse("{\"aud\":\"example.com\"}");
+        JwtClaims jwtClaims = JwtClaims.parse("{\"aud\":\"example.com\"}");
 
         JwtConsumer jwtConsumer = new JwtConsumerBuilder().build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
 
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.com").build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
         
 
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org", "example.com", "k8HiI26Y7").build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
 
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org", "nope", "nada").build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"sub\":\"subject\"}");
+        jwtClaims = JwtClaims.parse("{\"sub\":\"subject\"}");
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience(false, "example.org", "www.example.org").build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience(true, "example.org", "www.example.org").build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
 
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"aud\":[\"example.com\", \"usa.org\", \"ca.ca\"]}");
+        jwtClaims = JwtClaims.parse("{\"aud\":[\"example.com\", \"usa.org\", \"ca.ca\"]}");
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org", "some.other.junk").build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("usa.org").build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("ca.ca").build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("ca.ca", "some.other.thing").build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("noway", "ca.ca", "some.other.thing").build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("usa.org", "ca.ca", "random").build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("usa.org", "ca.ca").build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("usa.org", "ca.ca", "example.com").build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"aud\":[\"example.com\", 47, false]}");
+        jwtClaims = JwtClaims.parse("{\"aud\":[\"example.com\", 47, false]}");
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"aud\":20475}");
+        jwtClaims = JwtClaims.parse("{\"aud\":20475}");
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"aud\":{\"aud\":\"example.org\"}}");
+        jwtClaims = JwtClaims.parse("{\"aud\":{\"aud\":\"example.org\"}}");
         jwtConsumer = new JwtConsumerBuilder().setExpectedAudience("example.org").build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
     }
 
     @Test
     public void someBasicIssChecks() throws InvalidJwtException
     {
-        JwtClaimsSet jwtClaimsSet = JwtClaimsSet.parse("{\"iss\":\"issuer.example.com\"}");
+        JwtClaims jwtClaims = JwtClaims.parse("{\"iss\":\"issuer.example.com\"}");
         JwtConsumer jwtConsumer = new JwtConsumerBuilder().build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
         jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer("issuer.example.com").build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
         jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer(false, "issuer.example.com").build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
         jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer("nope.example.com").build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"sub\":\"subject\"}");
+        jwtClaims = JwtClaims.parse("{\"sub\":\"subject\"}");
         jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer("issuer.example.com").build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
 
         jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer(false, "issuer.example.com").build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"iss\":[\"issuer1\", \"other.one\", \"meh\"]}");
+        jwtClaims = JwtClaims.parse("{\"iss\":[\"issuer1\", \"other.one\", \"meh\"]}");
         jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer("issuer.example.com").build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"iss\":[\"issuer1\", \"nope.not\"]}");
+        jwtClaims = JwtClaims.parse("{\"iss\":[\"issuer1\", \"nope.not\"]}");
         jwtConsumer = new JwtConsumerBuilder().build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
     }
 
     @Test
     public void someBasicSubChecks() throws InvalidJwtException
     {
-        JwtClaimsSet jwtClaimsSet = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\"}");
+        JwtClaims jwtClaims = JwtClaims.parse("{\"sub\":\"brian.d.campbell\"}");
         JwtConsumer jwtConsumer = new JwtConsumerBuilder().build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
         jwtConsumer = new JwtConsumerBuilder().setRequireSubject().build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"name\":\"brian.d.campbell\"}");
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        jwtClaims = JwtClaims.parse("{\"name\":\"brian.d.campbell\"}");
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
         jwtConsumer = new JwtConsumerBuilder().build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"sub\":724729}");
+        jwtClaims = JwtClaims.parse("{\"sub\":724729}");
         jwtConsumer = new JwtConsumerBuilder().setRequireSubject().build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"sub\":{\"values\":[\"one\", \"2\"]}}");
+        jwtClaims = JwtClaims.parse("{\"sub\":{\"values\":[\"one\", \"2\"]}}");
         jwtConsumer = new JwtConsumerBuilder().build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
     }
 
     @Test
     public void someBasicJtiChecks() throws InvalidJwtException
     {
-        JwtClaimsSet jwtClaimsSet = JwtClaimsSet.parse("{\"jti\":\"1Y5iLSQfNgcSGt0A4is29\"}");
+        JwtClaims jwtClaims = JwtClaims.parse("{\"jti\":\"1Y5iLSQfNgcSGt0A4is29\"}");
         JwtConsumer jwtConsumer = new JwtConsumerBuilder().build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
         jwtConsumer = new JwtConsumerBuilder().setRequireJwtId().build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"notjti\":\"lbZ_mLS6w3xBSlvW6ULmkV-uLCk\"}");
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        jwtClaims = JwtClaims.parse("{\"notjti\":\"lbZ_mLS6w3xBSlvW6ULmkV-uLCk\"}");
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
         jwtConsumer = new JwtConsumerBuilder().build();
-        SimpleJwtConsumerTestHelp.goodValidate(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"jti\":55581529751992}");
+        jwtClaims = JwtClaims.parse("{\"jti\":55581529751992}");
         jwtConsumer = new JwtConsumerBuilder().setRequireJwtId().build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
 
-        jwtClaimsSet = JwtClaimsSet.parse("{\"jti\":[\"S0w3XbslvW6ULmk0\", \"5iLSQfNgcSGt7A4is\"]}");
+        jwtClaims = JwtClaims.parse("{\"jti\":[\"S0w3XbslvW6ULmk0\", \"5iLSQfNgcSGt7A4is\"]}");
         jwtConsumer = new JwtConsumerBuilder().build();
-        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaimsSet, jwtConsumer);
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
     }
 
     @Test
     public void someBasicTimeChecks() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\"}");
+        JwtClaims jcs = JwtClaims.parse("{\"sub\":\"brian.d.campbell\"}");
         JwtConsumer consumer = new JwtConsumerBuilder().build();
         SimpleJwtConsumerTestHelp.goodValidate(jcs, consumer);
         consumer = new JwtConsumerBuilder().setRequireExpirationTime().build();
@@ -912,7 +912,7 @@ public class JwtConsumerTest
         SimpleJwtConsumerTestHelp.expectValidationFailure(jcs, consumer);
 
 
-        jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"exp\":1430602000}");
+        jcs = JwtClaims.parse("{\"sub\":\"brian.d.campbell\", \"exp\":1430602000}");
         consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602000)).build();
         SimpleJwtConsumerTestHelp.expectValidationFailure(jcs, consumer);
         consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602000)).setAllowedClockSkewInSeconds(10).build();
@@ -937,7 +937,7 @@ public class JwtConsumerTest
         SimpleJwtConsumerTestHelp.goodValidate(jcs, consumer);
 
 
-        jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430602000}");
+        jcs = JwtClaims.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430602000}");
         consumer = new JwtConsumerBuilder().setEvaluationTime(NumericDate.fromSeconds(1430602000)).build();
         SimpleJwtConsumerTestHelp.goodValidate(jcs, consumer);
         consumer = new JwtConsumerBuilder().setEvaluationTime(NumericDate.fromSeconds(1430601999)).build();
@@ -947,21 +947,21 @@ public class JwtConsumerTest
         consumer = new JwtConsumerBuilder().setEvaluationTime(NumericDate.fromSeconds(1430601983)).setAllowedClockSkewInSeconds(3000).build();
         SimpleJwtConsumerTestHelp.goodValidate(jcs, consumer);
 
-        jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430602000, \"iat\":1430602060, \"exp\":1430602600 }");
+        jcs = JwtClaims.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430602000, \"iat\":1430602060, \"exp\":1430602600 }");
         consumer = new JwtConsumerBuilder().setRequireExpirationTime().setRequireNotBefore().setRequireIssuedAt().setEvaluationTime(NumericDate.fromSeconds(1430602002)).build();
         SimpleJwtConsumerTestHelp.goodValidate(jcs, consumer);
 
-        jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430603000, \"iat\":1430602060, \"exp\":1430602600 }");
+        jcs = JwtClaims.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430603000, \"iat\":1430602060, \"exp\":1430602600 }");
         consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602002)).build();
         SimpleJwtConsumerTestHelp.expectValidationFailure(jcs, consumer);
 
 
-        jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430602000, \"iat\":1430602660, \"exp\":1430602600 }");
+        jcs = JwtClaims.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430602000, \"iat\":1430602660, \"exp\":1430602600 }");
         consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430602002)).build();
         SimpleJwtConsumerTestHelp.expectValidationFailure(jcs, consumer);
 
 
-        jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"exp\":1430607201}");
+        jcs = JwtClaims.parse("{\"sub\":\"brian.d.campbell\", \"exp\":1430607201}");
         consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430600000)).build();
         SimpleJwtConsumerTestHelp.goodValidate(jcs, consumer);
         consumer = new JwtConsumerBuilder().setRequireExpirationTime().setEvaluationTime(NumericDate.fromSeconds(1430600000)).setMaxFutureValidityInMinutes(90).build();
@@ -975,7 +975,7 @@ public class JwtConsumerTest
     @Test
     public void someBasicChecks() throws InvalidJwtException
     {
-        JwtClaimsSet jcs = JwtClaimsSet.parse("{\"sub\":\"subject\", \"iss\":\"issuer\", \"aud\":\"audience\"}");
+        JwtClaims jcs = JwtClaims.parse("{\"sub\":\"subject\", \"iss\":\"issuer\", \"aud\":\"audience\"}");
         JwtConsumer consumer = new JwtConsumerBuilder().setExpectedAudience("audience").setExpectedIssuer("issuer").build();
         SimpleJwtConsumerTestHelp.goodValidate(jcs, consumer);
 

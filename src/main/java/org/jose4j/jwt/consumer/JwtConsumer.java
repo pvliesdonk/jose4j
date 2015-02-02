@@ -20,7 +20,7 @@ import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
-import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
@@ -101,20 +101,20 @@ public class JwtConsumer
         this.liberalContentTypeHandling = liberalContentTypeHandling;
     }
 
-    public JwtClaimsSet processToClaims(String jwt) throws InvalidJwtException
+    public JwtClaims processToClaims(String jwt) throws InvalidJwtException
     {
-        return process(jwt).getJwtClaimsSet();
+        return process(jwt).getJwtClaims();
     }
 
     public JwtContext process(String jwt) throws InvalidJwtException
     {
-        JwtClaimsSet jwtClaimsSet = null;
+        JwtClaims jwtClaims = null;
         LinkedList<JsonWebStructure> joseObjects = new LinkedList<>();
 
         boolean hasSignature = false;
         boolean hasEncryption = false;
 
-        while (jwtClaimsSet == null)
+        while (jwtClaims == null)
         {
             JsonWebStructure joseObject;
             try
@@ -168,7 +168,7 @@ public class JwtConsumer
                 {
                     try
                     {
-                        jwtClaimsSet = JwtClaimsSet.parse(payload);
+                        jwtClaims = JwtClaims.parse(payload);
                     }
                     catch (InvalidJwtException ije)
                     {
@@ -231,7 +231,7 @@ public class JwtConsumer
             throw new InvalidJwtException("The JWT has no encryption but the JWT Consumer is configured to require it: " + jwt);
         }
 
-        JwtContext jwtContext = new JwtContext(jwtClaimsSet, Collections.unmodifiableList(joseObjects));
+        JwtContext jwtContext = new JwtContext(jwtClaims, Collections.unmodifiableList(joseObjects));
         validate(jwtContext);
         return jwtContext;
     }
@@ -263,7 +263,7 @@ public class JwtConsumer
 
         if (!issues.isEmpty())
         {
-            InvalidJwtException invalidJwtException = new InvalidJwtException("JWT (claims->"+ jwtCtx.getJwtClaimsSet().getRawJson()+") rejected due to invalid claims.");
+            InvalidJwtException invalidJwtException = new InvalidJwtException("JWT (claims->"+ jwtCtx.getJwtClaims().getRawJson()+") rejected due to invalid claims.");
             invalidJwtException.setDetails(issues);
             throw invalidJwtException;
         }

@@ -28,19 +28,19 @@ import static org.jose4j.jwt.ReservedClaimNames.*;
 /**
  *
  */
-public class JwtClaimsSetTest
+public class JwtClaimsTest
 {
     @Test (expected = MalformedClaimException.class)
     public void testGetBadIssuer() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"iss\":{\"name\":\"value\"}}");
+        JwtClaims claims = JwtClaims.parse("{\"iss\":{\"name\":\"value\"}}");
         claims.getIssuer();
     }
 
     @Test
     public void testGetNullIssuer() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"exp\":123456781}");
+        JwtClaims claims = JwtClaims.parse("{\"exp\":123456781}");
         Assert.assertNull(claims.getIssuer());
     }
 
@@ -48,21 +48,21 @@ public class JwtClaimsSetTest
     public void testGetIssuer() throws InvalidJwtException, MalformedClaimException
     {
         String issuer = "https//idp.example.com";
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"iss\":\"" + issuer + "\"}");
+        JwtClaims claims = JwtClaims.parse("{\"iss\":\"" + issuer + "\"}");
         Assert.assertThat(issuer, equalTo(claims.getIssuer()));
     }
 
     @Test
     public void testGetNullAudience() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"iss\":\"some-issuer\"}");
+        JwtClaims claims = JwtClaims.parse("{\"iss\":\"some-issuer\"}");
         Assert.assertNull(claims.getAudience());
     }
 
     @Test
     public void testGetAudienceSingleInArray() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"aud\":[\"one\"]}");
+        JwtClaims claims = JwtClaims.parse("{\"aud\":[\"one\"]}");
         List<String> audiences = claims.getAudience();
         Assert.assertThat(1, equalTo(audiences.size()));
         Assert.assertThat("one", equalTo(audiences.get(0)));
@@ -71,7 +71,7 @@ public class JwtClaimsSetTest
     @Test
     public void testGetAudienceSingleValue() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"aud\":\"one\"}");
+        JwtClaims claims = JwtClaims.parse("{\"aud\":\"one\"}");
         List<String> audiences = claims.getAudience();
         Assert.assertThat(1, equalTo(audiences.size()));
         Assert.assertThat("one", equalTo(audiences.get(0)));
@@ -80,7 +80,7 @@ public class JwtClaimsSetTest
     @Test
     public void testGetAudienceMultipleInArray() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"aud\":[\"one\",\"two\",\"three\"]}");
+        JwtClaims claims = JwtClaims.parse("{\"aud\":[\"one\",\"two\",\"three\"]}");
         List<String> audiences = claims.getAudience();
         Assert.assertThat(3, equalTo(audiences.size()));
         Iterator<String> iterator = audiences.iterator();
@@ -92,7 +92,7 @@ public class JwtClaimsSetTest
     @Test
     public void testGetAudienceArray() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"aud\":[]}");
+        JwtClaims claims = JwtClaims.parse("{\"aud\":[]}");
         List<String> audiences = claims.getAudience();
         Assert.assertThat(0, equalTo(audiences.size()));
     }
@@ -100,21 +100,21 @@ public class JwtClaimsSetTest
     @Test (expected = MalformedClaimException.class)
     public void testGetBadAudience1() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"aud\":1996}");
+        JwtClaims claims = JwtClaims.parse("{\"aud\":1996}");
         claims.getAudience();
     }
 
     @Test (expected = MalformedClaimException.class)
     public void testGetBadAudience2() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"aud\":[\"value\", \"other\", 2, \"value\"]}");
+        JwtClaims claims = JwtClaims.parse("{\"aud\":[\"value\", \"other\", 2, \"value\"]}");
         claims.getAudience();
     }
 
     @Test
     public void testGetNullSubject() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"exp\":123456781}");
+        JwtClaims claims = JwtClaims.parse("{\"exp\":123456781}");
         Assert.assertNull(claims.getSubject());
     }
 
@@ -122,21 +122,21 @@ public class JwtClaimsSetTest
     public void testGetSubject() throws InvalidJwtException, MalformedClaimException
     {
         String sub = "subject@example.com";
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"sub\":\"" + sub + "\"}");
+        JwtClaims claims = JwtClaims.parse("{\"sub\":\"" + sub + "\"}");
         Assert.assertThat(sub, equalTo(claims.getSubject()));
     }
 
     @Test (expected = MalformedClaimException.class)
     public void testGetBadSubject() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"sub\":[\"nope\", \"not\", \"good\"]}");
+        JwtClaims claims = JwtClaims.parse("{\"sub\":[\"nope\", \"not\", \"good\"]}");
         claims.getSubject();
     }
 
     @Test
     public void testGetNullJti() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"whatever\":123456781}");
+        JwtClaims claims = JwtClaims.parse("{\"whatever\":123456781}");
         Assert.assertNull(claims.getJwtId());
     }
 
@@ -144,21 +144,21 @@ public class JwtClaimsSetTest
     public void testGetJti() throws InvalidJwtException, MalformedClaimException
     {
         String jti = "Xk9c2inNN8fFs60epZil3";
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"jti\":\"" + jti + "\"}");
+        JwtClaims claims = JwtClaims.parse("{\"jti\":\"" + jti + "\"}");
         Assert.assertThat(jti, equalTo(claims.getJwtId()));
     }
 
     @Test (expected = MalformedClaimException.class)
     public void testGetBadJti() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"jti\":[\"nope\", \"not\", \"good\"]}");
+        JwtClaims claims = JwtClaims.parse("{\"jti\":[\"nope\", \"not\", \"good\"]}");
         claims.getJwtId();
     }
 
     @Test
     public void testGetNullExp() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"right\":123456781}");
+        JwtClaims claims = JwtClaims.parse("{\"right\":123456781}");
         Assert.assertNull(claims.getExpirationTime());
     }
 
@@ -166,21 +166,21 @@ public class JwtClaimsSetTest
     public void testGetExp() throws InvalidJwtException, MalformedClaimException
     {
         long exp = 1418823169;
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"exp\":" + exp + "}");
+        JwtClaims claims = JwtClaims.parse("{\"exp\":" + exp + "}");
         Assert.assertThat(exp, equalTo(claims.getExpirationTime().getValue()));
     }
 
     @Test (expected = MalformedClaimException.class)
     public void testGetBadExp() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"exp\":\"nope\"}");
+        JwtClaims claims = JwtClaims.parse("{\"exp\":\"nope\"}");
         claims.getExpirationTime();
     }
 
     @Test
     public void testGetNullNbf() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"right\":123456781}");
+        JwtClaims claims = JwtClaims.parse("{\"right\":123456781}");
         Assert.assertNull(claims.getNotBefore());
     }
 
@@ -188,21 +188,21 @@ public class JwtClaimsSetTest
     public void testGetNbf() throws InvalidJwtException, MalformedClaimException
     {
         long nbf = 1418823109;
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"nbf\":" + nbf + "}");
+        JwtClaims claims = JwtClaims.parse("{\"nbf\":" + nbf + "}");
         Assert.assertThat(nbf, equalTo(claims.getNotBefore().getValue()));
     }
 
     @Test (expected = MalformedClaimException.class)
     public void testGetBadNbf() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"nbf\":[\"nope\", \"not\", \"good\"]}");
+        JwtClaims claims = JwtClaims.parse("{\"nbf\":[\"nope\", \"not\", \"good\"]}");
         claims.getNotBefore();
     }
 
     @Test
     public void testGetNullIat() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"right\":123456781, \"wrong\":123452781}");
+        JwtClaims claims = JwtClaims.parse("{\"right\":123456781, \"wrong\":123452781}");
         Assert.assertNull(claims.getIssuedAt());
     }
 
@@ -210,21 +210,21 @@ public class JwtClaimsSetTest
     public void testGetIat() throws InvalidJwtException, MalformedClaimException
     {
         long nbf = 1418823119;
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"iat\":" + nbf + "}");
+        JwtClaims claims = JwtClaims.parse("{\"iat\":" + nbf + "}");
         Assert.assertThat(nbf, equalTo(claims.getIssuedAt().getValue()));
     }
 
     @Test (expected = MalformedClaimException.class)
     public void testGetBadIat() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = JwtClaimsSet.parse("{\"iat\":\"not\"}");
+        JwtClaims claims = JwtClaims.parse("{\"iat\":\"not\"}");
         claims.getIssuedAt();
     }
 
     @Test
     public void testBasicCreate() throws GeneralJwtException
     {
-        JwtClaimsSet claims = new JwtClaimsSet();
+        JwtClaims claims = new JwtClaims();
         claims.setSubject("subject");
         claims.setAudience("audience");
         claims.setIssuer("issuer");
@@ -246,7 +246,7 @@ public class JwtClaimsSetTest
     @Test
     public void testSettingAud() throws GeneralJwtException
     {
-        JwtClaimsSet claims = new JwtClaimsSet();
+        JwtClaims claims = new JwtClaims();
 
         claims.setAudience("audience");
         Assert.assertThat(claims.toJson(), containsString("\"aud\":\"audience\""));
@@ -275,7 +275,7 @@ public class JwtClaimsSetTest
     @Test
     public void testCreateWithHelpers() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet claims = new JwtClaimsSet();
+        JwtClaims claims = new JwtClaims();
         claims.setSubject("subject");
         claims.setAudience("audience");
         claims.setIssuer("issuer");
@@ -293,7 +293,7 @@ public class JwtClaimsSetTest
         Assert.assertThat(jsonClaims, containsString("\"iat\":"));
         Assert.assertThat(jsonClaims, containsString("\"nbf\":"));
 
-        JwtClaimsSet parsedClaims = JwtClaimsSet.parse(jsonClaims);
+        JwtClaims parsedClaims = JwtClaims.parse(jsonClaims);
 
         Assert.assertThat(22, equalTo(parsedClaims.getJwtId().length()));    // base64url of 128bits is 22 chars
 
@@ -316,10 +316,10 @@ public class JwtClaimsSetTest
     @Test
     public void testSetExpirationTimeMinutesInTheFuturePartOfMinute() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet jwtClaimsSet = new JwtClaimsSet();
-        jwtClaimsSet.setExpirationTimeMinutesInTheFuture(0.167f);
-        jwtClaimsSet = JwtClaimsSet.parse(jwtClaimsSet.toJson());
-        NumericDate expirationTime = jwtClaimsSet.getExpirationTime();
+        JwtClaims jwtClaims = new JwtClaims();
+        jwtClaims.setExpirationTimeMinutesInTheFuture(0.167f);
+        jwtClaims = JwtClaims.parse(jwtClaims.toJson());
+        NumericDate expirationTime = jwtClaims.getExpirationTime();
         NumericDate checker = NumericDate.now();
         Assert.assertTrue(checker.isBefore(expirationTime));
         checker.addSeconds(9);
@@ -335,23 +335,23 @@ public class JwtClaimsSetTest
                 "\"jti\":\"mz3uxaCcLmQ2cwAV3oJxEQ\",\"exp\":1418906607," +
                 "\"email\":\"user@somewhere.io\", \"name\":\"Joe User\", \"someclaim\":\"yup\"}";
 
-        JwtClaimsSet jwtClaimsSet = JwtClaimsSet.parse(json);
-        Map<String, Object> claimsMap = jwtClaimsSet.getClaimsMap(INITIAL_REGISTERED_CLAIM_NAMES);
+        JwtClaims jwtClaims = JwtClaims.parse(json);
+        Map<String, Object> claimsMap = jwtClaims.getClaimsMap(INITIAL_REGISTERED_CLAIM_NAMES);
         Assert.assertThat(3, equalTo(claimsMap.size()));
 
-        claimsMap = jwtClaimsSet.getClaimsMap();
+        claimsMap = jwtClaims.getClaimsMap();
         Assert.assertThat(8, equalTo(claimsMap.size()));
 
-        Collection<String> claimNames = jwtClaimsSet.getClaimNames(INITIAL_REGISTERED_CLAIM_NAMES);
+        Collection<String> claimNames = jwtClaims.getClaimNames(INITIAL_REGISTERED_CLAIM_NAMES);
         Assert.assertThat(3, equalTo(claimNames.size()));
 
-        claimNames = jwtClaimsSet.getClaimNames(Collections.singleton(AUDIENCE));
+        claimNames = jwtClaims.getClaimNames(Collections.singleton(AUDIENCE));
         Assert.assertThat(7, equalTo(claimNames.size()));
 
-        claimNames = jwtClaimsSet.getClaimNames();
+        claimNames = jwtClaims.getClaimNames();
         Assert.assertThat(8, equalTo(claimNames.size()));
 
-        Assert.assertThat(json, is(equalTo(jwtClaimsSet.getRawJson())));
+        Assert.assertThat(json, is(equalTo(jwtClaims.getRawJson())));
     }
 
     @Test
@@ -361,7 +361,7 @@ public class JwtClaimsSetTest
         String stringClaimValue = "a value";
         String stringArrayClaimName = "array";
         String json = "{\""+stringClaimName+"\":\""+stringClaimValue+"\", \""+stringArrayClaimName+"\":[\"one\", \"two\", \"three\"]}";
-        JwtClaimsSet claims = JwtClaimsSet.parse(json);
+        JwtClaims claims = JwtClaims.parse(json);
         Assert.assertTrue(claims.isClaimValueOfType(stringClaimName, String.class));
         Assert.assertTrue(claims.isClaimValueString(stringClaimName));
         Assert.assertFalse(claims.isClaimValueStringList(stringClaimName));
@@ -396,7 +396,7 @@ public class JwtClaimsSetTest
     @Test
     public void testSomeSettingAndGettingHelpers() throws InvalidJwtException, MalformedClaimException
     {
-        JwtClaimsSet jcs = new JwtClaimsSet();
+        JwtClaims jcs = new JwtClaims();
         Assert.assertNull(jcs.getRawJson());
 
         jcs.setStringClaim("s", "value");
@@ -416,7 +416,7 @@ public class JwtClaimsSetTest
         ml.add(new String[] {"a", "B"});
         jcs.setClaim("mixed-list", ml);
 
-        JwtClaimsSet parsedJcs = JwtClaimsSet.parse(jcs.toJson());
+        JwtClaims parsedJcs = JwtClaims.parse(jcs.toJson());
         Assert.assertThat(parsedJcs.getStringClaimValue("s"), equalTo("value"));
         Assert.assertThat(parsedJcs.getStringListClaimValue("sa1"), equalTo(Arrays.asList("a", "b", "c")));
         Assert.assertThat(parsedJcs.getStringListClaimValue("sa2"), equalTo(Arrays.asList("1", "2")));
@@ -450,7 +450,7 @@ public class JwtClaimsSetTest
                 "\"e\":2.71828,\n" +
                 "\"f\":{\"fa\":{\"fb\":{\"fc\":\"value\", \"fc2\":{\"fd\":\"ddd\"}, \"fc3\":\"value3\"}}},\n" +
                 "}";
-        JwtClaimsSet jcs = JwtClaimsSet.parse(j);
+        JwtClaims jcs = JwtClaims.parse(j);
         Map<String, List<Object>> claims = jcs.flattenClaims(Collections.<String>emptySet());
 
         Assert.assertThat("av", equalTo(claims.get("a").get(0)));
@@ -497,7 +497,7 @@ public class JwtClaimsSetTest
                 "     \"country\": \"US\"},\n" +
                 "   \"phone_number\": \"+1 (310) 123-4567\"\n" +
                 "  }";
-        JwtClaimsSet jcs = JwtClaimsSet.parse(j);
+        JwtClaims jcs = JwtClaims.parse(j);
         Map<String, List<Object>> claims = jcs.flattenClaims();
         for (String k : claims.keySet())
         {
@@ -520,7 +520,7 @@ public class JwtClaimsSetTest
                 "      \"exp\":1300819380,\n" +
                 "      \"http://example.com/is_root\":true}";
 
-        JwtClaimsSet jcs = JwtClaimsSet.parse(json);
+        JwtClaims jcs = JwtClaims.parse(json);
         Assert.assertThat("joe", equalTo(jcs.getIssuer()));
         Assert.assertThat(NumericDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
         Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
@@ -537,7 +537,7 @@ public class JwtClaimsSetTest
         // ensure that we handle such values reasonably, if we receive them. This test checks that we don't fail
         // and just truncate the sub-second part.
 
-        JwtClaimsSet jcs = JwtClaimsSet.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430602000.173, \"iat\":1430602060.5, \"exp\":1430602600.77}");
+        JwtClaims jcs = JwtClaims.parse("{\"sub\":\"brian.d.campbell\", \"nbf\":1430602000.173, \"iat\":1430602060.5, \"exp\":1430602600.77}");
         Assert.assertThat(NumericDate.fromSeconds(1430602600), equalTo(jcs.getExpirationTime()));
         Assert.assertThat(NumericDate.fromSeconds(1430602060), equalTo(jcs.getIssuedAt()));
         Assert.assertThat(NumericDate.fromSeconds(1430602000), equalTo(jcs.getNotBefore()));

@@ -34,7 +34,7 @@ public class JtiValidator implements Validator
     @Override
     public String validate(JwtContext jwtContext) throws MalformedClaimException
     {
-        String subject = jwtContext.getJwtClaimsSet().getJwtId();
+        String subject = jwtContext.getJwtClaims().getJwtId();
         return (subject == null && requireJti) ?  "The JWT ID (jti) claim is not present." : null;
     }
 }

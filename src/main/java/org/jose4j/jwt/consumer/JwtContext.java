@@ -16,7 +16,7 @@
 
 package org.jose4j.jwt.consumer;
 
-import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwx.JsonWebStructure;
 
 import java.util.List;
@@ -26,18 +26,18 @@ import java.util.List;
 */
 public class JwtContext
 {
-    private JwtClaimsSet jwtClaimsSet;
+    private JwtClaims jwtClaims;
     private List<JsonWebStructure> joseObjects;
 
-    public JwtContext(JwtClaimsSet jwtClaimsSet, List<JsonWebStructure> joseObjects)
+    public JwtContext(JwtClaims jwtClaims, List<JsonWebStructure> joseObjects)
     {
-        this.jwtClaimsSet = jwtClaimsSet;
+        this.jwtClaims = jwtClaims;
         this.joseObjects = joseObjects;
     }
 
-    public JwtClaimsSet getJwtClaimsSet()
+    public JwtClaims getJwtClaims()
     {
-        return jwtClaimsSet;
+        return jwtClaims;
     }
 
     public List<JsonWebStructure> getJoseObjects()

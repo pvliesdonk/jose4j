@@ -38,7 +38,7 @@ public class AudValidator implements Validator
     @Override
     public String validate(JwtContext jwtContext) throws MalformedClaimException
     {
-        List<String> audiences = jwtContext.getJwtClaimsSet().getAudience();
+        List<String> audiences = jwtContext.getJwtClaims().getAudience();
 
         if (audiences == null)
         {

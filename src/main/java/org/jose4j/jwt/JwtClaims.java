@@ -27,17 +27,17 @@ import java.util.*;
 /**
  *
  */
-public class JwtClaimsSet
+public class JwtClaims
 {
     private Map<String, Object> claimsMap;
     private String rawJson;
 
-    public JwtClaimsSet()
+    public JwtClaims()
     {
         claimsMap = new LinkedHashMap<>();
     }
 
-    private JwtClaimsSet(String jsonClaims) throws InvalidJwtException
+    private JwtClaims(String jsonClaims) throws InvalidJwtException
     {
         rawJson = jsonClaims;
         try
@@ -51,9 +51,9 @@ public class JwtClaimsSet
         }
     }
 
-    public static JwtClaimsSet parse(String jsonClaims) throws InvalidJwtException
+    public static JwtClaims parse(String jsonClaims) throws InvalidJwtException
     {
-        return new JwtClaimsSet(jsonClaims);
+        return new JwtClaims(jsonClaims);
     }
 
     public String getIssuer() throws MalformedClaimException

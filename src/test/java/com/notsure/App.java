@@ -150,7 +150,7 @@ public class App
 //        System.out.println(encode);
 //        System.out.println("NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs".equals(encode));
 
-//        JwtClaimsSet jcs = new JwtClaimsSet();
+//        JwtClaims jcs = new JwtClaims();
 //        jcs.setIssuer("usa");
 //        jcs.setAudience("canada");
 //        jcs.setExpirationTimeMinutesInTheFuture(30);

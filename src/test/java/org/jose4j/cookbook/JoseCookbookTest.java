@@ -23,7 +23,7 @@ import org.jose4j.jwe.*;
 import org.jose4j.jwk.*;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
-import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.NumericDate;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
@@ -1361,11 +1361,11 @@ public class JoseCookbookTest
                         .setExpectedIssuer("hobbiton.example")
                         .setEvaluationTime(NumericDate.fromSeconds(1300819320))
                         .build();
-                JwtClaimsSet jwtClaimsSet = jwtConsumer.processToClaims(jweCs);
+                JwtClaims jwtClaims = jwtConsumer.processToClaims(jweCs);
 
-                assertThat("hobbiton.example", equalTo(jwtClaimsSet.getIssuer()));
-                assertThat(NumericDate.fromSeconds(1300819380), equalTo(jwtClaimsSet.getExpirationTime()));
-                assertTrue(jwtClaimsSet.getClaimValue("http://example.com/is_root", Boolean.class));
+                assertThat("hobbiton.example", equalTo(jwtClaims.getIssuer()));
+                assertThat(NumericDate.fromSeconds(1300819380), equalTo(jwtClaims.getExpirationTime()));
+                assertTrue(jwtClaims.getClaimValue("http://example.com/is_root", Boolean.class));
             }
         });
     }

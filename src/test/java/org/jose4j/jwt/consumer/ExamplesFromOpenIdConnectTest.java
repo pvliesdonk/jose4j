@@ -18,7 +18,7 @@ package org.jose4j.jwt.consumer;
 
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jws.JsonWebSignature;
-import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.NumericDate;
 import org.jose4j.jwx.JsonWebStructure;
@@ -83,8 +83,8 @@ public class ExamplesFromOpenIdConnectTest
                 .setVerificationKey(jwk.getKey())
                 .build();
 
-        JwtClaimsSet jwtClaimsSet = jwtConsumer.processToClaims(requestObject);
-        assertThat("https://client.example.org/cb", equalTo(jwtClaimsSet.getStringClaimValue("redirect_uri")));
+        JwtClaims jwtClaims = jwtConsumer.processToClaims(requestObject);
+        assertThat("https://client.example.org/cb", equalTo(jwtClaims.getStringClaimValue("redirect_uri")));
     }
 
 
@@ -172,8 +172,8 @@ public class ExamplesFromOpenIdConnectTest
                     .setVerificationKey(jwk.getKey())
                     .build();
 
-            JwtClaimsSet jwtClaimsSet = jwtConsumer.processToClaims(idToken);
-            assertThat("248289761001", equalTo(jwtClaimsSet.getSubject()));
+            JwtClaims jwtClaims = jwtConsumer.processToClaims(idToken);
+            assertThat("248289761001", equalTo(jwtClaims.getSubject()));
         }
     }
 
@@ -276,8 +276,8 @@ public class ExamplesFromOpenIdConnectTest
                     })
                     .build();
 
-            JwtClaimsSet jwtClaimsSet = jwtConsumer.processToClaims(idToken);
-            assertThat("248289761001", equalTo(jwtClaimsSet.getSubject()));
+            JwtClaims jwtClaims = jwtConsumer.processToClaims(idToken);
+            assertThat("248289761001", equalTo(jwtClaims.getSubject()));
         }
     }
 }

@@ -16,7 +16,7 @@
 
 package org.jose4j.jwt.consumer;
 
-import org.jose4j.jwt.JwtClaimsSet;
+import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 
 /**
@@ -35,8 +35,8 @@ public class SubValidator implements Validator
     @Override
     public String validate(JwtContext jwtContext) throws MalformedClaimException
     {
-        JwtClaimsSet jwtClaimsSet = jwtContext.getJwtClaimsSet();
-        String subject = jwtClaimsSet.getSubject();
+        JwtClaims jwtClaims = jwtContext.getJwtClaims();
+        String subject = jwtClaims.getSubject();
         return (subject == null && requireSubject) ?  "No Subject (sub) claim is present." : null;
     }
 }
