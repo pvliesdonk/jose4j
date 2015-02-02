@@ -17,7 +17,7 @@ package org.jose4j.jwt.consumer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jose4j.jwk.HttpsJsonWebKeySet;
+import org.jose4j.jwk.HttpsJwks;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.VerificationJwkSelector;
 import org.jose4j.jws.JsonWebSignature;
@@ -36,9 +36,9 @@ public class HttpsJwksVerificationKeyResolver implements VerificationKeyResolver
 {
     private Log log = LogFactory.getLog(this.getClass());
 
-    private HttpsJsonWebKeySet httpsJkws;
+    private HttpsJwks httpsJkws;
 
-    public HttpsJwksVerificationKeyResolver(HttpsJsonWebKeySet httpsJkws)
+    public HttpsJwksVerificationKeyResolver(HttpsJwks httpsJkws)
     {
         this.httpsJkws = httpsJkws;
     }

@@ -33,9 +33,9 @@ import java.util.List;
 /**
  *
  */
-public class HttpsJsonWebKeySet
+public class HttpsJwks
 {
-    private static Log log = LogFactory.getLog(HttpsJsonWebKeySet.class);
+    private static Log log = LogFactory.getLog(HttpsJwks.class);
 
     private URL location;
     private long defaultCacheDuration = 3600;
@@ -43,7 +43,7 @@ public class HttpsJsonWebKeySet
 
     private Cache cache = new Cache(Collections.<JsonWebKey>emptyList(), 0);
 
-    public HttpsJsonWebKeySet(String location)
+    public HttpsJwks(String location)
     {
         try
         {
