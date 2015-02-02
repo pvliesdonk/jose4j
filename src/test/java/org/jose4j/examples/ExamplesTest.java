@@ -58,7 +58,6 @@ public void jwtRoundTripExample() throws JoseException
     // Give the JWK a Key ID (kid), which is just the polite thing to do
     rsaJsonWebKey.setKeyId("k1");
 
-
     // Create the Claims, which will be the content of the JWT
     JwtClaims claims = new JwtClaims();
     claims.setIssuer("Issuer");  // who creates the token and signs it
@@ -91,6 +90,8 @@ public void jwtRoundTripExample() throws JoseException
     // Sign the JWS and produce the compact serialization or the complete JWT/JWS
     // representation, which is a string consisting of three dot ('.') separated
     // base64url-encoded parts in the form Header.Payload.Signature
+    // If you wanted to encrypt it, you can simply set this jwt as the payload
+    // of a JsonWebEncryption object and set the cty (Content Type) header to "jwt".
     String jwt = jws.getCompactSerialization();
 
 
@@ -104,6 +105,8 @@ public void jwtRoundTripExample() throws JoseException
     // The specific validation requirements for a JWT are context dependent, however,
     // it typically advisable to require a expiration time, a trusted issuer, and
     // and audience that identifies your system as the intended recipient.
+    // If the JWT is encrypted too, you need only provide a decryption key or
+    // decryption key resolver to the builder.
     JwtConsumer jwtConsumer = new JwtConsumerBuilder()
             .setRequireExpirationTime() // the JWT must have an expiration time
             .setAllowedClockSkewInSeconds(30) // allow some leeway in validating time based claims to account for clock skew
@@ -184,8 +187,6 @@ public void jwtRoundTripExample() throws JoseException
             .setVerificationKeyResolver(x509VerificationKeyResolver)
             // ...
             .build();
-
-
 }
 
 @Test
