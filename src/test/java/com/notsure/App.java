@@ -16,36 +16,17 @@
 
 package com.notsure;
 
-import org.jose4j.base64url.Base64;
-import org.jose4j.base64url.Base64Url;
 import org.jose4j.http.Get;
-import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
-import org.jose4j.jwe.JsonWebEncryption;
-import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.jwk.*;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
-import org.jose4j.jwt.JwtClaimsSet;
-import org.jose4j.jwx.HeaderParameterNames;
-import org.jose4j.keys.BigEndianBigInteger;
-import org.jose4j.keys.EllipticCurves;
-import org.jose4j.keys.PbkdfKey;
 import org.jose4j.keys.X509Util;
-import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
-import org.jose4j.lang.StringUtil;
-import org.jose4j.zip.CompressionAlgorithm;
-import org.jose4j.zip.CompressionAlgorithmIdentifiers;
-import org.junit.Test;
 
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.security.Provider;
-import java.security.PublicKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPublicKey;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -55,7 +36,7 @@ public class App
 {
     public void smoething() throws IOException, JoseException
     {
-        HttpsJsonWebKeySet hjwks = new HttpsJsonWebKeySet("https://www.googleapis.com/oauth2/v2/certs");
+        HttpsJwks hjwks = new HttpsJwks("https://www.googleapis.com/oauth2/v2/certs");
         List<JsonWebKey> jsonWebKeys = hjwks.getJsonWebKeys();
         System.out.println(jsonWebKeys);
         VerificationJwkSelector vjs = new VerificationJwkSelector();
@@ -94,7 +75,7 @@ public class App
         get.setProgressiveRetryWait(true);
         get.setInitialRetryWaitTime(500);
 
-        final HttpsJsonWebKeySet httpsJwks = new HttpsJsonWebKeySet(location);
+        final HttpsJwks httpsJwks = new HttpsJwks(location);
         httpsJwks.setSimpleHttpGet(get);
         httpsJwks.setDefaultCacheDuration(4);
 
