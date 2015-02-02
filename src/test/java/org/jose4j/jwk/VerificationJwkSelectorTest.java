@@ -935,4 +935,66 @@ public class VerificationJwkSelectorTest
         jws.setKey(selectedJwk.getKey());
         assertTrue(jws.verifySignature());
     }
+
+    @Test
+    public void noKids() throws JoseException
+    {
+        String json = "{" +
+                "  \"keys\": [" +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"AAib8AfuP9X2esxxZXJUH0oggizKpaIhf9ou3taXkQ6-nNoUfZNHllwaQMWzkVSusHe_LiRLf-9MJ51grtFRCMeC\"," +
+                "      \"y\": \"ARdAq_upn_rh4DRonyfopZbCdeJKhy7_jycKW9wceFFrvP2ZGC8uX1cH9IbEpcmHzXI2yAx3UZS8JiMueU6J_YEI\"," +
+                "      \"crv\": \"P-521\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"wwxLXWB-6zA06R6hs2GZQMezXpsql8piHuuz2uy_p8cJ1UDBXEjIblC2g2K0jqVR\"," +
+                "      \"y\": \"Bt0HwjlM4RoyCfq7DM9j34ujq_r45axa0S33YWLdQvHIwTj5bW1z81jqpPw0F_Xm\"," +
+                "      \"crv\": \"P-384\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"EC\"," +
+                "      \"use\": \"sig\"," +
+                "      \"x\": \"9aKnpWa5Fnhvao2cWprEj4tpWCJpY06n2DsaxjJ6vbU\"," +
+                "      \"y\": \"ZlAzvRY_PP0lTJ3nkxIP6HUW9KgzzxE4WWicXQuvf6w\"," +
+                "      \"crv\": \"P-256\"" +
+                "    }," +
+                "    {" +
+                "      \"kty\": \"RSA\"," +
+                "      \"use\": \"sig\"," +
+                "      \"n\": \"qqqF-eYSGLzU_ieAreTxa3Jj7zOy4uVKCpL6PeV5D85jHskPbaL7-SXzW6LlWSW6KUAW1Uwx_nohCZ7D5r24pW1tuQBnL20pfRs8gPpL28zsrK2SYg_AYyTJwmFTyYF5wfE8HZNGapF9-oHO794lSsWx_SpKQrH_vH_yqo8Bv_06Kf730VWIuREyW1kQS7sz56Aae5eH5oBnC45U4GqvshYLzd7CUvPNJWU7pumq_rzlr_MSMHjJs49CHXtqpezQgQvxQWfaOi691yrgLRl1QcrOqXwHNimrR1IOQyXx6_6isXLvGifZup48GmpzWQWyJ4t4Ud95ugc1HLeNlkHtBQ\"," +
+                "      \"e\": \"AQAB\"" +
+                "    }]}";
+
+        JsonWebKeySet jwks = new JsonWebKeySet(json);
+
+        VerificationJwkSelector verificationJwkSelector = new VerificationJwkSelector();
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
+        List<JsonWebKey> jsonWebKeys = jwks.getJsonWebKeys();
+        List<JsonWebKey> selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
+        assertThat(1, equalTo(selected.size()));
+
+        jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
+        jsonWebKeys = jwks.getJsonWebKeys();
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
+        assertThat(1, equalTo(selected.size()));
+
+        jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P521_CURVE_AND_SHA512);
+        jsonWebKeys = jwks.getJsonWebKeys();
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
+        assertThat(1, equalTo(selected.size()));
+
+        jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384);
+        jsonWebKeys = jwks.getJsonWebKeys();
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
+        assertThat(1, equalTo(selected.size()));
+    }
+
 }
