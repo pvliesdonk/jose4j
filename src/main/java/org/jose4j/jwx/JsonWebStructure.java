@@ -20,9 +20,11 @@ import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.keys.X509Util;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
+import java.security.cert.X509Certificate;
 
 import static org.jose4j.jwx.HeaderParameterNames.X509_CERTIFICATE_SHA256_THUMBPRINT;
 import static org.jose4j.jwx.HeaderParameterNames.X509_CERTIFICATE_THUMBPRINT;
@@ -151,6 +153,12 @@ public abstract class JsonWebStructure
         setHeader(X509_CERTIFICATE_THUMBPRINT, x5t);
     }
 
+    public void setX509CertSha1ThumbprintHeaderValue(X509Certificate certificate)
+    {
+        String x5t = X509Util.x5t(certificate);
+        setX509CertSha1ThumbprintHeaderValue(x5t);
+    }
+
     public String getX509CertSha256ThumbprintHeaderValue()
     {
         return getHeader(X509_CERTIFICATE_SHA256_THUMBPRINT);
@@ -159,6 +167,12 @@ public abstract class JsonWebStructure
     public void setX509CertSha256ThumbprintHeaderValue(String x5tS256)
     {
         setHeader(X509_CERTIFICATE_SHA256_THUMBPRINT, x5tS256);
+    }
+
+    public void setX509CertSha256ThumbprintHeaderValue(X509Certificate certificate)
+    {
+        String x5tS256 = X509Util.x5tS256(certificate);
+        setX509CertSha256ThumbprintHeaderValue(x5tS256);
     }
 
     public Key getKey()

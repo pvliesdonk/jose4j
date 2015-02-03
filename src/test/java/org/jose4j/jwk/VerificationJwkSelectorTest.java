@@ -7,6 +7,7 @@ import org.jose4j.keys.X509Util;
 import org.jose4j.lang.JoseException;
 import org.junit.Test;
 
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -452,10 +453,30 @@ public class VerificationJwkSelectorTest
         assertThat(1, equalTo(selected.size()));
         assertThat("6", equalTo(selected.get(0).getKeyId()));
 
-
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA512);
         jws.setX509CertSha256ThumbprintHeaderValue("Xm5kcmgZp3dZmZc_-K31CzStJl5pH3QjRp45D8uhinM");
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
+        assertThat(1, equalTo(selected.size()));
+        assertThat("3", equalTo(selected.get(0).getKeyId()));
+
+
+        SimpleJwkFilter filter = new SimpleJwkFilter();
+        filter.setKid("3", false);
+        JsonWebKey three = filter.filter(jsonWebKeys).iterator().next();
+        PublicJsonWebKey publicThree = (PublicJsonWebKey) three;
+        X509Certificate leafCertificate = publicThree.getLeafCertificate();
+
+        jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA512);
+        jws.setX509CertSha256ThumbprintHeaderValue(leafCertificate);
+        selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
+        assertThat(1, equalTo(selected.size()));
+        assertThat("3", equalTo(selected.get(0).getKeyId()));
+
+        jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA512);
+        jws.setX509CertSha1ThumbprintHeaderValue(leafCertificate);
         selected = verificationJwkSelector.selectList(jws, jsonWebKeys);
         assertThat(1, equalTo(selected.size()));
         assertThat("3", equalTo(selected.get(0).getKeyId()));
