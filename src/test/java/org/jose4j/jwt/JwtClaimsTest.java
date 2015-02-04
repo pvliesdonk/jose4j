@@ -30,6 +30,9 @@ import static org.jose4j.jwt.ReservedClaimNames.*;
  */
 public class JwtClaimsTest
 {
+
+    public static final int DEFAULT_JTI_LENGTH = 22;  // base64url of 128bits is 22 chars
+
     @Test (expected = MalformedClaimException.class)
     public void testGetBadIssuer() throws InvalidJwtException, MalformedClaimException
     {
@@ -153,6 +156,19 @@ public class JwtClaimsTest
     {
         JwtClaims claims = JwtClaims.parse("{\"jti\":[\"nope\", \"not\", \"good\"]}");
         claims.getJwtId();
+    }
+
+    @Test
+    public void generateAndGetJwt() throws MalformedClaimException
+    {
+        JwtClaims claims = new JwtClaims();
+        claims.setGeneratedJwtId();
+        String jwtId = claims.getJwtId();
+        Assert.assertThat(DEFAULT_JTI_LENGTH, equalTo(jwtId.length()));
+
+        claims.setJwtId("igotyourjtirighthere");
+        jwtId = claims.getJwtId();
+        Assert.assertThat(jwtId, equalTo("igotyourjtirighthere"));
     }
 
     @Test
@@ -295,7 +311,7 @@ public class JwtClaimsTest
 
         JwtClaims parsedClaims = JwtClaims.parse(jsonClaims);
 
-        Assert.assertThat(22, equalTo(parsedClaims.getJwtId().length()));    // base64url of 128bits is 22 chars
+        Assert.assertThat(DEFAULT_JTI_LENGTH, equalTo(parsedClaims.getJwtId().length()));
 
         long nowMillis = System.currentTimeMillis();
 
