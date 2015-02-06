@@ -40,6 +40,11 @@ public class JwtContext
         return jwtClaims;
     }
 
+    /**
+     * All of the JOSE objects that comprise the JWT. When the JWT is nested,
+     * the first item in the list is the inner most JOSE object.
+     * @return the list of JOSE objects that comprise the JWT
+     */
     public List<JsonWebStructure> getJoseObjects()
     {
         return joseObjects;
