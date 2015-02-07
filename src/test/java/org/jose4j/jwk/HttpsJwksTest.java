@@ -15,6 +15,7 @@
  */
 package org.jose4j.jwk;
 
+import org.jose4j.http.Response;
 import org.jose4j.http.SimpleResponse;
 import org.junit.Test;
 
@@ -47,17 +48,17 @@ public class HttpsJwksTest
         long fakeCurrentTime = 784111717000L;
 
         Map<String, List<String>> headers = Collections.singletonMap("Expires", Collections.singletonList("Sun, 06 Nov 1994 08:49:37 GMT"));
-        SimpleResponse simpleResponse = new SimpleResponse(200, "OK", headers, "doesn't matter");
+        SimpleResponse simpleResponse = new Response(200, "OK", headers, "doesn't matter");
         assertThat(actualDateMs, equalTo(HttpsJwks.getExpires(simpleResponse)));
         assertThat(actualCacheLife, equalTo(HttpsJwks.getCacheLife(simpleResponse, fakeCurrentTime)));
 
         headers = Collections.singletonMap("Expires", Collections.singletonList("Sunday, 06-Nov-94 08:49:37 GMT"));
-        simpleResponse = new SimpleResponse(200, "OK", headers, "doesn't matter");
+        simpleResponse = new Response(200, "OK", headers, "doesn't matter");
         assertThat(actualDateMs, equalTo(HttpsJwks.getExpires(simpleResponse)));
         assertThat(actualCacheLife, equalTo(HttpsJwks.getCacheLife(simpleResponse, fakeCurrentTime)));
 
         headers = Collections.singletonMap("Expires", Collections.singletonList("Sun Nov  6 08:49:37 1994"));
-        simpleResponse = new SimpleResponse(200, "OK", headers, "*still* doesn't matter");
+        simpleResponse = new Response(200, "OK", headers, "*still* doesn't matter");
         assertThat(actualDateMs, equalTo(HttpsJwks.getExpires(simpleResponse)));
         assertThat(actualCacheLife, equalTo(HttpsJwks.getCacheLife(simpleResponse, fakeCurrentTime)));
     }
@@ -85,7 +86,7 @@ public class HttpsJwksTest
             Map<String, List<String>> headers = new HashMap<>();
             headers.put("Expires", Collections.singletonList("Expires: Tue, 27 Jan 2015 16:00:10 GMT")); // Cache-Control takes precedence over this
             headers.put("Cache-Control", Collections.singletonList(headerValue));
-            SimpleResponse simpleResponse = new SimpleResponse(200, "OK", headers, "doesn't matter");
+            SimpleResponse simpleResponse = new Response(200, "OK", headers, "doesn't matter");
             long cacheLife = HttpsJwks.getCacheLife(simpleResponse);
             assertThat("it done broke on this one " + headerValue, 23760L , equalTo(cacheLife));
         }

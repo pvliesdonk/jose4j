@@ -83,7 +83,7 @@ public class Get implements SimpleGet
                 String body = getBody(urlConnection, charset);
 
                 Map<String,List<String>> headers = httpUrlConnection.getHeaderFields();
-                SimpleResponse simpleResponse = new SimpleResponse(code, msg, headers, body);
+                SimpleResponse simpleResponse = new Response(code, msg, headers, body);
                 if (log.isDebugEnabled()) { log.debug("HTTP GET of " + url + " returned " + simpleResponse);}
                 return simpleResponse;
             }

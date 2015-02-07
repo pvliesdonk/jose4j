@@ -17,6 +17,7 @@ package org.jose4j.jwt.consumer;
 
 import org.apache.commons.logging.LogFactory;
 import org.jose4j.http.Get;
+import org.jose4j.http.Response;
 import org.jose4j.http.SimpleResponse;
 import org.jose4j.jwk.*;
 import org.jose4j.jws.AlgorithmIdentifiers;
@@ -59,8 +60,8 @@ public class HttpsJwksVerificationKeyResolverTest
 
         Get mockGet = mock(Get.class);
         Map<String,List<String>> headers = Collections.emptyMap();
-        SimpleResponse ok1 = new SimpleResponse(200, "OK", headers, firstJkwsJson);
-        SimpleResponse ok2 = new SimpleResponse(200, "OK", headers, secondJwkJson);
+        SimpleResponse ok1 = new Response(200, "OK", headers, firstJkwsJson);
+        SimpleResponse ok2 = new Response(200, "OK", headers, secondJwkJson);
         when(mockGet.get(url)).thenReturn(ok1, ok2);
 
         httpsJkws.setSimpleHttpGet(mockGet);
