@@ -275,6 +275,24 @@ public class JwtConsumerTest
         SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, consumer);
     }
 
+    @Test
+    public void skipSignatureVerification() throws Exception
+    {
+        String jwt = "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9." +
+                "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ." +
+                "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
+
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setSkipSignatureVerification()
+                .setEvaluationTime(NumericDate.fromSeconds(1300819372))
+                .setExpectedIssuer("joe")
+                .setRequireExpirationTime()
+                .build();
+        JwtContext context = consumer.process(jwt);
+        Assert.assertTrue(context.getJwtClaims().getClaimValue("http://example.com/is_root", Boolean.class));
+        assertThat(1, equalTo(context.getJoseObjects().size()));
+    }
+
     @Test (expected = InvalidJwtSignatureException.class)
     public void jwtBadSig() throws Exception
     {

@@ -52,6 +52,8 @@ public class JwtConsumer
 
     private boolean liberalContentTypeHandling;
 
+    private boolean skipSignatureVerification;
+
     JwtConsumer()
     {
     }
@@ -101,6 +103,11 @@ public class JwtConsumer
         this.liberalContentTypeHandling = liberalContentTypeHandling;
     }
 
+    void setSkipSignatureVerification(boolean skipSignatureVerification)
+    {
+        this.skipSignatureVerification = skipSignatureVerification;
+    }
+
     public JwtClaims processToClaims(String jwt) throws InvalidJwtException
     {
         return process(jwt).getJwtClaims();
@@ -120,19 +127,29 @@ public class JwtConsumer
             try
             {
                 joseObject = JsonWebStructure.fromCompactSerialization(jwt);
-
+                String payload;
                 if (joseObject instanceof JsonWebSignature)
                 {
                     JsonWebSignature jws = (JsonWebSignature) joseObject;
-                    Key key = verificationKeyResolver.resolveKey(jws, Collections.unmodifiableList(joseObjects));
-                    jws.setKey(key);
-                    if (jwsAlgorithmConstraints != null)
+
+                    if (!skipSignatureVerification)
                     {
-                        jws.setAlgorithmConstraints(jwsAlgorithmConstraints);
+                        Key key = verificationKeyResolver.resolveKey(jws, Collections.unmodifiableList(joseObjects));
+                        jws.setKey(key);
+                        if (jwsAlgorithmConstraints != null)
+                        {
+                            jws.setAlgorithmConstraints(jwsAlgorithmConstraints);
+                        }
+                        if (!jws.verifySignature())
+                        {
+                            throw new InvalidJwtSignatureException("JWS signature is invalid: " + jwt);
+                        }
+
+                        payload = jws.getPayload();
                     }
-                    if (!jws.verifySignature())
+                    else
                     {
-                        throw new InvalidJwtSignatureException("JWS signature is invalid: " + jwt);
+                        payload = jws.getUnverifiedPayload();
                     }
 
                     if (!jws.getAlgorithmHeaderValue().equals(AlgorithmIdentifiers.NONE))
@@ -156,9 +173,9 @@ public class JwtConsumer
                     }
 
                     hasEncryption = true;
+                    payload = jwe.getPayload();
                 }
 
-                String payload = joseObject.getPayload();
 
                 if (isNestedJwt(joseObject))
                 {
