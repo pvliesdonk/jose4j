@@ -23,7 +23,6 @@ import org.jose4j.jwk.*;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwx.JsonWebStructure;
-import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver;
 import org.jose4j.lang.UnresolvableKeyException;
 import org.junit.Test;
 
