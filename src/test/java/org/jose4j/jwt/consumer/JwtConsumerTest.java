@@ -32,6 +32,8 @@ import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.keys.PbkdfKey;
+import org.jose4j.keys.resolvers.DecryptionKeyResolver;
+import org.jose4j.keys.resolvers.VerificationKeyResolver;
 import org.jose4j.lang.UnresolvableKeyException;
 import org.junit.Assert;
 import org.junit.Test;

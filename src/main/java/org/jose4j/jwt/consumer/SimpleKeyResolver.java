@@ -19,6 +19,8 @@ package org.jose4j.jwt.consumer;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwx.JsonWebStructure;
+import org.jose4j.keys.resolvers.DecryptionKeyResolver;
+import org.jose4j.keys.resolvers.VerificationKeyResolver;
 
 import java.security.Key;
 import java.util.List;

@@ -19,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jose4j.jwk.JsonWebKeySet;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.NumericDate;
+import org.jose4j.keys.resolvers.JwksVerificationKeyResolver;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -28,7 +29,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class JwksVerificationKeyResolverTest
+public class JwksVerificationKeyResolverUsingJwtConsumerTest
 {
     @Test
     public void idtokenFromPf() throws Exception

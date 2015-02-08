@@ -23,6 +23,7 @@ import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.NumericDate;
 import org.jose4j.keys.X509Util;
+import org.jose4j.keys.resolvers.X509VerificationKeyResolver;
 import org.jose4j.lang.JoseException;
 import org.junit.Assert;
 import org.junit.BeforeClass;

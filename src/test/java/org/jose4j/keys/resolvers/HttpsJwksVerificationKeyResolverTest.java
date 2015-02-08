@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jose4j.jwt.consumer;
+package org.jose4j.keys.resolvers;
 
 import org.apache.commons.logging.LogFactory;
 import org.jose4j.http.Get;
@@ -23,6 +23,7 @@ import org.jose4j.jwk.*;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwx.JsonWebStructure;
+import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver;
 import org.jose4j.lang.UnresolvableKeyException;
 import org.junit.Test;
 

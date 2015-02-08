@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.jose4j.jwt.consumer;
+package org.jose4j.keys.resolvers;
 
-import org.jose4j.jws.JsonWebSignature;
+
+import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.UnresolvableKeyException;
 
@@ -26,7 +27,7 @@ import java.util.List;
 /**
  *
  */
-public interface VerificationKeyResolver
+public interface DecryptionKeyResolver
 {
-    Key resolveKey(JsonWebSignature jws, List<JsonWebStructure> nestingContext) throws UnresolvableKeyException;
+    Key resolveKey(JsonWebEncryption jwe, List<JsonWebStructure> nestingContext) throws UnresolvableKeyException;
 }

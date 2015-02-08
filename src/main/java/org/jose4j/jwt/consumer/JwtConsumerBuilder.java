@@ -18,6 +18,8 @@ package org.jose4j.jwt.consumer;
 
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwt.NumericDate;
+import org.jose4j.keys.resolvers.DecryptionKeyResolver;
+import org.jose4j.keys.resolvers.VerificationKeyResolver;
 
 import java.security.Key;
 import java.util.*;
