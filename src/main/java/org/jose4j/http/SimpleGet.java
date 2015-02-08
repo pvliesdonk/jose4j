@@ -23,5 +23,5 @@ import java.net.URL;
  */
 public interface SimpleGet
 {
-    public SimpleResponse get(URL url) throws IOException;
+    public SimpleResponse get(String location) throws IOException;
 }

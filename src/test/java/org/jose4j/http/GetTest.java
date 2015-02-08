@@ -19,7 +19,6 @@ import org.jose4j.keys.X509Util;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.net.URL;
 import java.security.cert.X509Certificate;
 
 /**
@@ -56,7 +55,7 @@ public class GetTest
         get.setReadTimeout(200);
         get.setRetries(5);
         get.setProgressiveRetryWait(true);
-        SimpleResponse simpleResponse = get.get(new URL(location));
+        SimpleResponse simpleResponse = get.get(location);
         System.out.println(simpleResponse);
     }
 
@@ -66,7 +65,7 @@ public class GetTest
     {
         String location = "https://www.googleapis.com/oauth2/v2/certs";
         Get get = new Get();
-        SimpleResponse simpleResponse = get.get(new URL(location));
+        SimpleResponse simpleResponse = get.get(location);
         System.out.println(simpleResponse);
     }
 }

@@ -55,10 +55,11 @@ public class Get implements SimpleGet
     private HostnameVerifier hostnameVerifier;
 
     @Override
-    public SimpleResponse get(URL url) throws IOException
+    public SimpleResponse get(String location) throws IOException
     {
         int attempts = 0;
-        if (log.isDebugEnabled()) { log.debug("HTTP GET of " + url);}
+        if (log.isDebugEnabled()) { log.debug("HTTP GET of " + location);}
+        URL url = new URL(location);
         while (true)
         {
             try

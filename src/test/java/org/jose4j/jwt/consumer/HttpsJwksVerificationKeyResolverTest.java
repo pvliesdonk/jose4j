@@ -27,7 +27,6 @@ import org.jose4j.lang.UnresolvableKeyException;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.URL;
 import java.security.Key;
 import java.util.Collections;
 import java.util.List;
@@ -55,14 +54,13 @@ public class HttpsJwksVerificationKeyResolverTest
         JsonWebKey k2 = jwks.getJsonWebKeys().iterator().next();
 
         String location = "https://www.example.org/";
-        URL url = new URL(location);
         HttpsJwks httpsJkws = new HttpsJwks(location);
 
         Get mockGet = mock(Get.class);
         Map<String,List<String>> headers = Collections.emptyMap();
         SimpleResponse ok1 = new Response(200, "OK", headers, firstJkwsJson);
         SimpleResponse ok2 = new Response(200, "OK", headers, secondJwkJson);
-        when(mockGet.get(url)).thenReturn(ok1, ok2);
+        when(mockGet.get(location)).thenReturn(ok1, ok2);
 
         httpsJkws.setSimpleHttpGet(mockGet);
 
@@ -118,7 +116,7 @@ public class HttpsJwksVerificationKeyResolverTest
         String location = "https://www.example.org/";
 
         Get mockGet = mock(Get.class);
-        when(mockGet.get(new URL(location))).thenThrow(new IOException(location + "says 'no GET for you!'"));
+        when(mockGet.get(location)).thenThrow(new IOException(location + "says 'no GET for you!'"));
         HttpsJwks httpsJkws = new HttpsJwks(location);
         httpsJkws.setSimpleHttpGet(mockGet);
         HttpsJwksVerificationKeyResolver resolver = new HttpsJwksVerificationKeyResolver(httpsJkws);

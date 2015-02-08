@@ -21,11 +21,8 @@ import org.jose4j.http.Get;
 import org.jose4j.http.SimpleGet;
 import org.jose4j.http.SimpleResponse;
 import org.jose4j.lang.JoseException;
-import org.jose4j.lang.UncheckedJoseException;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +34,7 @@ public class HttpsJwks
 {
     private static Log log = LogFactory.getLog(HttpsJwks.class);
 
-    private URL location;
+    private String location;
     private long defaultCacheDuration = 3600;
     private SimpleGet simpleHttpGet = new Get();
 
@@ -45,14 +42,7 @@ public class HttpsJwks
 
     public HttpsJwks(String location)
     {
-        try
-        {
-            this.location = new URL(location);
-        }
-        catch (MalformedURLException e)
-        {
-            throw new UncheckedJoseException("The location of the HTTPS JWKS endpoint ("+location+") could not be parsed into a URL.", e);
-        }
+        this.location = location;
     }
 
     public void setDefaultCacheDuration(long defaultCacheDuration)
@@ -65,7 +55,7 @@ public class HttpsJwks
         this.simpleHttpGet = simpleHttpGet;
     }
 
-    public URL getLocation()
+    public String getLocation()
     {
         return location;
     }
