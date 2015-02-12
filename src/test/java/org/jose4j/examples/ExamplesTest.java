@@ -101,7 +101,7 @@ public void jwtRoundTripExample() throws JoseException
     String jwt = jws.getCompactSerialization();
 
 
-    // Now you can something with the JWT. Like send it to some other party
+    // Now you can do something with the JWT. Like send it to some other party
     // over the clouds and through the interwebs.
     System.out.println("JWT: " + jwt);
 
