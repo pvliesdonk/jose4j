@@ -103,7 +103,7 @@ public class SimpleJwkFilter
     }
 
 
-    String[] getThumbs(JsonWebKey jwk, boolean allowFallbackDeriveFromX5c) // todo
+    String[] getThumbs(JsonWebKey jwk, boolean allowFallbackDeriveFromX5c)
     {
         if (x5t == null && x5tS256 == null)
         {
