@@ -462,7 +462,7 @@ public class VerificationJwkSelectorTest
 
 
         SimpleJwkFilter filter = new SimpleJwkFilter();
-        filter.setKid("3", false);
+        filter.setKid("3", SimpleJwkFilter.VALUE_REQUIRED);
         JsonWebKey three = filter.filter(jsonWebKeys).iterator().next();
         PublicJsonWebKey publicThree = (PublicJsonWebKey) three;
         X509Certificate leafCertificate = publicThree.getLeafCertificate();
