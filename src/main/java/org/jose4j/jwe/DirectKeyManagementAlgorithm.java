@@ -33,7 +33,7 @@ public class DirectKeyManagementAlgorithm extends AlgorithmInfo implements KeyMa
     public DirectKeyManagementAlgorithm()
     {
         setAlgorithmIdentifier(KeyManagementAlgorithmIdentifiers.DIRECT);
-        setKeyPersuasion(KeyPersuasion.ASYMMETRIC);
+        setKeyPersuasion(KeyPersuasion.SYMMETRIC);
     }
 
     public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride) throws JoseException
