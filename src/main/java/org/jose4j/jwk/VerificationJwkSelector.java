@@ -36,28 +36,7 @@ public class VerificationJwkSelector
 
     public List<JsonWebKey> selectList(JsonWebSignature jws, Collection<JsonWebKey> keys) throws JoseException
     {
-        SimpleJwkFilter filter = new SimpleJwkFilter();
-        String kid = jws.getKeyIdHeaderValue();
-        if (kid != null)
-        {
-            filter.setKid(kid, SimpleJwkFilter.VALUE_REQUIRED);
-        }
-
-        String x5t = jws.getX509CertSha1ThumbprintHeaderValue();
-        String x5tS256 = jws.getX509CertSha256ThumbprintHeaderValue();
-        filter.setAllowFallbackDeriveFromX5cForX5Thumbs(true);
-        if (x5t != null)
-        {
-            filter.setX5t(x5t, SimpleJwkFilter.OMITTED_OKAY);
-        }
-        if (x5tS256 != null)
-        {
-            filter.setX5tS256(x5tS256, SimpleJwkFilter.OMITTED_OKAY);
-        }
-
-        String keyType = jws.getKeyType();
-        filter.setKty(keyType);
-        filter.setUse(Use.SIGNATURE, SimpleJwkFilter.OMITTED_OKAY);
+        SimpleJwkFilter filter = SelectorSupport.commonFilterForInbound(jws);
         List<JsonWebKey> filtered = filter.filter(keys);
 
         if (hasMoreThanOne(filtered))
@@ -66,7 +45,7 @@ public class VerificationJwkSelector
             filtered = filter.filter(filtered);
         }
 
-        if (hasMoreThanOne(filtered) && EllipticCurveJsonWebKey.KEY_TYPE.equals(keyType))
+        if (hasMoreThanOne(filtered) && EllipticCurveJsonWebKey.KEY_TYPE.equals(jws.getKeyType()))
         {
             JsonWebSignatureAlgorithm algorithm = jws.getAlgorithm();
             EcdsaUsingShaAlgorithm ecdsaAlgorithm = (EcdsaUsingShaAlgorithm) algorithm;
