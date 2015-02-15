@@ -17,10 +17,12 @@
 package org.jose4j.jwx;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwa.Algorithm;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.keys.X509Util;
+import org.jose4j.lang.InvalidAlgorithmException;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
@@ -50,6 +52,8 @@ public abstract class JsonWebStructure
 
     abstract public String getPayload() throws JoseException;
     abstract public void setPayload(String payload);
+
+    abstract public Algorithm getAlgorithm() throws InvalidAlgorithmException;
 
     public static JsonWebStructure fromCompactSerialization(String cs) throws JoseException
     {

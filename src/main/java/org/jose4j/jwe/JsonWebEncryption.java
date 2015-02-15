@@ -17,6 +17,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwa.Algorithm;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwa.AlgorithmFactory;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
@@ -148,6 +149,12 @@ public class JsonWebEncryption extends JsonWebStructure
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
         AlgorithmFactory<KeyManagementAlgorithm> factory = factoryFactory.getJweKeyManagementAlgorithmFactory();
         return factory.getAlgorithm(algo);
+    }
+
+    @Override
+    public KeyManagementAlgorithm getAlgorithm() throws InvalidAlgorithmException
+    {
+        return getKeyManagementModeAlgorithm();
     }
 
     protected void setCompactSerializationParts(String[] parts) throws JoseException

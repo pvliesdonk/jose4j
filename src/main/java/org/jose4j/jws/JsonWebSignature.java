@@ -110,6 +110,7 @@ public class JsonWebSignature extends JsonWebStructure
         return validSignature;
     }
 
+    @Override
     public JsonWebSignatureAlgorithm getAlgorithm() throws InvalidAlgorithmException
     {
         String algo = getAlgorithmHeaderValue();
