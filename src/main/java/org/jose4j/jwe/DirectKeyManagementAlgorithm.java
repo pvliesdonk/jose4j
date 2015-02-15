@@ -17,6 +17,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.jwa.AlgorithmInfo;
+import org.jose4j.jwk.OctetSequenceJsonWebKey;
 import org.jose4j.jwx.Headers;
 import org.jose4j.jwx.KeyValidationSupport;
 import org.jose4j.keys.KeyPersuasion;
@@ -34,6 +35,7 @@ public class DirectKeyManagementAlgorithm extends AlgorithmInfo implements KeyMa
     {
         setAlgorithmIdentifier(KeyManagementAlgorithmIdentifiers.DIRECT);
         setKeyPersuasion(KeyPersuasion.SYMMETRIC);
+        setKeyType(OctetSequenceJsonWebKey.KEY_TYPE);
     }
 
     public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride) throws JoseException
