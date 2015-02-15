@@ -40,7 +40,6 @@ import java.util.List;
  */
 public class X509VerificationKeyResolverInJwtConsumerTest
 {
-    private static List<PublicJsonWebKey> JWK_LIST;
     private static List<X509Certificate> CERT_LIST;
 
     @BeforeClass
@@ -113,15 +112,12 @@ public class X509VerificationKeyResolverInJwtConsumerTest
                 "  \"d\": \"LzVM5880beqKgVOnrab4PCNiIEpaUa8niRaOsZY0apc\"\n" +
                 "}";
 
-        JWK_LIST = new ArrayList<>();
         CERT_LIST = new ArrayList<>();
         for (String s : new String[] {j0, j1, j2, j3, j4})
         {
             PublicJsonWebKey publicJsonWebKey = PublicJsonWebKey.Factory.newPublicJwk(s);
-            JWK_LIST.add(publicJsonWebKey);
             CERT_LIST.add(publicJsonWebKey.getLeafCertificate());
         }
-        JWK_LIST = Collections.unmodifiableList(JWK_LIST);
         CERT_LIST = Collections.unmodifiableList(CERT_LIST);
     }
 
