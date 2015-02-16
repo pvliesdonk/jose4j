@@ -258,4 +258,37 @@ public class DecryptionJwkSelectorTest
         selectedList = selector.selectList(jwe, jwks);
         assertTrue(selectedList.isEmpty());
     }
+
+    @Test
+    public void someKidSymmetricSelections() throws Exception
+    {
+        String json = "{\"keys\":[" +
+                "{\"kty\":\"oct\",\"kid\":\"one\", \"k\":\"1gfpc39Jq5H5eR_JbwmAojgUlHIH0GoKz7COzLY1nRE\"}," +
+                "{\"kty\":\"oct\",\"kid\":\"deux\",\"k\":\"9vlp7BLzRr-a9pOKK7BA25o88u6cY2o9Lz6--FfSWXw\"}," +
+                "{\"kty\":\"oct\",\"kid\":\"tres\",\"k\":\"i001zDJd6-7rP5pnldgK-jcDjT8N12o3bIjwgeWAYEc\"}," +
+                "{\"kty\":\"oct\",\"kid\":\"quatro\",\"k\":\"_-cqzgJ-_aeZkppR2JCOlx\"}," +
+                "{\"kty\":\"oct\",\"kid\":\"cinque\",\"k\":\"FFsrZpj_Fbeal88Rz0c2Lk\"}," +
+                "{\"kty\":\"oct\",\"kid\":\"sechs\", \"k\":\"ad2-dGiAp8czx9310j4o70\"}]}";
+
+        JsonWebKeySet jsonWebKeySet = new JsonWebKeySet(json);
+        List<JsonWebKey> jwks = jsonWebKeySet.getJsonWebKeys();
+
+        DecryptionJwkSelector selector = new DecryptionJwkSelector();
+
+        JsonWebEncryption jwe = new JsonWebEncryption();
+        jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.DIRECT);
+        jwe.setKeyIdHeaderValue("tres");
+        List<JsonWebKey> selectedList = selector.selectList(jwe, jwks);
+        assertThat(1, equalTo(selectedList.size()));
+        JsonWebKey selected = selector.select(jwe, jwks);
+        assertThat("tres", equalTo(selected.getKeyId()));
+
+        jwe = new JsonWebEncryption();
+        jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.A128KW);
+        jwe.setKeyIdHeaderValue("quatro");
+        selectedList = selector.selectList(jwe, jwks);
+        assertThat(1, equalTo(selectedList.size()));
+        selected = selector.select(jwe, jwks);
+        assertThat("quatro", equalTo(selected.getKeyId()));
+    }
 }
