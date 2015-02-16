@@ -17,10 +17,10 @@ package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwa.AlgorithmInfo;
+import org.jose4j.jwk.OctetSequenceJsonWebKey;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
 import org.jose4j.jwx.KeyValidationSupport;
-import org.jose4j.keys.AesKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidKeyException;
@@ -45,7 +45,7 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
         setAlgorithmIdentifier(alg);
         setJavaAlgorithm(SimpleAeadCipher.GCM_TRANSFORMATION_NAME);
         setKeyPersuasion(KeyPersuasion.SYMMETRIC);
-        setKeyType(AesKey.ALGORITHM);
+        setKeyType(OctetSequenceJsonWebKey.KEY_TYPE);
         simpleAeadCipher = new SimpleAeadCipher(getJavaAlgorithm(), TAG_BYTE_LENGTH);
         this.keyByteLength = keyByteLength;
 

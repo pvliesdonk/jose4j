@@ -17,8 +17,8 @@
 package org.jose4j.jwe;
 
 import org.jose4j.jwa.AlgorithmAvailability;
+import org.jose4j.jwk.OctetSequenceJsonWebKey;
 import org.jose4j.jwx.KeyValidationSupport;
-import org.jose4j.keys.AesKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.InvalidKeyException;
 
@@ -33,7 +33,7 @@ public class AesKeyWrapManagementAlgorithm extends WrappingKeyManagementAlgorith
     public AesKeyWrapManagementAlgorithm(String alg, int keyByteLength)
     {
         super("AESWrap", alg);
-        setKeyType(AesKey.ALGORITHM);
+        setKeyType(OctetSequenceJsonWebKey.KEY_TYPE);
         setKeyPersuasion(KeyPersuasion.SYMMETRIC);
         this.keyByteLength = keyByteLength;
     }
