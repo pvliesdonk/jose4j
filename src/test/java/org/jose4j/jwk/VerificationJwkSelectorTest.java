@@ -1018,4 +1018,34 @@ public class VerificationJwkSelectorTest
         assertThat(1, equalTo(selected.size()));
     }
 
+
+    @Test
+    public void someKidSymmetricSelections() throws Exception
+    {
+        String json = "{\"keys\":[" +
+                "{\"kty\":\"oct\",\"kid\":\"uno\",  \"k\":\"9gfpc39Jq5H5eR_JbwmAojgUlHIH0GoKz7COz000001\"}," +
+                "{\"kty\":\"oct\",\"kid\":\"two\",  \"k\":\"5vlp7BaxRr-a9pOKK7BKNCo88u6cY2o9Lz6-P--_01j\"}," +
+                "{\"kty\":\"oct\",\"kid\":\"trois\",\"k\":\"i001cccx6-7rP5p91NeHi3K-jcDjt8N12o3bIeWA081\"}]}";
+
+        JsonWebKeySet jsonWebKeySet = new JsonWebKeySet(json);
+        List<JsonWebKey> jwks = jsonWebKeySet.getJsonWebKeys();
+
+        VerificationJwkSelector selector = new VerificationJwkSelector();
+
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jws.setKeyIdHeaderValue("uno");
+        List<JsonWebKey> selectedList = selector.selectList(jws, jwks);
+        assertThat(1, equalTo(selectedList.size()));
+        JsonWebKey selected = selector.select(jws, jwks);
+        assertThat("uno", equalTo(selected.getKeyId()));
+
+        jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jws.setKeyIdHeaderValue("trois");
+        selectedList = selector.selectList(jws, jwks);
+        assertThat(1, equalTo(selectedList.size()));
+        selected = selector.select(jws, jwks);
+        assertThat("trois", equalTo(selected.getKeyId()));
+    }
 }

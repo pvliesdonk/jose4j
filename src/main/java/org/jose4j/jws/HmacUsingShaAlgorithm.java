@@ -18,7 +18,7 @@ package org.jose4j.jws;
 
 import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
-import org.jose4j.keys.HmacKey;
+import org.jose4j.jwk.OctetSequenceJsonWebKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidKeyException;
@@ -38,7 +38,7 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
         setAlgorithmIdentifier(id);
         setJavaAlgorithm(javaAlgo);
         setKeyPersuasion(KeyPersuasion.SYMMETRIC);
-        setKeyType(HmacKey.ALGORITHM);
+        setKeyType(OctetSequenceJsonWebKey.KEY_TYPE);
         this.minimumKeyLength = minimumKeyLength;
     }
 
