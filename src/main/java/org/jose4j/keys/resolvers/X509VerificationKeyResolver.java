@@ -20,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.keys.X509Util;
-import org.jose4j.keys.resolvers.VerificationKeyResolver;
 import org.jose4j.lang.ExceptionHelp;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.UncheckedJoseException;
