@@ -21,6 +21,7 @@ import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.jwk.JsonWebKey;
+import org.jose4j.jwk.JsonWebKeySet;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
@@ -33,6 +34,8 @@ import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.keys.resolvers.DecryptionKeyResolver;
+import org.jose4j.keys.resolvers.JwksDecryptionKeyResolver;
+import org.jose4j.keys.resolvers.JwksVerificationKeyResolver;
 import org.jose4j.keys.resolvers.VerificationKeyResolver;
 import org.jose4j.lang.UnresolvableKeyException;
 import org.junit.Assert;
@@ -41,6 +44,7 @@ import org.junit.Test;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -256,8 +260,10 @@ public class JwtConsumerTest
                 "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
         String jwk = "{\"kty\":\"oct\",\"k\":\"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow\"}";
 
+        JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk(jwk);
+        JwksVerificationKeyResolver resolver = new JwksVerificationKeyResolver(Collections.singletonList(jsonWebKey));
         JwtConsumer consumer = new JwtConsumerBuilder()
-                .setVerificationKey(JsonWebKey.Factory.newJwk(jwk).getKey())
+                .setVerificationKeyResolver(resolver)
                 .setEvaluationTime(NumericDate.fromSeconds(1300819372))
                 .setExpectedIssuer("joe")
                 .setRequireExpirationTime()
@@ -266,10 +272,12 @@ public class JwtConsumerTest
         Assert.assertTrue(context.getJwtClaims().getClaimValue("http://example.com/is_root", Boolean.class));
         assertThat(1, equalTo(context.getJoseObjects().size()));
 
+
+
         // require encryption and it will fail
         consumer = new JwtConsumerBuilder()
                 .setEnableRequireEncryption()
-                .setVerificationKey(JsonWebKey.Factory.newJwk(jwk).getKey())
+                .setVerificationKey(jsonWebKey.getKey())
                 .setEvaluationTime(NumericDate.fromSeconds(1300819372))
                 .setExpectedIssuer("joe")
                 .setRequireExpirationTime()
@@ -754,8 +762,9 @@ public class JwtConsumerTest
     {
         String jwt = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..zWNzKpA-QA0BboVl02nz-A.oSy4V6cQ6EnuIMyazDCqc9jEZMC7k8LwLKkrC12Pf-wpFRyDtQjGdIZ_Ndq9JMAnrCbx0bgFSxjKISbXbcnHiA.QsGX3JhHP1Pwy4zQ8Ha9FQ";
         JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"30WEMkbhwHPBkg_fIfm_4GuzIz5pPZB7_BSfI3dHbbQ\"}");
+        DecryptionKeyResolver decryptionKeyResolver = new JwksDecryptionKeyResolver(Collections.singletonList(jsonWebKey));
         JwtConsumer consumer = new JwtConsumerBuilder()
-                .setDecryptionKey(jsonWebKey.getKey())
+                .setDecryptionKeyResolver(decryptionKeyResolver)
                 .setEvaluationTime(NumericDate.fromSeconds(1420230888))
                 .setExpectedAudience("me")
                 .setExpectedIssuer("me")
@@ -773,6 +782,51 @@ public class JwtConsumerTest
         jwt = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..zWNzKpA-QA0BboVl02nz-A.u1D7JCpDFeRl69G1L-h3IRrmcOXiWLnhr23ugO2kkDqKVNcO1YQ4Xvl9Sag4aYOnkqUbqe6Wdz8KK3d9q178tA.QsGX3JhHP1Pwy4zQ8Ha9FQ";
         SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, consumer);
     }
+
+    @Test
+    public void hmacWithResolver() throws Exception
+    {
+        String json = "{\"keys\":[" +
+                "{\"kty\":\"oct\",\"kid\":\"_1\",  \"k\":\"9g99cnHIc3kMeR_JbwmAojgUlHIH0GoKz7COz9719x1\"}," +
+                "{\"kty\":\"oct\",\"kid\":\"_2\",  \"k\":\"vvlp7BacRr-a9pOKK7BKxZo88u6cY2o9Lz6-P--_01p\"}," +
+                "{\"kty\":\"oct\",\"kid\":\"_3\",\"k\":\"a991cccx6-7rP5p91nnHi3K-jcDjsFh1o34bIeWA081\"}]}";
+
+        JsonWebKeySet jsonWebKeySet = new JsonWebKeySet(json);
+
+        JwtClaims claims = new JwtClaims();
+        claims.setIssuer("from");
+        claims.setAudience("to", "oryou");
+        claims.setExpirationTimeMinutesInTheFuture(40);
+        claims.setSubject("about");
+        System.out.println(claims.toJson());
+
+
+        JsonWebKey jsonWebKey = jsonWebKeySet.findJsonWebKey("_3", null, null, null);
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setKeyIdHeaderValue(jsonWebKey.getKeyId());
+        jws.setKey(jsonWebKey.getKey());
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jws.setPayload(claims.toJson());
+        System.out.println(jws.getCompactSerialization());
+
+        String jwt = "eyJraWQiOiJfMyIsImFsZyI6IkhTMjU2In0" +
+                ".eyJpc3MiOiJmcm9tIiwiYXVkIjpbInRvIiwib3J5b3UiXSwiZXhwIjoxNDI0MDQxNTc0LCJzdWIiOiJhYm91dCJ9" +
+                ".jgC4hWHd1C4kkYiVIbung4vg44bQOEv3JkGupnRrYDk";
+
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setEvaluationTime(NumericDate.fromSeconds(1424041569))
+                .setExpectedAudience("to")
+                .setExpectedIssuer("from")
+                .setRequireSubject()
+                .setVerificationKeyResolver(new JwksVerificationKeyResolver(jsonWebKeySet.getJsonWebKeys()))
+                .setRequireExpirationTime()
+                .build();
+
+        JwtContext context = consumer.process(jwt);
+        assertThat(1, equalTo(context.getJoseObjects().size()));
+        assertThat("about", equalTo(context.getJwtClaims().getSubject()));
+    }
+
 
     @Test
     public void someBasicAudChecks() throws InvalidJwtException
