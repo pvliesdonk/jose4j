@@ -16,11 +16,14 @@
 package org.jose4j.jwt.consumer;
 
 import org.apache.commons.logging.LogFactory;
+import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.JsonWebKeySet;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.NumericDate;
 import org.jose4j.keys.resolvers.JwksVerificationKeyResolver;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -89,6 +92,56 @@ public class JwksVerificationKeyResolverUsingJwtConsumerTest
         {
             jwtClaims = jwtConsumer.processToClaims(badJwt);
             fail("shouldn't have processed/validated but got " + jwtClaims);
+        }
+        catch (InvalidJwtException e)
+        {
+            LogFactory.getLog(this.getClass()).debug("this was expected and is okay: " + e);
+        }
+    }
+
+    @Test
+    public void someHmacOnes() throws Exception
+    {
+        String json = "{\"keys\":[" +
+            "{\"kty\":\"oct\",\"kid\":\"uno\",  \"k\":\"i-41ccx6-7rPpCK0-i0Hi3K-jcDjt8V0aF9aWY8081d1i2c33pzq5H5eR_JbwmAojgUl727gGoKz7COz9cjic1\"}," +
+            "{\"kty\":\"oct\",\"kid\":\"two\",  \"k\":\"-v_lp7B__xRr-a90cIJqpNCo7u6cY2o9Lz6-P--_01j0aF9d8bcKdrPpCK0-i0Hi3K-jcDjt8V0aF9aWY8081d\"}," +
+            "{\"kty\":\"oct\",\"kid\":\"trois\",\"k\":\"i-41ccx6-7rPpCK0-i0Hi3K-jcDjt89Lz6-c_1_01ji-41ccx6-7rPpCK0-i0HiV0aF9d8bcKic10_aWY8081d\"}]}";
+
+        JsonWebKeySet jsonWebKeySet = new JsonWebKeySet(json);
+        List<JsonWebKey> jsonWebKeys = jsonWebKeySet.getJsonWebKeys();
+        JwksVerificationKeyResolver verificationKeyResolver = new JwksVerificationKeyResolver(jsonWebKeys);
+
+        String jwtWithTrios = "eyJhbGciOiJIUzUxMiIsImtpZCI6InRyb2lzIn0" +
+                ".eyJpc3MiOiJGUk9NIiwiYXVkIjoiVE8iLCJleHAiOjE0MjQyMTgyMDUsInN1YiI6IkFCT1VUIn0" +
+                ".FtkwFqyO7nH6_FNBa-1kMGS2yx8Qabi9kQJMW2jbFWhFHYrM3VTlFIUw1Qc6znJSzLnfveix3Hi5ukc6EgIvVg";
+
+        String jwtWithUno = "eyJhbGciOiJIUzUxMiIsImtpZCI6InVubyJ9" +
+                ".eyJpc3MiOiJGUk9NIiwiYXVkIjoiVE8iLCJleHAiOjE0MjQyMTg0MzYsInN1YiI6IkFCT1VUIn0" +
+                ".pJIcOeLWixUfePKf2ob4Piac6NByJUFlaZ5dXPoVVS1_NHIZr_9oLpFCOAe8HSqc47yO_d3bQ6mOExh1MXA6nQ";
+
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+            .setEvaluationTime(NumericDate.fromSeconds(1424218020))
+            .setExpectedAudience("TO")
+            .setExpectedIssuer("FROM")
+            .setRequireExpirationTime()
+            .setRequireSubject()
+            .setVerificationKeyResolver(verificationKeyResolver)
+            .build();
+
+        JwtClaims claims = jwtConsumer.processToClaims(jwtWithTrios);
+        assertThat("ABOUT", equalTo(claims.getSubject()));
+
+        claims = jwtConsumer.processToClaims(jwtWithUno);
+        assertThat("ABOUT", equalTo(claims.getSubject()));
+
+        String jwtWithNope = "eyJhbGciOiJIUzUxMiIsImtpZCI6Im5vcGUifQ" +
+                ".eyJpc3MiOiJGUk9NIiwiYXVkIjoiVE8iLCJleHAiOjE0MjQyMTg2NzksInN1YiI6IkFCT1VUIn0" +
+                ".lZOnt-l4wIUl667laxBjZgyTZsebfitsKT1yBrEQ-DognQiqEafQaVrFTaV3dJrZDvgDqAKL9FzxOHfdBg8NXw";
+
+        try
+        {
+            claims = jwtConsumer.processToClaims(jwtWithNope);
+            fail("shouldn't have processed/validated but got " + claims);
         }
         catch (InvalidJwtException e)
         {
