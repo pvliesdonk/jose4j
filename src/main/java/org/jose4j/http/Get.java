@@ -237,7 +237,7 @@ public class Get implements SimpleGet
             int i = 0;
             for (X509Certificate certificate : certificates)
             {
-                keyStore.setCertificateEntry("alias" + i, certificate);
+                keyStore.setCertificateEntry("alias" + i++, certificate);
             }
             trustMgrFactory.init(keyStore);
             TrustManager[] customTrustManagers = trustMgrFactory.getTrustManagers();
