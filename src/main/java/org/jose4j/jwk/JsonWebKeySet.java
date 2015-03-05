@@ -63,7 +63,7 @@ public class JsonWebKeySet
 
     public JsonWebKeySet(JsonWebKey... keys)
     {
-        this.keys = Arrays.asList(keys);
+        this(Arrays.asList(keys));
     }
 
     public JsonWebKeySet(List<? extends JsonWebKey> keys)
@@ -73,6 +73,11 @@ public class JsonWebKeySet
         {
             this.keys.add(jwk);
         }
+    }
+
+    public void addJsonWebKey(JsonWebKey jsonWebKey)
+    {
+        keys.add(jsonWebKey);
     }
 
     public List<JsonWebKey> getJsonWebKeys()

@@ -278,4 +278,26 @@ public class JsonWebKeySetTest extends TestCase
         assertEquals(jwks.getJsonWebKeys().size(), newJwks.getJsonWebKeys().size());
     }
 
+    public void testNewWithVarArgsAndAddLater() throws Exception
+    {
+        JsonWebKey jwk1 = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"bbj4v-CvqwOm1q3WkVJEpw\"}");
+        JsonWebKey jwk2 = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"h008v_ab_Z-N7q13D-JabC\"}");
+        JsonWebKey jwk3 = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"-_-8888888888888888-_-\"}");
+        JsonWebKey jwk4 = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"__--_12_--33--_21_--__\"}");
+
+        JsonWebKeySet jwks = new JsonWebKeySet(jwk1);
+        jwks.addJsonWebKey(jwk2);
+        List<JsonWebKey> jwkList = jwks.getJsonWebKeys();
+        jwkList.add(jwk3);
+
+        assertEquals(3, jwkList.size());
+        assertEquals(3, jwks.getJsonWebKeys().size());
+
+        jwks = new JsonWebKeySet(jwkList);
+        jwks.addJsonWebKey(jwk4);
+
+        assertEquals(4, jwks.getJsonWebKeys().size());
+    }
+
+
 }
