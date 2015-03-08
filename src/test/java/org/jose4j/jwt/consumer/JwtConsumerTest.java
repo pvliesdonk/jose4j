@@ -82,6 +82,19 @@ public class JwtConsumerTest
         Assert.assertThat(NumericDate.fromSeconds(1300819380), equalTo(jcs.getExpirationTime()));
         Assert.assertTrue(jcs.getClaimValue("http://example.com/is_root", Boolean.class));
 
+        // just ensure that getting claims that aren't there returns null and doesn't throw an exception
+        Assert.assertNull(jcs.getStringClaimValue("no-such-claim"));
+        Assert.assertNull(jcs.getClaimValue("no way jose", Boolean.class));
+        Assert.assertNull(jcs.getStringListClaimValue("nope"));
+
+        Assert.assertTrue(jcs.hasClaim("http://example.com/is_root"));
+        Object objectClaimValue = jcs.getClaimValue("http://example.com/is_root");
+        Assert.assertNotNull(objectClaimValue);
+
+        Assert.assertFalse(jcs.hasClaim("nope"));
+        objectClaimValue = jcs.getClaimValue("nope");
+        Assert.assertNull(objectClaimValue);
+
 
         // fails w/ default constraints
         consumer = new JwtConsumerBuilder()

@@ -234,6 +234,16 @@ public class JwtClaims
         }
     }
 
+    public Object getClaimValue(String claimName)
+    {
+        return claimsMap.get(claimName);
+    }
+
+    public boolean hasClaim(String claimName)
+    {
+        return getClaimValue(claimName) != null;
+    }
+
     private String classCastMsg(ClassCastException e, Object o)
     {
         return "(" + o + " - " +e.getMessage() + ")";

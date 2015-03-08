@@ -434,12 +434,19 @@ public class JwtClaimsTest
 
         JwtClaims parsedJcs = JwtClaims.parse(jcs.toJson());
         Assert.assertThat(parsedJcs.getStringClaimValue("s"), equalTo("value"));
+        Assert.assertTrue(parsedJcs.hasClaim("s"));
+        Assert.assertNotNull(parsedJcs.getClaimValue("s"));
         Assert.assertThat(parsedJcs.getStringListClaimValue("sa1"), equalTo(Arrays.asList("a", "b", "c")));
         Assert.assertThat(parsedJcs.getStringListClaimValue("sa2"), equalTo(Arrays.asList("1", "2")));
         Assert.assertThat(parsedJcs.getStringListClaimValue("sa3"), equalTo(Collections.singletonList("single")));
         Assert.assertThat(parsedJcs.getStringListClaimValue("sa4"), equalTo(Collections.singletonList("single")));
         Assert.assertThat(parsedJcs.getStringListClaimValue("sa5"), equalTo(Collections.<String>emptyList()));
         Assert.assertThat(parsedJcs.getStringListClaimValue("sa6"), equalTo(Collections.<String>emptyList()));
+        Assert.assertNull(parsedJcs.getStringListClaimValue("nope"));
+        Assert.assertNull(parsedJcs.getStringClaimValue("nope"));
+        Assert.assertNull(parsedJcs.getClaimValue("nope", Boolean.class));
+        Assert.assertFalse(parsedJcs.hasClaim("nope"));
+        Assert.assertNull(parsedJcs.getClaimValue("nope"));
         Assert.assertTrue(parsedJcs.isClaimValueOfType("n", Number.class));
         Number n = jcs.getClaimValue("n", Number.class);
         Assert.assertThat(16, equalTo(n.intValue()));
