@@ -53,6 +53,7 @@ public class Get implements SimpleGet
     private boolean progressiveRetryWait = true;
     private SSLSocketFactory sslSocketFactory;
     private HostnameVerifier hostnameVerifier;
+    private int responseBodySizeLimit = 1024 * 512;
 
     @Override
     public SimpleResponse get(String location) throws IOException
@@ -88,7 +89,7 @@ public class Get implements SimpleGet
                 if (log.isDebugEnabled()) { log.debug("HTTP GET of " + url + " returned " + simpleResponse);}
                 return simpleResponse;
             }
-            catch (SSLHandshakeException | SSLPeerUnverifiedException | FileNotFoundException e)
+            catch (SSLHandshakeException | SSLPeerUnverifiedException | FileNotFoundException | ResponseBodyTooLargeException e)
             {
                 throw e;
             }
@@ -112,12 +113,19 @@ public class Get implements SimpleGet
         try (InputStream is = urlConnection.getInputStream();
              InputStreamReader isr = new InputStreamReader(is, charset))
         {
+            int charactersRead = 0;
             char[] buffer = new char[1024];
             int n;
             while (-1 != (n = isr.read(buffer)))
             {
                 writer.write(buffer, 0, n);
+                charactersRead += n;
+                if (responseBodySizeLimit > 0 && charactersRead > responseBodySizeLimit)
+                {
+                    throw new ResponseBodyTooLargeException("More than " + responseBodySizeLimit + " characters have been read from the response body.");
+                }
             }
+            log.debug("read " + charactersRead + " characters");
         }
         return writer.toString();
     }
@@ -227,6 +235,15 @@ public class Get implements SimpleGet
         this.initialRetryWaitTime = initialRetryWaitTime;
     }
 
+    /**
+     * in number of characters, -1 indicates no limit
+     * @param responseBodySizeLimit
+     */
+    public void setResponseBodySizeLimit(int responseBodySizeLimit)
+    {
+        this.responseBodySizeLimit = responseBodySizeLimit;
+    }
+
     public void setTrustedCertificates(Collection<X509Certificate> certificates)
     {
         try
@@ -251,4 +268,11 @@ public class Get implements SimpleGet
         }
     }
 
+    private static class ResponseBodyTooLargeException extends IOException
+    {
+        public ResponseBodyTooLargeException(String message)
+        {
+            super(message);
+        }
+    }
 }
