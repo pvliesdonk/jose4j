@@ -26,11 +26,19 @@ import java.util.List;
 */
 public class JwtContext
 {
+    private String jwt;
     private JwtClaims jwtClaims;
     private List<JsonWebStructure> joseObjects;
 
     public JwtContext(JwtClaims jwtClaims, List<JsonWebStructure> joseObjects)
     {
+        this.jwtClaims = jwtClaims;
+        this.joseObjects = joseObjects;
+    }
+
+    public JwtContext(String jwt, JwtClaims jwtClaims, List<JsonWebStructure> joseObjects)
+    {
+        this.jwt = jwt;
         this.jwtClaims = jwtClaims;
         this.joseObjects = joseObjects;
     }
@@ -48,5 +56,10 @@ public class JwtContext
     public List<JsonWebStructure> getJoseObjects()
     {
         return joseObjects;
+    }
+
+    public String getJwt()
+    {
+        return jwt;
     }
 }

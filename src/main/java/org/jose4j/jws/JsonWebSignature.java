@@ -94,14 +94,14 @@ public class JsonWebSignature extends JsonWebStructure
 
     public boolean verifySignature() throws JoseException
     {
+        JsonWebSignatureAlgorithm algorithm = getAlgorithm();
+        Key verificationKey = getKey();
+        if (isDoKeyValidation())
+        {
+            algorithm.validateVerificationKey(verificationKey);
+        }
         if (validSignature == null)
         {
-            JsonWebSignatureAlgorithm algorithm = getAlgorithm();
-            Key verificationKey = getKey();
-            if (isDoKeyValidation())
-            {
-                algorithm.validateVerificationKey(verificationKey);
-            }
             byte[] signatureBytes = getSignature();
             byte[] inputBytes = getSigningInputBytes();
             validSignature = algorithm.verifySignature(signatureBytes, verificationKey, inputBytes);

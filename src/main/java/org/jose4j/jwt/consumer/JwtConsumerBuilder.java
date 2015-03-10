@@ -49,6 +49,8 @@ public class JwtConsumerBuilder
 
     private boolean skipSignatureVerification = false;
 
+    private boolean skipAllValidators = false;
+
     private boolean liberalContentTypeHandling;
 
     public JwtConsumerBuilder setEnableRequireEncryption()
@@ -75,6 +77,11 @@ public class JwtConsumerBuilder
         return this;
     }
 
+    public JwtConsumerBuilder setSkipAllValidators()
+    {
+        skipAllValidators = true;
+        return this;
+    }
 
     public JwtConsumerBuilder setJwsAlgorithmConstraints(AlgorithmConstraints constraints)
     {
@@ -197,24 +204,27 @@ public class JwtConsumerBuilder
     public JwtConsumer build()
     {
         List<Validator> validators = new ArrayList<>();
-        if (audValidator == null)
+        if (!skipAllValidators)
         {
-            audValidator = new AudValidator(Collections.<String>emptySet(), false);
+            if (audValidator == null)
+            {
+                audValidator = new AudValidator(Collections.<String>emptySet(), false);
+            }
+            validators.add(audValidator);
+
+            if (issValidator == null)
+            {
+                issValidator = new IssValidator(null, false);
+            }
+            validators.add(issValidator);
+
+            validators.add(dateClaimsValidator);
+
+            validators.add(new SubValidator(requireSubject));
+            validators.add(new JtiValidator(requireJti));
+
+            validators.addAll(customValidators);
         }
-        validators.add(audValidator);
-
-        if (issValidator == null)
-        {
-            issValidator = new IssValidator(null, false);
-        }
-        validators.add(issValidator);
-
-        validators.add(dateClaimsValidator);
-
-        validators.add(new SubValidator(requireSubject));
-        validators.add(new JtiValidator(requireJti));
-
-        validators.addAll(customValidators);
 
         JwtConsumer jwtConsumer = new JwtConsumer();
         jwtConsumer.setValidators(validators);

@@ -45,6 +45,8 @@ public abstract class JsonWebStructure
 
     protected boolean doKeyValidation = true;
 
+    protected String rawCompactSerialization;
+
     private AlgorithmConstraints algorithmConstraints = AlgorithmConstraints.NO_CONSTRAINTS;
 
     abstract public String getCompactSerialization() throws JoseException;
@@ -76,6 +78,7 @@ public abstract class JsonWebStructure
         }
 
         jsonWebObject.setCompactSerializationParts(parts);
+        jsonWebObject.rawCompactSerialization = cs;
         return jsonWebObject;
     }
 
@@ -83,6 +86,7 @@ public abstract class JsonWebStructure
     {
     	String[] parts = CompactSerializer.deserialize(compactSerialization);
         setCompactSerializationParts(parts);
+        rawCompactSerialization = compactSerialization;
     }
 
     /**
@@ -228,5 +232,17 @@ public abstract class JsonWebStructure
     public void setAlgorithmConstraints(AlgorithmConstraints algorithmConstraints)
     {
         this.algorithmConstraints = algorithmConstraints;
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName()).append(getHeaders().getFullHeaderAsJsonString());
+        if (rawCompactSerialization != null)
+        {
+            sb.append("->").append(rawCompactSerialization);
+        }
+        return sb.toString();
     }
 }

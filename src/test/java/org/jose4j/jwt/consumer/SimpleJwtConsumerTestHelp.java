@@ -30,7 +30,7 @@ public class SimpleJwtConsumerTestHelp
 {
     static Log log = LogFactory.getLog(SimpleJwtConsumerTestHelp.class);
 
-    static void expectProcessingFailure(String jwt, JwtConsumer jwtConsumer)
+    static void expectProcessingFailure(String jwt, JwtContext jwtContext, JwtConsumer jwtConsumer)
     {
         try
         {
@@ -40,6 +40,19 @@ public class SimpleJwtConsumerTestHelp
         catch (InvalidJwtException e)
         {
             log.debug("Expected exception: " + e);
+        }
+
+        if (jwtContext != null)
+        {
+            try
+            {
+                jwtConsumer.processContext(jwtContext);
+                Assert.fail("jwt context process/validation should have thrown an exception");
+            }
+            catch (InvalidJwtException e)
+            {
+                log.debug("Expected exception: " + e);
+            }
         }
     }
 

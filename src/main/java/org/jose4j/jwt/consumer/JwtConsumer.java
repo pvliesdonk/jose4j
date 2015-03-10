@@ -115,25 +115,24 @@ public class JwtConsumer
         return process(jwt).getJwtClaims();
     }
 
-    public JwtContext process(String jwt) throws InvalidJwtException
+    public void processContext(JwtContext jwtContext) throws InvalidJwtException
     {
-        JwtClaims jwtClaims = null;
-        LinkedList<JsonWebStructure> joseObjects = new LinkedList<>();
-
         boolean hasSignature = false;
         boolean hasEncryption = false;
 
-        while (jwtClaims == null)
+        ArrayList<JsonWebStructure> originalJoseObjects = new ArrayList<>(jwtContext.getJoseObjects());
+
+        for (int idx = originalJoseObjects.size() - 1 ; idx >= 0 ; idx--)
         {
-            JsonWebStructure joseObject;
+            List<JsonWebStructure> joseObjects = originalJoseObjects.subList(idx+1, originalJoseObjects.size());
+            JsonWebStructure currentJoseObject = originalJoseObjects.get(idx);
+
             try
             {
-                joseObject = JsonWebStructure.fromCompactSerialization(jwt);
-                String payload;
-                if (joseObject instanceof JsonWebSignature)
-                {
-                    JsonWebSignature jws = (JsonWebSignature) joseObject;
 
+                if (currentJoseObject instanceof JsonWebSignature)
+                {
+                    JsonWebSignature jws = (JsonWebSignature) currentJoseObject;
                     if (!skipSignatureVerification)
                     {
                         Key key = verificationKeyResolver.resolveKey(jws, Collections.unmodifiableList(joseObjects));
@@ -142,22 +141,102 @@ public class JwtConsumer
                         {
                             jws.setAlgorithmConstraints(jwsAlgorithmConstraints);
                         }
+
                         if (!jws.verifySignature())
                         {
-                            throw new InvalidJwtSignatureException("JWS signature is invalid: " + jwt);
+                            throw new InvalidJwtSignatureException("JWS signature is invalid: " + jws);
                         }
-
-                        payload = jws.getPayload();
-                    }
-                    else
-                    {
-                        payload = jws.getUnverifiedPayload();
                     }
 
-                    if (!jws.getAlgorithmHeaderValue().equals(AlgorithmIdentifiers.NONE))
+
+                    if (!currentJoseObject.getAlgorithmHeaderValue().equals(AlgorithmIdentifiers.NONE))
                     {
                         hasSignature = true;
                     }
+
+                }
+                else
+                {
+                    JsonWebEncryption jwe = (JsonWebEncryption) currentJoseObject;
+
+                    Key key = decryptionKeyResolver.resolveKey(jwe, Collections.unmodifiableList(joseObjects));
+                    if (key != null && !key.equals(jwe.getKey()))
+                    {
+                        throw new InvalidJwtException("The resolved decryption key is different than the one originally used to decrypt the JWE.");
+                    }
+
+                    if (jweAlgorithmConstraints != null)
+                    {
+                        jweAlgorithmConstraints.checkConstraint(jwe.getAlgorithmHeaderValue());
+                    }
+
+                    if (jweContentEncryptionAlgorithmConstraints != null)
+                    {
+                        jweContentEncryptionAlgorithmConstraints.checkConstraint(jwe.getEncryptionMethodHeaderParameter());
+                    }
+
+                    hasEncryption = true;
+                }
+            }
+            catch (JoseException e)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Unable to process");
+                if (!joseObjects.isEmpty())
+                {
+                    sb.append(" nested");
+                }
+                sb.append(" JOSE object (cause: ").append(e).append("): ").append(currentJoseObject);
+                throw new InvalidJwtException(sb.toString(), e);
+            }
+            catch (InvalidJwtException e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Unexpected exception encountered while processing");
+                if (!joseObjects.isEmpty())
+                {
+                    sb.append(" nested");
+                }
+                sb.append(" JOSE object (").append(e).append("): ").append(currentJoseObject);
+                throw new InvalidJwtException(sb.toString(), e);
+            }
+        }
+
+
+        if (requireSignature && !hasSignature)
+        {
+            throw new InvalidJwtException("The JWT has no signature but the JWT Consumer is configured to require one: " + jwtContext.getJwt());
+        }
+
+        if (requireEncryption && !hasEncryption)
+        {
+            throw new InvalidJwtException("The JWT has no encryption but the JWT Consumer is configured to require it: " + jwtContext.getJwt());
+        }
+
+        validate(jwtContext);
+    }
+
+    public JwtContext process(String jwt) throws InvalidJwtException
+    {
+        String workingJwt = jwt;
+        JwtClaims jwtClaims = null;
+        LinkedList<JsonWebStructure> joseObjects = new LinkedList<>();
+
+        while (jwtClaims == null)
+        {
+            JsonWebStructure joseObject;
+            try
+            {
+                joseObject = JsonWebStructure.fromCompactSerialization(workingJwt);
+                String payload;
+                if (joseObject instanceof JsonWebSignature)
+                {
+                    JsonWebSignature jws = (JsonWebSignature) joseObject;
+                    payload = jws.getUnverifiedPayload();
                 }
                 else
                 {
@@ -174,14 +253,12 @@ public class JwtConsumer
                         jwe.setContentEncryptionAlgorithmConstraints(jweContentEncryptionAlgorithmConstraints);
                     }
 
-                    hasEncryption = true;
                     payload = jwe.getPayload();
                 }
 
-
                 if (isNestedJwt(joseObject))
                 {
-                    jwt = payload;
+                    workingJwt = payload;
                 }
                 else
                 {
@@ -196,7 +273,7 @@ public class JwtConsumer
                             try
                             {
                                 JsonWebStructure.fromCompactSerialization(jwt);
-                                jwt = payload;
+                                workingJwt = payload;
                             }
                             catch (JoseException je)
                             {
@@ -220,7 +297,7 @@ public class JwtConsumer
                 {
                     sb.append(" nested");
                 }
-                sb.append(" JOSE object (cause: ").append(e).append("): ").append(jwt);
+                sb.append(" JOSE object (cause: ").append(e).append("): ").append(workingJwt);
                 throw new InvalidJwtException(sb.toString(), e);
             }
             catch (InvalidJwtException e)
@@ -235,23 +312,13 @@ public class JwtConsumer
                 {
                     sb.append(" nested");
                 }
-                sb.append(" JOSE object (").append(e).append("): ").append(jwt);
+                sb.append(" JOSE object (").append(e).append("): ").append(workingJwt);
                 throw new InvalidJwtException(sb.toString(), e);
             }
         }
 
-        if (requireSignature && !hasSignature)
-        {
-            throw new InvalidJwtException("The JWT has no signature but the JWT Consumer is configured to require one: " + jwt);
-        }
-
-        if (requireEncryption && !hasEncryption)
-        {
-            throw new InvalidJwtException("The JWT has no encryption but the JWT Consumer is configured to require it: " + jwt);
-        }
-
-        JwtContext jwtContext = new JwtContext(jwtClaims, Collections.unmodifiableList(joseObjects));
-        validate(jwtContext);
+        JwtContext jwtContext = new JwtContext(jwt, jwtClaims, Collections.unmodifiableList(joseObjects));
+        processContext(jwtContext);
         return jwtContext;
     }
 
