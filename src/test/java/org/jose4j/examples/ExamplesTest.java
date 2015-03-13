@@ -23,6 +23,7 @@ import org.jose4j.jwk.*;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
+import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.consumer.*;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleEcKeysFromJws;
@@ -49,7 +50,7 @@ public class ExamplesTest
 {
 
 @Test
-public void jwtRoundTripExample() throws JoseException
+public void jwtRoundTripExample() throws JoseException, InvalidJwtException, MalformedClaimException
 {
     //
     // JSON Web Token is a compact URL-safe means of representing claims/attributes to be transferred between two parties.
@@ -234,6 +235,47 @@ public void jwtRoundTripExample() throws JoseException
     // Note that on the producing side, the X.509 Certificate Thumbprint Header
     // can be set like this on the JWS (which is the JWT)
     jws.setX509CertSha1ThumbprintHeaderValue(certificate);
+
+
+
+    // In some cases you won't have enough information to set up your JWT consumer without cracking open
+    // the JWT first. For example, in some contexts you might not know who issued the token without looking
+    // at the "iss" claim inside the JWT.
+    // This can be done efficiently and relatively easily using two JwtConsumers in a "two-pass" validation
+    // of sorts - the first JwtConsumer parses the JWT and the second one does the actual validation.
+
+    // Build a JwtConsumer that doesn't check signatures or do any validation.
+    JwtConsumer firstPassJwtConsumer = new JwtConsumerBuilder()
+            .setSkipAllValidators()
+            .setDisableRequireSignature()
+            .setSkipSignatureVerification()
+            .build();
+
+    //The first JwtConsumer is basically just used to parse the JWT into a JwtContext object.
+    JwtContext jwtContext = firstPassJwtConsumer.process(jwt);
+
+    // From the JwtContext we can get the issuer, or whatever else we might need,
+    // to lookup or figure out the kind of validation policy to apply
+    String issuer = jwtContext.getJwtClaims().getIssuer();
+
+    // Just using the same key here but you might, for example, have a JWKS URIs configured for
+    // each issuer, which you'd use to set up a HttpsJwksVerificationKeyResolver
+    Key verificationKey = rsaJsonWebKey.getKey();
+
+    // Using info from the JwtContext, this JwtConsumer is set up to verify
+    // the signature and validate the claims.
+    JwtConsumer secondPassJwtConsumer = new JwtConsumerBuilder()
+            .setExpectedIssuer(issuer)
+            .setVerificationKey(verificationKey)
+            .setRequireExpirationTime()
+            .setAllowedClockSkewInSeconds(30)
+            .setRequireSubject()
+            .setExpectedAudience("Audience")
+            .build();
+
+    // Finally using the second JwtConsumer to actually validate the JWT. This operates on
+    // the JwtContext from the first processing pass, which avoids redundant parsing/processing.
+    secondPassJwtConsumer.processContext(jwtContext);
 }
 
 @Test
