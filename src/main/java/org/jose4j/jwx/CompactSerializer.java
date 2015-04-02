@@ -16,8 +16,6 @@
 
 package org.jose4j.jwx;
 
-import org.jose4j.lang.JoseException;
-
 /**
  */
 public class CompactSerializer
@@ -42,7 +40,7 @@ public class CompactSerializer
         return parts;
     }
 
-    public static String serialize(String... parts) throws JoseException
+    public static String serialize(String... parts)
     {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < parts.length; i++)
