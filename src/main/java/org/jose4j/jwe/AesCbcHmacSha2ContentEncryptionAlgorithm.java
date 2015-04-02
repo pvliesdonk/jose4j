@@ -52,7 +52,11 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         contentEncryptionKeyDescriptor = new ContentEncryptionKeyDescriptor(cekByteLen, AesKey.ALGORITHM);
         this.hmacJavaAlgorithm = javaHmacAlg;
         this.tagTruncationLength = tagTruncationLength;
+
+        // This actually ends up with a cipher that does AES/CBC/PKCS7Padding but the JCA wants PKCS5Padding in the name
+        // A thread on it in the JOSE WG at http://www.ietf.org/mail-archive/web/jose/current/msg05031.html
         setJavaAlgorithm("AES/CBC/PKCS5Padding");
+
         setKeyPersuasion(KeyPersuasion.SYMMETRIC);
         setKeyType(AesKey.ALGORITHM);
     }
