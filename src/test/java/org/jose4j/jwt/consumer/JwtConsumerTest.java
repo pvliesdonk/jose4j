@@ -23,11 +23,13 @@ import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.JsonWebKeySet;
 import org.jose4j.jwk.PublicJsonWebKey;
+import org.jose4j.jwk.SimpleJwkFilter;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.NumericDate;
+import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
@@ -37,6 +39,7 @@ import org.jose4j.keys.resolvers.DecryptionKeyResolver;
 import org.jose4j.keys.resolvers.JwksDecryptionKeyResolver;
 import org.jose4j.keys.resolvers.JwksVerificationKeyResolver;
 import org.jose4j.keys.resolvers.VerificationKeyResolver;
+import org.jose4j.lang.JoseException;
 import org.jose4j.lang.UnresolvableKeyException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -844,6 +847,66 @@ public class JwtConsumerTest
         jwtClaims = context.getJwtClaims();
         Assert.assertThat("eh", equalTo(jwtClaims.getStringClaimValue("message")));
         consumer.processContext(jwtContext);
+    }
+
+    @Test
+    public void ctyRoundTrip() throws JoseException, InvalidJwtException, MalformedClaimException
+    {
+        JsonWebKeySet jwks = new JsonWebKeySet("{\"keys\":[" +
+                "{\"kty\":\"oct\",\"kid\":\"hk1\",\"alg\":\"HS256\",\"k\":\"RYCCH0Qai_7Clk_GnfBElTFIa5VJP3pJUDd8g5H0PKs\"}," +
+                "{\"kty\":\"oct\",\"kid\":\"ek1\",\"alg\":\"A128KW\",\"k\":\"Qi38jqNMENlgKaVRbhKWnQ\"}]}");
+
+        SimpleJwkFilter filter = new SimpleJwkFilter();
+        filter.setKid("hk1", false);
+        JsonWebKey hmacKey = filter.filter(jwks.getJsonWebKeys()).iterator().next();
+
+        filter = new SimpleJwkFilter();
+        filter.setKid("ek1", false);
+        JsonWebKey encKey = filter.filter(jwks.getJsonWebKeys()).iterator().next();
+
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("subject");
+        claims.setAudience("audience");
+        claims.setIssuer("issuer");
+        claims.setExpirationTimeMinutesInTheFuture(10);
+        claims.setNotBeforeMinutesInThePast(5);
+        claims.setGeneratedJwtId();
+
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jws.setPayload(claims.toJson());
+        jws.setKey(hmacKey.getKey());
+        jws.setKeyIdHeaderValue(hmacKey.getKeyId());
+        String innerJwt = jws.getCompactSerialization();
+
+        JsonWebEncryption jwe = new JsonWebEncryption();
+        jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.A128KW);
+        jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+        jwe.setKey(encKey.getKey());
+        jwe.setKeyIdHeaderValue(encKey.getKeyId());
+        jwe.setContentTypeHeaderValue("JWT");
+        jwe.setPayload(innerJwt);
+        String jwt = jwe.getCompactSerialization();
+
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                .setExpectedIssuer("issuer")
+                .setExpectedAudience("audience")
+                .setRequireSubject()
+                .setRequireExpirationTime()
+                .setDecryptionKey(encKey.getKey())
+                .setVerificationKey(hmacKey.getKey())
+                .build();
+
+        JwtContext jwtContext = jwtConsumer.process(jwt);
+        Assert.assertThat("subject", equalTo(jwtContext.getJwtClaims().getSubject()));
+        List<JsonWebStructure> joseObjects = jwtContext.getJoseObjects();
+        JsonWebStructure outerJsonWebObject = joseObjects.get(joseObjects.size() - 1);
+        Assert.assertTrue(outerJsonWebObject instanceof JsonWebEncryption);
+        Assert.assertThat("JWT", equalTo(outerJsonWebObject.getContentTypeHeaderValue()));
+        Assert.assertThat("JWT", equalTo(outerJsonWebObject.getHeader(HeaderParameterNames.CONTENT_TYPE)));
+        Assert.assertThat("JWT", equalTo(outerJsonWebObject.getHeaders().getStringHeaderValue(HeaderParameterNames.CONTENT_TYPE)));
+        JsonWebStructure innerJsonWebObject = joseObjects.get(0);
+        Assert.assertTrue(innerJsonWebObject instanceof JsonWebSignature);
     }
 
     @Test

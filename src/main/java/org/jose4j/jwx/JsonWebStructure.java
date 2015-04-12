@@ -141,6 +141,16 @@ public abstract class JsonWebStructure
         return getHeader(HeaderParameterNames.ALGORITHM);
     }
 
+    public void setContentTypeHeaderValue(String cty)
+    {
+        setHeader(HeaderParameterNames.CONTENT_TYPE, cty);
+    }
+
+    public String getContentTypeHeaderValue()
+    {
+        return getHeader(HeaderParameterNames.CONTENT_TYPE);
+    }
+
     public void setKeyIdHeaderValue(String kid)
     {
         setHeader(HeaderParameterNames.KEY_ID, kid);

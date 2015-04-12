@@ -357,7 +357,7 @@ public class JwtConsumer
 
     private boolean isNestedJwt(JsonWebStructure joseObject)
     {
-        String cty = joseObject.getHeaders().getStringHeaderValue(HeaderParameterNames.CONTENT_TYPE);
+        String cty = joseObject.getContentTypeHeaderValue();
         return cty != null && (cty.equalsIgnoreCase("jwt") || cty.equalsIgnoreCase("application/jwt"));
     }
 
