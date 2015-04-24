@@ -29,4 +29,11 @@ public class PbkdfKey extends SecretKeySpec
     {
         super(StringUtil.getBytesUtf8(password), ALGORITHM);
     }
+
+    // todo a char[] version? Like PBEKeySpec and other java stuff does and for the same reasons
+    // "Also note that this class stores passwords as char arrays instead of String objects
+    // (which would seem more logical), because the String class is immutable and there is no way to
+    // overwrite its internal value when the password stored in it is no longer needed. Hence, this
+    // class requests the password as a char array, so it can be overwritten when done."
+    // -- http://docs.oracle.com/javase/7/docs/api/javax/crypto/spec/PBEKeySpec.html
 }
