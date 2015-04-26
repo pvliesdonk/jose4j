@@ -36,6 +36,7 @@ public class JwtConsumerBuilder
     private AlgorithmConstraints jweAlgorithmConstraints;
     private AlgorithmConstraints jweContentEncryptionAlgorithmConstraints;
 
+    private boolean skipDefaultAudienceValidation;
     private AudValidator audValidator;
     private IssValidator issValidator;
     private boolean requireSubject;
@@ -136,6 +137,12 @@ public class JwtConsumerBuilder
         return this;
     }
 
+    public JwtConsumerBuilder setSkipDefaultAudienceValidation()
+    {
+        skipDefaultAudienceValidation = true;
+        return this;
+    }
+
     public JwtConsumerBuilder setExpectedIssuer(boolean requireIssuer, String expectedIssuer)
     {
         issValidator = new IssValidator(expectedIssuer, requireIssuer);
@@ -214,11 +221,14 @@ public class JwtConsumerBuilder
         List<Validator> validators = new ArrayList<>();
         if (!skipAllValidators)
         {
-            if (audValidator == null)
+            if (!skipDefaultAudienceValidation)
             {
-                audValidator = new AudValidator(Collections.<String>emptySet(), false);
+                if (audValidator == null)
+                {
+                    audValidator = new AudValidator(Collections.<String>emptySet(), false);
+                }
+                validators.add(audValidator);
             }
-            validators.add(audValidator);
 
             if (issValidator == null)
             {
