@@ -39,6 +39,7 @@ public class JwtConsumerBuilder
     private AudValidator audValidator;
     private IssValidator issValidator;
     private boolean requireSubject;
+    private String expectedSubject;
     private boolean requireJti;
     private NumericDateValidator dateClaimsValidator = new NumericDateValidator();
 
@@ -152,6 +153,13 @@ public class JwtConsumerBuilder
         return this;
     }
 
+    public JwtConsumerBuilder setExpectedSubject(String subject)
+    {
+        this.expectedSubject = subject;
+        return setRequireSubject();
+    }
+
+
     public JwtConsumerBuilder setRequireJwtId()
     {
         this.requireJti = true;
@@ -220,7 +228,8 @@ public class JwtConsumerBuilder
 
             validators.add(dateClaimsValidator);
 
-            validators.add(new SubValidator(requireSubject));
+            SubValidator subValidator = expectedSubject == null ? new SubValidator(requireSubject) : new SubValidator(expectedSubject);
+            validators.add(subValidator);
             validators.add(new JtiValidator(requireJti));
 
             validators.addAll(customValidators);

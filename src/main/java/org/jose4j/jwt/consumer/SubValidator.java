@@ -25,11 +25,17 @@ import org.jose4j.jwt.MalformedClaimException;
 public class SubValidator implements Validator
 {
     private boolean requireSubject;
-
+    private String expectedSubject;
 
     public SubValidator(boolean requireSubject)
     {
         this.requireSubject = requireSubject;
+    }
+
+    public SubValidator(String expectedSubject)
+    {
+        this(true);
+        this.expectedSubject = expectedSubject;
     }
 
     @Override
@@ -37,6 +43,15 @@ public class SubValidator implements Validator
     {
         JwtClaims jwtClaims = jwtContext.getJwtClaims();
         String subject = jwtClaims.getSubject();
-        return (subject == null && requireSubject) ?  "No Subject (sub) claim is present." : null;
+        if (subject == null && requireSubject)
+        {
+            return "No Subject (sub) claim is present.";
+        }
+        else if (expectedSubject != null && !expectedSubject.equals(subject))
+        {
+            return "Subject (sub) claim value (" + subject + ") doesn't match expected value of " + expectedSubject;
+        }
+
+        return null;
     }
 }

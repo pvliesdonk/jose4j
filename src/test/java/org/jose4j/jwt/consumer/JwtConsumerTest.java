@@ -1114,6 +1114,51 @@ public class JwtConsumerTest
         }
     }
 
+    @Test
+    public void ifItWereAnIdTokenHint() throws InvalidJwtException, JoseException, MalformedClaimException
+    {
+        // an ID Token and JWKS from NRI-phpOIDC-Implicit-10-Apr-2015 http://openid.net/certification/ just 'cause it's nice to have JWT content produced elsewhere
+        // this test was intended to explore some concepts around https://bitbucket.org/b_c/jose4j/issue/19 (skipping date aud checks and also an expected subject value)
+        String keys = "{\n" +
+                "\"keys\": [\n" +
+                "  {\n" +
+                "    \"e\": \"AQAB\",\n" +
+                "    \"kid\": \"PHPOP-00\",\n" +
+                "    \"kty\": \"RSA\",\n" +
+                "    \"n\": \"lqjtB9h9j1yl5Y3pmyt0qRUuGnCSn6HWFXHdlUPwt2xanA8aP5MN5dlRJCVR_sR08pb4taIerowTZ7ShdSaWqkGAqwgJYhM0Nyvj_GO1XIYfWl2u49U8j1s" +
+                "EFGDvNMNYQcX4RwaLU3lbavlYVHx_0W5gvw6XfEvkdWkPEbO3Ik1_cCySBxbaCxKszFP_yKCfRBbSQzrz_ZV6PMU6B0_OSknD7BRaogABdxPu79mUU-_Fk1XSA4gdRd5ccnX" +
+                "6lXiF0ePiI2x7s-RdyrMMT4HrXMYlO7VxraUvK61bNOKuRqoV6K-OdJUbcgziRe0nEidgyOgRTXRgnRkyCp2eMkKXFw\"\n" +
+                "}]}";
+
+        String jwt = "eyJhbGciOiJSUzI1NiIsImprdSI6Imh0dHBzOlwvXC9jb25uZWN0Lm9wZW5pZDQudXM6NTQ0M1wvcGhwT3BcL29wLmp3ayIsImtpZCI6IlBIUE9QLTAwIn0" +
+                ".eyJpc3MiOiJodHRwczpcL1wvY29ubmVjdC5vcGVuaWQ0LnVzOjU0NDNcL3BocE9wIiwic3ViIjoiZDRjMTEzOTE3NTA1MmRkNTE1ZmE5MzU4YTVjMmQ0YjRhNGF" +
+                "kYTM2ZDgxNWJiODc4OWEwNDFhNDFmZmZmZGNlYSIsImF1ZCI6WyJSLVJ1ZmpTRFZHQ0dmZFRtSW9iZjJRIl0sImV4cCI6MTQyODQ0NjkwNSwiaWF0IjoxNDI4NDQ" +
+                "2NjA1LCJub25jZSI6IlB1enhKSWtxdjZ6ciIsImF1dGhfdGltZSI6MTQyODQ0NTAxMH0" +
+                ".WYh2Zn3oNys7VIa6bCCw9LcIPD95W5YP4XKiIBcY5gz0Ti3fiwslsbm1wGJB-nJA9AXi1cIywsZs94l7BKJdNdUiJQUuSFRuyHCCDY--7iELwWFIGXSzFkwjUsR" +
+                "AAq9sMWqBO3qm01ganUH4Q9wFuSa-d6GA8ybMy3ymfV1OyNzVpTUqi9HWrRlAw0jUoTVGZA4p7qMzXgZfNF3pyankL2mmeb34ZhFk8S2IAZKFhRKuo0ORJRJ6_Fu" +
+                "9Eq0DvfrvX1RJpA3MKkJ8aiD5N4fcUy7vzgQRCNqsgEaqC-i4-vlNN5uyKP5IUZW-hqh-c6rXVrM-8hpZtCM_Z76eRfv1VQ";
+        // sub=d4c1139175052dd515fa9358a5c2d4b4a4ada36d815bb8789a041a41ffffdcea
+        // aud=[R-RufjSDVGCGfdTmIobf2Q]
+        // exp=1428446905 -> Apr 7, 2015 4:48:25 PM MDT
+
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setVerificationKeyResolver(new JwksVerificationKeyResolver(new JsonWebKeySet(keys).getJsonWebKeys()))
+                .setAllowedClockSkewInSeconds(Integer.MAX_VALUE)
+                .setExpectedSubject("d4c1139175052dd515fa9358a5c2d4b4a4ada36d815bb8789a041a41ffffdcea")
+                .setExpectedAudience("R-RufjSDVGCGfdTmIobf2Q")
+                .build();
+        JwtContext jwtCtx = consumer.process(jwt);
+        assertThat(jwtCtx.getJwtClaims().getSubject(), equalTo("d4c1139175052dd515fa9358a5c2d4b4a4ada36d815bb8789a041a41ffffdcea"));
+
+        consumer = new JwtConsumerBuilder()
+                .setVerificationKeyResolver(new JwksVerificationKeyResolver(new JsonWebKeySet(keys).getJsonWebKeys()))
+                .setAllowedClockSkewInSeconds(Integer.MAX_VALUE)
+                .setExpectedSubject("NOOOOOOOOOOOOOOOOPE")
+                .setExpectedAudience("R-RufjSDVGCGfdTmIobf2Q")
+                .build();
+
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, null, consumer);
+    }
 
     @Test
     public void someBasicAudChecks() throws InvalidJwtException
