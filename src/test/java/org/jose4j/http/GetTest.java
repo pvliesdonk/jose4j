@@ -77,7 +77,7 @@ public class GetTest
     @Test
     public void googlesJWKS() throws Exception
     {
-        String location = "https://www.googleapis.com/oauth2/v2/certs";
+        String location = "https://www.googleapis.com/oauth2/v3/certs";
         Get get = new Get();
         SimpleResponse simpleResponse = get.get(location);
         System.out.println(simpleResponse);
