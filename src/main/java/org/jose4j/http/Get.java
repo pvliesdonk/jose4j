@@ -268,6 +268,8 @@ public class Get implements SimpleGet
         }
     }
 
+    // todo -> need to give control over acceptable cipher suites? probably...
+
     private static class ResponseBodyTooLargeException extends IOException
     {
         public ResponseBodyTooLargeException(String message)
