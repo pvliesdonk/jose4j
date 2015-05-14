@@ -220,8 +220,8 @@ public class JSONValue {
 			JSONArray.writeJSONString((Object[])value, out);
 			return;
 		}
-		
-		out.write(value.toString());
+
+        writeJSONString(value.toString(), out);
 	}
 
 	/**

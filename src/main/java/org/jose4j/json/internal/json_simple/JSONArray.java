@@ -314,11 +314,11 @@ public class JSONArray extends ArrayList implements JSONAware, JSONStreamAware {
 			out.write("[]");
 		} else {
 			out.write("[\"");
-			out.write(String.valueOf(array[0]));
+			out.write(JSONValue.escape(String.valueOf(array[0])));
 			
 			for(int i = 1; i < array.length; i++){
 				out.write("\",\"");
-				out.write(String.valueOf(array[i]));
+				out.write(JSONValue.escape(String.valueOf(array[i])));
 			}
 			
 			out.write("\"]");

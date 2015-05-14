@@ -20,15 +20,32 @@ import org.junit.Assert;
 import org.jose4j.lang.JoseException;
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Random;
 
 /**
  */
 public class JsonUtilTest
 {
+    @Test
+    public void needsEsc() throws Exception
+    {
+        // char array serialization wasn't escaping special characters like quote and backslash
+        // and serialization of an unrecognized object was just getting the toString of it directly
+        // both of which could result in invalid JSON. this tests that has been fixed
+        Map<String, Object> map = new HashMap<>();
+        map.put("char array", new char[]{'a', '\\', '\"'});
+        map.put("some object", new Object());
+        map.put("nested", Collections.singletonMap("chars", "\"meh".toCharArray()));
+        map.put("nested also", Collections.singletonMap("obj", new Random()));
+
+        String s = JsonUtil.toJson(map);
+        System.out.println(s);
+        Map<String, Object> parsedMap = JsonUtil.parseJson(s);
+    }
+
     @Test
     public void testParseJson1() throws JoseException
     {
