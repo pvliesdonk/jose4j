@@ -16,23 +16,29 @@
 
 package org.jose4j.json;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
 import org.jose4j.lang.JoseException;
+import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 /**
  */
-public class JsonUtilTest extends TestCase
+public class JsonUtilTest
 {
+    @Test
     public void testParseJson1() throws JoseException
     {
         String basic = "{\"key\":\"value\"}";
         Map<String,Object> map = JsonUtil.parseJson(basic);
-        assertEquals(1, map.size());
-        assertEquals("value", map.get("key"));
+        Assert.assertEquals(1, map.size());
+        Assert.assertEquals("value", map.get("key"));
     }
 
+    @Test
     public void testParseJsonDisallowDupes()
     {
         String basic = "{\"key\":\"value\",\"key\":\"value2\"}";
@@ -40,7 +46,7 @@ public class JsonUtilTest extends TestCase
         try
         {
             Map<String,?> map = JsonUtil.parseJson(basic);
-            fail("parsing of " + basic + " should fail because the same member name occurs multiple times but returned: " + map);
+            Assert.fail("parsing of " + basic + " should fail because the same member name occurs multiple times but returned: " + map);
         }
         catch (JoseException e)
         {
@@ -48,6 +54,7 @@ public class JsonUtilTest extends TestCase
         }
     }
 
+    @Test
     public void testParseJsonDisallowDupesMoreComplex()
     {
         String json = "{\n" +
@@ -75,7 +82,7 @@ public class JsonUtilTest extends TestCase
         try
         {
             Map<String,?> map = JsonUtil.parseJson(json);
-            fail("parsing of " + json + " should fail because the same member name occurs multiple times but returned: " + map);
+            Assert.fail("parsing of " + json + " should fail because the same member name occurs multiple times but returned: " + map);
         }
         catch (JoseException e)
         {
@@ -83,12 +90,15 @@ public class JsonUtilTest extends TestCase
         }
     }
 
+    @Test
     public void testBiggerThanLong() throws Exception
     {
         String json = "{\"key\":\"value\",\"number\":90210, \"big number\":99990193716474719874987981237498321343555513331108571735145}";
         Map<String, Object> parsed = JsonUtil.parseJson(json);
-        assertEquals(3, parsed.size());
+        Assert.assertEquals(3, parsed.size());
     }
+
+
 
     //todo some general JSON tests?
     // todo disallow extra trailing data (and leading?)
