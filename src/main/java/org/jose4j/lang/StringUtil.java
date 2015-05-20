@@ -18,23 +18,23 @@ package org.jose4j.lang;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 /**
  */
 public class StringUtil
 {
+    // not using StandardCharsets due to lack of support in Android until API 19
     public static final String UTF_8 = "UTF-8";
     public static final String US_ASCII = "US-ASCII";
 
     public static String newStringUtf8(byte[] bytes)
     {
-        return newString(bytes, StandardCharsets.UTF_8);
+        return newString(bytes, UTF_8);
     }
 
     public static String newStringUsAscii(byte[] bytes)
     {
-        return newString(bytes, StandardCharsets.US_ASCII);
+        return newString(bytes, US_ASCII);
     }
 
     public static String newString(byte[] bytes, String charsetName)
@@ -56,12 +56,12 @@ public class StringUtil
 
     public static byte[] getBytesUtf8(String string)
     {
-        return getBytes(string, StandardCharsets.UTF_8);
+        return getBytesUnchecked(string, UTF_8);
     }
 
     public static byte[] getBytesAscii(String string)
     {
-        return getBytes(string, StandardCharsets.US_ASCII);
+        return getBytesUnchecked(string, US_ASCII);
     }
 
     public static byte[] getBytes(String string, Charset charset)
