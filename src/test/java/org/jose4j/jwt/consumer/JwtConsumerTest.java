@@ -673,7 +673,7 @@ public class JwtConsumerTest
                 .setExpectedIssuer("usa")
                 .setRequireExpirationTime()
                 .build();
-        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, null, consumer);
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, consumer);
 
         consumer = new JwtConsumerBuilder()
                 .setEnableLiberalContentTypeHandling()
@@ -1067,10 +1067,10 @@ public class JwtConsumerTest
 
         // change some things and make sure it fails
         jwt = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..zWNzKpA-QA0BboVl02nz-A.eyJpc3MiOiJtZSIsImF1ZCI6Im1lIiwiZXhwIjoxNDIwMjMxNjA2LCJuYW1lIjoidmFsdWUifQ.QsGX3JhHP1Pwy4zQ8Ha9FQ";
-        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, null, consumer);
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, consumer);
 
         jwt = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..zWNzKpA-QA0BboVl02nz-A.u1D7JCpDFeRl69G1L-h3IRrmcOXiWLnhr23ugO2kkDqKVNcO1YQ4Xvl9Sag4aYOnkqUbqe6Wdz8KK3d9q178tA.QsGX3JhHP1Pwy4zQ8Ha9FQ";
-        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, null, consumer);
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, consumer);
     }
 
     @Test
@@ -1156,7 +1156,7 @@ public class JwtConsumerTest
                 .setExpectedSubject("NOOOOOOOOOOOOOOOOPE")
                 .setExpectedAudience("R-RufjSDVGCGfdTmIobf2Q")
                 .build();
-        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, null, consumer);
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, consumer);
 
 
         consumer = new JwtConsumerBuilder()
@@ -1171,14 +1171,14 @@ public class JwtConsumerTest
                 .setVerificationKeyResolver(new JwksVerificationKeyResolver(new JsonWebKeySet(keys).getJsonWebKeys()))
                 .setAllowedClockSkewInSeconds(Integer.MAX_VALUE)
                 .build();
-        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, null, consumer);
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, consumer);
 
         consumer = new JwtConsumerBuilder()
                 .setVerificationKeyResolver(new JwksVerificationKeyResolver(new JsonWebKeySet(keys).getJsonWebKeys()))
                 .setAllowedClockSkewInSeconds(Integer.MAX_VALUE)
                 .setExpectedAudience("no", "nope", "no way jose")
                 .build();
-        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, null, consumer);
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, consumer);
     }
 
     @Test

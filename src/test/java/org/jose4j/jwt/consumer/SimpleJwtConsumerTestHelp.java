@@ -30,6 +30,12 @@ public class SimpleJwtConsumerTestHelp
 {
     static Log log = LogFactory.getLog(SimpleJwtConsumerTestHelp.class);
 
+    static void expectProcessingFailure(String jwt, JwtConsumer jwtConsumer)
+    {
+        expectProcessingFailure(jwt, null, jwtConsumer);
+    }
+
+
     static void expectProcessingFailure(String jwt, JwtContext jwtContext, JwtConsumer jwtConsumer)
     {
         try
