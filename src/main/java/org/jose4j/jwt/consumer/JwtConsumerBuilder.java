@@ -56,6 +56,7 @@ public class JwtConsumerBuilder
     private boolean relaxDecryptionKeyValidation;
 
     private boolean skipAllValidators = false;
+    private boolean skipAllDefaultValidators = false;
 
     private boolean liberalContentTypeHandling;
 
@@ -86,6 +87,12 @@ public class JwtConsumerBuilder
     public JwtConsumerBuilder setSkipAllValidators()
     {
         skipAllValidators = true;
+        return this;
+    }
+
+    public JwtConsumerBuilder setSkipAllDefaultValidators()
+    {
+        skipAllDefaultValidators = true;
         return this;
     }
 
@@ -236,26 +243,29 @@ public class JwtConsumerBuilder
         List<Validator> validators = new ArrayList<>();
         if (!skipAllValidators)
         {
-            if (!skipDefaultAudienceValidation)
+            if (!skipAllDefaultValidators)
             {
-                if (audValidator == null)
+                if (!skipDefaultAudienceValidation)
                 {
-                    audValidator = new AudValidator(Collections.<String>emptySet(), false);
+                    if (audValidator == null)
+                    {
+                        audValidator = new AudValidator(Collections.<String>emptySet(), false);
+                    }
+                    validators.add(audValidator);
                 }
-                validators.add(audValidator);
+
+                if (issValidator == null)
+                {
+                    issValidator = new IssValidator(null, false);
+                }
+                validators.add(issValidator);
+
+                validators.add(dateClaimsValidator);
+
+                SubValidator subValidator = expectedSubject == null ? new SubValidator(requireSubject) : new SubValidator(expectedSubject);
+                validators.add(subValidator);
+                validators.add(new JtiValidator(requireJti));
             }
-
-            if (issValidator == null)
-            {
-                issValidator = new IssValidator(null, false);
-            }
-            validators.add(issValidator);
-
-            validators.add(dateClaimsValidator);
-
-            SubValidator subValidator = expectedSubject == null ? new SubValidator(requireSubject) : new SubValidator(expectedSubject);
-            validators.add(subValidator);
-            validators.add(new JtiValidator(requireJti));
 
             validators.addAll(customValidators);
         }

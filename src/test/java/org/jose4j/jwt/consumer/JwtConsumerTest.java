@@ -22,11 +22,7 @@ import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.JsonWebKeySet;
-import org.jose4j.jwk.OctJwkGenerator;
-import org.jose4j.jwk.OctetSequenceJsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
-import org.jose4j.jwk.RsaJsonWebKey;
-import org.jose4j.jwk.RsaJwkGenerator;
 import org.jose4j.jwk.SimpleJwkFilter;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
@@ -38,13 +34,11 @@ import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
-import org.jose4j.keys.HmacKey;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.keys.resolvers.DecryptionKeyResolver;
 import org.jose4j.keys.resolvers.JwksDecryptionKeyResolver;
 import org.jose4j.keys.resolvers.JwksVerificationKeyResolver;
 import org.jose4j.keys.resolvers.VerificationKeyResolver;
-import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.UnresolvableKeyException;
 import org.junit.Assert;
@@ -1330,6 +1324,80 @@ public class JwtConsumerTest
 
         JwtClaims claims = jwtConsumer.processToClaims(jwt);
         assertThat(claims.getClaimsMap().size(), equalTo(5));
+    }
+
+    @Test
+    public void skipAllDefaultValidators() throws Exception
+    {
+//        OctetSequenceJsonWebKey octetSequenceJsonWebKey = OctJwkGenerator.generateJwk(256);
+//        octetSequenceJsonWebKey.setKeyId("xxc");
+//
+//        JsonWebKeySet jwks = new JsonWebKeySet(octetSequenceJsonWebKey);
+//        System.out.println(jwks.toJson(JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE));
+//
+//        JwtClaims jwtClaims = new JwtClaims();
+//        jwtClaims.setAudience("a");
+//        jwtClaims.setIssuer("i");
+//        jwtClaims.setExpirationTimeMinutesInTheFuture(10);
+//        jwtClaims.setSubject("s");
+//        jwtClaims.setNotBeforeMinutesInThePast(1);
+//
+//        System.out.println(jwtClaims);
+//
+//        JsonWebSignature jws = new JsonWebSignature();
+//        jws.setPayload(jwtClaims.toJson());
+//        jws.setKey(octetSequenceJsonWebKey.getKey());
+//        jws.setKeyIdHeaderValue(octetSequenceJsonWebKey.getKeyId());
+//        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+//        jws.setDoKeyValidation(false);
+//        String jwsCompactSerialization = jws.getCompactSerialization();
+//
+//        System.out.println(jwsCompactSerialization);
+
+        String jwt = "eyJraWQiOiJ4eGMiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhIiwiaXNzIjoiaSIsImV4cCI6MTQzMjMyNzE5NSwic3ViIjoicyIsIm5iZiI6MTQzMjMyNjUzNX0.zfBXCLSysVxY-zT4DNCLXS7IyfKkYv7kCIUKxdIGxdI";
+        JsonWebKeySet jwks = new JsonWebKeySet("{\"keys\":[{\"kty\":\"oct\",\"kid\":\"xxc\",\"k\":\"7bLZdrROsprHkX75gCjKLeGj4brDf7TFtcr2h1F_nfc\"}]}");
+
+        VerificationKeyResolver verificationKeyResolver = new JwksVerificationKeyResolver(jwks.getJsonWebKeys());
+
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                .setVerificationKeyResolver(verificationKeyResolver)
+                .build();
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, jwtConsumer); // fail b/c exp and aud
+
+
+        jwtConsumer = new JwtConsumerBuilder()
+                .setVerificationKeyResolver(verificationKeyResolver)
+                .setSkipAllDefaultValidators()
+                .build();
+        JwtClaims claims = jwtConsumer.processToClaims(jwt);  // this will work 'cause no claims validation is happening
+        assertThat(claims.getClaimsMap().size(), equalTo(5));
+
+
+        Validator customValidator = new Validator()
+        {
+            @Override
+            public String validate(JwtContext jwtContext) throws MalformedClaimException
+            {
+                return (jwtContext.getJwtClaims().getIssuer().equals("i")) ? "i isn't okay as an issuer" : null;
+            }
+        };
+
+        jwtConsumer = new JwtConsumerBuilder()
+                .setVerificationKeyResolver(verificationKeyResolver)
+                .setSkipAllDefaultValidators()
+                .registerValidator(customValidator)
+                .build();
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, jwtConsumer); // make sure fail w/ custom validator b/c setSkipAllDefaultValidators runs any that were registered
+
+        jwtConsumer = new JwtConsumerBuilder()
+                .setVerificationKeyResolver(verificationKeyResolver)
+                .setSkipAllValidators()
+                .registerValidator(customValidator)
+                .build();
+        claims = jwtConsumer.processToClaims(jwt);  // this will work 'cause no claims validation is happening due to setSkipAllValidators
+        assertThat(claims.getClaimsMap().size(), equalTo(5));
+
+        // setSkipAllDefaultValidators makes more sense than setSkipAllValidators but I started with setSkipAllValidators and don't want to change that behaviour and accidentally break someone
     }
 
     @Test
