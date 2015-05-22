@@ -22,7 +22,6 @@ import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
-import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.keys.resolvers.DecryptionKeyResolver;
 import org.jose4j.keys.resolvers.VerificationKeyResolver;
@@ -55,6 +54,10 @@ public class JwtConsumer
     private boolean liberalContentTypeHandling;
 
     private boolean skipSignatureVerification;
+
+    private boolean relaxVerificationKeyValidation;
+
+    private boolean relaxDecryptionKeyValidation;
 
     JwtConsumer()
     {
@@ -110,6 +113,16 @@ public class JwtConsumer
         this.skipSignatureVerification = skipSignatureVerification;
     }
 
+    void setRelaxVerificationKeyValidation(boolean relaxVerificationKeyValidation)
+    {
+        this.relaxVerificationKeyValidation = relaxVerificationKeyValidation;
+    }
+
+    void setRelaxDecryptionKeyValidation(boolean relaxDecryptionKeyValidation)
+    {
+        this.relaxDecryptionKeyValidation = relaxDecryptionKeyValidation;
+    }
+
     public JwtClaims processToClaims(String jwt) throws InvalidJwtException
     {
         return process(jwt).getJwtClaims();
@@ -135,6 +148,11 @@ public class JwtConsumer
                     JsonWebSignature jws = (JsonWebSignature) currentJoseObject;
                     if (!skipSignatureVerification)
                     {
+                        if (relaxVerificationKeyValidation)
+                        {
+                            jws.setDoKeyValidation(false);
+                        }
+
                         Key key = verificationKeyResolver.resolveKey(jws, Collections.unmodifiableList(joseObjects));
                         jws.setKey(key);
                         if (jwsAlgorithmConstraints != null)
@@ -241,6 +259,12 @@ public class JwtConsumer
                 else
                 {
                     JsonWebEncryption jwe = (JsonWebEncryption) joseObject;
+
+                    if (relaxDecryptionKeyValidation)
+                    {
+                        jwe.setDoKeyValidation(false);
+                    }
+
                     Key key = decryptionKeyResolver.resolveKey(jwe, Collections.unmodifiableList(joseObjects));
                     jwe.setKey(key);
                     if (jweAlgorithmConstraints != null)

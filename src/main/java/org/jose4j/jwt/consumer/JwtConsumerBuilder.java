@@ -51,6 +51,10 @@ public class JwtConsumerBuilder
 
     private boolean skipSignatureVerification = false;
 
+    private boolean relaxVerificationKeyValidation;
+
+    private boolean relaxDecryptionKeyValidation;
+
     private boolean skipAllValidators = false;
 
     private boolean liberalContentTypeHandling;
@@ -209,6 +213,17 @@ public class JwtConsumerBuilder
         return this;
     }
 
+    public JwtConsumerBuilder setRelaxVerificationKeyValidation()
+    {
+        relaxVerificationKeyValidation = true;
+        return this;
+    }
+
+    public JwtConsumerBuilder setRelaxDecryptionKeyValidation()
+    {
+        relaxDecryptionKeyValidation = true;
+        return this;
+    }
 
     public JwtConsumerBuilder registerValidator(Validator validator)
     {
@@ -260,6 +275,9 @@ public class JwtConsumerBuilder
         jwtConsumer.setLiberalContentTypeHandling(liberalContentTypeHandling);
 
         jwtConsumer.setSkipSignatureVerification(skipSignatureVerification);
+
+        jwtConsumer.setRelaxVerificationKeyValidation(relaxVerificationKeyValidation);
+        jwtConsumer.setRelaxDecryptionKeyValidation(relaxDecryptionKeyValidation);
 
         return jwtConsumer;
     }

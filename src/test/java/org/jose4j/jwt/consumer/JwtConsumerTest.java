@@ -22,7 +22,11 @@ import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.JsonWebKeySet;
+import org.jose4j.jwk.OctJwkGenerator;
+import org.jose4j.jwk.OctetSequenceJsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
+import org.jose4j.jwk.RsaJsonWebKey;
+import org.jose4j.jwk.RsaJwkGenerator;
 import org.jose4j.jwk.SimpleJwkFilter;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
@@ -34,11 +38,13 @@ import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
+import org.jose4j.keys.HmacKey;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.keys.resolvers.DecryptionKeyResolver;
 import org.jose4j.keys.resolvers.JwksDecryptionKeyResolver;
 import org.jose4j.keys.resolvers.JwksVerificationKeyResolver;
 import org.jose4j.keys.resolvers.VerificationKeyResolver;
+import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.UnresolvableKeyException;
 import org.junit.Assert;
@@ -1179,6 +1185,151 @@ public class JwtConsumerTest
                 .setExpectedAudience("no", "nope", "no way jose")
                 .build();
         SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, consumer);
+    }
+
+    @Test
+    public void relaxDecryptionKeyValidation() throws Exception
+    {
+//        PublicJsonWebKey rsaJsonWebKey = RsaJwkGenerator.generateJwk(1024);
+//        rsaJsonWebKey.setKeyId("acc");
+//        OctetSequenceJsonWebKey octetSequenceJsonWebKey = OctJwkGenerator.generateJwk(256);
+//        octetSequenceJsonWebKey.setKeyId("ltc");
+//
+//        JsonWebKeySet jwks = new JsonWebKeySet(rsaJsonWebKey, octetSequenceJsonWebKey);
+//        System.out.println(jwks.toJson(JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE));
+//
+//        JwtClaims jwtClaims = new JwtClaims();
+//        jwtClaims.setAudience("a");
+//        jwtClaims.setIssuer("i");
+//        jwtClaims.setExpirationTimeMinutesInTheFuture(10);
+//        jwtClaims.setSubject("s");
+//        jwtClaims.setNotBeforeMinutesInThePast(1);
+//
+//        System.out.println(jwtClaims);
+//
+//        JsonWebSignature jws = new JsonWebSignature();
+//        jws.setPayload(jwtClaims.toJson());
+//        jws.setKey(octetSequenceJsonWebKey.getKey());
+//        jws.setKeyIdHeaderValue(octetSequenceJsonWebKey.getKeyId());
+//        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+//        String jwsCompactSerialization = jws.getCompactSerialization();
+//
+//        System.out.println(jwsCompactSerialization);
+//
+//        JsonWebEncryption jwe = new JsonWebEncryption();
+//        jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.RSA_OAEP);
+//        jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+//        jwe.setKey(rsaJsonWebKey.getPublicKey());
+//        jwe.setDoKeyValidation(false);
+//        jwe.setKeyIdHeaderValue(rsaJsonWebKey.getKeyId());
+//        jwe.setPayload(jwsCompactSerialization);
+//        jwe.setContentTypeHeaderValue("JWT");
+//        String jweCompactSerialization = jwe.getCompactSerialization();
+//
+//        System.out.println(jweCompactSerialization);
+
+
+        String jwt = "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhDQkMtSFMyNTYiLCJraWQiOiJhY2MiLCJjdHkiOiJKV1QifQ" +
+                ".KrukndaF2sHb3Y0r311rrYmCrXco-99ZIQ3iLjvCVbbow5MppRTK4DPJUShcndfcIVIFXMYSLGvIJwf39yZRJJ_EvBFnqhOUeCAsUHLGO1yxoQ619jmSh4bCaIicLYeivKaVSQN4Ezc5fvg-Nnv6TBIIgHuWMDU2Ztd96DJRokc" +
+                ".wMg2Eb8izCOUnACqdrcPQA" +
+                ".quFKSN7xQoMJzaYFBVwykQZ8zB3hpW8HtK7pm-4Ggzorno_K-eBQ7fXjRmJ1Jw-kCcmUa8flpnQqpL9jurtlz7DC1ABe0vm2ZkHoJluB6QeSr60Y9rP7kyy_rd3blXT_7t6Wgowo8MumXrrUUxxEQJgXvCmKbd-Rw9sK5jAHEug3zztLXHOX0O0QoxDzTJOsSRtodsu7bTJa-ADvPmK9e0Xp06NRqvx7WuJGKlq3cwQ" +
+                ".DL6yaCdiOUcViN-eZVIwOA";
+
+        JsonWebKeySet jwks = new JsonWebKeySet("{\"keys\":[" +
+                "{\"kty\":\"RSA\",\"kid\":\"acc\",\"n\":\"pkRsP8W09WkolK85OQlq6XTQEoRsulNY6vQsJMluOPErKIOJp6K4cgg5n6Y9NXnswUt0n5suxqlKDHmRRQgU9BGBcqptmCog-0KQKvTqUQJmtDviRTu1aO12Zz_ATEszf8rvPt795xaFvDycCA2YS87lkdIET2ap2qrHCfeWlkk\"," +
+                "\"e\":\"AQAB\",\"d\":\"MnNknV0ycZz9EVCx_lqbNEebs2K3UzpjKrf4hRkR9vlG7T4skM9RRFi2k3jv7cAXVPe-ZYfDA8jujSZ-LAItyPwIO-pbtIeXrKQtvLgP4igsfDMCmvRvNmUuV93Gy9fMBVhEGK_xxVQtJWbdgZsk_v2kMUkX4W2WS_Mbo3YHCwE\"," +
+                "\"p\":\"2BBdLVoi6DP-5JJyTCxdBbaKUjQvVPHXlcqNdaKf2949Nze7IpLoPtkCTVVlTtEvAhYGxuI1i101fK4hGW_IcQ\",\"q\":\"xP_Mg7_SNlzg0eyCzK09mKdagOFfoHKIMoJb9qzOAENnIjt67hpxd7x2h45pX4HM7ObU_1OAl9IYvTqUPhPXWQ\"," +
+                "\"dp\":\"ljx6rchZMWDGQiVaeID4hbpx38sNhmFLaIqZZkyYH4gexMBpzRadiuXWZfOVKALoTukF-VDdrnQ3duSVe1xw4Q\",\"dq\":\"Q23K8s2VhkYELdZmbuhdTQL7V2HM-X46YA9-qtA7MpvfkTgKu7URYYqAh6WXK7miCvR3s21BdrXTAfIrC5R_AQ\"," +
+                "\"qi\":\"iaHGlWvmsQvWyZ5GdAar0WOJi_CNTGCzv9SaVnA83I1ewXvKejYMnzLjetPbopxE2enVicnvjlrDaihJbZ5TYA\"}" +
+                ",{\"kty\":\"oct\",\"kid\":\"ltc\",\"k\":\"vJRXGLSNo-jggR8o5yxjzrm_82w-35rpnve0JzEr2sw\"}" +
+                "]}");
+
+        VerificationKeyResolver verificationKeyResolver = new JwksVerificationKeyResolver(jwks.getJsonWebKeys());
+        DecryptionKeyResolver decryptionKeyResolver = new JwksDecryptionKeyResolver(jwks.getJsonWebKeys());
+
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                .setEvaluationTime(NumericDate.fromSeconds(1432324168))
+                .setExpectedAudience("a")
+                .setExpectedIssuer("i")
+                .setExpectedSubject("s")
+                .setRequireExpirationTime()
+                .setVerificationKeyResolver(verificationKeyResolver)
+                .setDecryptionKeyResolver(decryptionKeyResolver)
+                .build();
+
+         SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, jwtConsumer); // fail b/c the RSA key is too small
+
+        jwtConsumer = new JwtConsumerBuilder()
+                .setEvaluationTime(NumericDate.fromSeconds(1432324168))
+                .setExpectedAudience("a")
+                .setExpectedIssuer("i")
+                .setExpectedSubject("s")
+                .setRequireExpirationTime()
+                .setVerificationKeyResolver(verificationKeyResolver)
+                .setDecryptionKeyResolver(decryptionKeyResolver)
+                .setRelaxDecryptionKeyValidation()  // be more relaxed here to allow the 1024 bit RSA key
+                .build();
+
+        JwtClaims claims = jwtConsumer.processToClaims(jwt);
+        assertThat(claims.getClaimsMap().size(), equalTo(5));
+    }
+
+    @Test
+    public void relaxVerificationKeyValidation() throws Exception
+    {
+//        OctetSequenceJsonWebKey octetSequenceJsonWebKey = OctJwkGenerator.generateJwk(128);
+//        octetSequenceJsonWebKey.setKeyId("esc");
+//
+//        JsonWebKeySet jwks = new JsonWebKeySet(octetSequenceJsonWebKey);
+//        System.out.println(jwks.toJson(JsonWebKey.OutputControlLevel.INCLUDE_PRIVATE));
+//
+//        JwtClaims jwtClaims = new JwtClaims();
+//        jwtClaims.setAudience("a");
+//        jwtClaims.setIssuer("i");
+//        jwtClaims.setExpirationTimeMinutesInTheFuture(10);
+//        jwtClaims.setSubject("s");
+//        jwtClaims.setNotBeforeMinutesInThePast(1);
+//
+//        System.out.println(jwtClaims);
+//
+//        JsonWebSignature jws = new JsonWebSignature();
+//        jws.setPayload(jwtClaims.toJson());
+//        jws.setKey(octetSequenceJsonWebKey.getKey());
+//        jws.setKeyIdHeaderValue(octetSequenceJsonWebKey.getKeyId());
+//        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+//        jws.setDoKeyValidation(false);
+//        String jwsCompactSerialization = jws.getCompactSerialization();
+//
+//        System.out.println(jwsCompactSerialization);
+
+        String jwt = "eyJraWQiOiJlc2MiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhIiwiaXNzIjoiaSIsImV4cCI6MTQzMjMyNTQ5Niwic3ViIjoicyIsIm5iZiI6MTQzMjMyNDgzNn0.16LpzAZyBcokZ4aUaXHn5yN0xQ1zpmLyJVFHu6nH1zY";
+        JsonWebKeySet jwks = new JsonWebKeySet("{\"keys\":[{\"kty\":\"oct\",\"kid\":\"esc\",\"k\":\"dbwsHvQsXoZiWpulhZA8dg\"}]}");
+
+        VerificationKeyResolver verificationKeyResolver = new JwksVerificationKeyResolver(jwks.getJsonWebKeys());
+
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                .setEvaluationTime(NumericDate.fromSeconds(1432324836))
+                .setExpectedAudience("a")
+                .setExpectedIssuer("i")
+                .setExpectedSubject("s")
+                .setRequireExpirationTime()
+                .setVerificationKeyResolver(verificationKeyResolver)
+                .build();
+
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, jwtConsumer); // fail b/c the HMAC key is too small
+
+        jwtConsumer = new JwtConsumerBuilder()
+                .setEvaluationTime(NumericDate.fromSeconds(1432324836))
+                .setExpectedAudience("a")
+                .setExpectedIssuer("i")
+                .setExpectedSubject("s")
+                .setRequireExpirationTime()
+                .setVerificationKeyResolver(verificationKeyResolver)
+                .setRelaxVerificationKeyValidation()  // be more relaxed here to allow the smaller key
+                .build();
+
+        JwtClaims claims = jwtConsumer.processToClaims(jwt);
+        assertThat(claims.getClaimsMap().size(), equalTo(5));
     }
 
     @Test
