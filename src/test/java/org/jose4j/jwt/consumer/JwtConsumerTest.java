@@ -22,6 +22,8 @@ import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.JsonWebKeySet;
+import org.jose4j.jwk.OctJwkGenerator;
+import org.jose4j.jwk.OctetSequenceJsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jwk.SimpleJwkFilter;
 import org.jose4j.jws.AlgorithmIdentifiers;
@@ -1399,6 +1401,97 @@ public class JwtConsumerTest
 
         // setSkipAllDefaultValidators makes more sense than setSkipAllValidators but I started with setSkipAllValidators and don't want to change that behaviour and accidentally break someone
     }
+
+    @Test
+    public void roundTripWithMoreLiveDateChecks() throws Exception
+    {
+        OctetSequenceJsonWebKey octetSequenceJsonWebKey = OctJwkGenerator.generateJwk(256);
+        octetSequenceJsonWebKey.setKeyId("ltc");
+
+        JsonWebKeySet jwks = new JsonWebKeySet(octetSequenceJsonWebKey);
+
+        JwtClaims jwtClaims = new JwtClaims();
+        jwtClaims.setAudience("a");
+        jwtClaims.setIssuer("i");
+        jwtClaims.setExpirationTimeMinutesInTheFuture(2);
+        jwtClaims.setSubject("s");
+        jwtClaims.setNotBeforeMinutesInThePast(2);
+
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setPayload(jwtClaims.toJson());
+        jws.setKey(octetSequenceJsonWebKey.getKey());
+        jws.setKeyIdHeaderValue(octetSequenceJsonWebKey.getKeyId());
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        String jwt = jws.getCompactSerialization();
+
+        VerificationKeyResolver verificationKeyResolver = new JwksVerificationKeyResolver(jwks.getJsonWebKeys());
+
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                .setExpectedAudience("a")
+                .setExpectedIssuer("i")
+                .setExpectedSubject("s")
+                .setRequireExpirationTime()
+                .setVerificationKeyResolver(verificationKeyResolver)
+                .build();
+        JwtClaims claims = jwtConsumer.processToClaims(jwt);
+        assertThat(claims.getClaimsMap().size(), equalTo(5));
+
+        jwtClaims = new JwtClaims();
+        jwtClaims.setAudience("a");
+        jwtClaims.setIssuer("i");
+        jwtClaims.setExpirationTimeMinutesInTheFuture(-1);
+        jwtClaims.setSubject("s");
+        jwtClaims.setNotBeforeMinutesInThePast(3);
+        jws = new JsonWebSignature();
+        jws.setPayload(jwtClaims.toJson());
+        jws.setKey(octetSequenceJsonWebKey.getKey());
+        jws.setKeyIdHeaderValue(octetSequenceJsonWebKey.getKeyId());
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jwt = jws.getCompactSerialization();
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, jwtConsumer);
+
+        jwtClaims = new JwtClaims();
+        jwtClaims.setAudience("a");
+        jwtClaims.setIssuer("i");
+        jwtClaims.setExpirationTimeMinutesInTheFuture(-1);
+        jwtClaims.setSubject("s");
+        jws = new JsonWebSignature();
+        jws.setPayload(jwtClaims.toJson());
+        jws.setKey(octetSequenceJsonWebKey.getKey());
+        jws.setKeyIdHeaderValue(octetSequenceJsonWebKey.getKeyId());
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jwt = jws.getCompactSerialization();
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, jwtConsumer);
+
+        jwtClaims = new JwtClaims();
+        jwtClaims.setAudience("a");
+        jwtClaims.setIssuer("i");
+        jwtClaims.setExpirationTimeMinutesInTheFuture(20);
+        jwtClaims.setSubject("s");
+        jwtClaims.setNotBeforeMinutesInThePast(-4);
+        jws = new JsonWebSignature();
+        jws.setPayload(jwtClaims.toJson());
+        jws.setKey(octetSequenceJsonWebKey.getKey());
+        jws.setKeyIdHeaderValue(octetSequenceJsonWebKey.getKeyId());
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jwt = jws.getCompactSerialization();
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(jwt, jwtConsumer);
+
+        jwtClaims = new JwtClaims();
+        jwtClaims.setAudience("a");
+        jwtClaims.setIssuer("i");
+        jwtClaims.setExpirationTimeMinutesInTheFuture(1);
+        jwtClaims.setSubject("s");
+        jws = new JsonWebSignature();
+        jws.setPayload(jwtClaims.toJson());
+        jws.setKey(octetSequenceJsonWebKey.getKey());
+        jws.setKeyIdHeaderValue(octetSequenceJsonWebKey.getKeyId());
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jwt = jws.getCompactSerialization();
+        claims = jwtConsumer.processToClaims(jwt);
+        assertThat(claims.getClaimsMap().size(), equalTo(4));
+    }
+
 
     @Test
     public void someBasicAudChecks() throws InvalidJwtException

@@ -28,7 +28,7 @@ public class NumericDateValidator implements Validator
     private boolean requireExp;
     private boolean requireIat;
     private boolean requireNbf;
-    private NumericDate evaluationTime = NumericDate.now();
+    private NumericDate staticEvaluationTime;
     private int allowedClockSkewSeconds = 0;
     private int maxFutureValidityInMinutes = 0;
 
@@ -49,7 +49,7 @@ public class NumericDateValidator implements Validator
 
     public void setEvaluationTime(NumericDate evaluationTime)
     {
-        this.evaluationTime = evaluationTime;
+        this.staticEvaluationTime = evaluationTime;
     }
 
     public void setAllowedClockSkewSeconds(int allowedClockSkewSeconds)
@@ -84,6 +84,8 @@ public class NumericDateValidator implements Validator
         {
             return "No Not Before (nbf) claim present.";
         }
+
+        NumericDate evaluationTime = (staticEvaluationTime == null) ? NumericDate.now() : staticEvaluationTime;
 
         if (expirationTime != null)
         {
