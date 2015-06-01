@@ -130,7 +130,7 @@ public class SimpleAeadCipher
                 encrypt(new AesKey(cek), iv, plain, aad);
                 isAvailable = true;
             }
-            catch (JoseException e)
+            catch (Throwable e)
             {
                 log.debug(joseAlg + " is not available (" + ExceptionHelp.toStringWithCauses(e) + ").");
             }

@@ -85,7 +85,7 @@ public class AlgorithmFactory<A extends Algorithm>
         {
             return algorithm.isAvailable();
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             log.debug("Unexpected problem checking for availability of " +algorithm.getAlgorithmIdentifier()+ " algorithm: " + ExceptionHelp.toStringWithCauses(e));
             return false;
