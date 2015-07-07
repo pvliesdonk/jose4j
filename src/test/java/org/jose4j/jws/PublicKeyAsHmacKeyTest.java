@@ -22,9 +22,11 @@ import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.ExceptionHelp;
 import org.jose4j.lang.JoseException;
+import org.jose4j.lang.ProviderHelp;
 import org.junit.Test;
 
 import javax.crypto.spec.SecretKeySpec;
+
 import java.security.PublicKey;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -48,13 +50,13 @@ public class PublicKeyAsHmacKeyTest
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
         jws.setPayload("http://watchout4snakes.com/wo4snakes/Random/RandomPhrase");
         jws.setKey(new HmacKey(ExampleRsaKeyFromJws.PUBLIC_KEY.getEncoded()));
-        verify(ExampleRsaKeyFromJws.PUBLIC_KEY, jws.getCompactSerialization(), false);
+        verify(ExampleRsaKeyFromJws.PUBLIC_KEY, jws.getCompactSerialization(), ProviderHelp.isBouncyCastleAvailable());
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
         jws.setPayload("salty slop");
         jws.setKey(new SecretKeySpec(ExampleRsaKeyFromJws.PUBLIC_KEY.getEncoded(), "algorithm"));
-        verify(ExampleRsaKeyFromJws.PUBLIC_KEY, jws.getCompactSerialization(), false);
+        verify(ExampleRsaKeyFromJws.PUBLIC_KEY, jws.getCompactSerialization(), ProviderHelp.isBouncyCastleAvailable());
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
