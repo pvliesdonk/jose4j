@@ -16,10 +16,10 @@
 
 package org.jose4j.jwa;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.lang.ExceptionHelp;
 import org.jose4j.lang.InvalidAlgorithmException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public class AlgorithmFactory<A extends Algorithm>
 {
-    private final Log log;
+    private final Logger log;
 
     private String parameterName;
 
@@ -39,7 +39,7 @@ public class AlgorithmFactory<A extends Algorithm>
     public AlgorithmFactory(String parameterName, Class<A> type)
     {
         this.parameterName = parameterName;
-        log = LogFactory.getLog(this.getClass() + "->" + type.getSimpleName());
+        this.log = LoggerFactory.getLogger(getClass() + "->" + type.getSimpleName());
     }
 
     public A getAlgorithm(String algorithmIdentifier) throws InvalidAlgorithmException
@@ -71,11 +71,11 @@ public class AlgorithmFactory<A extends Algorithm>
         if (isAvailable(algorithm))
         {
             algorithms.put(algId, algorithm);
-            log.info(algorithm + " registered for " + parameterName + " algorithm " + algId);
+            log.info("{} registered for {} algorithm {}", algorithm, parameterName, algId);
         }
         else
         {
-            log.info(algId + " is unavailable so will not be registered for " + parameterName + " algorithms.");
+            log.info("{} is unavailable so will not be registered for {} algorithms.", algId, parameterName);
         }
     }
 

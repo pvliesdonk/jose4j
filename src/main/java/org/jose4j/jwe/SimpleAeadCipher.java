@@ -15,18 +15,19 @@
  */
 package org.jose4j.jwe;
 
-import org.apache.commons.logging.Log;
-import org.jose4j.keys.AesKey;
-import org.jose4j.lang.ByteUtil;
-import org.jose4j.lang.ExceptionHelp;
-import org.jose4j.lang.JoseException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.Key;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.GCMParameterSpec;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.Key;
+
+import org.jose4j.keys.AesKey;
+import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.ExceptionHelp;
+import org.jose4j.lang.JoseException;
+import org.slf4j.Logger;
 
 /**
  *                                  1
@@ -110,7 +111,7 @@ public class SimpleAeadCipher
 
     }
 
-    public boolean isAvailable(Log log, int keyByteLength, int ivByteLength, String joseAlg)
+    public boolean isAvailable(Logger log, int keyByteLength, int ivByteLength, String joseAlg)
     {
         boolean isAvailable = false;
         // The Sun/Oracle provider in Java 7 doesn't have GCM.
@@ -132,7 +133,7 @@ public class SimpleAeadCipher
             }
             catch (Throwable e)
             {
-                log.debug(joseAlg + " is not available (" + ExceptionHelp.toStringWithCauses(e) + ").");
+                log.debug("{} is not available ({}).", joseAlg, ExceptionHelp.toStringWithCauses(e));
             }
         }
         return isAvailable;

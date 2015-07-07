@@ -1,12 +1,12 @@
 package org.jose4j.jwe;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.lang.IntegrityException;
 import org.jose4j.lang.JoseException;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.hamcrest.CoreMatchers.*;
 
@@ -15,7 +15,7 @@ import static org.hamcrest.CoreMatchers.*;
  */
 public class NegativeJweWrappingTest
 {
-    Log log = LogFactory.getLog(this.getClass());
+    private static final Logger log = LoggerFactory.getLogger(NegativeJweWrappingTest.class);
 
     public static final String PAYLOAD = "https://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-39#section-11.5";
 
@@ -131,7 +131,7 @@ public class NegativeJweWrappingTest
         }
         catch (IntegrityException e)
         {
-            log.debug("Expected exception processing modified JWE " + e);
+            log.debug("Expected exception processing modified JWE {}", e);
         }
     }
 }

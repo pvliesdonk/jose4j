@@ -16,17 +16,18 @@
 
 package org.jose4j.jwe;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.Headers;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.ExceptionHelp;
 import org.jose4j.lang.JoseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -36,7 +37,7 @@ import java.security.spec.AlgorithmParameterSpec;
  */
 public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo implements KeyManagementAlgorithm
 {
-    protected final Log log = LogFactory.getLog(this.getClass());
+    protected final Logger log = LoggerFactory.getLogger(getClass());
 
     private AlgorithmParameterSpec algorithmParameterSpec;
 
@@ -110,7 +111,7 @@ public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo imple
             if (log.isDebugEnabled())
             {
                 String flatStack = ExceptionHelp.toStringWithCausesAndAbbreviatedStack(e, JsonWebEncryption.class);
-                log.debug("Key unwrap failed. Substituting a randomly generated CEK and proceeding. " + flatStack);
+                log.debug("Key unwrap failed. Substituting a randomly generated CEK and proceeding. {}", flatStack);
             }
             /* https://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-39#section-11.5
                    and doing this should also result in the same type of error for different types of problems as suggested 11.4

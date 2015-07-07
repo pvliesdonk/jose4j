@@ -17,14 +17,15 @@
 package org.jose4j.jwe;
 
 import junit.framework.TestCase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.Key;
 import java.security.PrivateKey;
@@ -37,7 +38,7 @@ import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.*;
  */
 public class NegativeJweKeyTest extends TestCase
 {
-    Log log = LogFactory.getLog(this.getClass());
+    private static final Logger log = LoggerFactory.getLogger(NegativeJweKeyTest.class);
 
     public void testProduceA128KW() throws JoseException
     {
@@ -359,7 +360,7 @@ public class NegativeJweKeyTest extends TestCase
         }
         catch (InvalidKeyException e)
         {
-            log.debug("Expected exception due to invalid key: " + e);
+            log.debug("Expected exception due to invalid key: {}", e);
         }
     }
 
@@ -378,7 +379,7 @@ public class NegativeJweKeyTest extends TestCase
         }
         catch (InvalidKeyException e)
         {
-            log.debug("Expected exception due to invalid key: " + e);
+            log.debug("Expected exception due to invalid key: {}", e);
         }
 
     }

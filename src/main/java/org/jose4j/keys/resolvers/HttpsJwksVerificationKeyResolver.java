@@ -15,8 +15,6 @@
  */
 package org.jose4j.keys.resolvers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.jwk.HttpsJwks;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.VerificationJwkSelector;
@@ -24,6 +22,8 @@ import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.UnresolvableKeyException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.Key;
@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class HttpsJwksVerificationKeyResolver implements VerificationKeyResolver
 {
-    private Log log = LogFactory.getLog(this.getClass());
+    private static final Logger log = LoggerFactory.getLogger(HttpsJwksVerificationKeyResolver.class);
 
     private HttpsJwks httpsJkws;
 
@@ -57,13 +57,8 @@ public class HttpsJwksVerificationKeyResolver implements VerificationKeyResolver
             theChosenOne = verificationJwkSelector.select(jws, jsonWebKeys);
             if (theChosenOne == null)
             {
-                if (log.isDebugEnabled())
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("Refreshing JWKs from ").append(httpsJkws.getLocation()).append(" as no suitable verification key for JWS w/ header ");
-                    sb.append(jws.getHeaders().getFullHeaderAsJsonString()).append(" was found in ").append(jsonWebKeys);
-                    log.debug(sb.toString());
-                }
+                log.debug("Refreshing JWKs from {} as no suitable verification key for JWS w/ header {} was found in {}", httpsJkws.getLocation(), jws.getHeaders().getFullHeaderAsJsonString(), jsonWebKeys);
+
                 httpsJkws.refresh();
                 jsonWebKeys = httpsJkws.getJsonWebKeys();
                 theChosenOne = verificationJwkSelector.select(jws, jsonWebKeys);

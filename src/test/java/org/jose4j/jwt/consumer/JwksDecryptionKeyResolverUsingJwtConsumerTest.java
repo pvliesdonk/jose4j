@@ -15,7 +15,6 @@
  */
 package org.jose4j.jwt.consumer;
 
-import org.apache.commons.logging.LogFactory;
 import org.hamcrest.CoreMatchers;
 import org.jose4j.jwk.JsonWebKeySet;
 import org.jose4j.jwt.JwtClaims;
@@ -26,7 +25,8 @@ import org.jose4j.keys.resolvers.JwksVerificationKeyResolver;
 import org.jose4j.lang.JoseException;
 import org.junit.Assert;
 import org.junit.Test;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -37,6 +37,8 @@ import static org.junit.Assert.fail;
  */
 public class JwksDecryptionKeyResolverUsingJwtConsumerTest
 {
+	private static final Logger log = LoggerFactory.getLogger(JwksDecryptionKeyResolverUsingJwtConsumerTest.class);
+	
     @Test
     public void testSymmetricKeysWithDir() throws JoseException, InvalidJwtException, MalformedClaimException
     {
@@ -78,7 +80,7 @@ public class JwksDecryptionKeyResolverUsingJwtConsumerTest
         }
         catch (InvalidJwtException e)
         {
-            LogFactory.getLog(this.getClass()).debug("this was expected and is okay: " + e);
+        	log.debug("this was expected and is okay: {}", e);
         }
 
         json = "{\"keys\":[" +
@@ -101,7 +103,7 @@ public class JwksDecryptionKeyResolverUsingJwtConsumerTest
         }
         catch (InvalidJwtException e)
         {
-            LogFactory.getLog(this.getClass()).debug("this was expected and is okay: " + e);
+            log.debug("this was expected and is okay: {}", e);
         }
     }
 

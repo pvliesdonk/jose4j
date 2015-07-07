@@ -15,12 +15,12 @@
  */
 package org.jose4j.jwk;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.http.Get;
 import org.jose4j.http.SimpleGet;
 import org.jose4j.http.SimpleResponse;
 import org.jose4j.lang.JoseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class HttpsJwks
 {
-    private static Log log = LogFactory.getLog(HttpsJwks.class);
+    private static final Logger log = LoggerFactory.getLogger(HttpsJwks.class);
 
     private String location;
     private long defaultCacheDuration = 3600;
@@ -71,18 +71,18 @@ public class HttpsJwks
 
     public void refresh() throws JoseException, IOException
     {
-        if (log.isDebugEnabled()) {log.debug("Refreshing/loading JWKS from " + location);}
+        log.debug("Refreshing/loading JWKS from {}", location);
         SimpleResponse simpleResponse = simpleHttpGet.get(location);
         JsonWebKeySet jwks = new JsonWebKeySet(simpleResponse.getBody());
         List<JsonWebKey> keys = jwks.getJsonWebKeys();
         long cacheLife = getCacheLife(simpleResponse);
         if (cacheLife <= 0)
         {
-            if (log.isDebugEnabled()) {log.debug("Will use default cache duration of "+defaultCacheDuration+" seconds for content from " + location);}
+            log.debug("Will use default cache duration of {} seconds for content from {}", defaultCacheDuration, location);
             cacheLife = defaultCacheDuration;
         }
         long exp = System.currentTimeMillis() + (cacheLife * 1000L);
-        if (log.isDebugEnabled()) {log.debug("Updated JWKS content from " + location + " will be cached for " + cacheLife + " seconds until " + new Date(exp) + " -> " + keys);}
+        log.debug("Updated JWKS content from {} will be cached for {} seconds until {} -> {}", location, cacheLife, new Date(exp), keys);
         cache = new Cache(keys, exp);
     }
 

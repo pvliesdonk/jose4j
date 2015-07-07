@@ -16,10 +16,10 @@
 
 package org.jose4j.jwk;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.json.JsonUtil;
 import org.jose4j.lang.JoseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -27,7 +27,7 @@ import java.util.*;
  */
 public class JsonWebKeySet
 {
-    private final Log log = LogFactory.getLog(this.getClass());
+    private static final Logger log = LoggerFactory.getLogger(JsonWebKeySet.class);
 
     public static final String JWK_SET_MEMBER_NAME = "keys";
 
@@ -53,10 +53,7 @@ public class JsonWebKeySet
             }
             catch (Exception e)
             {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Ignoring an individual JWK in a JWKS due to a problem processing it. JWK params:" );
-                sb.append(jwkParamsMap).append(" and the full JWKS content: ").append(json);
-                log.debug(sb.toString(), e);
+                log.debug("Ignoring an individual JWK in a JWKS due to a problem processing it. JWK params: {} and the full JWKS content: {}. {}", jwkParamsMap, json, e);
             }
         }
     }
