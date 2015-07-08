@@ -43,6 +43,9 @@ public class GoogsTooSmallKeyJwtConsumerTest
      *
      * A bug report was submitted to them on May 19 2-4355000007039 but we'll see if anything comes of it.  Exposing the setRelaxXXXKeyValidations on JwtConsumer[Builder]
      * will probably be useful in other ways.
+     *
+     * On July 8, 2015 I was informed that they moved to using 2048 bit RSA keys (thanks William!) and was asked to test it. The new test
+     * here checks that things work as expected.
      */
 
     static String ID_TOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc2ZmQzMmFlYzdlMGY4YzE5MGRkYThiOWRkODVlN2NmNWFkMzNjNDMifQ" +
@@ -148,4 +151,52 @@ public class GoogsTooSmallKeyJwtConsumerTest
         JwtClaims claims = jwtConsumer.processToClaims(ID_TOKEN);
         assertThat(SUBJECT_VALUE, equalTo(claims.getSubject()));
     }
+
+    @Test
+    public void testAfterTheyMovedTo2048() throws Exception
+    {
+        // endpoints mentioned were found at https://accounts.google.com/.well-known/openid-configuration
+
+        // JWKS content from https://www.googleapis.com/oauth2/v3/certs on July 8, 2015
+        JsonWebKeySet jwks = new JsonWebKeySet("{\n" +
+                " \"keys\": [\n" +
+                "  {\n" +
+                "   \"kty\": \"RSA\",\n" +
+                "   \"alg\": \"RS256\",\n" +
+                "   \"use\": \"sig\",\n" +
+                "   \"kid\": \"e53139984bd36d2c230552441608cc0b5179487a\",\n" +
+                "   \"n\": \"w5F_3au2fyRLapW4K1g0zT6hjF-co8hjHJWniH3aBOKP45xuSRYXnPrpBHkXM6jFkVHs2pCFAOg6o0tl65iRCcf3hOAI6VOIXjMCJqxNap0-j_lJ6Bc6TBKgX3XD96iEI92iaxn_UIVZ_SpPrbPVyRmH0P7B6oDkwFpApviJRtQzv1F6uyh9W_sNnEZrCZDcs5lL5Xa_44-EkhVNz8yGZmAz9d04htNU7xElmXKs8fRdospyv380WeaWFoNJpc-3ojgRus26jvPy8Oc-d4M5yqs9mI72-1G0zbGVFI_PfxZRL8YdFAIZLg44zGzL2M7pFmagJ7Aj46LUb3p_n9V1NQ\",\n" +
+                "   \"e\": \"AQAB\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "   \"kty\": \"RSA\",\n" +
+                "   \"alg\": \"RS256\",\n" +
+                "   \"use\": \"sig\",\n" +
+                "   \"kid\": \"bc8a31927af20860418f6b2231bbfd7ebcc04665\",\n" +
+                "   \"n\": \"ucGr4fFCJYGVUwHYWAtBNclebyhMjALOTUmmAXdMrCIOgT8TxBEn5oXCrszWX7RoC37nFqc1GlMorfII19qMwHdC_iskju3Rh-AuHr29zkDpYIuh4lRW0xJ0Xyo2Iw4PlV9qgqPJLfkmE5V-sr5RxZNe0T1jyYaOGIJ5nF3WbDkgYW4GNHXhv-5tOwWLThJRtH_n6wtYqsBwqAdVX-EVbkyZvYeOzbiNiop7bDM5Td6ER1oCBC4NZjvjdmnOh8-_x6vB449jL5IRAOIIv8NW9dLtQd2DescZOw46HZjWO-zwyhjQeYY87R93yM9yivJdfrjQxydgEs8Ckh03NDATmQ\",\n" +
+                "   \"e\": \"AQAB\"\n" +
+                "  }\n" +
+                " ]\n" +
+                "}\n");
+
+        // an ID token from making an openid request to https://accounts.google.com/o/oauth2/v2/auth
+        String jwt = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJjOGEzMTkyN2FmMjA4NjA0MThmNmIyMjMxYmJmZDdlYmNjMDQ2NjUifQ" +
+                ".eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwic3ViIjoiMTA5MzM5ODA3NjQ3Nzc3MzkzOTYxIiwiYXpwIjoiMTA3ODQ0OTAyOTY4Ni5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImF1ZCI6IjEwNzg0NDkwMjk2ODYuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJpYXQiOjE0MzYzODUzMzYsImV4cCI6MTQzNjM4ODkzNn0" +
+                ".B8jAoYKnsN0Xy62VjBXIrk5B-3ZdbQNt_qzndhlOJXpo4W0C1Q4BvC8YjFc2k6T1qNuehfSrO9xvm-BQGAXRyuQSZPpcQOtP2_LR39oYpnBgDwGKxTdJwAHTIoYTti1R1o-sAkMk-dt4lP45RbUXJEKST0RLKe9RdjNKLtcg62wSvVuLwaqRYyIRWK3Tb8aRA3Eay8uUe8Llk5qJ-1E1pSOscvlYF6EVNkafKBa4jC5utAu5WwvdDoMFz3ZPOzNnhQsjOdxtnAjN3mI9EWNALUsLrdY54-O0JnVJGywKEnwfeDBcUClt_ZBwV-Rl8WMv8TWZRJ8SWywnYi2gaBnaPw";
+
+        JwksVerificationKeyResolver verificationKeyResolver = new JwksVerificationKeyResolver(jwks.getJsonWebKeys());
+
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                .setRequireExpirationTime()
+                .setEvaluationTime(NumericDate.fromSeconds(1436388930))
+                .setRequireSubject()
+                .setExpectedIssuer(ISSUER)
+                .setExpectedAudience("1078449029686.apps.googleusercontent.com") // borrowed a bitbucket client id
+                .setVerificationKeyResolver(verificationKeyResolver) // pretend to use Google's jwks endpoint to find the key for signature checks
+                .build();
+
+        JwtClaims claims = jwtConsumer.processToClaims(jwt);
+        assertThat("109339807647777393961", equalTo(claims.getSubject()));
+    }
+
 }
