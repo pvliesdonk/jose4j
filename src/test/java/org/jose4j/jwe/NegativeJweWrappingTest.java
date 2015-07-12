@@ -131,7 +131,7 @@ public class NegativeJweWrappingTest
         }
         catch (IntegrityException e)
         {
-            log.debug("Expected exception processing modified JWE {}", e);
+            log.debug("Expected exception processing modified JWE {}", e.toString());
         }
     }
 }

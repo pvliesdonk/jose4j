@@ -80,7 +80,7 @@ public class JwksDecryptionKeyResolverUsingJwtConsumerTest
         }
         catch (InvalidJwtException e)
         {
-        	log.debug("this was expected and is okay: {}", e);
+        	log.debug("this was expected and is okay: {}", e.toString());
         }
 
         json = "{\"keys\":[" +
@@ -103,7 +103,7 @@ public class JwksDecryptionKeyResolverUsingJwtConsumerTest
         }
         catch (InvalidJwtException e)
         {
-            log.debug("this was expected and is okay: {}", e);
+            log.debug("this was expected and is okay: {}", e.toString());
         }
     }
 

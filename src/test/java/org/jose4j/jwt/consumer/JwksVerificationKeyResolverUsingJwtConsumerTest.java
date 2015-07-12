@@ -98,7 +98,7 @@ public class JwksVerificationKeyResolverUsingJwtConsumerTest
         }
         catch (InvalidJwtException e)
         {
-            log.debug("this was expected and is okay: {}", e);
+            log.debug("this was expected and is okay: {}", e.toString());
         }
     }
 
@@ -148,7 +148,7 @@ public class JwksVerificationKeyResolverUsingJwtConsumerTest
         }
         catch (InvalidJwtException e)
         {
-            log.debug("this was expected and is okay: {}", e);
+            log.debug("this was expected and is okay: {}", e.toString());
         }
     }
 }

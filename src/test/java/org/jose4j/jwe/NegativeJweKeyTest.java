@@ -360,7 +360,7 @@ public class NegativeJweKeyTest extends TestCase
         }
         catch (InvalidKeyException e)
         {
-            log.debug("Expected exception due to invalid key: {}", e);
+            log.debug("Expected exception due to invalid key: {}", e.toString());
         }
     }
 
@@ -379,7 +379,7 @@ public class NegativeJweKeyTest extends TestCase
         }
         catch (InvalidKeyException e)
         {
-            log.debug("Expected exception due to invalid key: {}", e);
+            log.debug("Expected exception due to invalid key: {}", e.toString());
         }
 
     }

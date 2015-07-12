@@ -141,7 +141,7 @@ public class HmacShaTest extends TestCase
         }
         catch (InvalidKeyException e)
         {
-            log.debug("Expected something like this: {}", e);
+            log.debug("Expected something like this: {}", e.toString());
         }
     }
 

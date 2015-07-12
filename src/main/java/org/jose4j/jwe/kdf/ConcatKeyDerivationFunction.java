@@ -64,13 +64,13 @@ public class ConcatKeyDerivationFunction
     public byte[] kdf(byte[] sharedSecret, int keydatalen, byte[] otherInfo)
     {
         long reps = getReps(keydatalen);
-        log.debug("reps: {}", reps);
+        log.debug("reps: {}", String.valueOf(reps));
         log.debug("otherInfo: {}", ByteUtil.toDebugString(otherInfo));
 
         ByteArrayOutputStream derivedByteOutputStream = new ByteArrayOutputStream();
         for (int i = 1; i <= reps; i++)
         {
-            log.debug("rep {} hashing ");
+            log.debug("rep {} hashing ", i);
             byte[] counterBytes = ByteUtil.getBytes(i);
             log.debug(" counter: {}", ByteUtil.toDebugString(counterBytes));
             log.debug(" z: {}", ByteUtil.toDebugString(sharedSecret));

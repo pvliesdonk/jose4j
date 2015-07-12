@@ -108,7 +108,7 @@ public class HttpsJwksVerificationKeyResolverTest
         }
         catch (UnresolvableKeyException e)
         {
-        	log.debug("this was expected and is okay: {}", e);
+        	log.debug("this was expected and is okay: {}", e.toString() );
             assertFalse("do you really need UnresolvableKeyException inside a UnresolvableKeyException?", e.getCause() instanceof UnresolvableKeyException);
         }
     }
@@ -135,7 +135,7 @@ public class HttpsJwksVerificationKeyResolverTest
         }
         catch (UnresolvableKeyException e)
         {
-            log.debug("this was expected and is okay: {}", e);
+            log.debug("this was expected and is okay: {}", e.toString());
         }
     }
 

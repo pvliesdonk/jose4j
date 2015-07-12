@@ -45,7 +45,7 @@ public class SimpleJwtConsumerTestHelp
         }
         catch (InvalidJwtException e)
         {
-            log.debug("Expected exception: {}", e);
+            log.debug("Expected exception: {}", e.toString());
         }
 
         if (jwtContext != null)
@@ -57,7 +57,7 @@ public class SimpleJwtConsumerTestHelp
             }
             catch (InvalidJwtException e)
             {
-                log.debug("Expected exception: {}", e);
+                log.debug("Expected exception: {}", e.toString());
             }
         }
     }
@@ -76,7 +76,7 @@ public class SimpleJwtConsumerTestHelp
         }
         catch (InvalidJwtException e)
         {
-            log.debug("Expected exception: {}", e);
+            log.debug("Expected exception: {}", e.toString());
         }
     }
 }

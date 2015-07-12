@@ -97,7 +97,7 @@ public class JwsTestSupport
         }
         catch (JoseException e)
         {
-            log.debug("Expected something like this: {}", e);
+            log.debug("Expected something like this: {}", e.toString());
         }
     }
 
@@ -113,7 +113,7 @@ public class JwsTestSupport
         }
         catch (InvalidKeyException e)
         {
-            log.debug("Expected something like this: {}", e);
+            log.debug("Expected something like this: {}", e.toString());
         }
     }
 }
