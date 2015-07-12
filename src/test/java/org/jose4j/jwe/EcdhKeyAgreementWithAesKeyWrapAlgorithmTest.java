@@ -17,12 +17,13 @@
 package org.jose4j.jwe;
 
 import junit.framework.TestCase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 import org.jose4j.jwa.AlgorithmFactory;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.lang.JoseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -32,7 +33,7 @@ import java.util.Set;
  */
 public class EcdhKeyAgreementWithAesKeyWrapAlgorithmTest extends TestCase
 {
-    Log log = LogFactory.getLog(this.getClass());
+    private static final Logger log = LoggerFactory.getLogger(EcdhKeyAgreementWithAesKeyWrapAlgorithmTest.class);
 
     public void testRoundTrip() throws JoseException
     {
@@ -62,8 +63,8 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithmTest extends TestCase
             log.warn("*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*");
             log.warn("It looks like the JCE's Unlimited Strength Jurisdiction Policy Files are not installed for the JRE.");
             log.warn("So some algorithms are not available and will not be tested.");
-            log.warn(algs + " vs " + Arrays.toString(algArray));
-            log.warn(encs + " vs " + Arrays.toString(encArray));
+            log.warn("{} vs {}", algs, Arrays.toString(algArray));
+            log.warn("{} vs {}", encs, Arrays.toString(encArray));
             log.warn("*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*");
         }
 
@@ -98,7 +99,7 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithmTest extends TestCase
 
         String compactSerialization = jwe.getCompactSerialization();
 
-        log.debug("JWE w/ " + alg + " & " + enc +": " + compactSerialization);
+        log.debug("JWE w/ {} & {}: {}", alg, enc, compactSerialization);
 
         JsonWebEncryption receiverJwe = new JsonWebEncryption();
         receiverJwe.setCompactSerialization(compactSerialization);

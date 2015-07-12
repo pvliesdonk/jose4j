@@ -15,8 +15,6 @@
  */
 package org.jose4j.keys.resolvers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.keys.X509Util;
@@ -24,6 +22,8 @@ import org.jose4j.lang.ExceptionHelp;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.UncheckedJoseException;
 import org.jose4j.lang.UnresolvableKeyException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.Key;
 import java.security.PublicKey;
@@ -38,7 +38,7 @@ import static org.jose4j.jwx.HeaderParameterNames.X509_CERTIFICATE_THUMBPRINT;
  */
 public class X509VerificationKeyResolver implements VerificationKeyResolver
 {
-    final static Log log = LogFactory.getLog(X509VerificationKeyResolver.class);
+    private static final Logger log = LoggerFactory.getLogger(X509VerificationKeyResolver.class);
 
     private Map<String,X509Certificate> x5tMap;
     private Map<String,X509Certificate> x5tS256Map;
@@ -138,7 +138,7 @@ public class X509VerificationKeyResolver implements VerificationKeyResolver
             }
             catch (JoseException e)
             {
-                log.debug("Verify signature didn't work: " + ExceptionHelp.toStringWithCauses(e));
+                log.debug("Verify signature didn't work: {}", ExceptionHelp.toStringWithCauses(e));
             }
         }
         StringBuilder sb = new StringBuilder();

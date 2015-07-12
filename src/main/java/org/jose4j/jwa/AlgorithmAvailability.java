@@ -15,17 +15,17 @@
  */
 package org.jose4j.jwa;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.security.Security;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  */
 public class AlgorithmAvailability
 {
-    private static Log log = LogFactory.getLog(AlgorithmAvailability.class);
+    private static Logger log = LoggerFactory.getLogger(AlgorithmAvailability.class);
 
     public static boolean isAvailable(String serviceName, String algorithm)
     {
@@ -38,8 +38,7 @@ public class AlgorithmAvailability
             }
         }
 
-        log.info(algorithm + " is NOT available for " + serviceName +
-                    ". Algorithms available from underlying JCE: " + algorithms);
+        log.info("{} is NOT available for {}. Algorithms available from underlying JCE: {}", algorithm, serviceName, algorithms);
         return false;
     }
 }

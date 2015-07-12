@@ -16,13 +16,15 @@
 
 package org.jose4j.jws;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+
 import junit.framework.TestCase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.Key;
 
@@ -31,7 +33,7 @@ import java.security.Key;
  */
 public class HmacShaTest extends TestCase
 {
-    Log log = LogFactory.getLog(this.getClass());
+    private static final Logger log = LoggerFactory.getLogger(HmacShaTest.class);
 
     Key KEY1 = new HmacKey(new byte[]{-41, -1, 60, 1, 1, 45, -92, -114, 8, -1, -60, 7, 54, -16, 16, 14, -20, -85, 56,
             103, 4, 10, -56, 120, 37, -48, 6, 9, 110, -96, 27, -4, 41, -99, 60, 91, 49, 70, -99, -14, -108, -81, 60,
@@ -139,7 +141,7 @@ public class HmacShaTest extends TestCase
         }
         catch (InvalidKeyException e)
         {
-            log.debug("Expected something like this: " + e);
+            log.debug("Expected something like this: {}", e.toString());
         }
     }
 

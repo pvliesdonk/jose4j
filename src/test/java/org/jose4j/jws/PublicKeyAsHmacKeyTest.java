@@ -16,15 +16,16 @@
 
 package org.jose4j.jws;
 
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.ExceptionHelp;
 import org.jose4j.lang.JoseException;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.spec.SecretKeySpec;
+
 import java.security.PublicKey;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -87,7 +88,7 @@ public class PublicKeyAsHmacKeyTest
         }
         catch (JoseException e)
         {
-            LogFactory.getLog(this.getClass()).debug(ExceptionHelp.toStringWithCauses(e));
+            LoggerFactory.getLogger(getClass()).debug(ExceptionHelp.toStringWithCauses(e));
             assertFalse("expected valid signature but got " + e, expectedSignatureStatus);
         }
     }

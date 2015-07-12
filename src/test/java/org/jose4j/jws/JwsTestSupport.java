@@ -16,12 +16,12 @@
 
 package org.jose4j.jws;
 
-import junit.framework.Assert;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
 import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.Key;
 
@@ -29,7 +29,7 @@ import java.security.Key;
  */
 public class JwsTestSupport
 {
-    static Log log = LogFactory.getLog(JwsTestSupport.class);
+    private static final Logger log = LoggerFactory.getLogger(JwsTestSupport.class);
 
     static void testBasicRoundTrip(String payload, String jwsAlgo, Key signingKey1, Key verificationKey1, Key signingKey2, Key verificationKey2) throws JoseException
     {
@@ -39,7 +39,7 @@ public class JwsTestSupport
         jwsWithKey1.setKey(signingKey1);
         String serializationWithKey1 = jwsWithKey1.getCompactSerialization();
 
-        log.debug(jwsAlgo + " " + serializationWithKey1);
+        log.debug("{} {}", jwsAlgo, serializationWithKey1);
 
         JsonWebSignature jwsWithKey2 = new JsonWebSignature();
         jwsWithKey2.setKey(signingKey2);
@@ -97,7 +97,7 @@ public class JwsTestSupport
         }
         catch (JoseException e)
         {
-            log.debug("Expected something like this: " + e);
+            log.debug("Expected something like this: {}", e.toString());
         }
     }
 
@@ -113,7 +113,7 @@ public class JwsTestSupport
         }
         catch (InvalidKeyException e)
         {
-            log.debug("Expected something like this: " + e);
+            log.debug("Expected something like this: {}", e.toString());
         }
     }
 }

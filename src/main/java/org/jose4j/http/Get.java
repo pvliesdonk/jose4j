@@ -15,12 +15,13 @@
  */
 package org.jose4j.http;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.lang.StringUtil;
 import org.jose4j.lang.UncheckedJoseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -44,7 +45,7 @@ public class Get implements SimpleGet
 {
     private static final long MAX_RETRY_WAIT = 8000;
 
-    private static Log log = LogFactory.getLog(Get.class);
+    private static final Logger log = LoggerFactory.getLogger(Get.class);
 
     private int connectTimeout = 20000;
     private int readTimeout = 20000;
@@ -59,7 +60,7 @@ public class Get implements SimpleGet
     public SimpleResponse get(String location) throws IOException
     {
         int attempts = 0;
-        if (log.isDebugEnabled()) { log.debug("HTTP GET of " + location);}
+        log.debug("HTTP GET of {}", location);
         URL url = new URL(location);
         while (true)
         {
@@ -86,7 +87,7 @@ public class Get implements SimpleGet
 
                 Map<String,List<String>> headers = httpUrlConnection.getHeaderFields();
                 SimpleResponse simpleResponse = new Response(code, msg, headers, body);
-                if (log.isDebugEnabled()) { log.debug("HTTP GET of " + url + " returned " + simpleResponse);}
+                log.debug("HTTP GET of {} returned {}", url, simpleResponse);
                 return simpleResponse;
             }
             catch (SSLHandshakeException | SSLPeerUnverifiedException | FileNotFoundException | ResponseBodyTooLargeException e)
@@ -101,8 +102,8 @@ public class Get implements SimpleGet
                     throw e;
                 }
                 long retryWaitTime = getRetryWaitTime(attempts);
-                if (log.isDebugEnabled()) { log.debug("Waiting "+retryWaitTime+ "ms before retrying ("+ attempts + " of " + retries + ") HTTP GET of " + url + " after failed attempt: " + e);}
-                try { Thread.sleep(retryWaitTime);} catch (InterruptedException ie) { /* ignore */ }
+                log.debug("Waiting {}ms before retrying ({} of {}) HTTP GET of {} after failed attempt: {}", retryWaitTime, attempts, retries, url, e);
+                try { Thread.sleep(retryWaitTime); } catch (InterruptedException ie) { /* ignore */ }
             }
         }
     }
@@ -125,7 +126,7 @@ public class Get implements SimpleGet
                     throw new ResponseBodyTooLargeException("More than " + responseBodySizeLimit + " characters have been read from the response body.");
                 }
             }
-            log.debug("read " + charactersRead + " characters");
+            log.debug("read {} characters", charactersRead);
         }
         return writer.toString();
     }
@@ -167,7 +168,7 @@ public class Get implements SimpleGet
         }
         catch (Exception e)
         {
-            if (log.isDebugEnabled()) { log.debug("Unexpected problem attempted to determine the charset from the Content-Type (" +contentType+") so will default to using UTF8" + e);}
+            log.debug("Unexpected problem attempted to determine the charset from the Content-Type ({}) so will default to using UTF8: {}", contentType, e);
             charset = StringUtil.UTF_8;
         }
         return charset;

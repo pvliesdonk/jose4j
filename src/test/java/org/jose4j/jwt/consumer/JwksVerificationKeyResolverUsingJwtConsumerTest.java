@@ -15,13 +15,14 @@
  */
 package org.jose4j.jwt.consumer;
 
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.JsonWebKeySet;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.NumericDate;
 import org.jose4j.keys.resolvers.JwksVerificationKeyResolver;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -34,6 +35,8 @@ import static org.junit.Assert.fail;
  */
 public class JwksVerificationKeyResolverUsingJwtConsumerTest
 {
+	private static final Logger log = LoggerFactory.getLogger(JwksVerificationKeyResolverUsingJwtConsumerTest.class);
+	
     @Test
     public void idtokenFromPf() throws Exception
     {
@@ -95,7 +98,7 @@ public class JwksVerificationKeyResolverUsingJwtConsumerTest
         }
         catch (InvalidJwtException e)
         {
-            LogFactory.getLog(this.getClass()).debug("this was expected and is okay: " + e);
+            log.debug("this was expected and is okay: {}", e.toString());
         }
     }
 
@@ -145,7 +148,7 @@ public class JwksVerificationKeyResolverUsingJwtConsumerTest
         }
         catch (InvalidJwtException e)
         {
-            LogFactory.getLog(this.getClass()).debug("this was expected and is okay: " + e);
+            log.debug("this was expected and is okay: {}", e.toString());
         }
     }
 }

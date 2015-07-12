@@ -16,9 +16,9 @@
 
 package org.jose4j.keys;
 
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.security.interfaces.ECPrivateKey;
@@ -103,7 +103,7 @@ public class ExampleEcKeysFromJws
         }
         catch (JoseException e)
         {
-            LogFactory.getLog(ExampleEcKeysFromJws.class).warn("Unable to initialize Example EC keys.", e);
+            LoggerFactory.getLogger(ExampleEcKeysFromJws.class).warn("Unable to initialize Example EC keys.", e);
         }
     }
 }

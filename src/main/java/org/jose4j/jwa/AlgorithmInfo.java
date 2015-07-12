@@ -16,15 +16,15 @@
 
 package org.jose4j.jwa;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.keys.KeyPersuasion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  */
 public abstract class AlgorithmInfo implements Algorithm
 {
-    protected final Log log = LogFactory.getLog(this.getClass());
+    protected final Logger log = LoggerFactory.getLogger(getClass());
 
     private String algorithmIdentifier;
     private String javaAlgorithm;

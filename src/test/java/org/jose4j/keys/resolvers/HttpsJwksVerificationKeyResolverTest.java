@@ -15,7 +15,6 @@
  */
 package org.jose4j.keys.resolvers;
 
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.http.Get;
 import org.jose4j.http.Response;
 import org.jose4j.http.SimpleResponse;
@@ -25,6 +24,8 @@ import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.UnresolvableKeyException;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.Key;
@@ -41,6 +42,8 @@ import static org.mockito.Mockito.*;
  */
 public class HttpsJwksVerificationKeyResolverTest
 {
+	private static final Logger log = LoggerFactory.getLogger(HttpsJwksVerificationKeyResolverTest.class);
+	
     @Test
     public void simpleKeyFoundThenNotFoundAndRefreshToFindAndThenCantFind() throws Exception
     {
@@ -105,7 +108,7 @@ public class HttpsJwksVerificationKeyResolverTest
         }
         catch (UnresolvableKeyException e)
         {
-            LogFactory.getLog(this.getClass()).debug("this was expected and is okay: " + e);
+        	log.debug("this was expected and is okay: {}", e.toString() );
             assertFalse("do you really need UnresolvableKeyException inside a UnresolvableKeyException?", e.getCause() instanceof UnresolvableKeyException);
         }
     }
@@ -132,7 +135,7 @@ public class HttpsJwksVerificationKeyResolverTest
         }
         catch (UnresolvableKeyException e)
         {
-            LogFactory.getLog(this.getClass()).debug("this was expected and is okay: " + e);
+            log.debug("this was expected and is okay: {}", e.toString());
         }
     }
 

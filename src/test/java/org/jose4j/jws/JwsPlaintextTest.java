@@ -16,14 +16,14 @@
 
 package org.jose4j.jws;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.InvalidAlgorithmException;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.Key;
 
@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
  */
 public class JwsPlaintextTest
 {
-    Log log = LogFactory.getLog(this.getClass());
+    private static final Logger log = LoggerFactory.getLogger(JwsPlaintextTest.class);
 
     String JWS = "eyJhbGciOiJub25lIn0.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.";
     String PAYLOAD = "{\"iss\":\"joe\",\r\n \"exp\":1300819380,\r\n \"http://example.com/is_root\":true}";
