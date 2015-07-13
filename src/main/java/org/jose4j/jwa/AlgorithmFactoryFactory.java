@@ -47,7 +47,7 @@ public class AlgorithmFactoryFactory
 
     void reinitialize()
     {
-        log.info("Reinitializing jose4j...");
+        log.debug("Reinitializing jose4j...");
         initialize();
     }
 
@@ -57,7 +57,7 @@ public class AlgorithmFactoryFactory
         String vendor = System.getProperty("java.vendor");
         String home = System.getProperty("java.home");
         String providers = Arrays.toString(Security.getProviders());
-        log.info("Initializing jose4j (running with Java {} from {} at {} with {} security providers installed)...", version, vendor, home, providers);
+        log.debug("Initializing jose4j (running with Java {} from {} at {} with {} security providers installed)...", version, vendor, home, providers);
         long startTime = System.currentTimeMillis();
         jwsAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ALGORITHM, JsonWebSignatureAlgorithm.class);
         jwsAlgorithmFactory.registerAlgorithm(new PlaintextNoneAlgorithm());
@@ -74,7 +74,7 @@ public class AlgorithmFactoryFactory
         jwsAlgorithmFactory.registerAlgorithm(new RsaUsingShaAlgorithm.RsaPssSha384());
         jwsAlgorithmFactory.registerAlgorithm(new RsaUsingShaAlgorithm.RsaPssSha512());
 
-        log.info("JWS signature algorithms: {}", jwsAlgorithmFactory.getSupportedAlgorithms());
+        log.debug("JWS signature algorithms: {}", jwsAlgorithmFactory.getSupportedAlgorithms());
 
         jweKeyMgmtModeAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ALGORITHM, KeyManagementAlgorithm.class);
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new RsaKeyManagementAlgorithm.Rsa1_5());
@@ -95,7 +95,7 @@ public class AlgorithmFactoryFactory
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new AesGcmKeyEncryptionAlgorithm.Aes192Gcm());
         jweKeyMgmtModeAlgorithmFactory.registerAlgorithm(new AesGcmKeyEncryptionAlgorithm.Aes256Gcm());
 
-        log.info("JWE key management algorithms: {}", jweKeyMgmtModeAlgorithmFactory.getSupportedAlgorithms());
+        log.debug("JWE key management algorithms: {}", jweKeyMgmtModeAlgorithmFactory.getSupportedAlgorithms());
 
         jweContentEncryptionAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ENCRYPTION_METHOD, ContentEncryptionAlgorithm.class);
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new AesCbcHmacSha2ContentEncryptionAlgorithm.Aes128CbcHmacSha256());
@@ -105,13 +105,13 @@ public class AlgorithmFactoryFactory
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new AesGcmContentEncryptionAlgorithm.Aes192Gcm());
         jweContentEncryptionAlgorithmFactory.registerAlgorithm(new AesGcmContentEncryptionAlgorithm.Aes256Gcm());
 
-        log.info("JWE content encryption algorithms: {}", jweContentEncryptionAlgorithmFactory.getSupportedAlgorithms());
+        log.debug("JWE content encryption algorithms: {}", jweContentEncryptionAlgorithmFactory.getSupportedAlgorithms());
 
         compressionAlgorithmFactory = new AlgorithmFactory<>(HeaderParameterNames.ZIP, CompressionAlgorithm.class);
         compressionAlgorithmFactory.registerAlgorithm(new DeflateRFC1951CompressionAlgorithm());
 
-        log.info("JWE compression algorithms: {}", compressionAlgorithmFactory.getSupportedAlgorithms());
-        log.info("Initialized jose4j in {}ms", (System.currentTimeMillis() - startTime));
+        log.debug("JWE compression algorithms: {}", compressionAlgorithmFactory.getSupportedAlgorithms());
+        log.debug("Initialized jose4j in {}ms", (System.currentTimeMillis() - startTime));
     }
 
     public static AlgorithmFactoryFactory getInstance()

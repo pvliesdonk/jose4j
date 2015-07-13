@@ -71,11 +71,11 @@ public class AlgorithmFactory<A extends Algorithm>
         if (isAvailable(algorithm))
         {
             algorithms.put(algId, algorithm);
-            log.info("{} registered for {} algorithm {}", algorithm, parameterName, algId);
+            log.debug("{} registered for {} algorithm {}", algorithm, parameterName, algId);
         }
         else
         {
-            log.info("{} is unavailable so will not be registered for {} algorithms.", algId, parameterName);
+            log.debug("{} is unavailable so will not be registered for {} algorithms.", algId, parameterName);
         }
     }
 
