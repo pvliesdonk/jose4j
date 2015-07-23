@@ -32,6 +32,7 @@ import java.util.Set;
  */
 public class JceProviderTestSupport
 {
+    private boolean useBouncyCastleRegardlessOfAlgs;
     private boolean doReinitialize = true;
     private Set<String> signatureAlgs = Collections.emptySet();
     private Set<String> keyManagementAlgs = Collections.emptySet();
@@ -45,7 +46,7 @@ public class JceProviderTestSupport
     public void runWithBouncyCastleProviderIfNeeded(RunnableTest test) throws Exception
     {
         BouncyCastleProvider bouncyCastleProvider = new BouncyCastleProvider();
-        boolean needBouncyCastle = false;
+        boolean needBouncyCastle = useBouncyCastleRegardlessOfAlgs;
 
         AlgorithmFactoryFactory aff = AlgorithmFactoryFactory.getInstance();
 
@@ -117,6 +118,11 @@ public class JceProviderTestSupport
     public void setDoReinitialize(boolean doReinitialize)
     {
         this.doReinitialize = doReinitialize;
+    }
+
+    public void setUseBouncyCastleRegardlessOfAlgs(boolean useBouncyCastleRegardlessOfAlgs)
+    {
+        this.useBouncyCastleRegardlessOfAlgs = useBouncyCastleRegardlessOfAlgs;
     }
 
     public static interface RunnableTest
