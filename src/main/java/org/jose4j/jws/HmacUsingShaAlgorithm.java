@@ -25,6 +25,7 @@ import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.mac.MacUtil;
 
 import javax.crypto.Mac;
+import javax.crypto.SecretKey;
 import java.security.Key;
 
 /**
@@ -44,6 +45,11 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
 
     public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws InvalidKeyException
     {
+        if (!(key instanceof SecretKey))
+        {
+            throw new InvalidKeyException(key.getClass() + " cannot be used for HMAC verification.");
+        }
+
         Mac mac = getMacInstance(key);
         byte[] calculatedSigature = mac.doFinal(securedInputBytes);
 

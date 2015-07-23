@@ -16,6 +16,7 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.jwa.JceProviderTestSupport;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.keys.HmacKey;
@@ -66,15 +67,93 @@ public class PublicKeyAsHmacKeyTest
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
         jws.setPayload("scrupulous undercut");
-        jws.setKey(new HmacKey(ExampleEcKeysFromJws.PRIVATE_256.getEncoded()));
+        jws.setKey(new HmacKey(ExampleEcKeysFromJws.PUBLIC_256.getEncoded()));
         verify(ExampleEcKeysFromJws.PUBLIC_256, jws.getCompactSerialization(), false);
 
         jws = new JsonWebSignature();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
         jws.setPayload("menial predestination");
-        jws.setKey(new SecretKeySpec(ExampleEcKeysFromJws.PRIVATE_256.getEncoded(), ""));
+        jws.setKey(new SecretKeySpec(ExampleEcKeysFromJws.PUBLIC_256.getEncoded(), ""));
         verify(ExampleEcKeysFromJws.PUBLIC_256, jws.getCompactSerialization(), false);
     }
+
+    @Test
+    public void tryPubKeyAsHmacTrickWithRsaBC1() throws Exception
+    {
+        JceProviderTestSupport support = new JceProviderTestSupport();
+        support.setUseBouncyCastleRegardlessOfAlgs(true);
+        support.runWithBouncyCastleProviderIfNeeded(new JceProviderTestSupport.RunnableTest()
+        {
+            @Override
+            public void runTest() throws Exception
+            {
+                JsonWebSignature jws = new JsonWebSignature();
+                jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+                jws.setPayload("salty slop");
+                jws.setKey(new SecretKeySpec(ExampleRsaKeyFromJws.PUBLIC_KEY.getEncoded(), "algorithm"));
+                verify(ExampleRsaKeyFromJws.PUBLIC_KEY, jws.getCompactSerialization(), false);
+            }
+        });
+    }
+
+    @Test
+    public void tryPubKeyAsHmacTrickWithRsaBC2() throws Exception
+    {
+        JceProviderTestSupport support = new JceProviderTestSupport();
+        support.setUseBouncyCastleRegardlessOfAlgs(true);
+        support.runWithBouncyCastleProviderIfNeeded(new JceProviderTestSupport.RunnableTest()
+        {
+            @Override
+            public void runTest() throws Exception
+            {
+                JsonWebSignature jws = new JsonWebSignature();
+                jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+                jws.setPayload("http://watchout4snakes.com/wo4snakes/Random/RandomPhrase");
+                jws.setKey(new HmacKey(ExampleRsaKeyFromJws.PUBLIC_KEY.getEncoded()));
+                verify(ExampleRsaKeyFromJws.PUBLIC_KEY, jws.getCompactSerialization(), false);
+            }
+        });
+    }
+
+    @Test
+    public void tryPubKeyAsHmacTrickWithEcBC1() throws Exception
+    {
+        JceProviderTestSupport support = new JceProviderTestSupport();
+        support.setUseBouncyCastleRegardlessOfAlgs(true);
+        support.runWithBouncyCastleProviderIfNeeded(new JceProviderTestSupport.RunnableTest()
+        {
+            @Override
+            public void runTest() throws Exception
+            {
+                JsonWebSignature jws = new JsonWebSignature();
+                jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+                jws.setPayload("scrupulous undercut");
+                jws.setKey(new HmacKey(ExampleEcKeysFromJws.PUBLIC_256.getEncoded()));
+                verify(ExampleEcKeysFromJws.PUBLIC_256, jws.getCompactSerialization(), false);
+
+            }
+        });
+    }
+
+    @Test
+    public void tryPubKeyAsHmacTrickWithEcBC2() throws Exception
+    {
+        JceProviderTestSupport support = new JceProviderTestSupport();
+        support.setUseBouncyCastleRegardlessOfAlgs(true);
+        support.runWithBouncyCastleProviderIfNeeded(new JceProviderTestSupport.RunnableTest()
+        {
+            @Override
+            public void runTest() throws Exception
+            {
+                JsonWebSignature jws = new JsonWebSignature();
+                jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+                jws.setPayload("menial predestination");
+                jws.setKey(new SecretKeySpec(ExampleEcKeysFromJws.PUBLIC_256.getEncoded(), ""));
+                verify(ExampleEcKeysFromJws.PUBLIC_256, jws.getCompactSerialization(), false);
+            }
+        });
+    }
+
 
     private void verify(PublicKey verificationKey, String cs, boolean expectedSignatureStatus) throws JoseException
     {
