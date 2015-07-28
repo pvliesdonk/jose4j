@@ -16,22 +16,24 @@
 
 package org.jose4j.jwe;
 
-import junit.framework.TestCase;
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jwa.AlgorithmFactory;
+import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwa.JceProviderTestSupport;
-import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
-import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Security;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
@@ -115,6 +117,11 @@ public class RsaOaepKeyManagementAlgorithmTest
             @Override
             public void runTest() throws Exception
             {
+                if (!doubleCheckRsaOaep256())
+                {
+                    return;
+                }
+
                 RsaJsonWebKey jwk = (RsaJsonWebKey) PublicJsonWebKey.Factory.newPublicJwk(JWK_JSON);
                 JsonWebEncryption jwe = new JsonWebEncryption();
                 jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.RSA_OAEP_256);
@@ -130,6 +137,19 @@ public class RsaOaepKeyManagementAlgorithmTest
                 assertEquals(payloadIn, payloadOut);
             }
         });
+    }
+
+    private boolean doubleCheckRsaOaep256()
+    {
+        AlgorithmFactory<KeyManagementAlgorithm> jweKeyManagementAlgorithmFactory = AlgorithmFactoryFactory.getInstance().getJweKeyManagementAlgorithmFactory();
+        String rsaOaep256 = KeyManagementAlgorithmIdentifiers.RSA_OAEP_256;
+        boolean available = jweKeyManagementAlgorithmFactory.isAvailable(rsaOaep256);
+        if (!available)
+        {
+            Logger log = LoggerFactory.getLogger(this.getClass());
+            log.warn("\n\n\n\n**not** testing " + rsaOaep256 + " because it is unavailable due to the underlying JCA provider set up " + Arrays.toString(Security.getProviders()) + "\n\n\n\n");
+        }
+        return available;
     }
 
     @Test
@@ -153,8 +173,12 @@ public class RsaOaepKeyManagementAlgorithmTest
             @Override
             public void runTest() throws Exception
             {
-                RsaJsonWebKey jwk = (RsaJsonWebKey) PublicJsonWebKey.Factory.newPublicJwk(JWK_JSON);
+                if (!doubleCheckRsaOaep256())
+                {
+                    return;
+                }
 
+                RsaJsonWebKey jwk = (RsaJsonWebKey) PublicJsonWebKey.Factory.newPublicJwk(JWK_JSON);
                 JsonWebEncryption jwe = new JsonWebEncryption();
                 jwe.setCompactSerialization(cs);
                 jwe.setKey(jwk.getPrivateKey());
