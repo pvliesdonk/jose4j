@@ -21,7 +21,6 @@ import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ExceptionHelp;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
-import org.jose4j.lang.ProviderHelp;
 
 import java.security.*;
 import java.security.spec.AlgorithmParameterSpec;
@@ -30,12 +29,6 @@ import java.security.spec.AlgorithmParameterSpec;
  */
 public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements JsonWebSignatureAlgorithm
 {
-	static
-	{
-		// Try to load BC dynamically...
-		ProviderHelp.enableBouncyCastleProvider();
-	}
-	
     private AlgorithmParameterSpec algorithmParameterSpec;
 
     public BaseSignatureAlgorithm(String id, String javaAlgo, String keyAlgo)
