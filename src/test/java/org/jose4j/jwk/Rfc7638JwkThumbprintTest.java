@@ -117,7 +117,6 @@ public class Rfc7638JwkThumbprintTest
         String json = "{\"kty\":\"oct\",\"k\":\"GawgguFyGrWKav7AX4VKUg\"}";
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(json);
         String thumb = jwk.calculateBase64urlEncodedThumbprint(SHA_256);
-        // looks like they have a bug in symmetric keys https://twitter.com/__b_c/status/645995173483147264
-        // assertThat("mm1dkvdCX1bCNj9fNzdnZPUJ6fomGdWE52AjA2L8dA4", equalTo(thumb));
+        assertThat("k1JnWRfC-5zzmL72vXIuBgTLfVROXBakS4OmGcrMCoc", equalTo(thumb));
     }
 }
