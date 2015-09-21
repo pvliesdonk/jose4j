@@ -16,12 +16,16 @@
 
 package org.jose4j.jwk;
 
+import org.jose4j.base64url.Base64Url;
 import org.jose4j.json.JsonUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.JsonHelp;
+import org.jose4j.lang.MessageDigestUtil;
+import org.jose4j.lang.StringUtil;
 
 import java.io.Serializable;
 import java.security.Key;
+import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -137,6 +141,22 @@ public abstract class JsonWebKey implements Serializable
     {
         return getClass().getName() + toParams(OutputControlLevel.PUBLIC_ONLY);
     }
+
+    public String calculateBase64urlEncodedThumbprint(String hashAlgorithm)
+    {
+        byte[] thumbprint = calculateThumbprint(hashAlgorithm);
+        return Base64Url.encode(thumbprint);
+    }
+
+    public byte[] calculateThumbprint(String hashAlgorithm)
+    {
+        MessageDigest digest = MessageDigestUtil.getMessageDigest(hashAlgorithm);
+        String hashInputString = produceThumbprintHashInput();
+        byte[] hashInputBytes = StringUtil.getBytesUtf8(hashInputString);
+        return digest.digest(hashInputBytes);
+    }
+
+    protected abstract String produceThumbprintHashInput();
 
     protected void putIfNotNull(String name, String value, Map<String, Object> params)
     {

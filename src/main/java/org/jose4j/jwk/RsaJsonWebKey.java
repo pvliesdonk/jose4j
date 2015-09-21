@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -133,5 +134,14 @@ public class RsaJsonWebKey extends PublicJsonWebKey
 	            putBigIntAsBase64UrlEncodedParam(params, FIRST_CRT_COEFFICIENT_MEMBER_NAME, crt.getCrtCoefficient());
 	        }
         }
+    }
+
+    @Override
+    protected String produceThumbprintHashInput()
+    {
+        String template = "{\"e\":\"%s\",\"kty\":\"RSA\",\"n\":\"%s\"}";
+        HashMap<String, Object> params = new HashMap<>();
+        fillPublicTypeSpecificParams(params);
+        return String.format(template, params.get(EXPONENT_MEMBER_NAME), params.get(MODULUS_MEMBER_NAME));
     }
 }

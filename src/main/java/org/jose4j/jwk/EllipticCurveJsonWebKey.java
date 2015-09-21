@@ -26,6 +26,7 @@ import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.EllipticCurve;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -121,5 +122,17 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
             int coordinateByteLength = getCoordinateByteLength();
         	putBigIntAsBase64UrlEncodedParam(params, PRIVATE_KEY_MEMBER_NAME, ecPrivateKey.getS(), coordinateByteLength);
         }
+    }
+
+    @Override
+    protected String produceThumbprintHashInput()
+    {
+        String template = "{\"crv\":\"%s\",\"kty\":\"EC\",\"x\":\"%s\",\"y\":\"%s\"}";
+        HashMap<String, Object> params = new HashMap<>();
+        fillPublicTypeSpecificParams(params);
+        Object crv = params.get(CURVE_MEMBER_NAME);
+        Object x = params.get(X_MEMBER_NAME);
+        Object y = params.get(Y_MEMBER_NAME);
+        return String.format(template, crv, x, y);
     }
 }

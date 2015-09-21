@@ -64,14 +64,25 @@ public class OctetSequenceJsonWebKey extends JsonWebKey
         return octetSequence;
     }
 
+    private String getEncoded()
+    {
+        return Base64Url.encode(octetSequence);
+    }
+
     @Override
     protected void fillTypeSpecificParams(Map<String, Object> params, OutputControlLevel outputLevel)
     {
         if (OutputControlLevel.INCLUDE_SYMMETRIC.compareTo(outputLevel) >= 0)
         {
-            Base64Url base64Url = new Base64Url();
-            String encodedBytes = base64Url.base64UrlEncode(octetSequence);
-            params.put(KEY_VALUE_MEMBER_NAME, encodedBytes);
+            params.put(KEY_VALUE_MEMBER_NAME, getEncoded());
         }
+    }
+
+    @Override
+    protected String produceThumbprintHashInput()
+    {
+        String template = "{\"k\":\"%s\",\"kty\":\"oct\"}";
+        String k = getEncoded();
+        return String.format(template, k);
     }
 }
