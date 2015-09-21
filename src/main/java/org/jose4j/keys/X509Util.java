@@ -19,8 +19,8 @@ package org.jose4j.keys;
 import org.jose4j.base64url.Base64;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.base64url.SimplePEMEncoder;
+import org.jose4j.lang.HashUtil;
 import org.jose4j.lang.JoseException;
-import org.jose4j.lang.MessageDigestUtil;
 import org.jose4j.lang.UncheckedJoseException;
 
 import java.io.ByteArrayInputStream;
@@ -101,7 +101,7 @@ public class X509Util
 
     private static String base64urlThumbprint(X509Certificate certificate, String hashAlg)
     {
-        MessageDigest msgDigest = MessageDigestUtil.getMessageDigest(hashAlg);
+        MessageDigest msgDigest = HashUtil.getMessageDigest(hashAlg);
         byte[] certificateEncoded;
         try
         {

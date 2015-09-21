@@ -18,9 +18,9 @@ package org.jose4j.jwk;
 
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.json.JsonUtil;
+import org.jose4j.lang.HashUtil;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.JsonHelp;
-import org.jose4j.lang.MessageDigestUtil;
 import org.jose4j.lang.StringUtil;
 
 import java.io.Serializable;
@@ -150,7 +150,7 @@ public abstract class JsonWebKey implements Serializable
 
     public byte[] calculateThumbprint(String hashAlgorithm)
     {
-        MessageDigest digest = MessageDigestUtil.getMessageDigest(hashAlgorithm);
+        MessageDigest digest = HashUtil.getMessageDigest(hashAlgorithm);
         String hashInputString = produceThumbprintHashInput();
         byte[] hashInputBytes = StringUtil.getBytesUtf8(hashInputString);
         return digest.digest(hashInputBytes);

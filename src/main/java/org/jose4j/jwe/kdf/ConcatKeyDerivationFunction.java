@@ -17,7 +17,7 @@
 package org.jose4j.jwe.kdf;
 
 import org.jose4j.lang.ByteUtil;
-import org.jose4j.lang.MessageDigestUtil;
+import org.jose4j.lang.HashUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class ConcatKeyDerivationFunction
 
     public ConcatKeyDerivationFunction(String hashAlgoritm)
     {
-        messageDigest = MessageDigestUtil.getMessageDigest(hashAlgoritm);
+        messageDigest = HashUtil.getMessageDigest(hashAlgoritm);
         digestLength = ByteUtil.bitLength(messageDigest.getDigestLength());
 
         log.debug("Hash Algorithm: {} with hashlen: {} bits", hashAlgoritm, digestLength);

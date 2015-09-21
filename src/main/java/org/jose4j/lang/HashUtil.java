@@ -21,7 +21,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  *
  */
-public class MessageDigestUtil
+public class HashUtil
 {
     public static final String SHA_256 = "SHA-256";
 

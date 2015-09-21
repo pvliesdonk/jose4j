@@ -23,7 +23,7 @@ import org.junit.Test;
 import java.security.MessageDigest;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.jose4j.lang.MessageDigestUtil.*;
+import static org.jose4j.lang.HashUtil.*;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 
