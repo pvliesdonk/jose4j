@@ -20,11 +20,11 @@ import org.jose4j.base64url.Base64;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.base64url.SimplePEMEncoder;
 import org.jose4j.lang.JoseException;
+import org.jose4j.lang.MessageDigestUtil;
 import org.jose4j.lang.UncheckedJoseException;
 
 import java.io.ByteArrayInputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.*;
 
 /**
@@ -101,7 +101,7 @@ public class X509Util
 
     private static String base64urlThumbprint(X509Certificate certificate, String hashAlg)
     {
-        MessageDigest msgDigest = getMessageDigest(hashAlg);
+        MessageDigest msgDigest = MessageDigestUtil.getMessageDigest(hashAlg);
         byte[] certificateEncoded;
         try
         {
@@ -113,17 +113,5 @@ public class X509Util
         }
         byte[] digest = msgDigest.digest(certificateEncoded);
         return Base64Url.encode(digest);
-    }
-
-    private static MessageDigest getMessageDigest(String alg)
-    {
-        try
-        {
-            return MessageDigest.getInstance(alg);
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new UncheckedJoseException("Unable to get MessageDigest instance with " + alg);
-        }
     }
 }

@@ -17,13 +17,12 @@
 package org.jose4j.jwe.kdf;
 
 import org.jose4j.lang.ByteUtil;
-import org.jose4j.lang.UncheckedJoseException;
+import org.jose4j.lang.MessageDigestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * An implementation of Concatenation Key Derivation Function (aka Concat KDF or ConcatKDF)
@@ -40,7 +39,7 @@ public class ConcatKeyDerivationFunction
 
     public ConcatKeyDerivationFunction(String hashAlgoritm)
     {
-        messageDigest = getMessageDigest(hashAlgoritm);
+        messageDigest = MessageDigestUtil.getMessageDigest(hashAlgoritm);
         digestLength = ByteUtil.bitLength(messageDigest.getDigestLength());
 
         log.debug("Hash Algorithm: {} with hashlen: {} bits", hashAlgoritm, digestLength);
@@ -103,17 +102,5 @@ public class ConcatKeyDerivationFunction
         double repsD = (float) keydatalen / (float) digestLength;
         repsD = Math.ceil(repsD);
         return (int) repsD;
-    }
-
-    private MessageDigest getMessageDigest(String digestMethod)
-    {
-       try
-       {
-          return MessageDigest.getInstance(digestMethod);
-       }
-       catch (NoSuchAlgorithmException e)
-       {
-           throw new UncheckedJoseException("Must have " + digestMethod + " MessageDigest but don't.", e);
-       }
     }
 }
