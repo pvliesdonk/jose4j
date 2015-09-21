@@ -98,4 +98,26 @@ public class Rfc7638JwkThumbprintTest
 
         assertArrayEquals(digest, thumb);
     }
+
+    @Test
+    public void testEcFromNimb() throws JoseException
+    {
+        String json = "{\"crv\":\"P-256\"," +
+                " \"kty\":\"EC\"," +
+                " \"y\":\"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM\"," +
+                " \"x\":\"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4\"}";
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(json);
+        String thumb = jwk.calculateBase64urlEncodedThumbprint(SHA_256);
+        assertThat("cn-I_WNMClehiVp51i_0VpOENW1upEerA8sEam5hn-s", equalTo(thumb));
+    }
+
+    @Test
+    public void testOctFromNimb() throws JoseException
+    {
+        String json = "{\"kty\":\"oct\",\"k\":\"GawgguFyGrWKav7AX4VKUg\"}";
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(json);
+        String thumb = jwk.calculateBase64urlEncodedThumbprint(SHA_256);
+        // looks like they have a bug in symmetric keys https://twitter.com/__b_c/status/645995173483147264
+        // assertThat("mm1dkvdCX1bCNj9fNzdnZPUJ6fomGdWE52AjA2L8dA4", equalTo(thumb));
+    }
 }
