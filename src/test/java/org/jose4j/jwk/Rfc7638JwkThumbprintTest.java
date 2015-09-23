@@ -119,4 +119,39 @@ public class Rfc7638JwkThumbprintTest
         String thumb = jwk.calculateBase64urlEncodedThumbprint(SHA_256);
         assertThat("k1JnWRfC-5zzmL72vXIuBgTLfVROXBakS4OmGcrMCoc", equalTo(thumb));
     }
+
+    @Test
+    public void joseWgListTestVectors() throws Exception
+    {
+        // https://mailarchive.ietf.org/arch/msg/jose/gS-nOfqgV1n17DFUd6w_yBEf0sU
+        // ... https://mailarchive.ietf.org/arch/msg/jose/nxct2sTGJvHxtOtofmUA8bMe6B0
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\", \"k\":\"ZW8Eg8TiwoT2YamLJfC2leYpLgLmUAh_PcMHqRzBnMg\"}");
+        String thumb = "7WWD36NF4WCpPaYtK47mM4o0a5CCeOt01JXSuMayv5g";
+        assertThat(thumb, equalTo(jwk.calculateBase64urlEncodedThumbprint(SHA_256)));
+
+        jwk = JsonWebKey.Factory.newJwk("{\"kty\":\"EC\",\n" +
+                " \"x\":\"CEuRLUISufhcjrj-32N0Bvl3KPMiHH9iSw4ohN9jxrA\",\n" +
+                " \"y\":\"EldWz_iXSK3l_S7n4w_t3baxos7o9yqX0IjzG959vHc\",\n" +
+                " \"crv\":\"P-256\"}");
+        thumb = "j4UYwo9wrtllSHaoLDJNh7MhVCL8t0t8cGPPzChpYDs";
+        assertThat(thumb, equalTo(jwk.calculateBase64urlEncodedThumbprint(SHA_256)));
+
+        jwk = JsonWebKey.Factory.newJwk("{\"kty\":\"EC\",\n" +
+                " \"x\":\"Aeq3uMrb3iCQEt0PzSeZMmrmYhsKP5DM1oMP6LQzTFQY9-F3Ab45xiK4AJxltXEI-87g3gRwId88hTyHgq180JDt\",\n" +
+                " \"y\":\"ARA0lIlrZMEzaXyXE4hjEkc50y_JON3qL7HSae9VuWpOv_2kit8p3pyJBiRb468_U5ztLT7FvDvtimyS42trhDTu\",\n" +
+                " \"crv\":\"P-521\"}");
+        thumb = "rz4Ohmpxg-UOWIWqWKHlOe0bHSjNUFlHW5vwG_M7qYg";
+        assertThat(thumb, equalTo(jwk.calculateBase64urlEncodedThumbprint(SHA_256)));
+
+        jwk = JsonWebKey.Factory.newJwk("{\"kty\":\"EC\",\n" +
+                " \"x\":\"2jCG5DmKUql9YPn7F2C-0ljWEbj8O8-vn5Ih1k7Wzb-y3NpBLiG1BiRa392b1kcQ\",\n" +
+                " \"y\":\"7Ragi9rT-5tSzaMbJlH_EIJl6rNFfj4V4RyFM5U2z4j1hesX5JXa8dWOsE-5wPIl\",\n" +
+                " \"crv\":\"P-384\"}");
+        thumb = "vZtaWIw-zw95JNzzURg1YB7mWNLlm44YZDZzhrPNetM";
+        assertThat(thumb, equalTo(jwk.calculateBase64urlEncodedThumbprint(SHA_256)));
+
+        jwk = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"NGbwp1rC4n85A1SaNxoHow\"}");
+        thumb = "5_qb56G0OJDw-lb5mkDaWS4MwuY0fatkn9LkNqUHqMk";
+        assertThat(thumb, equalTo(jwk.calculateBase64urlEncodedThumbprint(SHA_256)));
+    }
 }
