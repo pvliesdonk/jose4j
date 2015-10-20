@@ -42,19 +42,24 @@ public class ConcatKeyDerivationFunction
         messageDigest = HashUtil.getMessageDigest(hashAlgoritm);
         digestLength = ByteUtil.bitLength(messageDigest.getDigestLength());
 
-        log.debug("Hash Algorithm: {} with hashlen: {} bits", hashAlgoritm, digestLength);
+        if (traceLog()) { log.trace("Hash Algorithm: {} with hashlen: {} bits", hashAlgoritm, digestLength);}
     }
 
     public byte[] kdf(byte[] sharedSecret, int keydatalen, byte[] algorithmId, byte[] partyUInfo, byte[] partyVInfo, byte[] suppPubInfo, byte[] suppPrivInfo)
     {
-        log.debug("KDF:");
-        log.debug("  z: {}", ByteUtil.toDebugString(sharedSecret));
-        log.debug("  keydatalen: {}", keydatalen);
-        log.debug("  algorithmId: {}", ByteUtil.toDebugString(algorithmId));
-        log.debug("  partyUInfo: {}", ByteUtil.toDebugString(partyUInfo));
-        log.debug("  partyVInfo: {}", ByteUtil.toDebugString(partyVInfo));
-        log.debug("  suppPubInfo: {}", ByteUtil.toDebugString(suppPubInfo));
-        log.debug("  suppPrivInfo: {}", ByteUtil.toDebugString(suppPrivInfo));
+        if (traceLog())
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("KDF:").append("\n");
+            msg.append("  z: ").append(ByteUtil.toDebugString(sharedSecret)).append("\n");
+            msg.append("  keydatalen: ").append(keydatalen);
+            msg.append("  algorithmId: ").append(ByteUtil.toDebugString(algorithmId)).append("\n");
+            msg.append("  partyUInfo: ").append(ByteUtil.toDebugString(partyUInfo)).append("\n");
+            msg.append("  partyVInfo: ").append(ByteUtil.toDebugString(partyVInfo)).append("\n");
+            msg.append("  suppPubInfo: ").append(ByteUtil.toDebugString(suppPubInfo)).append("\n");
+            msg.append("  suppPrivInfo: ").append(ByteUtil.toDebugString(suppPrivInfo));
+            log.trace(msg.toString());
+        }
 
         byte[] otherInfo = ByteUtil.concat(algorithmId, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo);
         return kdf(sharedSecret, keydatalen, otherInfo);
@@ -63,37 +68,44 @@ public class ConcatKeyDerivationFunction
     public byte[] kdf(byte[] sharedSecret, int keydatalen, byte[] otherInfo)
     {
         long reps = getReps(keydatalen);
-        log.debug("reps: {}", String.valueOf(reps));
-        log.debug("otherInfo: {}", ByteUtil.toDebugString(otherInfo));
+        if (traceLog())
+        {
+            log.trace("reps: {}", String.valueOf(reps));
+            log.trace("otherInfo: {}", ByteUtil.toDebugString(otherInfo));
+        }
 
         ByteArrayOutputStream derivedByteOutputStream = new ByteArrayOutputStream();
         for (int i = 1; i <= reps; i++)
         {
-            log.debug("rep {} hashing ", i);
             byte[] counterBytes = ByteUtil.getBytes(i);
-            log.debug(" counter: {}", ByteUtil.toDebugString(counterBytes));
-            log.debug(" z: {}", ByteUtil.toDebugString(sharedSecret));
-            log.debug(" otherInfo: {}", ByteUtil.toDebugString(otherInfo));
+
+            if (traceLog())
+            {
+                log.trace("rep {} hashing ", i);
+                log.trace(" counter: {}", ByteUtil.toDebugString(counterBytes));
+                log.trace(" z: {}", ByteUtil.toDebugString(sharedSecret));
+                log.trace(" otherInfo: {}", ByteUtil.toDebugString(otherInfo));
+            }
 
             messageDigest.update(counterBytes);
             messageDigest.update(sharedSecret);
             messageDigest.update(otherInfo);
             byte[] digest = messageDigest.digest();
-            log.debug(" k({}): {}", i, ByteUtil.toDebugString(digest));
+            if (traceLog()) { log.trace(" k({}): {}", i, ByteUtil.toDebugString(digest));}
             derivedByteOutputStream.write(digest, 0, digest.length);
         }
 
         int keyDateLenInBytes = ByteUtil.byteLength(keydatalen);
         byte[] derivedKeyMaterial = derivedByteOutputStream.toByteArray();
-        log.debug("derived key material: {}", ByteUtil.toDebugString(derivedKeyMaterial));
+        if (traceLog()) { log.trace("derived key material: {}", ByteUtil.toDebugString(derivedKeyMaterial));}
         if (derivedKeyMaterial.length != keyDateLenInBytes)
         {
             byte[] newKeyMaterial  = ByteUtil.subArray(derivedKeyMaterial, 0, keyDateLenInBytes);
-            log.debug("first {} bits of derived key material: {}", keydatalen, ByteUtil.toDebugString(newKeyMaterial));
+            if (traceLog()) {log.trace("first {} bits of derived key material: {}", keydatalen, ByteUtil.toDebugString(newKeyMaterial));}
             derivedKeyMaterial = newKeyMaterial;
         }
 
-        log.debug("final derived key material: {}", ByteUtil.toDebugString(derivedKeyMaterial));
+        if (traceLog()) { log.trace("final derived key material: {}", ByteUtil.toDebugString(derivedKeyMaterial)); }
         return derivedKeyMaterial;
     }
 
@@ -102,5 +114,10 @@ public class ConcatKeyDerivationFunction
         double repsD = (float) keydatalen / (float) digestLength;
         repsD = Math.ceil(repsD);
         return (int) repsD;
+    }
+
+    private boolean traceLog()
+    {
+        return false && log.isTraceEnabled();
     }
 }
