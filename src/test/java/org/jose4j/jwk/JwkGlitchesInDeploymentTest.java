@@ -94,7 +94,6 @@ public class JwkGlitchesInDeploymentTest
         List<JsonWebKey> jsonWebKeys = jsonWebKeySet.getJsonWebKeys();
         assertThat(jsonWebKeys.size(), is(equalTo(2)));
         String jose4jJwkJson = jsonWebKeySet.toJson();
-        System.out.println(jose4jJwkJson);
 
         // make sure there's no padding on the base64url output
         assertThat(jose4jJwkJson, not(containsString("=")));
