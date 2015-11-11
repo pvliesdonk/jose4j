@@ -32,8 +32,8 @@ import java.util.Set;
  */
 abstract class KeyPairUtil
 {
-    public static final String BEGIN_PUBLIC_KEY = "-----BEGIN PUBLIC KEY-----";
-    public static final String END_PUBLIC_KEY = "-----END PUBLIC KEY-----";
+    private static final String BEGIN_PUBLIC_KEY = "-----BEGIN PUBLIC KEY-----";
+    private static final String END_PUBLIC_KEY = "-----END PUBLIC KEY-----";
 
     abstract String getAlgorithm();
 
