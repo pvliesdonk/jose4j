@@ -16,18 +16,25 @@
 
 package org.jose4j.keys;
 
+import org.jose4j.base64url.SimplePEMEncoder;
 import org.jose4j.lang.JoseException;
 
 import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.Security;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Set;
 
 /**
  */
 abstract class KeyPairUtil
 {
+    public static final String BEGIN_PUBLIC_KEY = "-----BEGIN PUBLIC KEY-----";
+    public static final String END_PUBLIC_KEY = "-----END PUBLIC KEY-----";
+
     abstract String getAlgorithm();
 
     protected KeyFactory getKeyFactory() throws JoseException
@@ -52,6 +59,23 @@ abstract class KeyPairUtil
         {
             throw new JoseException("Couldn't find " + getAlgorithm() + " KeyPairGenerator! " + e, e);
         }
+    }
+
+    public PublicKey fromPemEncoded(String pem) throws JoseException, InvalidKeySpecException
+    {
+        int beginIndex = pem.indexOf(BEGIN_PUBLIC_KEY) + BEGIN_PUBLIC_KEY.length();
+        int endIndex = pem.indexOf(END_PUBLIC_KEY);
+        String base64 = pem.substring(beginIndex, endIndex).trim();
+        byte[] decode = SimplePEMEncoder.decode(base64);
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(decode);
+        KeyFactory kf = getKeyFactory();
+        return kf.generatePublic(spec);
+    }
+
+    public static String pemEncode(PublicKey publicKey)
+    {
+        byte[] encoded = publicKey.getEncoded(); // X509 SPKI
+        return BEGIN_PUBLIC_KEY + "\r\n" + SimplePEMEncoder.encode(encoded) + END_PUBLIC_KEY;
     }
 
     public boolean isAvailable()
