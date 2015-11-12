@@ -22,6 +22,7 @@ import org.jose4j.base64url.Base64Url;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.security.SecureRandom;
 import java.util.Arrays;
 
 public class ByteUtil
@@ -146,10 +147,17 @@ public class ByteUtil
         return numberOfBits / 8;
     }
 
+    public static byte[] randomBytes(int length, SecureRandom secureRandom)
+    {
+        secureRandom = (secureRandom == null) ? new SecureRandom() : secureRandom;
+        byte[] bytes = new byte[length];
+        secureRandom.nextBytes(bytes);
+        return bytes;
+    }
+
     public static byte[] randomBytes(int length)
     {
-        ByteGenerator gen = new DefaultByteGenerator();
-        return gen.randomBytes(length);
+        return randomBytes(length, null);
     }
 
     public static String toDebugString(byte[] bytes)

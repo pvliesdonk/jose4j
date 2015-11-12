@@ -17,9 +17,9 @@
 package org.jose4j.lang;
 
 import java.security.SecureRandom;
-import java.util.Random;
 
 /**
+ * @deprecated this wasn't a good abstraction...
  */
 public class DefaultByteGenerator implements ByteGenerator
 {
@@ -30,6 +30,10 @@ public class DefaultByteGenerator implements ByteGenerator
         this.random = new SecureRandom();
     }
 
+    /**
+     *
+     * @deprecated use ByteUtil.randomBytes(...)
+     */
     public byte[] randomBytes(int length)
     {
         byte[] bytes = new byte[length];
