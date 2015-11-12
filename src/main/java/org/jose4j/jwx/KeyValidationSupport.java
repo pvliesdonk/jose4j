@@ -86,12 +86,15 @@ public class KeyValidationSupport
                     + AesKey.ALGORITHM+ " key but an " + alg + " key was provided.");
         }
 
-        int managementKeyByteLength = managementKey.getEncoded().length;
-        if (managementKeyByteLength != expectedKeyByteLength)
+        if (managementKey.getEncoded() != null)
         {
-            throw new InvalidKeyException("Invalid key for JWE " + joseAlg + ", expected a "
-                    + ByteUtil.bitLength(expectedKeyByteLength)+ " bit key but a "
-                    + ByteUtil.bitLength(managementKeyByteLength) + " bit key was provided.");
+            int managementKeyByteLength = managementKey.getEncoded().length;
+            if (managementKeyByteLength != expectedKeyByteLength)
+            {
+                throw new InvalidKeyException("Invalid key for JWE " + joseAlg + ", expected a "
+                        + ByteUtil.bitLength(expectedKeyByteLength)+ " bit key but a "
+                        + ByteUtil.bitLength(managementKeyByteLength) + " bit key was provided.");
+            }
         }
     }
 }

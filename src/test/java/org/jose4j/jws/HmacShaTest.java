@@ -16,6 +16,11 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.jwt.JwtClaims;
+import org.jose4j.jwt.consumer.JwtConsumer;
+import org.jose4j.jwt.consumer.JwtConsumerBuilder;
+import org.jose4j.keys.FakeHsmNonExtractableSecretKeySpec;
+import org.jose4j.lang.StringUtil;
 import org.junit.Assert;
 
 import junit.framework.TestCase;
@@ -34,6 +39,8 @@ import java.security.Key;
 public class HmacShaTest extends TestCase
 {
     private static final Logger log = LoggerFactory.getLogger(HmacShaTest.class);
+    private static final FakeHsmNonExtractableSecretKeySpec FAKE_HSM_NON_EXTRACTABLE_SECRET_KEY_SPEC = new FakeHsmNonExtractableSecretKeySpec(StringUtil.getBytesUtf8("12345678901234567890123456789012"), "HmacSHA256");
+    private static final String JWS_CS_WITH_FAKE_NON_EX_KEY = "eyJhbGciOiJIUzI1NiJ9.aHR0cHM6Ly9iaXRidWNrZXQub3JnL2JfYy9qb3NlNGovaXNzdWVzLzM5Lw.Bp7boj9FhfSdAX7Sq2GkjiS3RAVZrA9rcH5xxCQ1fRo";
 
     Key KEY1 = new HmacKey(new byte[]{-41, -1, 60, 1, 1, 45, -92, -114, 8, -1, -60, 7, 54, -16, 16, 14, -20, -85, 56,
             103, 4, 10, -56, 120, 37, -48, 6, 9, 110, -96, 27, -4, 41, -99, 60, 91, 49, 70, -99, -14, -108, -81, 60,
@@ -145,4 +152,23 @@ public class HmacShaTest extends TestCase
         }
     }
 
+    public void testNpeWithNonExtractableKeyDataCreate() throws Exception
+    {
+        Key key = FAKE_HSM_NON_EXTRACTABLE_SECRET_KEY_SPEC;
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setPayload("https://bitbucket.org/b_c/jose4j/issues/39/");
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jws.setKey(key);
+        String jwscs = jws.getCompactSerialization();
+        assertEquals(JWS_CS_WITH_FAKE_NON_EX_KEY, jwscs);
+    }
+
+    public void testNpeWithNonExtractableKeyDataVerify() throws Exception
+    {
+        Key key = FAKE_HSM_NON_EXTRACTABLE_SECRET_KEY_SPEC;
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setCompactSerialization(JWS_CS_WITH_FAKE_NON_EX_KEY);
+        jws.setKey(key);
+        assertTrue(jws.verifySignature());
+    }
 }

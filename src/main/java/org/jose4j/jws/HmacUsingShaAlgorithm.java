@@ -74,12 +74,15 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
             throw new InvalidKeyException("key is null");
         }
 
-        int length = ByteUtil.bitLength(key.getEncoded());
-        if (length < minimumKeyLength)
+        if (key.getEncoded() != null)
         {
-            throw new InvalidKeyException("A key of the same size as the hash output (i.e. "+minimumKeyLength+
-                    " bits for "+getAlgorithmIdentifier()+
-                    ") or larger MUST be used with the HMAC SHA algorithms but this key is only " + length + " bits");
+            int length = ByteUtil.bitLength(key.getEncoded());
+            if (length < minimumKeyLength)
+            {
+                throw new InvalidKeyException("A key of the same size as the hash output (i.e. "+minimumKeyLength+
+                        " bits for "+getAlgorithmIdentifier()+
+                        ") or larger MUST be used with the HMAC SHA algorithms but this key is only " + length + " bits");
+            }
         }
     }
 

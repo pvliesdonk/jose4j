@@ -16,7 +16,9 @@
 
 package org.jose4j.jwt.consumer;
 
+import org.jose4j.base64url.Base64Url;
 import org.jose4j.jwa.AlgorithmConstraints;
+import org.jose4j.jwa.JceProviderTestSupport;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
@@ -36,6 +38,7 @@ import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
+import org.jose4j.keys.FakeHsmNonExtractableSecretKeySpec;
 import org.jose4j.keys.PbkdfKey;
 import org.jose4j.keys.resolvers.DecryptionKeyResolver;
 import org.jose4j.keys.resolvers.JwksDecryptionKeyResolver;
@@ -54,6 +57,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.AES_128_GCM;
+import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.AES_192_GCM;
+import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.AES_256_GCM;
+import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.A128GCMKW;
+import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.A192GCMKW;
+import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.A256GCMKW;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -1727,4 +1736,106 @@ public class JwtConsumerTest
         SimpleJwtConsumerTestHelp.expectValidationFailure(jcs, consumer);
     }
 
+    @Test
+    public void testNpeWithNonExtractableKeyDataHS256() throws Exception
+    {
+        byte[] raw = Base64Url.decode("hup76LcA9B7pqrEtqyb4EBg6XCcr9r0iOCFF1FeZiJM");
+        FakeHsmNonExtractableSecretKeySpec key = new FakeHsmNonExtractableSecretKeySpec(raw, "HmacSHA256");
+        JwtClaims claims = new JwtClaims();
+        claims.setExpirationTimeMinutesInTheFuture(5);
+        claims.setSubject("subject");
+        claims.setIssuer("issuer");
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setPayload(claims.toJson());
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jws.setKey(key);
+        String jwt = jws.getCompactSerialization();
+        JwtConsumerBuilder jwtConsumerBuilder = new JwtConsumerBuilder();
+        jwtConsumerBuilder.setAllowedClockSkewInSeconds(60);
+        jwtConsumerBuilder.setRequireSubject();
+        jwtConsumerBuilder.setExpectedIssuer("issuer");
+        jwtConsumerBuilder.setVerificationKey(key);
+        JwtConsumer jwtConsumer = jwtConsumerBuilder.build();
+        JwtClaims processedClaims = jwtConsumer.processToClaims(jwt);
+        System.out.println(processedClaims);
+    }
+
+    @Test
+    public void testNpeWithNonExtractableKeyDataAxxxKW() throws Exception
+    {
+        littleJweRoundTrip(KeyManagementAlgorithmIdentifiers.A128KW, ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256, "mmp7iLc1cB7cQrEtqyb9c1");
+        littleJweRoundTrip(KeyManagementAlgorithmIdentifiers.A192KW, ContentEncryptionAlgorithmIdentifiers.AES_192_CBC_HMAC_SHA_384, "X--mSrs-JGaf0ulQQFSoJGH0vjrfe_c1");
+        littleJweRoundTrip(KeyManagementAlgorithmIdentifiers.A256KW, ContentEncryptionAlgorithmIdentifiers.AES_256_CBC_HMAC_SHA_512, "j-DJVQ9ftUV-muUT_-yjP6dB9kuypGeT6lEGpCKOi-c");
+    }
+
+    // @Test direct doesn't currently work w/ non extractable keys and will require some deeper changes to treat the CEK as a key rather than bytes
+    public void testNpeWithNonExtractableKeyDataDirect() throws Exception
+    {
+        littleJweRoundTrip(KeyManagementAlgorithmIdentifiers.DIRECT, ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256, "j-DJVQ9ftUV-muUT_-yjP6dB9kuypGeT6lEGpCKOi-c");
+        littleJweRoundTrip(KeyManagementAlgorithmIdentifiers.DIRECT, ContentEncryptionAlgorithmIdentifiers.AES_192_CBC_HMAC_SHA_384, "X--mSrs-JGaf0ulQQFSoJGH0vjrfe_c1X--mSrs-JGaf0ulQQFSoJGH0vjrfe_c1");
+        littleJweRoundTrip(KeyManagementAlgorithmIdentifiers.DIRECT, ContentEncryptionAlgorithmIdentifiers.AES_256_CBC_HMAC_SHA_512, "j-DJVQ9ftUV-muUT_-yjP6dB9kuypGeT6lEGpCKOi-cj-DJVQ9ftUV-muUT_-yjP6dB9kuypGeT6lEGpCKOi-c");
+
+        JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
+        jceProviderTestSupport.setEncryptionAlgsNeeded(AES_128_GCM, AES_192_GCM, AES_256_GCM);
+
+        jceProviderTestSupport.runWithBouncyCastleProviderIfNeeded(
+            new JceProviderTestSupport.RunnableTest()
+            {
+                @Override
+                public void runTest() throws Exception
+                {
+                    littleJweRoundTrip(KeyManagementAlgorithmIdentifiers.DIRECT, AES_128_GCM, "mmp7iLc1cB7cQrEtqyb9c1");
+                    littleJweRoundTrip(KeyManagementAlgorithmIdentifiers.DIRECT, AES_192_GCM, "X--mSrs-JGaf0ulQQFSoJGH0vjrfe_c1");
+                    littleJweRoundTrip(KeyManagementAlgorithmIdentifiers.DIRECT, AES_256_GCM, "j-DJVQ9ftUV-muUT_-yjP6dB9kuypGeT6lEGpCKOi-c");
+                }
+            }
+        );
+    }
+
+    private void littleJweRoundTrip(String alg, String enc, String b64uKey) throws Exception
+    {
+        byte[] raw = Base64Url.decode(b64uKey);
+        Key key = new FakeHsmNonExtractableSecretKeySpec(raw, "AES");
+        JwtClaims claims = new JwtClaims();
+        claims.setExpirationTimeMinutesInTheFuture(5);
+        claims.setSubject("subject");
+        claims.setIssuer("issuer");
+        JsonWebEncryption jwe = new JsonWebEncryption();
+        jwe.setPayload(claims.toJson());
+        jwe.setAlgorithmHeaderValue(alg);
+        jwe.setEncryptionMethodHeaderParameter(enc);
+        jwe.setKey(key);
+
+        String jwt = jwe.getCompactSerialization();
+        JwtConsumerBuilder jwtConsumerBuilder = new JwtConsumerBuilder();
+        jwtConsumerBuilder.setAllowedClockSkewInSeconds(60);
+        jwtConsumerBuilder.setRequireSubject();
+        jwtConsumerBuilder.setExpectedIssuer("issuer");
+        jwtConsumerBuilder.setDecryptionKey(key);
+        jwtConsumerBuilder.setDisableRequireSignature();
+        JwtConsumer jwtConsumer = jwtConsumerBuilder.build();
+        JwtClaims processedClaims = jwtConsumer.processToClaims(jwt);
+        Assert.assertThat(processedClaims.getSubject(), equalTo("subject"));
+    }
+
+    @Test
+    public void testNpeWithNonExtractableKeyDataAxxxGCMKW() throws Exception
+    {
+        JceProviderTestSupport jceProviderTestSupport = new JceProviderTestSupport();
+        jceProviderTestSupport.setKeyManagementAlgsNeeded(A128GCMKW, A192GCMKW, A256GCMKW);
+        jceProviderTestSupport.setEncryptionAlgsNeeded(AES_128_GCM, AES_192_GCM, AES_256_GCM);
+
+        jceProviderTestSupport.runWithBouncyCastleProviderIfNeeded(
+            new JceProviderTestSupport.RunnableTest()
+            {
+                @Override
+                public void runTest() throws Exception
+                {
+                    littleJweRoundTrip(A128GCMKW, AES_128_GCM, "mmp7iLc1cB7cQrEtqyb9c1");
+                    littleJweRoundTrip(A192GCMKW, AES_192_GCM, "X--mSrs-JGaf0ulQQFSoJGH0vjrfe_c1");
+                    littleJweRoundTrip(A256GCMKW, AES_256_GCM, "j-DJVQ9ftUV-muUT2-yjP6dB9kuypGeT6lEGpCKOi-c");
+                }
+            }
+        );
+    }
 }

@@ -65,14 +65,17 @@ public class DirectKeyManagementAlgorithm extends AlgorithmInfo implements KeyMa
     {
         KeyValidationSupport.notNull(managementKey);
 
-        int managementKeyByteLength = managementKey.getEncoded().length;
-        int expectedByteLength = contentEncryptionAlg.getContentEncryptionKeyDescriptor().getContentEncryptionKeyByteLength();
-        if (expectedByteLength != managementKeyByteLength)
+        if (managementKey.getEncoded() != null)
         {
-            throw new InvalidKeyException("Invalid key for " + getAlgorithmIdentifier() + " with "
-                              + contentEncryptionAlg.getAlgorithmIdentifier() +", expected a "
-                              + ByteUtil.bitLength(expectedByteLength)+ " bit key but a "
-                              + ByteUtil.bitLength(managementKeyByteLength) + " bit key was provided.");
+            int managementKeyByteLength = managementKey.getEncoded().length;
+            int expectedByteLength = contentEncryptionAlg.getContentEncryptionKeyDescriptor().getContentEncryptionKeyByteLength();
+            if (expectedByteLength != managementKeyByteLength)
+            {
+                throw new InvalidKeyException("Invalid key for " + getAlgorithmIdentifier() + " with "
+                                  + contentEncryptionAlg.getAlgorithmIdentifier() +", expected a "
+                                  + ByteUtil.bitLength(expectedByteLength)+ " bit key but a "
+                                  + ByteUtil.bitLength(managementKeyByteLength) + " bit key was provided.");
+            }
         }
     }
 
