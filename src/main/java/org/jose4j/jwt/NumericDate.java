@@ -68,6 +68,11 @@ public class NumericDate
     {
         return value;
     }
+    
+    public long setValue(long value)
+    {
+        this.value = value; 
+    }
 
     public long getValueInMillis()
     {
