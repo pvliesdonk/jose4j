@@ -69,7 +69,7 @@ public class NumericDate
         return value;
     }
     
-    public long setValue(long value)
+    public void setValue(long value)
     {
         this.value = value; 
     }
