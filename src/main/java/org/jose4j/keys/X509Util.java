@@ -25,6 +25,7 @@ import org.jose4j.lang.UncheckedJoseException;
 
 import java.io.ByteArrayInputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchProviderException;
 import java.security.cert.*;
 
 /**
@@ -35,7 +36,6 @@ public class X509Util
 
     private CertificateFactory certFactory;
 
-
     public X509Util()
     {
         try
@@ -45,6 +45,37 @@ public class X509Util
         catch (CertificateException e)
         {
             throw new IllegalStateException("Couldn't find "+ FACTORY_TYPE + " CertificateFactory!?!", e);
+        }
+    }
+
+    public X509Util(String provider) throws NoSuchProviderException
+    {
+        try
+        {
+            certFactory = CertificateFactory.getInstance(FACTORY_TYPE, provider);
+        }
+        catch (CertificateException e)
+        {
+            throw new IllegalStateException("Couldn't find "+ FACTORY_TYPE + " CertificateFactory!?!", e);
+        }
+    }
+
+    public static X509Util getX509Util(String jcaProvider) throws JoseException
+    {
+        if (jcaProvider == null)
+        {
+            return new X509Util();
+        }
+        else
+        {
+            try
+            {
+                return new X509Util(jcaProvider);
+            }
+            catch (NoSuchProviderException e)
+            {
+                throw new JoseException("Provider " + jcaProvider + " not found when creating X509Util." , e);
+            }
         }
     }
 

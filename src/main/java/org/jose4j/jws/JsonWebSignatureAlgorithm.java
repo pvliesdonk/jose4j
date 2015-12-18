@@ -16,6 +16,7 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.Algorithm;
 import org.jose4j.lang.InvalidKeyException;
 import org.jose4j.lang.JoseException;
@@ -26,8 +27,8 @@ import java.security.Key;
  */
 public interface JsonWebSignatureAlgorithm extends Algorithm
 {
-    boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException;
-    byte[] sign(Key key, byte[] securedInputBytes) throws JoseException ;
+    boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes, ProviderContext providerContext) throws JoseException;
+    byte[] sign(Key key, byte[] securedInputBytes, ProviderContext providerContext) throws JoseException;
     void validateSigningKey(Key key) throws InvalidKeyException;
     void validateVerificationKey(Key key) throws InvalidKeyException;
 }

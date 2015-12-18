@@ -16,6 +16,7 @@
 
 package org.jose4j.jwt.consumer;
 
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwt.NumericDate;
 import org.jose4j.keys.resolvers.DecryptionKeyResolver;
@@ -59,6 +60,9 @@ public class JwtConsumerBuilder
     private boolean skipAllDefaultValidators = false;
 
     private boolean liberalContentTypeHandling;
+
+    private ProviderContext jwsProviderContext;
+    private ProviderContext jweProviderContext;
 
     public JwtConsumerBuilder setEnableRequireEncryption()
     {
@@ -238,6 +242,38 @@ public class JwtConsumerBuilder
         return this;
     }
 
+    /**
+     * Sets the {@link ProviderContext} for any JWS operations to be done by the JwtConsumer being built.
+     * This allows for
+     * a particular Java Cryptography Architecture provider to be indicated by name to be used
+     * for signature/MAC verification operations.
+     *
+     * @param jwsProviderContext the ProviderContext object indicating the Java Cryptography Architecture provider
+     * to be used for JWS signature/MAC verification operations when consuming a JWT.
+     * @return this JwtConsumerBuilder
+     */
+    public JwtConsumerBuilder setJwsProviderContext(ProviderContext jwsProviderContext)
+    {
+        this.jwsProviderContext = jwsProviderContext;
+        return this;
+    }
+
+    /**
+     * Sets the {@link ProviderContext} for any JWE operations to be done by the JwtConsumer being built.
+     * This allows for
+     * a particular Java Cryptography Architecture provider to be indicated by name to be used
+     * for decryption and related operations.
+     *
+     * @param jweProviderContext the ProviderContext object indicating the Java Cryptography Architecture provider
+     * to be used for decryption and related operations operations when consuming a JWT.
+     * @return this JwtConsumerBuilder
+     */
+    public JwtConsumerBuilder setJweProviderContext(ProviderContext jweProviderContext)
+    {
+        this.jweProviderContext = jweProviderContext;
+        return this;
+    }
+
     public JwtConsumer build()
     {
         List<Validator> validators = new ArrayList<>();
@@ -288,6 +324,9 @@ public class JwtConsumerBuilder
 
         jwtConsumer.setRelaxVerificationKeyValidation(relaxVerificationKeyValidation);
         jwtConsumer.setRelaxDecryptionKeyValidation(relaxDecryptionKeyValidation);
+
+        jwtConsumer.setJwsProviderContext(jwsProviderContext);
+        jwtConsumer.setJweProviderContext(jweProviderContext);
 
         return jwtConsumer;
     }

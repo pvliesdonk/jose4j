@@ -54,7 +54,12 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
 
     public EllipticCurveJsonWebKey(Map<String, Object> params) throws JoseException
     {
-        super(params);
+        this(params, null);
+    }
+
+    public EllipticCurveJsonWebKey(Map<String, Object> params, String jcaProvider) throws JoseException
+    {
+        super(params, jcaProvider);
 
         curveName = getString(params, CURVE_MEMBER_NAME, true);
         ECParameterSpec curve = EllipticCurves.getSpec(curveName);
@@ -63,7 +68,7 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
 
         BigInteger y =  getBigIntFromBase64UrlEncodedParam(params, Y_MEMBER_NAME, true);
 
-        EcKeyUtil keyUtil = new EcKeyUtil();
+        EcKeyUtil keyUtil = new EcKeyUtil(jcaProvider, null);
         key = keyUtil.publicKey(x, y, curve);
         checkForBareKeyCertMismatch();
 

@@ -16,6 +16,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwk.OctetSequenceJsonWebKey;
 import org.jose4j.jwx.HeaderParameterNames;
@@ -28,6 +29,7 @@ import org.jose4j.lang.JoseException;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
+import java.security.SecureRandom;
 
 /**
  *
@@ -48,13 +50,13 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
         setKeyType(OctetSequenceJsonWebKey.KEY_TYPE);
         simpleAeadCipher = new SimpleAeadCipher(getJavaAlgorithm(), TAG_BYTE_LENGTH);
         this.keyByteLength = keyByteLength;
-
     }
 
     @Override
-    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride) throws JoseException
+    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride, ProviderContext providerContext) throws JoseException
     {
-        byte[] cek = (cekOverride == null) ? ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength()) : cekOverride;
+        SecureRandom secureRandom = providerContext.getSecureRandom();
+        byte[] cek = (cekOverride == null) ? ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength(), secureRandom) : cekOverride;
 
         Base64Url base64Url = new Base64Url();
 
@@ -62,7 +64,7 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
         byte[] iv;
         if (encodedIv == null)
         {
-            iv = ByteUtil.randomBytes(IV_BYTE_LENGTH);
+            iv = ByteUtil.randomBytes(IV_BYTE_LENGTH, secureRandom);
             encodedIv = base64Url.base64UrlEncode(iv);
             headers.setStringHeaderValue(HeaderParameterNames.INITIALIZATION_VECTOR, encodedIv);
         }
@@ -71,7 +73,8 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
             iv = base64Url.base64UrlDecode(encodedIv);
         }
 
-        SimpleAeadCipher.CipherOutput encrypted = simpleAeadCipher.encrypt(managementKey, iv, cek, null);
+        String cipherProvider = providerContext.getSuppliedKeyProviderContext().getCipherProvider();
+        SimpleAeadCipher.CipherOutput encrypted = simpleAeadCipher.encrypt(managementKey, iv, cek, null, cipherProvider);
         byte[] encryptedKey = encrypted.getCiphertext();
         byte[] tag = encrypted.getTag();
 
@@ -82,7 +85,7 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
     }
 
     @Override
-    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
+    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, ProviderContext providerContext) throws JoseException
     {
         Base64Url base64Url = new Base64Url();
         String encodedIv = headers.getStringHeaderValue(HeaderParameterNames.INITIALIZATION_VECTOR);
@@ -91,7 +94,8 @@ public class AesGcmKeyEncryptionAlgorithm extends AlgorithmInfo implements KeyMa
         String encodedTag = headers.getStringHeaderValue(HeaderParameterNames.AUTHENTICATION_TAG);
         byte[] tag = base64Url.base64UrlDecode(encodedTag);
 
-        byte[] cek = simpleAeadCipher.decrypt(managementKey, iv, encryptedKey, tag, null);
+        String cipherProvider = providerContext.getSuppliedKeyProviderContext().getCipherProvider();
+        byte[] cek = simpleAeadCipher.decrypt(managementKey, iv, encryptedKey, tag, null, cipherProvider);
         return new SecretKeySpec(cek, cekDesc.getContentEncryptionKeyAlgorithm());
     }
 

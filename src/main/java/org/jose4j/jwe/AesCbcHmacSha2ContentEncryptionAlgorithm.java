@@ -17,6 +17,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.Headers;
 import org.jose4j.keys.AesKey;
@@ -76,19 +77,19 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         return contentEncryptionKeyDescriptor;
     }
 
-    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers, byte[] ivOverride) throws JoseException
+    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers, byte[] ivOverride, ProviderContext providerContext) throws JoseException
     {
         // The Initialization Vector (IV) used is a 128 bit value generated randomly or pseudorandomly for use in the cipher.
-        byte[] iv = InitializationVectorHelp.iv(IV_BYTE_LENGTH, ivOverride);
-        return encrypt(plaintext, aad, contentEncryptionKey, iv);
+        byte[] iv = InitializationVectorHelp.iv(IV_BYTE_LENGTH, ivOverride, providerContext.getSecureRandom());
+        return encrypt(plaintext, aad, contentEncryptionKey, iv, headers, providerContext);
     }
 
-    ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] key, byte[] iv) throws JoseException
+    ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] key, byte[] iv, Headers headers, ProviderContext providerContext) throws JoseException
     {
         Key hmacKey = new HmacKey(ByteUtil.leftHalf(key));
         Key encryptionKey = new AesKey(ByteUtil.rightHalf(key));
-
-        Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm());
+        final String cipherProvider = ContentEncryptionHelp.getCipherProvider(headers, providerContext);
+        Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm(), cipherProvider);
 
         try
         {
@@ -113,7 +114,8 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
             throw new JoseException(e.toString(), e);
         }
 
-        Mac mac = MacUtil.getInitializedMac(getHmacJavaAlgorithm(), hmacKey);
+        final String macProvider = ContentEncryptionHelp.getMacProvider(headers, providerContext);
+        Mac mac = MacUtil.getInitializedMac(getHmacJavaAlgorithm(), hmacKey, macProvider);
 
         byte[] al = getAdditionalAuthenticatedDataLengthBytes(aad);
 
@@ -124,15 +126,18 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         return new ContentEncryptionParts(iv, cipherText, authenticationTag);
     }
 
-    public byte[] decrypt(ContentEncryptionParts contentEncryptionParts, byte[] aad, byte[] contentEncryptionKey, Headers headers) throws JoseException
+    public byte[] decrypt(ContentEncryptionParts contentEncryptionParts, byte[] aad, byte[] contentEncryptionKey, Headers headers, ProviderContext providerContext) throws JoseException
     {
+        String cipherProvider = ContentEncryptionHelp.getCipherProvider(headers, providerContext);
+        String macProvider = ContentEncryptionHelp.getMacProvider(headers, providerContext);
+
         byte[] iv = contentEncryptionParts.getIv();
         byte[] ciphertext = contentEncryptionParts.getCiphertext();
         byte[] authenticationTag = contentEncryptionParts.getAuthenticationTag();
         byte[] al = getAdditionalAuthenticatedDataLengthBytes(aad);
         byte[] authenticationTagInput = ByteUtil.concat(aad, iv, ciphertext, al);
         Key hmacKey = new HmacKey(ByteUtil.leftHalf(contentEncryptionKey));
-        Mac mac = MacUtil.getInitializedMac(getHmacJavaAlgorithm(), hmacKey);
+        Mac mac = MacUtil.getInitializedMac(getHmacJavaAlgorithm(), hmacKey, macProvider);
         byte[] calculatedAuthenticationTag = mac.doFinal(authenticationTagInput);
         calculatedAuthenticationTag = ByteUtil.subArray(calculatedAuthenticationTag, 0, getTagTruncationLength()); // truncate it
         boolean tagMatch = ByteUtil.secureEquals(authenticationTag, calculatedAuthenticationTag);
@@ -145,8 +150,7 @@ public class AesCbcHmacSha2ContentEncryptionAlgorithm extends AlgorithmInfo impl
         }
 
         Key encryptionKey = new AesKey(ByteUtil.rightHalf(contentEncryptionKey));
-
-        Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm());
+        Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm(), cipherProvider);
         try
         {
             cipher.init(Cipher.DECRYPT_MODE, encryptionKey, new IvParameterSpec(iv));

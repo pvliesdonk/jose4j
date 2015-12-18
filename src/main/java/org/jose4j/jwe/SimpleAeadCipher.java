@@ -46,9 +46,9 @@ public class SimpleAeadCipher
         this.tagByteLength = tagByteLength;
     }
 
-    private Cipher getInitialisedCipher(Key key, byte[] iv, int mode) throws JoseException
+    private Cipher getInitialisedCipher(Key key, byte[] iv, int mode, String provider) throws JoseException
     {
-        Cipher cipher = CipherUtil.getCipher(algorithm);
+        Cipher cipher = CipherUtil.getCipher(algorithm, provider);
         try
         {
             GCMParameterSpec parameterSpec = new GCMParameterSpec(ByteUtil.bitLength(tagByteLength), iv);
@@ -65,9 +65,9 @@ public class SimpleAeadCipher
         }
     }
 
-    public CipherOutput encrypt(Key key, byte[] iv, byte[] plaintext, byte[] aad) throws JoseException
+    public CipherOutput encrypt(Key key, byte[] iv, byte[] plaintext, byte[] aad, String provider) throws JoseException
     {
-        Cipher cipher = getInitialisedCipher(key, iv, Cipher.ENCRYPT_MODE);
+        Cipher cipher = getInitialisedCipher(key, iv, Cipher.ENCRYPT_MODE, provider);
         updateAad(cipher, aad);
 
         byte[] cipherOutput;
@@ -95,9 +95,9 @@ public class SimpleAeadCipher
         }
     }
 
-    public byte[] decrypt(Key key, byte[] iv, byte[] ciphertext, byte[] tag, byte[] aad) throws JoseException
+    public byte[] decrypt(Key key, byte[] iv, byte[] ciphertext, byte[] tag, byte[] aad, String provider) throws JoseException
     {
-        Cipher cipher = getInitialisedCipher(key, iv, Cipher.DECRYPT_MODE);
+        Cipher cipher = getInitialisedCipher(key, iv, Cipher.DECRYPT_MODE, provider);
         updateAad(cipher, aad);
 
         try
@@ -128,7 +128,7 @@ public class SimpleAeadCipher
             byte[] iv = new byte[ivByteLength];
             try
             {
-                encrypt(new AesKey(cek), iv, plain, aad);
+                encrypt(new AesKey(cek), iv, plain, aad, null);
                 isAvailable = true;
             }
             catch (Throwable e)

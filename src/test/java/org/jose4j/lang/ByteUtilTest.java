@@ -156,6 +156,12 @@ public class ByteUtilTest extends TestCase
         compareTest(bytes1, bytes2, true);
     }
 
+    public void testRandomBytesNullSecRan()
+    {
+        byte[] bytes = ByteUtil.randomBytes(4, null);
+        assertTrue(bytes.length == 4);
+    }
+
     public void testEquals1()
     {
         compareTest(new byte[]{-1}, new byte[]{1}, false);

@@ -16,6 +16,7 @@
 
 package org.jose4j.jwe;
 
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwk.EllipticCurveJsonWebKey;
 import org.jose4j.jwx.HeaderParameterNames;
@@ -50,20 +51,20 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithm extends AlgorithmInfo imple
         keyWrapKeyDescriptor = new ContentEncryptionKeyDescriptor(keyWrapAlgorithm.getKeyByteLength(), AesKey.ALGORITHM);
     }
 
-    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride)
+    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride, ProviderContext providerContext)
             throws JoseException
     {
-        ContentEncryptionKeys agreedKeys = ecdh.manageForEncrypt(managementKey, keyWrapKeyDescriptor, headers, (byte[])null);
+        ContentEncryptionKeys agreedKeys = ecdh.manageForEncrypt(managementKey, keyWrapKeyDescriptor, headers, (byte[])null, providerContext);
         String contentEncryptionKeyAlgorithm = keyWrapKeyDescriptor.getContentEncryptionKeyAlgorithm();
         Key agreedKey = new SecretKeySpec(agreedKeys.getContentEncryptionKey(), contentEncryptionKeyAlgorithm);
-        return keyWrap.manageForEncrypt(agreedKey, cekDesc, headers, cekOverride);
+        return keyWrap.manageForEncrypt(agreedKey, cekDesc, headers, cekOverride, providerContext);
     }
 
-    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers)
+    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, ProviderContext providerContext)
             throws JoseException
     {
-        Key agreedKey = ecdh.manageForDecrypt(managementKey, ByteUtil.EMPTY_BYTES, keyWrapKeyDescriptor, headers);
-        return keyWrap.manageForDecrypt(agreedKey, encryptedKey, cekDesc, headers);
+        Key agreedKey = ecdh.manageForDecrypt(managementKey, ByteUtil.EMPTY_BYTES, keyWrapKeyDescriptor, headers, providerContext);
+        return keyWrap.manageForDecrypt(agreedKey, encryptedKey, cekDesc, headers, providerContext);
     }
 
     @Override
@@ -88,7 +89,7 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithm extends AlgorithmInfo imple
     {
         public EcdhKeyAgreementWithAes128KeyWrapAlgorithm()
         {
-            super(KeyManagementAlgorithmIdentifiers.ECDH_ES_A128KW, new AesKeyWrapManagementAlgorithm.Aes128());
+            super(KeyManagementAlgorithmIdentifiers.ECDH_ES_A128KW, new AesKeyWrapManagementAlgorithm.Aes128().setUseGeneralProviderContext());
         }
     }
 
@@ -96,7 +97,7 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithm extends AlgorithmInfo imple
     {
         public EcdhKeyAgreementWithAes192KeyWrapAlgorithm()
         {
-            super(KeyManagementAlgorithmIdentifiers.ECDH_ES_A192KW, new AesKeyWrapManagementAlgorithm.Aes192());
+            super(KeyManagementAlgorithmIdentifiers.ECDH_ES_A192KW, new AesKeyWrapManagementAlgorithm.Aes192().setUseGeneralProviderContext());
         }
     }
 
@@ -104,7 +105,7 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithm extends AlgorithmInfo imple
     {
         public EcdhKeyAgreementWithAes256KeyWrapAlgorithm()
         {
-            super(KeyManagementAlgorithmIdentifiers.ECDH_ES_A256KW, new AesKeyWrapManagementAlgorithm.Aes256());
+            super(KeyManagementAlgorithmIdentifiers.ECDH_ES_A256KW, new AesKeyWrapManagementAlgorithm.Aes256().setUseGeneralProviderContext());
         }
     }
 }

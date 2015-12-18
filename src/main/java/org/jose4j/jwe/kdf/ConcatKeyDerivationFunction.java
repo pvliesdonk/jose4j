@@ -40,9 +40,20 @@ public class ConcatKeyDerivationFunction
     public ConcatKeyDerivationFunction(String hashAlgoritm)
     {
         messageDigest = HashUtil.getMessageDigest(hashAlgoritm);
+        init();
+    }
+
+    public ConcatKeyDerivationFunction(String hashAlgoritm, String provider)
+    {
+        messageDigest = HashUtil.getMessageDigest(hashAlgoritm, provider);
+        init();
+    }
+
+    private void init()
+    {
         digestLength = ByteUtil.bitLength(messageDigest.getDigestLength());
 
-        if (traceLog()) { log.trace("Hash Algorithm: {} with hashlen: {} bits", hashAlgoritm, digestLength);}
+        if (traceLog()) { log.trace("Hash Algorithm: {} with hashlen: {} bits", messageDigest.getAlgorithm(), digestLength); }
     }
 
     public byte[] kdf(byte[] sharedSecret, int keydatalen, byte[] algorithmId, byte[] partyUInfo, byte[] partyVInfo, byte[] suppPubInfo, byte[] suppPrivInfo)

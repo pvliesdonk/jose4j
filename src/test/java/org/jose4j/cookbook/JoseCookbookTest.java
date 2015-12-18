@@ -17,6 +17,7 @@
 package org.jose4j.cookbook;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jca.ProviderContextTest;
 import org.jose4j.json.JsonUtil;
 import org.jose4j.jwa.JceProviderTestSupport;
 import org.jose4j.jwe.*;
@@ -800,7 +801,7 @@ public class JoseCookbookTest
 
                 ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(32, AesKey.ALGORITHM);
 
-                Key cek = keyManagementModeAlg.manageForDecrypt(jwe.getKey(), jwe.getEncryptedKey(), cekDesc, jwe.getHeaders());
+                Key cek = keyManagementModeAlg.manageForDecrypt(jwe.getKey(), jwe.getEncryptedKey(), cekDesc, jwe.getHeaders(), ProviderContextTest.EMPTY_CONTEXT);
 
                 String encodedExampleCek = "mYMfsggkTAm0TbvtlFh2hyoXnbEzJQjMxmgLN3d8xXA";
                 assertArrayEquals(cek.getEncoded(), Base64Url.decode(encodedExampleCek));

@@ -193,21 +193,16 @@ public abstract class JsonWebKey implements Serializable
         {
             String kty = getStringRequired(params, KEY_TYPE_PARAMETER);
 
-            if (RsaJsonWebKey.KEY_TYPE.equals(kty))
+            switch (kty)
             {
-                return new RsaJsonWebKey(params);
-            }
-            else if (EllipticCurveJsonWebKey.KEY_TYPE.equals(kty))
-            {
-                return new EllipticCurveJsonWebKey(params);
-            }
-            else if (OctetSequenceJsonWebKey.KEY_TYPE.equals(kty))
-            {
-                return new OctetSequenceJsonWebKey(params);
-            }
-            else
-            {
-                throw new JoseException("Unknown key algorithm: '" + kty + "'");
+                case RsaJsonWebKey.KEY_TYPE:
+                    return new RsaJsonWebKey(params);
+                case EllipticCurveJsonWebKey.KEY_TYPE:
+                    return new EllipticCurveJsonWebKey(params);
+                case OctetSequenceJsonWebKey.KEY_TYPE:
+                    return new OctetSequenceJsonWebKey(params);
+                default:
+                    throw new JoseException("Unknown key type algorithm: '" + kty + "'");
             }
         }
 

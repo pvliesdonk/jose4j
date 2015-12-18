@@ -16,6 +16,7 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ExceptionHelp;
@@ -44,9 +45,10 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
         this.algorithmParameterSpec = algorithmParameterSpec;
     }
 
-    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException
+    @Override
+    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes, ProviderContext providerContext) throws JoseException
     {
-        Signature signature = getSignature();
+        Signature signature = getSignature(providerContext);
         initForVerify(signature, key);
         try
         {
@@ -59,10 +61,11 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
         }
     }
 
-    public byte[] sign(Key key, byte[] securedInputBytes) throws JoseException
+    @Override
+    public byte[] sign(Key key, byte[] securedInputBytes, ProviderContext providerContext) throws JoseException
     {
-        Signature signature = getSignature();
-        initForSign(signature, key);
+        Signature signature = getSignature(providerContext);
+        initForSign(signature, key, providerContext);
         try
         {
             signature.update(securedInputBytes);
@@ -74,12 +77,20 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
         }
     }
 
-    private void initForSign(Signature signature, Key key) throws InvalidKeyException
+    private void initForSign(Signature signature, Key key, ProviderContext providerContext) throws InvalidKeyException
     {
         try
         {
             PrivateKey privateKey = (PrivateKey) key;
-            signature.initSign(privateKey);
+            SecureRandom secureRandom = providerContext.getSecureRandom();
+            if (secureRandom == null)
+            {
+                signature.initSign(privateKey);
+            }
+            else
+            {
+                signature.initSign(privateKey, secureRandom);
+            }
         }
         catch (java.security.InvalidKeyException e)
         {
@@ -106,11 +117,14 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
         return "The given key (" + msg + ") is not valid ";
     }
 
-    private Signature getSignature() throws JoseException
+    private Signature getSignature(ProviderContext providerContext) throws JoseException
     {
+        String sigProvider = providerContext.getSuppliedKeyProviderContext().getSignatureProvider();
+        String javaAlg = getJavaAlgorithm();
         try
         {
-            Signature signature = Signature.getInstance(getJavaAlgorithm());
+
+            Signature signature = sigProvider == null ? Signature.getInstance(javaAlg) : Signature.getInstance(javaAlg, sigProvider);
             if (algorithmParameterSpec != null)
             {
                 signature.setParameter(algorithmParameterSpec);
@@ -119,11 +133,15 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new JoseException("Unable to get an implementation of algorithm name: " + getJavaAlgorithm(), e);
+            throw new JoseException("Unable to get an implementation of algorithm name: " + javaAlg, e);
         }
         catch (InvalidAlgorithmParameterException e)
         {
-            throw new JoseException("Invalid algorithm parameter ("+algorithmParameterSpec+") for: " + getJavaAlgorithm(), e);
+            throw new JoseException("Invalid algorithm parameter ("+algorithmParameterSpec+") for: " + javaAlg, e);
+        }
+        catch (NoSuchProviderException e)
+        {
+            throw new JoseException("Unable to get an implementation of " + javaAlg + " for provider " + sigProvider, e);
         }
     }
 
@@ -174,7 +192,7 @@ public abstract class BaseSignatureAlgorithm extends AlgorithmInfo implements Js
     {
         try
         {
-            Signature signature = getSignature();
+            Signature signature = getSignature(new ProviderContext());
             return signature != null;
         }
         catch (Exception e)

@@ -17,6 +17,7 @@ package org.jose4j.lang;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 /**
  *
@@ -27,13 +28,22 @@ public class HashUtil
 
     public static MessageDigest getMessageDigest(String alg)
     {
+        return getMessageDigest(alg, null);
+    }
+
+    public static MessageDigest getMessageDigest(String alg, String provider)
+    {
         try
         {
-            return MessageDigest.getInstance(alg);
+            return provider == null ? MessageDigest.getInstance(alg) : MessageDigest.getInstance(alg, provider);
         }
         catch (NoSuchAlgorithmException e)
         {
             throw new UncheckedJoseException("Unable to get MessageDigest instance with " + alg);
+        }
+        catch (NoSuchProviderException e)
+        {
+            throw new UncheckedJoseException("Unable to get a MessageDigest implementation of algorithm name: " + alg + " using provider " + provider, e);
         }
     }
 }

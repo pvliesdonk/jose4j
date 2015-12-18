@@ -188,11 +188,11 @@ public class JsonWebEncryption extends JsonWebStructure
             keyManagementModeAlg.validateDecryptionKey(getKey(), contentEncryptionAlg);
         }
 
-        Key cek = keyManagementModeAlg.manageForDecrypt(getKey(), getEncryptedKey(), contentEncryptionKeyDesc, getHeaders());
+        Key cek = keyManagementModeAlg.manageForDecrypt(getKey(), getEncryptedKey(), contentEncryptionKeyDesc, getHeaders(), getProviderCtx());
 
         ContentEncryptionParts contentEncryptionParts = new ContentEncryptionParts(iv, ciphertext, getIntegrity());
         byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();
-        byte[] decrypted = contentEncryptionAlg.decrypt(contentEncryptionParts, aad, cek.getEncoded(), getHeaders());
+        byte[] decrypted = contentEncryptionAlg.decrypt(contentEncryptionParts, aad, cek.getEncoded(), getHeaders(), getProviderCtx());
 
         decrypted = decompress(getHeaders(), decrypted);
 
@@ -248,7 +248,7 @@ public class JsonWebEncryption extends JsonWebStructure
             keyManagementModeAlg.validateEncryptionKey(getKey(), contentEncryptionAlg);
         }
 
-        ContentEncryptionKeys contentEncryptionKeys = keyManagementModeAlg.manageForEncrypt(managementKey, contentEncryptionKeyDesc, getHeaders(), contentEncryptionKey);
+        ContentEncryptionKeys contentEncryptionKeys = keyManagementModeAlg.manageForEncrypt(managementKey, contentEncryptionKeyDesc, getHeaders(), contentEncryptionKey, getProviderCtx());
         setContentEncryptionKey(contentEncryptionKeys.getContentEncryptionKey());
         encryptedKey = contentEncryptionKeys.getEncryptedKey();
 
@@ -263,7 +263,7 @@ public class JsonWebEncryption extends JsonWebStructure
 
         plaintextBytes = compress(getHeaders(), plaintextBytes);
 
-        ContentEncryptionParts contentEncryptionParts = contentEncryptionAlg.encrypt(plaintextBytes, aad, contentEncryptionKey, getHeaders(), getIv());
+        ContentEncryptionParts contentEncryptionParts = contentEncryptionAlg.encrypt(plaintextBytes, aad, contentEncryptionKey, getHeaders(), getIv(), getProviderCtx());
         setIv(contentEncryptionParts.getIv());
         ciphertext = contentEncryptionParts.getCiphertext();
 

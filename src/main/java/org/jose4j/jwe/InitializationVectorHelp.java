@@ -17,10 +17,12 @@ package org.jose4j.jwe;
 
 import org.jose4j.lang.ByteUtil;
 
+import java.security.SecureRandom;
+
 public class InitializationVectorHelp
 {
-    static byte[] iv(int byteLength, byte[] ivOverride)
+    static byte[] iv(int byteLength, byte[] ivOverride, SecureRandom secureRandom)
     {
-        return (ivOverride == null) ? ByteUtil.randomBytes(byteLength) : ivOverride;
+        return (ivOverride == null) ? ByteUtil.randomBytes(byteLength, secureRandom) : ivOverride;
     }
 }

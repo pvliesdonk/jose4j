@@ -24,6 +24,7 @@ import org.jose4j.lang.JsonHelp;
 
 import java.math.BigInteger;
 import java.security.Key;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -44,6 +45,8 @@ public abstract class PublicJsonWebKey extends JsonWebKey
     protected boolean writeOutPrivateKeyToJson;
     protected PrivateKey privateKey;
 
+    protected String jcaProvider;
+
     private List<X509Certificate> certificateChain;
     private String x5t;
     private String x5tS256;
@@ -56,14 +59,20 @@ public abstract class PublicJsonWebKey extends JsonWebKey
 
     protected PublicJsonWebKey(Map<String, Object> params) throws JoseException
     {
+        this(params, null);
+    }
+
+    public PublicJsonWebKey(Map<String,Object> params, String jcaProvider) throws JoseException
+    {
         super(params);
+        this.jcaProvider = jcaProvider;
 
         if (params.containsKey(X509_CERTIFICATE_CHAIN_PARAMETER))
         {
             List<String> x5cStrings = JsonHelp.getStringArray(params, X509_CERTIFICATE_CHAIN_PARAMETER);
             certificateChain = new ArrayList<X509Certificate>(x5cStrings.size());
 
-            X509Util x509Util = new X509Util();
+            X509Util x509Util = X509Util.getX509Util(jcaProvider);
 
             for (String b64EncodedDer : x5cStrings)
             {
@@ -245,10 +254,24 @@ public abstract class PublicJsonWebKey extends JsonWebKey
 
     public static class Factory
     {
+        public static PublicJsonWebKey newPublicJwk(Map<String,Object> params, String jcaProvider) throws JoseException
+        {
+            String kty = getStringRequired(params, KEY_TYPE_PARAMETER);
+
+            switch (kty)
+            {
+                case RsaJsonWebKey.KEY_TYPE:
+                    return new RsaJsonWebKey(params, jcaProvider);
+                case EllipticCurveJsonWebKey.KEY_TYPE:
+                    return new EllipticCurveJsonWebKey(params, jcaProvider);
+                default:
+                    throw new JoseException("Unknown key type (for public keys): '" + kty + "'");
+            }
+        }
+
         public static PublicJsonWebKey newPublicJwk(Map<String,Object> params) throws JoseException
         {
-            JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk(params);
-            return (PublicJsonWebKey) jsonWebKey;
+            return newPublicJwk(params, null);
         }
 
         public static PublicJsonWebKey newPublicJwk(Key publicKey) throws JoseException
@@ -259,8 +282,13 @@ public abstract class PublicJsonWebKey extends JsonWebKey
 
         public static PublicJsonWebKey newPublicJwk(String json) throws JoseException
         {
+            return newPublicJwk(json, null);
+        }
+
+        public static PublicJsonWebKey newPublicJwk(String json, String jcaProvider) throws JoseException
+        {
             Map<String, Object> parsed = JsonUtil.parseJson(json);
-            return newPublicJwk(parsed);
+            return newPublicJwk(parsed, jcaProvider);
         }
     }
 }

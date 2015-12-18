@@ -18,6 +18,7 @@ package org.jose4j.jwe;
 
 import junit.framework.TestCase;
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jca.ProviderContextTest;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
@@ -26,7 +27,6 @@ import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
 
 import java.security.Key;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 
 /**
@@ -69,7 +69,7 @@ public class EcdhKeyAgreementAlgorithmTest extends TestCase
         ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(ByteUtil.byteLength(128), AesKey.ALGORITHM);
 
         PublicKey pubKey = receiverJwk.getPublicKey();
-        ContentEncryptionKeys contentEncryptionKeys = ecdhKeyAgreementAlgorithm.manageForEncrypt(pubKey, cekDesc, headers, ephemeralJwk);
+        ContentEncryptionKeys contentEncryptionKeys = ecdhKeyAgreementAlgorithm.manageForEncrypt(pubKey, cekDesc, headers, ephemeralJwk, ProviderContextTest.EMPTY_CONTEXT);
 
         assertTrue(contentEncryptionKeys.getEncryptedKey().length == 0);
         Base64Url base64Url = new Base64Url();
@@ -78,7 +78,7 @@ public class EcdhKeyAgreementAlgorithmTest extends TestCase
         Headers receivedHeaders = new Headers();
         receivedHeaders.setFullHeaderAsJsonString(headers.getFullHeaderAsJsonString());
 
-        Key key = ecdhKeyAgreementAlgorithm.manageForDecrypt(receiverJwk.getPrivateKey(), null, cekDesc, receivedHeaders);
+        Key key = ecdhKeyAgreementAlgorithm.manageForDecrypt(receiverJwk.getPrivateKey(), null, cekDesc, receivedHeaders, ProviderContextTest.EMPTY_CONTEXT);
         assertEquals("VqqN6vgjbSBcIijNcacQGg", base64Url.base64UrlEncode(key.getEncoded()));
     }
 
@@ -131,7 +131,7 @@ public class EcdhKeyAgreementAlgorithmTest extends TestCase
 
         ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(ByteUtil.byteLength(256), AesKey.ALGORITHM);
 
-        Key derivedKey = ecdhKeyAgreementAlgorithm.manageForDecrypt(receiverJwk.getPrivateKey(), null, cekDesc, headers);
+        Key derivedKey = ecdhKeyAgreementAlgorithm.manageForDecrypt(receiverJwk.getPrivateKey(), null, cekDesc, headers, ProviderContextTest.EMPTY_CONTEXT);
         assertEquals("bqXVMd1yd5E08Wy2T1U9m9Q5DEjj7-BYIyWUgazzZkA", Base64Url.encode(derivedKey.getEncoded()));
     }
 

@@ -16,6 +16,7 @@
 
 package org.jose4j.jwe;
 
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.Headers;
 import org.jose4j.keys.AesKey;
@@ -49,29 +50,33 @@ public class AesGcmContentEncryptionAlgorithm extends AlgorithmInfo implements C
         return contentEncryptionKeyDescriptor;
     }
 
-    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers, byte[] ivOverride)
+    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, Headers headers, byte[] ivOverride, ProviderContext providerContext)
             throws JoseException
     {
-        byte[] iv = InitializationVectorHelp.iv(IV_BYTE_LENGTH, ivOverride);
-        return encrypt(plaintext, aad, contentEncryptionKey, iv);
+        byte[] iv = InitializationVectorHelp.iv(IV_BYTE_LENGTH, ivOverride, providerContext.getSecureRandom());
+        String cipherProvider = ContentEncryptionHelp.getCipherProvider(headers, providerContext);
+        return encrypt(plaintext, aad, contentEncryptionKey, iv, cipherProvider);
     }
 
-    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, byte[] iv)
+
+
+    public ContentEncryptionParts encrypt(byte[] plaintext, byte[] aad, byte[] contentEncryptionKey, byte[] iv, String provider)
             throws JoseException
     {
         AesKey cek = new AesKey(contentEncryptionKey);
-        SimpleAeadCipher.CipherOutput encrypted = simpleAeadCipher.encrypt(cek, iv, plaintext, aad);
+        SimpleAeadCipher.CipherOutput encrypted = simpleAeadCipher.encrypt(cek, iv, plaintext, aad, provider);
         return new ContentEncryptionParts(iv, encrypted.getCiphertext(), encrypted.getTag());
     }
 
-    public byte[] decrypt(ContentEncryptionParts contentEncParts, byte[] aad, byte[] contentEncryptionKey, Headers headers)
+    public byte[] decrypt(ContentEncryptionParts contentEncParts, byte[] aad, byte[] contentEncryptionKey, Headers headers, ProviderContext providerContext)
             throws JoseException
     {
         byte[] iv = contentEncParts.getIv();
         AesKey cek = new AesKey(contentEncryptionKey);
         byte[] ciphertext = contentEncParts.getCiphertext();
         byte[] tag = contentEncParts.getAuthenticationTag();
-        return simpleAeadCipher.decrypt(cek, iv, ciphertext, tag, aad);
+        String cipherProvider = ContentEncryptionHelp.getCipherProvider(headers, providerContext);
+        return simpleAeadCipher.decrypt(cek, iv, ciphertext, tag, aad, cipherProvider);
     }
 
     @Override

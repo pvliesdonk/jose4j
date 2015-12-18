@@ -17,7 +17,7 @@
 package org.jose4j.jwe.kdf;
 
 import org.jose4j.base64url.Base64Url;
-import org.jose4j.lang.InvalidKeyException;
+import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,7 +28,7 @@ import org.junit.Test;
 public class Pbkdf2MoreTest
 {
     @Test
-    public void test1() throws InvalidKeyException
+    public void test1() throws JoseException
     {
         int ic = 1024;
         String encodedSalt = "_bdWuYq60PU";
@@ -40,7 +40,7 @@ public class Pbkdf2MoreTest
     }
 
     @Test
-    public void test2() throws InvalidKeyException
+    public void test2() throws JoseException
     {
         int ic = 500;
         String encodedSalt = "4qJnWHair2GDKxXd9SYE64MA";
@@ -52,7 +52,7 @@ public class Pbkdf2MoreTest
     }
 
     @Test
-    public void test3() throws InvalidKeyException
+    public void test3() throws JoseException
     {
         int ic = 7;
         String encodedSalt = "SCZwvZ_lZek";
@@ -64,7 +64,7 @@ public class Pbkdf2MoreTest
     }
 
     @Test
-    public void test4() throws InvalidKeyException
+    public void test4() throws JoseException
     {
         int ic = 20;
         String encodedSalt = "eGOROhJ6jDqos0hYhQh8EYfGJ7g";
@@ -76,7 +76,7 @@ public class Pbkdf2MoreTest
     }
 
     @Test
-    public void test5() throws InvalidKeyException
+    public void test5() throws JoseException
     {
         int ic = 1;
         String encodedSalt = "WKSJ8q-EvvyP-0RQd6g";
@@ -88,7 +88,7 @@ public class Pbkdf2MoreTest
     }
 
     @Test
-    public void test6() throws InvalidKeyException
+    public void test6() throws JoseException
     {
         int ic = 3;
         String encodedSalt = "SldHVNgHJadJ";
@@ -101,7 +101,7 @@ public class Pbkdf2MoreTest
 
     }
 
-    private void testIt(int count, String salt, int dklenBytes, String pwd, String prn, String pbk) throws InvalidKeyException
+    private void testIt(int count, String salt, int dklenBytes, String pwd, String prn, String pbk) throws JoseException
     {
         PasswordBasedKeyDerivationFunction2 pbkdf2 = new PasswordBasedKeyDerivationFunction2(prn);
         byte[] pwdBytes = StringUtil.getBytesUtf8(pwd);

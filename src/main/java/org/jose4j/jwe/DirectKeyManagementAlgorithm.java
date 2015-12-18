@@ -16,6 +16,7 @@
 
 package org.jose4j.jwe;
 
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwk.OctetSequenceJsonWebKey;
 import org.jose4j.jwx.Headers;
@@ -38,14 +39,14 @@ public class DirectKeyManagementAlgorithm extends AlgorithmInfo implements KeyMa
         setKeyType(OctetSequenceJsonWebKey.KEY_TYPE);
     }
 
-    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride) throws JoseException
+    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride, ProviderContext providerContext) throws JoseException
     {
         KeyValidationSupport.cekNotAllowed(cekOverride, getAlgorithmIdentifier());
         byte[] cekBytes = managementKey.getEncoded();
         return new ContentEncryptionKeys(cekBytes, ByteUtil.EMPTY_BYTES);
     }
 
-    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
+    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, ProviderContext providerContext) throws JoseException
     {
         if (encryptedKey.length != 0)
         {

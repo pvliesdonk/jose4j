@@ -16,6 +16,7 @@
 
 package org.jose4j.jwt.consumer;
 
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jws.AlgorithmIdentifiers;
@@ -58,6 +59,9 @@ public class JwtConsumer
     private boolean relaxVerificationKeyValidation;
 
     private boolean relaxDecryptionKeyValidation;
+
+    private ProviderContext jwsProviderContext;
+    private ProviderContext jweProviderContext;
 
     JwtConsumer()
     {
@@ -123,6 +127,16 @@ public class JwtConsumer
         this.relaxDecryptionKeyValidation = relaxDecryptionKeyValidation;
     }
 
+    void setJwsProviderContext(ProviderContext jwsProviderContext)
+    {
+        this.jwsProviderContext = jwsProviderContext;
+    }
+
+    void setJweProviderContext(ProviderContext jweProviderContext)
+    {
+        this.jweProviderContext = jweProviderContext;
+    }
+
     public JwtClaims processToClaims(String jwt) throws InvalidJwtException
     {
         return process(jwt).getJwtClaims();
@@ -148,6 +162,11 @@ public class JwtConsumer
                     JsonWebSignature jws = (JsonWebSignature) currentJoseObject;
                     if (!skipSignatureVerification)
                     {
+                        if (jwsProviderContext != null)
+                        {
+                            jws.setProviderContext(jwsProviderContext);
+                        }
+
                         if (relaxVerificationKeyValidation)
                         {
                             jws.setDoKeyValidation(false);
@@ -176,6 +195,11 @@ public class JwtConsumer
                 else
                 {
                     JsonWebEncryption jwe = (JsonWebEncryption) currentJoseObject;
+
+                    if (jweProviderContext != null)
+                    {
+                        jwe.setProviderContext(jweProviderContext);
+                    }
 
                     Key key = decryptionKeyResolver.resolveKey(jwe, Collections.unmodifiableList(joseObjects));
                     if (key != null && !key.equals(jwe.getKey()))

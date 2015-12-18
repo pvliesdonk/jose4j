@@ -16,12 +16,14 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwk.OctetSequenceJsonWebKey;
 import org.jose4j.keys.KeyPersuasion;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidKeyException;
+import org.jose4j.lang.JoseException;
 import org.jose4j.mac.MacUtil;
 
 import javax.crypto.Mac;
@@ -43,28 +45,29 @@ public class HmacUsingShaAlgorithm extends AlgorithmInfo implements JsonWebSigna
         this.minimumKeyLength = minimumKeyLength;
     }
 
-    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws InvalidKeyException
+    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes, ProviderContext providerContext) throws JoseException
     {
         if (!(key instanceof SecretKey))
         {
             throw new InvalidKeyException(key.getClass() + " cannot be used for HMAC verification.");
         }
 
-        Mac mac = getMacInstance(key);
+        Mac mac = getMacInstance(key, providerContext);
         byte[] calculatedSigature = mac.doFinal(securedInputBytes);
 
         return ByteUtil.secureEquals(signatureBytes, calculatedSigature);
     }
 
-    public byte[] sign(Key key, byte[] securedInputBytes) throws InvalidKeyException
+    public byte[] sign(Key key, byte[] securedInputBytes, ProviderContext providerContext) throws JoseException
     {
-        Mac mac = getMacInstance(key);
+        Mac mac = getMacInstance(key, providerContext);
         return mac.doFinal(securedInputBytes);
     }
 
-    private Mac getMacInstance(Key key) throws InvalidKeyException
+    private Mac getMacInstance(Key key, ProviderContext providerContext) throws JoseException
     {
-        return MacUtil.getInitializedMac(getJavaAlgorithm(), key);
+        String macProvider = providerContext.getSuppliedKeyProviderContext().getMacProvider();
+        return MacUtil.getInitializedMac(getJavaAlgorithm(), key, macProvider);
     }
 
     void validateKey(Key key) throws InvalidKeyException

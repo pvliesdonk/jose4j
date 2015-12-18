@@ -56,13 +56,18 @@ public class RsaJsonWebKey extends PublicJsonWebKey
 
     public RsaJsonWebKey(Map<String, Object> params) throws JoseException
     {
-        super(params);
+        this(params, null);
+    }
+
+    public RsaJsonWebKey(Map<String, Object> params, String jcaProvider) throws JoseException
+    {
+        super(params, jcaProvider);
 
         BigInteger modulus = getBigIntFromBase64UrlEncodedParam(params, MODULUS_MEMBER_NAME, true);
 
         BigInteger publicExponent = getBigIntFromBase64UrlEncodedParam(params, EXPONENT_MEMBER_NAME, true);
 
-        RsaKeyUtil rsaKeyUtil = new RsaKeyUtil();
+        RsaKeyUtil rsaKeyUtil = new RsaKeyUtil(jcaProvider, null);
         key = rsaKeyUtil.publicKey(modulus, publicExponent);
         checkForBareKeyCertMismatch();
 

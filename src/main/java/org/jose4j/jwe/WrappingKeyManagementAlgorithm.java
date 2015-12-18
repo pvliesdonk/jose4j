@@ -16,6 +16,7 @@
 
 package org.jose4j.jwe;
 
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.Headers;
 import org.jose4j.lang.ByteUtil;
@@ -40,6 +41,7 @@ public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo imple
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
     private AlgorithmParameterSpec algorithmParameterSpec;
+    protected boolean useSuppliedKeyProviderContext = true;
 
     public WrappingKeyManagementAlgorithm(String javaAlg, String alg)
     {
@@ -52,15 +54,18 @@ public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo imple
         this.algorithmParameterSpec = algorithmParameterSpec;
     }
 
-    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride) throws JoseException
+    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride, ProviderContext providerContext) throws JoseException
     {
         byte[] contentEncryptionKey = cekOverride == null ? ByteUtil.randomBytes(cekDesc.getContentEncryptionKeyByteLength()) : cekOverride;
-        return manageForEnc(managementKey, cekDesc, contentEncryptionKey);
+        return manageForEnc(managementKey, cekDesc, contentEncryptionKey, providerContext);
     }
 
-    protected ContentEncryptionKeys manageForEnc(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, byte[] contentEncryptionKey) throws JoseException
+    protected ContentEncryptionKeys manageForEnc(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, byte[] contentEncryptionKey, ProviderContext providerContext) throws JoseException
     {
-        Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm());
+        ProviderContext.Context ctx = useSuppliedKeyProviderContext ? providerContext.getSuppliedKeyProviderContext() : providerContext.getGeneralProviderContext();
+        String provider = ctx.getCipherProvider();
+
+        Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm(), provider);
 
         try
         {
@@ -87,9 +92,10 @@ public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo imple
         }
     }
 
-    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
+    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, ProviderContext providerContext) throws JoseException
     {
-        Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm());
+        String provider = providerContext.getSuppliedKeyProviderContext().getCipherProvider();
+        Cipher cipher = CipherUtil.getCipher(getJavaAlgorithm(), provider);
 
         try
         {

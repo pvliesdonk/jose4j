@@ -21,20 +21,30 @@ import org.jose4j.lang.JoseException;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 /**
  */
 public class CipherUtil
 {
-    static Cipher getCipher(String algorithm) throws JoseException
+//    static Cipher getCipher(String algorithm) throws JoseException
+//    {
+//        return getCipher(algorithm, null);
+//    }
+
+    static Cipher getCipher(String algorithm, String provider) throws JoseException
     {
         try
         {
-            return Cipher.getInstance(algorithm);
+            return provider == null ? Cipher.getInstance(algorithm) : Cipher.getInstance(algorithm, provider);
         }
         catch (NoSuchAlgorithmException | NoSuchPaddingException e)
         {
             throw new JoseException(e.toString() , e);
+        }
+        catch (NoSuchProviderException e)
+        {
+            throw new JoseException("Unable to get a Cipher implementation of " + algorithm + " using provider " + provider, e);
         }
     }
 }

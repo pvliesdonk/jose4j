@@ -16,6 +16,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jca.ProviderContextTest;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jwk.Use;
@@ -221,7 +222,7 @@ public class Pbes2ExampleEncryptedRSAPrivateKeyJwkAppendixCTest
         PbkdfKey pbkdfKey = new PbkdfKey(PASSWORD);
 
         Pbes2HmacShaWithAesKeyWrapAlgorithm pbesAlg = new Pbes2HmacShaWithAesKeyWrapAlgorithm.HmacSha256Aes128();
-        Key derivedKey = pbesAlg.deriveForEncrypt(pbkdfKey, headers);
+        Key derivedKey = pbesAlg.deriveForEncrypt(pbkdfKey, headers, ProviderContextTest.EMPTY_CONTEXT);
 
         byte[] expectedDerived = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{110, 171, 169, 92, 129, 92, 109, 117,
                                                                                         233, 242, 116, 233, 170, 14, 24, 75});
@@ -234,7 +235,7 @@ public class Pbes2ExampleEncryptedRSAPrivateKeyJwkAppendixCTest
 
         WrappingKeyManagementAlgorithm keyWrap = new AesKeyWrapManagementAlgorithm.Aes128();
         ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(exampleCek.length, AesKey.ALGORITHM);
-        ContentEncryptionKeys contentEncryptionKeys = keyWrap.manageForEnc(derivedKey, cekDesc, exampleCek);
+        ContentEncryptionKeys contentEncryptionKeys = keyWrap.manageForEnc(derivedKey, cekDesc, exampleCek, ProviderContextTest.EMPTY_CONTEXT);
         byte[] contentEncryptionKey = contentEncryptionKeys.getContentEncryptionKey();
         assertArrayEquals(exampleCek, contentEncryptionKey);
 
@@ -251,7 +252,7 @@ public class Pbes2ExampleEncryptedRSAPrivateKeyJwkAppendixCTest
 
         AesCbcHmacSha2ContentEncryptionAlgorithm aes128CbcHmacSha256 = new AesCbcHmacSha2ContentEncryptionAlgorithm.Aes128CbcHmacSha256();
         byte[] aad = StringUtil.getBytesAscii(encodedHeader);
-        ContentEncryptionParts contentEncryptionParts = aes128CbcHmacSha256.encrypt(plainTextOctetsAsBytes, aad, contentEncryptionKey, iv);
+        ContentEncryptionParts contentEncryptionParts = aes128CbcHmacSha256.encrypt(plainTextOctetsAsBytes, aad, contentEncryptionKey, iv, headers, ProviderContextTest.EMPTY_CONTEXT);
         byte[] authenticationTag = contentEncryptionParts.getAuthenticationTag();
         String encodedTag = base64url.base64UrlEncode(authenticationTag);
         byte[] ciphertext = contentEncryptionParts.getCiphertext();

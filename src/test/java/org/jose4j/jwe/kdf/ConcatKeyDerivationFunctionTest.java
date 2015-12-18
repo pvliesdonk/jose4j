@@ -70,7 +70,7 @@ public class ConcatKeyDerivationFunctionTest extends TestCase
         byte[] pub = ByteUtil.getBytes(keyDatalen);
         byte[] priv = ByteUtil.EMPTY_BYTES;
 
-        ConcatKeyDerivationFunction myConcatKdf = new ConcatKeyDerivationFunction("SHA-256");
+        ConcatKeyDerivationFunction myConcatKdf = new ConcatKeyDerivationFunction("SHA-256", null);
 
         byte[] kdfed = myConcatKdf.kdf(z, keyDatalen, algId, partyU, partyV, pub, priv);
         assertEquals(derivedKey, Base64Url.encode(kdfed));
@@ -83,7 +83,7 @@ public class ConcatKeyDerivationFunctionTest extends TestCase
         String derivedKey = "vphyobtvExGXF7TaOvAkx6CCjHQNYamP2ET8xkhTu-0";
         byte[] z = Base64Url.decode("LfkHot2nGTVlmfxbgxQfMg");  // ByteUtil.randomBytes(16);
         System.out.println(Base64Url.encode(z));
-        KdfUtil kdfUtil = new KdfUtil();
+        KdfUtil kdfUtil = new KdfUtil(null);
         int keyDatalen = 256;
         String alg = ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256;
         byte[] algId = kdfUtil.prependDatalen(StringUtil.getBytesUtf8(alg));
@@ -92,7 +92,7 @@ public class ConcatKeyDerivationFunctionTest extends TestCase
         byte[] pub = ByteUtil.getBytes(keyDatalen);
         byte[] priv = ByteUtil.EMPTY_BYTES;
 
-        ConcatKeyDerivationFunction myConcatKdf = new ConcatKeyDerivationFunction("SHA-256");
+        ConcatKeyDerivationFunction myConcatKdf = new ConcatKeyDerivationFunction("SHA-256", null);
 
         byte[] kdfed = myConcatKdf.kdf(z, keyDatalen, algId, partyU, partyV, pub, priv);
         assertEquals(derivedKey, Base64Url.encode(kdfed));
@@ -103,7 +103,7 @@ public class ConcatKeyDerivationFunctionTest extends TestCase
         // test values produced from implementation found at http://stackoverflow.com/questions/10879658
         String derivedKey = "yRbmmZJpxv3H1aq3FgzESa453frljIaeMz6pt5rQZ4Q5Hs-4RYoFRXFh_qBsbTjlsj8JxIYTWj-cp5LKtgi1fBRsf_5yTEcLDv4pKH2fNxjbEOKuVVDWA1_Qv2IkEC0_QSi3lSSELcJaNX-hDG8occ7oQv-w8lg6lLJjg58kOes";
         byte[] z = Base64Url.decode("KSDnQpf2iurUsAbcuI4YH-FKfk2gecN6cWHTYlBzrd8");
-        KdfUtil kdfUtil = new KdfUtil();
+        KdfUtil kdfUtil = new KdfUtil(null);
         int keyDatalen = 1024;
         String alg = "meh";
         byte[] algId = kdfUtil.prependDatalen(StringUtil.getBytesUtf8(alg));

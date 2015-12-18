@@ -17,6 +17,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwe.kdf.PasswordBasedKeyDerivationFunction2;
 import org.jose4j.jwx.HeaderParameterNames;
@@ -62,13 +63,13 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     }
 
     @Override
-    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride) throws JoseException
+    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride, ProviderContext providerContext) throws JoseException
     {
-        Key derivedKey = deriveForEncrypt(managementKey, headers);
-        return keyWrap.manageForEncrypt(derivedKey, cekDesc, headers, cekOverride);
+        Key derivedKey = deriveForEncrypt(managementKey, headers, providerContext);
+        return keyWrap.manageForEncrypt(derivedKey, cekDesc, headers, cekOverride, providerContext);
     }
 
-    protected Key deriveForEncrypt(Key managementKey, Headers headers) throws InvalidKeyException
+    protected Key deriveForEncrypt(Key managementKey, Headers headers, ProviderContext providerContext) throws JoseException
     {
         Long iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
         if (iterationCount == null)
@@ -82,7 +83,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
         Base64Url base64Url = new Base64Url();
         if (saltInputString == null)
         {
-            saltInput = ByteUtil.randomBytes(defaultSaltByteLength);
+            saltInput = ByteUtil.randomBytes(defaultSaltByteLength, providerContext.getSecureRandom());
             saltInputString = base64Url.base64UrlEncode(saltInput);
             headers.setStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT, saltInputString);
         }
@@ -91,25 +92,26 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
             saltInput = base64Url.base64UrlDecode(saltInputString);
         }
 
-        return deriveKey(managementKey, iterationCount, saltInput);
+        return deriveKey(managementKey, iterationCount, saltInput, providerContext);
     }
 
     @Override
-    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
+    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, ProviderContext providerContext) throws JoseException
     {
         Long iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
         String saltInputString = headers.getStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT);
         Base64Url base64Url = new Base64Url();
         byte[] saltInput = base64Url.base64UrlDecode(saltInputString);
-        Key derivedKey = deriveKey(managementKey, iterationCount, saltInput);
-        return keyWrap.manageForDecrypt(derivedKey, encryptedKey, cekDesc, headers);
+        Key derivedKey = deriveKey(managementKey, iterationCount, saltInput, providerContext);
+        return keyWrap.manageForDecrypt(derivedKey, encryptedKey, cekDesc, headers, providerContext);
     }
 
-    private Key deriveKey(Key managementKey, Long iterationCount, byte[] saltInput) throws InvalidKeyException
+    private Key deriveKey(Key managementKey, Long iterationCount, byte[] saltInput, ProviderContext providerContext) throws JoseException
     {
         byte[] salt = ByteUtil.concat(StringUtil.getBytesUtf8(getAlgorithmIdentifier()), ZERO_BYTE, saltInput);
         int dkLen = keyWrapKeyDescriptor.getContentEncryptionKeyByteLength();
-        byte[] derivedKeyBytes = pbkdf2.derive(managementKey.getEncoded(), salt, iterationCount.intValue(), dkLen);
+        String macProvider = providerContext.getSuppliedKeyProviderContext().getMacProvider();
+        byte[] derivedKeyBytes = pbkdf2.derive(managementKey.getEncoded(), salt, iterationCount.intValue(), dkLen, macProvider);
         return new SecretKeySpec(derivedKeyBytes, keyWrapKeyDescriptor.getContentEncryptionKeyAlgorithm());
     }
 
@@ -160,7 +162,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     {
         public HmacSha256Aes128()
         {
-            super(KeyManagementAlgorithmIdentifiers.PBES2_HS256_A128KW, MacUtil.HMAC_SHA256, new AesKeyWrapManagementAlgorithm.Aes128());
+            super(KeyManagementAlgorithmIdentifiers.PBES2_HS256_A128KW, MacUtil.HMAC_SHA256, new AesKeyWrapManagementAlgorithm.Aes128().setUseGeneralProviderContext());
         }
     }
 
@@ -168,7 +170,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     {
         public HmacSha384Aes192()
         {
-            super(KeyManagementAlgorithmIdentifiers.PBES2_HS384_A192KW, MacUtil.HMAC_SHA384, new AesKeyWrapManagementAlgorithm.Aes192());
+            super(KeyManagementAlgorithmIdentifiers.PBES2_HS384_A192KW, MacUtil.HMAC_SHA384, new AesKeyWrapManagementAlgorithm.Aes192().setUseGeneralProviderContext());
         }
     }
 
@@ -176,7 +178,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     {
         public HmacSha512Aes256()
         {
-            super(KeyManagementAlgorithmIdentifiers.PBES2_HS512_A256KW, MacUtil.HMAC_SHA512, new AesKeyWrapManagementAlgorithm.Aes256());
+            super(KeyManagementAlgorithmIdentifiers.PBES2_HS512_A256KW, MacUtil.HMAC_SHA512, new AesKeyWrapManagementAlgorithm.Aes256().setUseGeneralProviderContext());
         }
     }
 }

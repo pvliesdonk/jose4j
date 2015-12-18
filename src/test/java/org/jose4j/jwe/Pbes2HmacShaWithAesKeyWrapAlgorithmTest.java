@@ -17,6 +17,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jca.ProviderContextTest;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.Headers;
 import org.jose4j.keys.PbkdfKey;
@@ -123,7 +124,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithmTest
         PbkdfKey key = new PbkdfKey("a password");
 
         Headers headers = new Headers();
-        Key derivedKey = pbes2.deriveForEncrypt(key, headers);
+        Key derivedKey = pbes2.deriveForEncrypt(key, headers, ProviderContextTest.EMPTY_CONTEXT);
         assertThat(derivedKey.getEncoded().length, equalTo(16));
 
         String saltInputString = headers.getStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT);
@@ -140,7 +141,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithmTest
         newPbes2.setDefaultSaltByteLength(newDefaultSaltByteLength);
 
         headers = new Headers();
-        derivedKey = newPbes2.deriveForEncrypt(key, headers);
+        derivedKey = newPbes2.deriveForEncrypt(key, headers, ProviderContextTest.EMPTY_CONTEXT);
         saltInputString = headers.getStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT);
         saltInput = Base64Url.decode(saltInputString);
         assertThat(saltInput.length, equalTo(newDefaultSaltByteLength));

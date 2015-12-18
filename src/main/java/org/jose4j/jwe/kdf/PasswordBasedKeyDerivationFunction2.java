@@ -18,7 +18,7 @@ package org.jose4j.jwe.kdf;
 
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.ByteUtil;
-import org.jose4j.lang.InvalidKeyException;
+import org.jose4j.lang.JoseException;
 import org.jose4j.lang.UncheckedJoseException;
 import org.jose4j.mac.MacUtil;
 
@@ -37,9 +37,14 @@ public class PasswordBasedKeyDerivationFunction2
         this.hmacAlgorithm = hmacAlgorithm;
     }
 
-    public byte[] derive(byte[] password, byte[] salt, int iterationCount, int dkLen) throws InvalidKeyException
+    public byte[] derive(byte[] password, byte[] salt, int iterationCount, int dkLen) throws JoseException
     {
-        Mac prf = MacUtil.getInitializedMac(hmacAlgorithm, new HmacKey(password));
+        return derive(password, salt, iterationCount, dkLen, null);
+    }
+
+    public byte[] derive(byte[] password, byte[] salt, int iterationCount, int dkLen, String provider) throws JoseException
+    {
+        Mac prf = MacUtil.getInitializedMac(hmacAlgorithm, new HmacKey(password), provider);
         int hLen = prf.getMacLength();
 
         //  1. If dkLen > (2^32 - 1) * hLen, output "derived key too long" and
@@ -108,7 +113,7 @@ public class PasswordBasedKeyDerivationFunction2
         return byteArrayOutputStream.toByteArray();
     }
 
-    byte[] f(byte[] salt, int iterationCount, int blockIndex, Mac prf) throws InvalidKeyException
+    byte[] f(byte[] salt, int iterationCount, int blockIndex, Mac prf)
     {
         byte[] currentU;
         byte[] lastU = null;

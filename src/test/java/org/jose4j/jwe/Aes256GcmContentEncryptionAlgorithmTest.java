@@ -17,6 +17,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jca.ProviderContextTest;
 import org.jose4j.jwa.JceProviderTestSupport;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.StringUtil;
@@ -56,7 +57,7 @@ public class Aes256GcmContentEncryptionAlgorithmTest
 
                 byte[] iv = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{227, 197, 117, 252, 2, 219, 233, 68, 180, 225, 77, 219});
 
-                ContentEncryptionParts encryptionParts = aesGcmContentEncryptionAlg.encrypt(plainText, aad, cek, iv);
+                ContentEncryptionParts encryptionParts = aesGcmContentEncryptionAlg.encrypt(plainText, aad, cek, iv, null);
 
                 Base64Url base64Url = new Base64Url();
 
@@ -69,7 +70,7 @@ public class Aes256GcmContentEncryptionAlgorithmTest
                 assertThat(encodedAuthenticationTag, equalTo(base64Url.base64UrlEncode(authenticationTag)));
 
                 ContentEncryptionParts parts = new ContentEncryptionParts(iv, ciphertext, authenticationTag);
-                byte[] decrypted = aesGcmContentEncryptionAlg.decrypt(parts, aad, cek, null);
+                byte[] decrypted = aesGcmContentEncryptionAlg.decrypt(parts, aad, cek, null, ProviderContextTest.EMPTY_CONTEXT);
                 assertArrayEquals(plainText, decrypted);
             }
         });

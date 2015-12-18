@@ -16,6 +16,7 @@
 
 package org.jose4j.jwe;
 
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jwx.KeyValidationSupport;
@@ -62,7 +63,7 @@ public class RsaKeyManagementAlgorithm extends WrappingKeyManagementAlgorithm im
     {
         try
         {
-             return CipherUtil.getCipher(getJavaAlgorithm()) != null;
+             return CipherUtil.getCipher(getJavaAlgorithm(), null) != null;
         }
         catch (JoseException e)
         {
@@ -107,7 +108,7 @@ public class RsaKeyManagementAlgorithm extends WrappingKeyManagementAlgorithm im
                     "7-VTdL1VbC2tejvcI2BlMkEpk1BzBZI0KQB0GaDWFLN-aEAw3vRw\"," +
                     "\"e\":\"AQAB\"}");
                 ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(16, AesKey.ALGORITHM);
-                ContentEncryptionKeys contentEncryptionKeys = manageForEncrypt(jwk.getKey(), cekDesc, null, null);
+                ContentEncryptionKeys contentEncryptionKeys = manageForEncrypt(jwk.getKey(), cekDesc, null, null, new ProviderContext());
                 return contentEncryptionKeys != null;
             }
             catch (JoseException e)

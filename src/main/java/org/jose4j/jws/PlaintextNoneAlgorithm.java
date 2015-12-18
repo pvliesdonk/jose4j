@@ -16,6 +16,7 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.keys.KeyPersuasion;
@@ -38,25 +39,29 @@ public class PlaintextNoneAlgorithm extends AlgorithmInfo implements JsonWebSign
         setKeyPersuasion(KeyPersuasion.NONE);
     }
 
-    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException
+    @Override
+    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes, ProviderContext providerContext) throws JoseException
     {
         validateKey(key);
 
         return (signatureBytes.length == 0);
     }
 
-    public byte[] sign(Key key, byte[] securedInputBytes) throws JoseException
+    @Override
+    public byte[] sign(Key key, byte[] securedInputBytes, ProviderContext providerContext) throws JoseException
     {
         validateKey(key);
 
         return ByteUtil.EMPTY_BYTES;
     }
 
+    @Override
     public void validateSigningKey(Key key) throws InvalidKeyException
     {
         validateKey(key);
     }
 
+    @Override
     public void validateVerificationKey(Key key) throws InvalidKeyException
     {
         validateKey(key);

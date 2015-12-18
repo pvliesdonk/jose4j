@@ -68,6 +68,12 @@ public class AesKeyWrapManagementAlgorithm extends WrappingKeyManagementAlgorith
         return AlgorithmAvailability.isAvailable("Cipher", agl) && CipherStrengthSupport.isAvailable(agl, aesByteKeyLength);
     }
 
+    AesKeyWrapManagementAlgorithm setUseGeneralProviderContext()
+    {
+        this.useSuppliedKeyProviderContext = false;
+        return this;
+    }
+
     public static class Aes128 extends AesKeyWrapManagementAlgorithm
     {
         public Aes128()

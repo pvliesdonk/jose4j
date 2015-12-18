@@ -17,6 +17,7 @@
 package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jca.ProviderContextTest;
 import org.jose4j.jwa.AlgorithmFactory;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwa.JceProviderTestSupport;
@@ -81,7 +82,7 @@ public class RsaOaepKeyManagementAlgorithmTest
         RsaKeyManagementAlgorithm.RsaOaep keyManagementAlgorithm = new RsaKeyManagementAlgorithm.RsaOaep();
         PrivateKey privateKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPrivateKey();
         ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(32, AesKey.ALGORITHM);
-        Key key = keyManagementAlgorithm.manageForDecrypt(privateKey, encryptedKey, cekDesc, null);
+        Key key = keyManagementAlgorithm.manageForDecrypt(privateKey, encryptedKey, cekDesc, null, ProviderContextTest.EMPTY_CONTEXT);
 
         byte[] cekBytes = ByteUtil.convertUnsignedToSignedTwosComp(new int[]{177, 161, 244, 128, 84, 143, 225,
                 115, 63, 180, 3, 255, 107, 154, 212, 246, 138, 7, 110, 91, 112, 46, 34, 105, 47, 130, 203, 46,
@@ -96,12 +97,12 @@ public class RsaOaepKeyManagementAlgorithmTest
         RsaKeyManagementAlgorithm.RsaOaep oaep = new RsaKeyManagementAlgorithm.RsaOaep();
         ContentEncryptionKeyDescriptor cekDesc = new ContentEncryptionKeyDescriptor(16, AesKey.ALGORITHM);
         PublicKey publicKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPublicKey();
-        ContentEncryptionKeys contentEncryptionKeys = oaep.manageForEncrypt(publicKey, cekDesc, null, null);
+        ContentEncryptionKeys contentEncryptionKeys = oaep.manageForEncrypt(publicKey, cekDesc, null, null, ProviderContextTest.EMPTY_CONTEXT);
 
         byte[] encryptedKey = contentEncryptionKeys.getEncryptedKey();
 
         PrivateKey privateKey = ExampleRsaJwksFromJwe.APPENDIX_A_1.getPrivateKey();
-        Key key = oaep.manageForDecrypt(privateKey, encryptedKey, cekDesc, null);
+        Key key = oaep.manageForDecrypt(privateKey, encryptedKey, cekDesc, null, ProviderContextTest.EMPTY_CONTEXT);
 
         byte[] cek = contentEncryptionKeys.getContentEncryptionKey();
         assertTrue(Arrays.equals(cek, key.getEncoded()));

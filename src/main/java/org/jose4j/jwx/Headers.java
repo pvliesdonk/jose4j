@@ -19,6 +19,7 @@ package org.jose4j.jwx;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.json.JsonUtil;
 import org.jose4j.jwk.JsonWebKey;
+import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.JsonHelp;
 
@@ -93,6 +94,14 @@ public class Headers
         Map<String, Object> jwkParams = (Map<String, Object>) objectHeaderValue;
         return JsonWebKey.Factory.newJwk(jwkParams);
     }
+
+    public PublicJsonWebKey getPublicJwkHeaderValue(String name, String jcaProvider) throws JoseException
+    {
+        Object objectHeaderValue = getObjectHeaderValue(name);
+        Map<String, Object> jwkParams = (Map<String, Object>) objectHeaderValue;
+        return PublicJsonWebKey.Factory.newPublicJwk(jwkParams, jcaProvider);
+    }
+
 
     public void setFullHeaderAsJsonString(String header) throws JoseException
     {

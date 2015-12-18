@@ -30,6 +30,16 @@ public class EcKeyUtil extends KeyPairUtil
 {
     public static final String EC = "EC";
 
+    public EcKeyUtil()
+    {
+        this(null, null);
+    }
+
+    public EcKeyUtil(String provider, SecureRandom secureRandom)
+    {
+        super(provider, secureRandom);
+    }
+
     @Override
     String getAlgorithm()
     {
@@ -73,7 +83,14 @@ public class EcKeyUtil extends KeyPairUtil
 
         try
         {
-            keyGenerator.initialize(spec);
+            if (secureRandom == null)
+            {
+                keyGenerator.initialize(spec);
+            }
+            else
+            {
+                keyGenerator.initialize(spec, secureRandom);
+            }
             return keyGenerator.generateKeyPair();
         }
         catch (InvalidAlgorithmParameterException e)

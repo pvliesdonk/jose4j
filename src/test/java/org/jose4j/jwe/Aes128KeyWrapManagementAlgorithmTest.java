@@ -18,6 +18,7 @@ package org.jose4j.jwe;
 
 import junit.framework.TestCase;
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jca.ProviderContextTest;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.keys.AesKey;
 import org.jose4j.lang.ByteUtil;
@@ -51,7 +52,7 @@ public class Aes128KeyWrapManagementAlgorithmTest extends TestCase
         ContentEncryptionAlgorithm contentEncryptionAlgorithm = new AesCbcHmacSha2ContentEncryptionAlgorithm.Aes128CbcHmacSha256();
         ContentEncryptionKeyDescriptor cekDesc = contentEncryptionAlgorithm.getContentEncryptionKeyDescriptor();
 
-        ContentEncryptionKeys contentEncryptionKeys = wrappingKeyManagementAlgorithm.manageForEnc(managementKey, cekDesc, cekBytes);
+        ContentEncryptionKeys contentEncryptionKeys = wrappingKeyManagementAlgorithm.manageForEnc(managementKey, cekDesc, cekBytes, ProviderContextTest.EMPTY_CONTEXT);
 
         String encodedEncryptedKeyFromExample ="6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ";
 
@@ -62,7 +63,7 @@ public class Aes128KeyWrapManagementAlgorithmTest extends TestCase
 
         byte[] encryptedKey = u.base64UrlDecode(encodedEncryptedKeyFromExample);
 
-        Key key = wrappingKeyManagementAlgorithm.manageForDecrypt(managementKey, encryptedKey, cekDesc, null);
+        Key key = wrappingKeyManagementAlgorithm.manageForDecrypt(managementKey, encryptedKey, cekDesc, null, ProviderContextTest.EMPTY_CONTEXT);
 
         assertTrue(Arrays.equals(cekBytes, key.getEncoded()));
     }

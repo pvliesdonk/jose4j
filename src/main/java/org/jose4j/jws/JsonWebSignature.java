@@ -82,7 +82,7 @@ public class JsonWebSignature extends JsonWebStructure
             algorithm.validateSigningKey(signingKey);
         }
         byte[] inputBytes = getSigningInputBytes();
-        byte[] signatureBytes = algorithm.sign(signingKey, inputBytes);
+        byte[] signatureBytes = algorithm.sign(signingKey, inputBytes, getProviderCtx());
         setSignature(signatureBytes);
     }
 
@@ -104,7 +104,7 @@ public class JsonWebSignature extends JsonWebStructure
         {
             byte[] signatureBytes = getSignature();
             byte[] inputBytes = getSigningInputBytes();
-            validSignature = algorithm.verifySignature(signatureBytes, verificationKey, inputBytes);
+            validSignature = algorithm.verifySignature(signatureBytes, verificationKey, inputBytes, getProviderCtx());
         }
 
         return validSignature;

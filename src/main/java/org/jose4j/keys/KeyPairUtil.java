@@ -22,7 +22,9 @@ import org.jose4j.lang.JoseException;
 import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
@@ -35,29 +37,48 @@ abstract class KeyPairUtil
     private static final String BEGIN_PUBLIC_KEY = "-----BEGIN PUBLIC KEY-----";
     private static final String END_PUBLIC_KEY = "-----END PUBLIC KEY-----";
 
+    protected String provider;
+    protected SecureRandom secureRandom;
+
+    protected KeyPairUtil(String provider, SecureRandom secureRandom)
+    {
+        this.provider = provider;
+        this.secureRandom = secureRandom;
+    }
+
     abstract String getAlgorithm();
 
     protected KeyFactory getKeyFactory() throws JoseException
     {
+        String agl = getAlgorithm();
         try
         {
-            return KeyFactory.getInstance(getAlgorithm());
+            return provider == null ? KeyFactory.getInstance(agl) : KeyFactory.getInstance(agl, provider);
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new JoseException("Couldn't find " + getAlgorithm() + " KeyFactory! " + e, e);
+            throw new JoseException("Couldn't find " + agl + " KeyFactory! " + e, e);
+        }
+        catch (NoSuchProviderException e)
+        {
+            throw new JoseException("Cannot get KeyFactory instance with provider " + provider, e);
         }
     }
 
     protected KeyPairGenerator getKeyPairGenerator() throws JoseException
     {
+        String alg = getAlgorithm();
         try
         {
-            return KeyPairGenerator.getInstance(getAlgorithm());
+            return provider == null ? KeyPairGenerator.getInstance(alg) : KeyPairGenerator.getInstance(alg, provider);
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new JoseException("Couldn't find " + getAlgorithm() + " KeyPairGenerator! " + e, e);
+            throw new JoseException("Couldn't find " + alg + " KeyPairGenerator! " + e, e);
+        }
+        catch (NoSuchProviderException e)
+        {
+            throw new JoseException("Cannot get KeyPairGenerator instance with provider " + provider, e);
         }
     }
 

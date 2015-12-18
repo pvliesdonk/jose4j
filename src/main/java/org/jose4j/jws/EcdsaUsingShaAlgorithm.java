@@ -17,6 +17,7 @@
 package org.jose4j.jws;
 
 
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwk.EllipticCurveJsonWebKey;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.lang.InvalidKeyException;
@@ -47,7 +48,7 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
         this.signatureByteLength = signatureByteLength;
     }
 
-    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes) throws JoseException
+    public boolean verifySignature(byte[] signatureBytes, Key key, byte[] securedInputBytes, ProviderContext providerContext) throws JoseException
     {
         byte[] derEncodedSignatureBytes;
         try
@@ -59,12 +60,12 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
             throw new JoseException("Unable to convert R and S as a concatenated byte array to DER encoding.", e);
         }
 
-        return super.verifySignature(derEncodedSignatureBytes, key, securedInputBytes);
+        return super.verifySignature(derEncodedSignatureBytes, key, securedInputBytes, providerContext);
     }
 
-    public byte[] sign(Key key, byte[] securedInputBytes) throws JoseException
+    public byte[] sign(Key key, byte[] securedInputBytes, ProviderContext providerContext) throws JoseException
     {
-        byte[] derEncodedSignatureBytes = super.sign(key, securedInputBytes);
+        byte[] derEncodedSignatureBytes = super.sign(key, securedInputBytes, providerContext);
         try
         {
             return convertDerToConcatenated(derEncodedSignatureBytes, signatureByteLength);

@@ -17,6 +17,7 @@
 package org.jose4j.jwx;
 
 import org.jose4j.base64url.Base64Url;
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.Algorithm;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwe.JsonWebEncryption;
@@ -48,6 +49,9 @@ public abstract class JsonWebStructure
     protected String rawCompactSerialization;
 
     private AlgorithmConstraints algorithmConstraints = AlgorithmConstraints.NO_CONSTRAINTS;
+
+    private static final ProviderContext DEFAULT_PROVIDER_CONTEXT = new ProviderContext();
+    private ProviderContext providerCtx = DEFAULT_PROVIDER_CONTEXT;
 
     abstract public String getCompactSerialization() throws JoseException;
     abstract protected void setCompactSerializationParts(String[] parts) throws JoseException;
@@ -242,6 +246,25 @@ public abstract class JsonWebStructure
     public void setAlgorithmConstraints(AlgorithmConstraints algorithmConstraints)
     {
         this.algorithmConstraints = algorithmConstraints;
+    }
+
+    protected ProviderContext getProviderCtx()
+    {
+        return providerCtx;
+    }
+
+    /**
+     * Sets the {@link ProviderContext} for this JWS or JWE, which allows for
+     * a particular Java Cryptography Architecture provider to be indicated by name to be used
+     * for various cryptographic operations. A {@code SecureRandom} source of randomness can also be
+     * supplied.
+     *
+     * @param providerCtx the ProviderContext object indicating the Java Cryptography Architecture provider
+     * to be used for various cryptographic operations.
+     */
+    public void setProviderContext(ProviderContext providerCtx)
+    {
+        this.providerCtx = providerCtx;
     }
 
     @Override

@@ -16,6 +16,7 @@
 
 package org.jose4j.jwe;
 
+import org.jose4j.jca.ProviderContext;
 import org.jose4j.jwa.AlgorithmAvailability;
 import org.jose4j.jwa.AlgorithmInfo;
 import org.jose4j.jwe.kdf.KdfUtil;
@@ -37,8 +38,10 @@ import javax.crypto.KeyAgreement;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 
@@ -62,35 +65,39 @@ public class EcdhKeyAgreementAlgorithm extends AlgorithmInfo implements KeyManag
         this.algorithmIdHeaderName = algorithmIdHeaderName;
     }
 
-    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride) throws JoseException
+    public ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] cekOverride, ProviderContext providerContext) throws JoseException
     {
         KeyValidationSupport.cekNotAllowed(cekOverride, getAlgorithmIdentifier());
         ECPublicKey receiversKey = (ECPublicKey) managementKey;
-        EllipticCurveJsonWebKey ephemeralJwk = EcJwkGenerator.generateJwk(receiversKey.getParams());
-        return manageForEncrypt(managementKey, cekDesc, headers, ephemeralJwk);
+        String keyPairGeneratorProvider = providerContext.getGeneralProviderContext().getKeyPairGeneratorProvider();
+        SecureRandom secureRandom = providerContext.getSecureRandom();
+        EllipticCurveJsonWebKey ephemeralJwk = EcJwkGenerator.generateJwk(receiversKey.getParams(), keyPairGeneratorProvider, secureRandom);
+        return manageForEncrypt(managementKey, cekDesc, headers, ephemeralJwk, providerContext);
     }
 
-    ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, PublicJsonWebKey ephemeralJwk) throws JoseException
+    ContentEncryptionKeys manageForEncrypt(Key managementKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers, PublicJsonWebKey ephemeralJwk, ProviderContext providerContext) throws JoseException
     {
         headers.setJwkHeaderValue(HeaderParameterNames.EPHEMERAL_PUBLIC_KEY, ephemeralJwk);
-        byte[] z = generateEcdhSecret(ephemeralJwk.getPrivateKey(), (PublicKey) managementKey);
-        byte[] derivedKey = kdf(cekDesc, headers, z);
+        byte[] z = generateEcdhSecret(ephemeralJwk.getPrivateKey(), (PublicKey) managementKey, providerContext);
+        byte[] derivedKey = kdf(cekDesc, headers, z, providerContext);
         return new ContentEncryptionKeys(derivedKey, null);
     }
 
-    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers) throws JoseException
+    public Key manageForDecrypt(Key managementKey, byte[] encryptedKey, ContentEncryptionKeyDescriptor cekDesc, Headers headers,  ProviderContext providerContext) throws JoseException
     {
-        JsonWebKey ephemeralJwk = headers.getJwkHeaderValue(HeaderParameterNames.EPHEMERAL_PUBLIC_KEY);
+        String keyFactoryProvider = providerContext.getGeneralProviderContext().getKeyFactoryProvider();
+        JsonWebKey ephemeralJwk = headers.getPublicJwkHeaderValue(HeaderParameterNames.EPHEMERAL_PUBLIC_KEY, keyFactoryProvider);
         ephemeralJwk.getKey();
-        byte[] z = generateEcdhSecret((PrivateKey) managementKey, (PublicKey)ephemeralJwk.getKey());
-        byte[] derivedKey = kdf(cekDesc, headers, z);
+        byte[] z = generateEcdhSecret((PrivateKey) managementKey, (PublicKey)ephemeralJwk.getKey(), providerContext);
+        byte[] derivedKey = kdf(cekDesc, headers, z, providerContext);
         String cekAlg = cekDesc.getContentEncryptionKeyAlgorithm();
         return new SecretKeySpec(derivedKey, cekAlg);
     }
 
-    private byte[] kdf(ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] z)
+    private byte[] kdf(ContentEncryptionKeyDescriptor cekDesc, Headers headers, byte[] z, ProviderContext providerContext)
     {
-        KdfUtil kdf = new KdfUtil();
+        String messageDigestProvider = providerContext.getGeneralProviderContext().getMessageDigestProvider();
+        KdfUtil kdf = new KdfUtil(messageDigestProvider);
         int keydatalen = ByteUtil.bitLength(cekDesc.getContentEncryptionKeyByteLength());
         /*
            AlgorithmID  In the Direct Key Agreement case, this is set to the
@@ -105,21 +112,27 @@ public class EcdhKeyAgreementAlgorithm extends AlgorithmInfo implements KeyManag
     }
 
 
-    private KeyAgreement getKeyAgreement()
+    private KeyAgreement getKeyAgreement(String provider) throws JoseException
     {
+        String javaAlgorithm = getJavaAlgorithm();
         try
         {
-            return KeyAgreement.getInstance(getJavaAlgorithm());
+            return provider == null ? KeyAgreement.getInstance(javaAlgorithm) : KeyAgreement.getInstance(javaAlgorithm, provider);
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new UncheckedJoseException("No " + getJavaAlgorithm() + " KeyAgreement available.", e);
+            throw new UncheckedJoseException("No " + javaAlgorithm + " KeyAgreement available.", e);
+        }
+        catch (NoSuchProviderException e)
+        {
+            throw new JoseException("Cannot get "+javaAlgorithm+ " KeyAgreement with provider " + provider, e);
         }
     }
 
-    private byte[] generateEcdhSecret(PrivateKey privateKey, PublicKey publicKey) throws InvalidKeyException
+    private byte[] generateEcdhSecret(PrivateKey privateKey, PublicKey publicKey, ProviderContext providerContext) throws JoseException
     {
-        KeyAgreement keyAgreement = getKeyAgreement();
+        String keyAgreementProvider = providerContext.getSuppliedKeyProviderContext().getKeyAgreementProvider();
+        KeyAgreement keyAgreement = getKeyAgreement(keyAgreementProvider);
 
         try
         {

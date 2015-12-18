@@ -20,6 +20,7 @@ import org.jose4j.keys.RsaKeyUtil;
 import org.jose4j.lang.JoseException;
 
 import java.security.KeyPair;
+import java.security.SecureRandom;
 
 /**
  */
@@ -27,7 +28,12 @@ public class RsaJwkGenerator
 {
     public static RsaJsonWebKey generateJwk(int bits) throws JoseException
     {
-        RsaKeyUtil keyUtil = new RsaKeyUtil();
+        return generateJwk(bits, null, null);
+    }
+
+    public static RsaJsonWebKey generateJwk(int bits, String provider, SecureRandom secureRandom) throws JoseException
+    {
+        RsaKeyUtil keyUtil = new RsaKeyUtil(provider, secureRandom);
         KeyPair keyPair = keyUtil.generateKeyPair(bits);
         RsaJsonWebKey rsaJwk = (RsaJsonWebKey) PublicJsonWebKey.Factory.newPublicJwk(keyPair.getPublic());
         rsaJwk.setPrivateKey(keyPair.getPrivate());

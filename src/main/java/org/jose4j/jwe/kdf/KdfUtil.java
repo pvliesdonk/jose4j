@@ -24,13 +24,17 @@ import org.jose4j.lang.StringUtil;
  */
 public class KdfUtil
 {
-    private Base64Url base64Url;
+    private Base64Url base64Url = new Base64Url();;
     private ConcatKeyDerivationFunction kdf;
 
     public KdfUtil()
     {
-        base64Url = new Base64Url();
         kdf = new ConcatKeyDerivationFunction("SHA-256");
+    }
+
+    public KdfUtil(String provider)
+    {
+        kdf = new ConcatKeyDerivationFunction("SHA-256", provider);
     }
 
     public byte[] kdf(byte[] sharedSecret, int keydatalen, String algorithmId, String partyUInfo, String partyVInfo)

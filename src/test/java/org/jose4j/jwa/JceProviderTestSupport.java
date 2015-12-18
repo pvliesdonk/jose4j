@@ -32,6 +32,7 @@ import java.util.Set;
  */
 public class JceProviderTestSupport
 {
+    private boolean putBouncyCastleFirst = true;
     private boolean useBouncyCastleRegardlessOfAlgs;
     private boolean doReinitialize = true;
     private Set<String> signatureAlgs = Collections.emptySet();
@@ -73,7 +74,8 @@ public class JceProviderTestSupport
         {
             if (needBouncyCastle)
             {
-                int position = Security.insertProviderAt(bouncyCastleProvider, 1);
+                final int targetPosition = putBouncyCastleFirst ? 1 : Security.getProviders().length + 1;
+                int position = Security.insertProviderAt(bouncyCastleProvider, targetPosition);
                 removeBouncyCastle = (position != -1);
                 if (doReinitialize)
                 {
@@ -123,6 +125,11 @@ public class JceProviderTestSupport
     public void setUseBouncyCastleRegardlessOfAlgs(boolean useBouncyCastleRegardlessOfAlgs)
     {
         this.useBouncyCastleRegardlessOfAlgs = useBouncyCastleRegardlessOfAlgs;
+    }
+
+    public void setPutBouncyCastleFirst(boolean putBouncyCastleFirst)
+    {
+        this.putBouncyCastleFirst = putBouncyCastleFirst;
     }
 
     public static interface RunnableTest

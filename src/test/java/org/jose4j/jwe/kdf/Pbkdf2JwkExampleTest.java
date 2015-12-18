@@ -17,6 +17,7 @@ package org.jose4j.jwe.kdf;
 
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.InvalidKeyException;
+import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 import org.jose4j.mac.MacUtil;
 import org.junit.Assert;
@@ -29,7 +30,7 @@ import java.io.IOException;
 public class Pbkdf2JwkExampleTest
 {
     @Test
-    public void testThePbdkfPartFromJwkAppendixC() throws IOException, InvalidKeyException
+    public void testThePbdkfPartFromJwkAppendixC() throws IOException, JoseException
     {
         // just the pbkdf2 part from http://tools.ietf.org/html/draft-ietf-jose-json-web-key-22#appendix-C
 

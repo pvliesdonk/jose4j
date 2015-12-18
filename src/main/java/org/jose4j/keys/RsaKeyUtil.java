@@ -23,6 +23,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -35,6 +36,16 @@ import java.security.spec.RSAPublicKeySpec;
 public class RsaKeyUtil extends KeyPairUtil
 {
     public static final String RSA = "RSA";
+
+    public RsaKeyUtil()
+    {
+        this(null, null);
+    }
+
+    public RsaKeyUtil(String provider, SecureRandom secureRandom)
+    {
+        super(provider, secureRandom);
+    }
 
     @Override
     String getAlgorithm()
@@ -87,7 +98,14 @@ public class RsaKeyUtil extends KeyPairUtil
     public KeyPair generateKeyPair(int bits) throws JoseException
     {
         KeyPairGenerator keyGenerator = getKeyPairGenerator();
-        keyGenerator.initialize(bits);
+        if (secureRandom == null)
+        {
+            keyGenerator.initialize(bits);
+        }
+        else
+        {
+            keyGenerator.initialize(bits, secureRandom);
+        }
         return keyGenerator.generateKeyPair();
     }
 }
