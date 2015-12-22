@@ -124,7 +124,7 @@ public class JSONObject extends HashMap implements Map, JSONAware, JSONStreamAwa
 	 * @see org.jose4j.json.internal.json_simple.JSONValue#escape(String)
 	 * 
 	 * @param s
-	 * @return
+	 * @return string
 	 */
 	public static String escape(String s){
 		return JSONValue.escape(s);
