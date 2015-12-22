@@ -196,11 +196,6 @@ public class JwtConsumer
                 {
                     JsonWebEncryption jwe = (JsonWebEncryption) currentJoseObject;
 
-                    if (jweProviderContext != null)
-                    {
-                        jwe.setProviderContext(jweProviderContext);
-                    }
-
                     Key key = decryptionKeyResolver.resolveKey(jwe, Collections.unmodifiableList(joseObjects));
                     if (key != null && !key.equals(jwe.getKey()))
                     {
@@ -283,6 +278,11 @@ public class JwtConsumer
                 else
                 {
                     JsonWebEncryption jwe = (JsonWebEncryption) joseObject;
+
+                    if (jweProviderContext != null)
+                    {
+                        jwe.setProviderContext(jweProviderContext);
+                    }
 
                     if (relaxDecryptionKeyValidation)
                     {
