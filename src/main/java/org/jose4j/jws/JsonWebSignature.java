@@ -38,6 +38,7 @@ public class JsonWebSignature extends JsonWebStructure
 
     private String payload;
     private String payloadCharEncoding = StringUtil.UTF_8;
+    private String encodedPayload;
 
     private Boolean validSignature;
 
@@ -173,12 +174,13 @@ public class JsonWebSignature extends JsonWebStructure
 
     public void setEncodedPayload(String encodedPayload)
     {
+        this.encodedPayload = encodedPayload;
         setPayload(base64url.base64UrlDecodeToString(encodedPayload, payloadCharEncoding));
     }
 
     public String getEncodedPayload()
     {
-        return base64url.base64UrlEncode(payload, getPayloadCharEncoding());
+        return (encodedPayload != null) ? encodedPayload : base64url.base64UrlEncode(payload, getPayloadCharEncoding());
     }
 
     public String getEncodedSignature()
