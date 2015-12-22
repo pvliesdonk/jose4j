@@ -26,6 +26,8 @@ public class CompactSerialization
 {
     /**
      * @deprecated please use CompactSerializer
+     * @param cs cs
+     * @return string array
      */
     public static String[] deserialize(String cs)
     {
@@ -34,6 +36,9 @@ public class CompactSerialization
 
     /**
      * @deprecated please use CompactSerializer
+     * @param parts parts
+     * @return string
+     * @throws JoseException never
      */
     public static String serialize(String... parts) throws JoseException
     {

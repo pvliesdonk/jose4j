@@ -26,6 +26,7 @@ public interface Validator
     /**
      * @param jwtContext the JWT context
      * @return a description of the problem or null, if valid
+     * @throws MalformedClaimException if a malformed claim is encountered
      */
     public String validate(JwtContext jwtContext) throws MalformedClaimException;
 }
