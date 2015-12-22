@@ -102,6 +102,7 @@ public class JsonWebSignature extends JsonWebStructure
         }
         if (validSignature == null)
         {
+            checkCrit();
             byte[] signatureBytes = getSignature();
             byte[] inputBytes = getSigningInputBytes();
             validSignature = algorithm.verifySignature(signatureBytes, verificationKey, inputBytes, getProviderCtx());

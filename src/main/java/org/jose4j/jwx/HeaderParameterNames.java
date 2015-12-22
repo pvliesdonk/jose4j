@@ -50,4 +50,6 @@ public class HeaderParameterNames
 
     public static final String INITIALIZATION_VECTOR = "iv";
     public static final String AUTHENTICATION_TAG = "tag";
+
+    public static final String CRITICAL = "crit";
 }

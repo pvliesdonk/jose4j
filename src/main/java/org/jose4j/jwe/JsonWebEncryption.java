@@ -188,6 +188,8 @@ public class JsonWebEncryption extends JsonWebStructure
             keyManagementModeAlg.validateDecryptionKey(getKey(), contentEncryptionAlg);
         }
 
+        checkCrit();
+
         Key cek = keyManagementModeAlg.manageForDecrypt(getKey(), getEncryptedKey(), contentEncryptionKeyDesc, getHeaders(), getProviderCtx());
 
         ContentEncryptionParts contentEncryptionParts = new ContentEncryptionParts(iv, ciphertext, getIntegrity());

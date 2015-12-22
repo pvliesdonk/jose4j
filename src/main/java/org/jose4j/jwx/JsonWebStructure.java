@@ -28,6 +28,11 @@ import org.jose4j.lang.JoseException;
 
 import java.security.Key;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.jose4j.jwx.HeaderParameterNames.X509_CERTIFICATE_SHA256_THUMBPRINT;
 import static org.jose4j.jwx.HeaderParameterNames.X509_CERTIFICATE_THUMBPRINT;
@@ -49,6 +54,8 @@ public abstract class JsonWebStructure
     protected String rawCompactSerialization;
 
     private AlgorithmConstraints algorithmConstraints = AlgorithmConstraints.NO_CONSTRAINTS;
+
+    private Set<String> knownCriticalHeaders = Collections.emptySet();
 
     private static final ProviderContext DEFAULT_PROVIDER_CONTEXT = new ProviderContext();
     private ProviderContext providerCtx = DEFAULT_PROVIDER_CONTEXT;
@@ -247,6 +254,51 @@ public abstract class JsonWebStructure
     {
         this.algorithmConstraints = algorithmConstraints;
     }
+
+    /**
+     * Sets the value(s) of the critical ("crit") header, defined in
+     * <a href="http://tools.ietf.org/html/rfc7515#section-4.1.11">section 4.1.11 of RFC 7515</a>,
+     * which indicates that those headers MUST be understood and processed by the recipient.
+     * @param headerNames the name(s) of headers that will be marked as critical
+     */
+    public void setCriticalHeaderNames(String... headerNames)
+    {
+        headers.setObjectHeaderValue(HeaderParameterNames.CRITICAL, headerNames);
+    }
+
+    /**
+     * Sets the values of the critical ("crit") header that are acceptable for the library to process.
+     * Basically calling this  is telling the jose4j library to allow these headers marked as critical
+     * and saying that the caller knows how to process them and will do so.
+     * @param knownCriticalHeaders one or more header names that will be allowed as values of the critical header
+     */
+    public void setKnownCriticalHeaders(String... knownCriticalHeaders)
+    {
+        this.knownCriticalHeaders = new HashSet<>(Arrays.asList(knownCriticalHeaders));
+    }
+
+    protected void checkCrit() throws JoseException
+    {
+        final Object criticalHeaderObjectValue = headers.getObjectHeaderValue(HeaderParameterNames.CRITICAL);
+        if (criticalHeaderObjectValue != null)
+        {
+            try
+            {
+                for (String criticalHeader : (List<String>) criticalHeaderObjectValue)
+                {
+                    if (!knownCriticalHeaders.contains(criticalHeader))
+                    {
+                        throw new JoseException("Unrecognized header '" + criticalHeader + "' marked as critical.");
+                    }
+                }
+            }
+            catch (ClassCastException e)
+            {
+                throw new JoseException(HeaderParameterNames.CRITICAL + " header value not an array.");
+            }
+        }
+    }
+
 
     protected ProviderContext getProviderCtx()
     {
