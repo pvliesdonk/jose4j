@@ -1573,6 +1573,12 @@ public class JwtConsumerTest
         JwtConsumer jwtConsumer = new JwtConsumerBuilder().build();
         SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer(null).build();
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
+
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer(false, null).build();
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
+
         jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer("issuer.example.com").build();
         SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
@@ -1587,6 +1593,9 @@ public class JwtConsumerTest
         SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
 
         jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer(false, "issuer.example.com").build();
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
+
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer(false, null).build();
         SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
 
         jwtClaims = JwtClaims.parse("{\"iss\":[\"issuer1\", \"other.one\", \"meh\"]}");
