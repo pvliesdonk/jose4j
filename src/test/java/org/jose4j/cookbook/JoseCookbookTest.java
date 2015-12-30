@@ -637,7 +637,7 @@ public class JoseCookbookTest
         assertThat(jws.verifySignature(), is(true));
         assertThat(jws.getPayload(), equalTo(jwsPayload));
 
-        // verify reproducing it (it's just luck that using the setters for the headers results in the exact same
+        // verify reproducing it (it's just mostly luck that using the setters for the headers results in the exact same
         // JSON representation of the header)
         jws = new JsonWebSignature();
         jws.setPayload(jwsPayload);
@@ -651,6 +651,23 @@ public class JoseCookbookTest
         String reproducedDetachedCs = encodedHeader + ".." + encodedSignature;
         assertThat(detachedCs, is(equalTo(reproducedDetachedCs)));
         assertThat(encodedJwsPayload, is(equalTo(jws.getEncodedPayload())));
+
+        // now (expected 0.5.0) also have a method on jws for getting the compact serialization without the payload
+        // check that it produces the expected result both on that same jws and on a new object
+        String detachedContentCompactSerialization = jws.getDetachedContentCompactSerialization();
+        assertThat(detachedCs, is(equalTo(detachedContentCompactSerialization)));
+        assertThat(jws.getPayload(), equalTo(jwsPayload));
+        assertThat(jws.getEncodedPayload(), equalTo(encodedJwsPayload));
+
+        jws = new JsonWebSignature();
+        jws.setPayload(jwsPayload);
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jws.setKeyIdHeaderValue(jwk.getKeyId());
+        jws.setKey(jwk.getKey());
+        detachedContentCompactSerialization = jws.getDetachedContentCompactSerialization();
+        assertThat(detachedCs, is(equalTo(detachedContentCompactSerialization)));
+        assertThat(jws.getPayload(), equalTo(jwsPayload));
+        assertThat(jws.getEncodedPayload(), equalTo(encodedJwsPayload));
     }
 
     @Test

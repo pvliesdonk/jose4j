@@ -74,6 +74,21 @@ public class JsonWebSignature extends JsonWebStructure
         return CompactSerializer.serialize(getSigningInput(), getEncodedSignature());
     }
 
+    /**
+     * Produces the compact serialization with an empty/detached payload as described in
+     * <a href="http://tools.ietf.org/html/rfc7515#appendix-F">Appendix F, Detached Content, of the JWS spec</a>
+     * though providing library support rather than making the application do it all as
+     * described therein.
+     *
+     * @return the encoded header + ".." + the encoded signature
+     * @throws JoseException if an error condition is encountered during the signing process
+     */
+    public String getDetachedContentCompactSerialization() throws JoseException
+    {
+        this.sign();
+        return CompactSerializer.serialize(getEncodedHeader(), "", getEncodedSignature());
+    }
+
     public void sign() throws JoseException
     {
         JsonWebSignatureAlgorithm algorithm = getAlgorithm();
