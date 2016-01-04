@@ -24,9 +24,17 @@ import java.security.Key;
 import java.util.List;
 
 /**
- *
+ *  A callback interface for resolving the key (by looking at headers like "kid", for example) to use to verify the JWS signature.
  */
 public interface VerificationKeyResolver
 {
+    /**
+     * Choose the key to be used for signature verification on the given JWS.
+     * @param jws the JsonWebSignature that's about to be verified
+     * @param nestingContext a list of JOSE objects, if any, in which the JWS was nested.
+     *                       The last item in the list is the outer most JOSE object (not including the current JWS).
+     * @return the signature or MAC verification key
+     * @throws UnresolvableKeyException if no appropriate key can be found
+     */
     Key resolveKey(JsonWebSignature jws, List<JsonWebStructure> nestingContext) throws UnresolvableKeyException;
 }

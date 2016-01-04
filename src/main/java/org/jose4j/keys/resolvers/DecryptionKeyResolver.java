@@ -25,9 +25,17 @@ import java.security.Key;
 import java.util.List;
 
 /**
- *
+ *  A callback interface for resolving the key (by looking at headers like "kid", for example) to use to decrypt the JWE.
  */
 public interface DecryptionKeyResolver
 {
+    /**
+     * Choose the key to be used for decryption on the given JWE.
+     * @param jwe the JsonWebEncryption that's about to be decrypted
+     * @param nestingContext a list of JOSE objects, if any, in which the JWE was nested.
+     *                       The last item in the list is the outer most JOSE object (not including the current JWE).
+     * @return the decryption key
+     * @throws UnresolvableKeyException if no appropriate key can be found
+     */
     Key resolveKey(JsonWebEncryption jwe, List<JsonWebStructure> nestingContext) throws UnresolvableKeyException;
 }
