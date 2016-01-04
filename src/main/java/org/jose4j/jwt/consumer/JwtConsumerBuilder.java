@@ -96,6 +96,9 @@ public class JwtConsumerBuilder
     private ProviderContext jwsProviderContext;
     private ProviderContext jweProviderContext;
 
+    private JwsCustomizer jwsCustomizer;
+    private JweCustomizer jweCustomizer;
+
     /**
      * Creates a new JwtConsumerBuilder, which is set up by default to build a JwtConsumer
      * that requires a signature and will validate the core JWT claims when they
@@ -502,13 +505,43 @@ public class JwtConsumerBuilder
     }
 
     /**
-     * Custom Validator implementations, which will be invoked when the {@JwtConsumer} is validating the JWT claims.
+     * Custom Validator implementations, which will be invoked when the {@code JwtConsumer} is validating the JWT claims.
      * @param validator the validator
      * @return the same JwtConsumerBuilder
      */
     public JwtConsumerBuilder registerValidator(Validator validator)
     {
         customValidators.add(validator);
+        return this;
+    }
+
+    /**
+     * Set a callback JwsCustomizer that provides a hook to call arbitrary methods on the/any JsonWebSignature prior
+     * to the JwsConsumer using it to verify the signature.
+     * This might be used, for example, to allow for
+     * critical ("crit") headers vai {@link org.jose4j.jwx.JsonWebStructure#setKnownCriticalHeaders(String...)}
+     * that the caller knows how to handle and needs to tell the JwsConsumer to allow them.
+     * @param jwsCustomizer the JwsCustomizer implementation
+     * @return the same JwtConsumerBuilder
+     */
+    public JwtConsumerBuilder setJwsCustomizer(JwsCustomizer jwsCustomizer)
+    {
+        this.jwsCustomizer = jwsCustomizer;
+        return this;
+    }
+
+    /**
+     * Set a callback JweCustomizer that provides a hook to call arbitrary methods on the/any JsonWebEncryption prior
+     * to the JwsConsumer using it for decryption.
+     * This might be used, for example, to allow for
+     * critical ("crit") headers vai {@link org.jose4j.jwx.JsonWebStructure#setKnownCriticalHeaders(String...)}
+     * that the caller knows how to handle and needs to tell the JwsConsumer to allow them.
+     * @param jweCustomizer the JweCustomizer implementation
+     * @return the same JwtConsumerBuilder
+     */
+    public JwtConsumerBuilder setJweCustomizer(JweCustomizer jweCustomizer)
+    {
+        this.jweCustomizer = jweCustomizer;
         return this;
     }
 
@@ -598,6 +631,9 @@ public class JwtConsumerBuilder
 
         jwtConsumer.setRelaxVerificationKeyValidation(relaxVerificationKeyValidation);
         jwtConsumer.setRelaxDecryptionKeyValidation(relaxDecryptionKeyValidation);
+
+        jwtConsumer.setJwsCustomizer(jwsCustomizer);
+        jwtConsumer.setJweCustomizer(jweCustomizer);
 
         jwtConsumer.setJwsProviderContext(jwsProviderContext);
         jwtConsumer.setJweProviderContext(jweProviderContext);

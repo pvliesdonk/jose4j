@@ -36,6 +36,7 @@ import org.jose4j.jwt.NumericDate;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.keys.AesKey;
+import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaJwksFromJwe;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.keys.FakeHsmNonExtractableSecretKeySpec;
@@ -1846,5 +1847,71 @@ public class JwtConsumerTest
                 }
             }
         );
+    }
+
+
+    @Test
+    public void customizationCallbacksWithCritHeaders() throws Exception
+    {
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("me");
+        claims.setAudience("a");
+        claims.setIssuer("i");
+        claims.setExpirationTimeMinutesInTheFuture(10);
+
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setKey(ExampleEcKeysFromJws.PRIVATE_256);
+        jws.setPayload(claims.toJson());
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
+        jws.setCriticalHeaderNames("fake.meh");
+
+        JsonWebEncryption jwe = new JsonWebEncryption();
+        jwe.setPayload(jws.getCompactSerialization());
+        jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.RSA_OAEP);
+        jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+        jwe.setKey(ExampleRsaKeyFromJws.PUBLIC_KEY);
+        jwe.setContentTypeHeaderValue("jwt");
+        jwe.setCriticalHeaderNames("fake.blah");
+
+        System.out.println(claims);
+        String nestedJwt = jwe.getCompactSerialization();
+
+        System.out.println(nestedJwt);
+
+        JwtConsumer consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(ExampleRsaKeyFromJws.PRIVATE_KEY)
+                .setVerificationKey(ExampleEcKeysFromJws.PUBLIC_256)
+                .setExpectedAudience("a")
+                .setRequireExpirationTime()
+                .build();
+        SimpleJwtConsumerTestHelp.expectProcessingFailure(nestedJwt, consumer);
+
+        consumer = new JwtConsumerBuilder()
+                .setDecryptionKey(ExampleRsaKeyFromJws.PRIVATE_KEY)
+                .setVerificationKey(ExampleEcKeysFromJws.PUBLIC_256)
+                .setExpectedAudience("a")
+                .setRequireExpirationTime()
+                .setJwsCustomizer(new JwsCustomizer()
+                {
+                    @Override
+                    public void customize(JsonWebSignature jws, List<JsonWebStructure> nestingContext)
+                    {
+                        jws.setKnownCriticalHeaders("fake.meh");
+                    }
+                })
+                .setJweCustomizer(new JweCustomizer()
+                {
+                    @Override
+                    public void customize(JsonWebEncryption jwe, List<JsonWebStructure> nestingContext)
+                    {
+                        jwe.setKnownCriticalHeaders("fake.blah");
+                    }
+                })
+                .build();
+
+        JwtContext ctx = consumer.process(nestedJwt);
+        assertThat(ctx.getJoseObjects().size(), equalTo(2));
+        assertThat(ctx.getJwtClaims().getSubject(), equalTo("me"));
+        assertThat(ctx.getJwt(), equalTo(nestedJwt));
     }
 }

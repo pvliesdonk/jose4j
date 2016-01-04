@@ -63,6 +63,9 @@ public class JwtConsumer
     private ProviderContext jwsProviderContext;
     private ProviderContext jweProviderContext;
 
+    private JwsCustomizer jwsCustomizer;
+    private JweCustomizer jweCustomizer;
+
     JwtConsumer()
     {
     }
@@ -137,6 +140,16 @@ public class JwtConsumer
         this.jweProviderContext = jweProviderContext;
     }
 
+    void setJwsCustomizer(JwsCustomizer jwsCustomizer)
+    {
+        this.jwsCustomizer = jwsCustomizer;
+    }
+
+    void setJweCustomizer(JweCustomizer jweCustomizer)
+    {
+        this.jweCustomizer = jweCustomizer;
+    }
+
     public JwtClaims processToClaims(String jwt) throws InvalidJwtException
     {
         return process(jwt).getJwtClaims();
@@ -152,10 +165,12 @@ public class JwtConsumer
         for (int idx = originalJoseObjects.size() - 1 ; idx >= 0 ; idx--)
         {
             List<JsonWebStructure> joseObjects = originalJoseObjects.subList(idx+1, originalJoseObjects.size());
+            final List<JsonWebStructure> nestingContext = Collections.unmodifiableList(joseObjects);
             JsonWebStructure currentJoseObject = originalJoseObjects.get(idx);
 
             try
             {
+
 
                 if (currentJoseObject instanceof JsonWebSignature)
                 {
@@ -172,11 +187,16 @@ public class JwtConsumer
                             jws.setDoKeyValidation(false);
                         }
 
-                        Key key = verificationKeyResolver.resolveKey(jws, Collections.unmodifiableList(joseObjects));
+                        Key key = verificationKeyResolver.resolveKey(jws, nestingContext);
                         jws.setKey(key);
                         if (jwsAlgorithmConstraints != null)
                         {
                             jws.setAlgorithmConstraints(jwsAlgorithmConstraints);
+                        }
+
+                        if (jwsCustomizer != null)
+                        {
+                            jwsCustomizer.customize(jws, nestingContext);
                         }
 
                         if (!jws.verifySignature())
@@ -196,7 +216,7 @@ public class JwtConsumer
                 {
                     JsonWebEncryption jwe = (JsonWebEncryption) currentJoseObject;
 
-                    Key key = decryptionKeyResolver.resolveKey(jwe, Collections.unmodifiableList(joseObjects));
+                    Key key = decryptionKeyResolver.resolveKey(jwe, nestingContext);
                     if (key != null && !key.equals(jwe.getKey()))
                     {
                         throw new InvalidJwtException("The resolved decryption key is different than the one originally used to decrypt the JWE.");
@@ -289,7 +309,8 @@ public class JwtConsumer
                         jwe.setDoKeyValidation(false);
                     }
 
-                    Key key = decryptionKeyResolver.resolveKey(jwe, Collections.unmodifiableList(joseObjects));
+                    final List<JsonWebStructure> nestingContext = Collections.unmodifiableList(joseObjects);
+                    Key key = decryptionKeyResolver.resolveKey(jwe, nestingContext);
                     jwe.setKey(key);
                     if (jweAlgorithmConstraints != null)
                     {
@@ -299,6 +320,11 @@ public class JwtConsumer
                     if (jweContentEncryptionAlgorithmConstraints != null)
                     {
                         jwe.setContentEncryptionAlgorithmConstraints(jweContentEncryptionAlgorithmConstraints);
+                    }
+
+                    if (jweCustomizer != null)
+                    {
+                        jweCustomizer.customize(jwe, nestingContext);
                     }
 
                     payload = jwe.getPayload();
