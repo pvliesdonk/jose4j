@@ -15,16 +15,27 @@
  */
 package org.jose4j.jwk;
 
+import org.jose4j.http.Get;
 import org.jose4j.http.Response;
 import org.jose4j.http.SimpleResponse;
+import org.jose4j.keys.X509Util;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -32,6 +43,8 @@ import static org.junit.Assert.assertThat;
  */
 public class HttpsJwksTest
 {
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     @Test
     public void testExpiresDateHeadersPerRfc() throws Exception
     {
@@ -93,4 +106,64 @@ public class HttpsJwksTest
     }
 
     // todo more tests
+
+    @Test
+    @Ignore // skip this one b/c of external dependency and manual intervention needed
+    public void testKindaSimplisticConcurrent() throws Exception
+    {
+        X509Util x509Util = new X509Util();
+        X509Certificate certificate = x509Util.fromBase64Der(
+                "MIICUDCCAbkCBETczdcwDQYJKoZIhvcNAQEFBQAwbzELMAkGA1UEBhMCVVMxCzAJ\n" +
+                "BgNVBAgTAkNPMQ8wDQYDVQQHEwZEZW52ZXIxFTATBgNVBAoTDFBpbmdJZGVudGl0\n" +
+                "eTEXMBUGA1UECxMOQnJpYW4gQ2FtcGJlbGwxEjAQBgNVBAMTCWxvY2FsaG9zdDAe\n" +
+                "Fw0wNjA4MTExODM1MDNaFw0zMzEyMjcxODM1MDNaMG8xCzAJBgNVBAYTAlVTMQsw\n" +
+                "CQYDVQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRUwEwYDVQQKEwxQaW5nSWRlbnRp\n" +
+                "dHkxFzAVBgNVBAsTDkJyaWFuIENhbXBiZWxsMRIwEAYDVQQDEwlsb2NhbGhvc3Qw\n" +
+                "gZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAJLrpeiY/Ai2gGFxNY8Tm/QSO8qg\n" +
+                "POGKDMAT08QMyHRlxW8fpezfBTAtKcEsztPzwYTLWmf6opfJT+5N6cJKacxWchn/\n" +
+                "dRrzV2BoNuz1uo7wlpRqwcaOoi6yHuopNuNO1ms1vmlv3POq5qzMe6c1LRGADyZh\n" +
+                "i0KejDX6+jVaDiUTAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAMojbPEYJiIWgQzZc\n" +
+                "QJCQeodtKSJl5+lA8MWBBFFyZmvZ6jUYglIQdLlc8Pu6JF2j/hZEeTI87z/DOT6U\n" +
+                "uqZA83gZcy6re4wMnZvY2kWX9CsVWDCaZhnyhjBNYfhcOf0ZychoKShaEpTQ5UAG\n" +
+                "wvYYcbqIWC04GAZYVsZxlPl9hoA=\n");
+
+
+        String location = "https://localhost:9031/pf/JWKS";
+
+        Get get = new Get();
+        get.setTrustedCertificates(certificate);
+
+        final HttpsJwks httpsJwks = new HttpsJwks(location);
+        httpsJwks.setSimpleHttpGet(get);
+        httpsJwks.setDefaultCacheDuration(1);
+        httpsJwks.setRetainCacheOnErrorDuration(1);
+
+        Callable<List> task = new Callable<List>()
+        {
+            @Override
+            public List<JsonWebKey> call() throws Exception
+            {
+                List<JsonWebKey> jsonWebKeys = null;
+                for (long i = 1000000000 ; i > 0 ; i--)
+                {
+                    jsonWebKeys = httpsJwks.getJsonWebKeys();
+                    assertFalse(jsonWebKeys.isEmpty());
+                    if (i % 10000000 == 0) { log.debug("... working ... " + i + " ... " + Thread.currentThread().toString());}
+                }
+                return jsonWebKeys;
+            }
+        };
+
+        int threadCount = 5;
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        List<Callable<List>> tasks = Collections.nCopies(threadCount, task);
+
+        List<Future<List>> futures = executorService.invokeAll(tasks);
+        log.debug("=== and done ===");
+
+        for (Future<List> future : futures)
+        {
+            log.debug(future.get().toString());
+        }
+    }
 }
