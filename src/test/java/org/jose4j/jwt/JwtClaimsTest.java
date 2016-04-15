@@ -56,10 +56,11 @@ public class JwtClaimsTest
     }
 
     @Test
-    public void testGetNullAudience() throws InvalidJwtException, MalformedClaimException
+    public void testGetAudienceWithNoAudience() throws InvalidJwtException, MalformedClaimException
     {
         JwtClaims claims = JwtClaims.parse("{\"iss\":\"some-issuer\"}");
-        Assert.assertNull(claims.getAudience());
+        Assert.assertFalse(claims.hasAudience());
+        Assert.assertTrue(claims.getAudience().isEmpty());
     }
 
     @Test
@@ -406,7 +407,8 @@ public class JwtClaimsTest
 
         Assert.assertThat(stringClaimValue, equalTo(claims.getStringClaimValue(stringClaimName)));
         Assert.assertNull(claims.getStringClaimValue(nonexistentClaimName));
-        Assert.assertNull(claims.getStringListClaimValue(nonexistentClaimName));
+        Assert.assertFalse(claims.hasClaim(nonexistentClaimName));
+        Assert.assertTrue(claims.getStringListClaimValue(nonexistentClaimName).isEmpty());
     }
 
     @Test
@@ -442,7 +444,7 @@ public class JwtClaimsTest
         Assert.assertThat(parsedJcs.getStringListClaimValue("sa4"), equalTo(Collections.singletonList("single")));
         Assert.assertThat(parsedJcs.getStringListClaimValue("sa5"), equalTo(Collections.<String>emptyList()));
         Assert.assertThat(parsedJcs.getStringListClaimValue("sa6"), equalTo(Collections.<String>emptyList()));
-        Assert.assertNull(parsedJcs.getStringListClaimValue("nope"));
+        Assert.assertTrue(parsedJcs.getStringListClaimValue("nope").isEmpty());
         Assert.assertNull(parsedJcs.getStringClaimValue("nope"));
         Assert.assertNull(parsedJcs.getClaimValue("nope", Boolean.class));
         Assert.assertFalse(parsedJcs.hasClaim("nope"));

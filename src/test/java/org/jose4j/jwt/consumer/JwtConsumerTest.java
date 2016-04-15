@@ -110,10 +110,11 @@ public class JwtConsumerTest
 
         consumer.processContext(jwtContext);
 
-        // just ensure that getting claims that aren't there returns null and doesn't throw an exception
+        // just ensure that getting claims that aren't there returns null (or empty for string list) and doesn't throw an exception
         Assert.assertNull(jcs.getStringClaimValue("no-such-claim"));
         Assert.assertNull(jcs.getClaimValue("no way jose", Boolean.class));
-        Assert.assertNull(jcs.getStringListClaimValue("nope"));
+        Assert.assertFalse(jcs.hasClaim("nope"));
+        Assert.assertTrue(jcs.getStringListClaimValue("nope").isEmpty());
 
         Assert.assertTrue(jcs.hasClaim("http://example.com/is_root"));
         Object objectClaimValue = jcs.getClaimValue("http://example.com/is_root");

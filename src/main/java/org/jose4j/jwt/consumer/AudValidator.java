@@ -16,13 +16,14 @@
 
 package org.jose4j.jwt.consumer;
 
+import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 
 import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Validate the "aud" (Audience) Claim per http://tools.ietf.org/html/rfc7519#section-4.1.3
  */
 public class AudValidator implements Validator
 {
@@ -38,12 +39,14 @@ public class AudValidator implements Validator
     @Override
     public String validate(JwtContext jwtContext) throws MalformedClaimException
     {
-        List<String> audiences = jwtContext.getJwtClaims().getAudience();
+        final JwtClaims jwtClaims = jwtContext.getJwtClaims();
 
-        if (audiences == null)
+        if (!jwtClaims.hasAudience())
         {
             return requireAudience ? "No Audience (aud) claim present." : null;
         }
+
+        List<String> audiences = jwtClaims.getAudience();
 
         boolean ok = false;
         for (String audience : audiences)

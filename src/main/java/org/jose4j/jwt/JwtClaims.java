@@ -98,6 +98,22 @@ public class JwtClaims
         }
     }
 
+    /**
+     * Is there an "aud" (Audience) Claim in this claim set?
+     * @return true, if the claims have an "aud" claim, false otherwise
+     */
+    public boolean hasAudience()
+    {
+        return hasClaim(ReservedClaimNames.AUDIENCE);
+    }
+
+    /**
+     * Gets the value of the "aud" (Audience) Claim. An empty list is returned if aud is not present.
+     * Use {@link #hasAudience()} to distinguish between an aud claim with an empty array value and
+     * the lack of an aud claim.
+     * @return a list of the audience values. Will return an empty list, if aud is not present.
+     * @throws MalformedClaimException if the value of the audience claim is not an array of strings or a single string value
+     */
     public List<String> getAudience() throws MalformedClaimException
     {
         Object audienceObject = claimsMap.get(ReservedClaimNames.AUDIENCE);
@@ -106,15 +122,11 @@ public class JwtClaims
         {
             return Collections.singletonList((String) audienceObject);
         }
-        else if (audienceObject instanceof List)
+        else if (audienceObject instanceof List || audienceObject == null)
         {
             List audienceList = (List) audienceObject;
             String claimName = ReservedClaimNames.AUDIENCE;
             return toStringList(audienceList, claimName);
-        }
-        else if (audienceObject == null)
-        {
-            return null;
         }
 
         throw new MalformedClaimException("The value of the '" + ReservedClaimNames.AUDIENCE + "' claim is not an array of strings or a single string value.");
@@ -124,7 +136,7 @@ public class JwtClaims
     {
         if (list == null)
         {
-            return null;
+            return Collections.emptyList();
         }
         List<String> values = new ArrayList<>();
         for (Object object : list)
@@ -260,6 +272,12 @@ public class JwtClaims
         return getClaimValue(claimName, String.class);
     }
 
+    /**
+     * Gets the value of the claim as a List of Strings, which assumes that it is a JSON array of strings.
+     * @param claimName the name of the claim
+     * @return a {@code List<String>} with the values of the claim. Empty list, if the claim is not present.
+     * @throws MalformedClaimException if the claim value is not an array or is an array that contains non string values
+     */
     public List<String> getStringListClaimValue(String claimName) throws MalformedClaimException
     {
         List listClaimValue = getClaimValue(claimName, List.class);
@@ -308,11 +326,16 @@ public class JwtClaims
         return isClaimValueOfType(claimName, String.class);
     }
 
+    /**
+     * Is the claim present with a string array value.
+     * @param claimName the name of the claim
+     * @return true, if the claim is present and its value is array of strings. False otherwise.
+     */
     public boolean isClaimValueStringList(String claimName)
     {
         try
         {
-            return getStringListClaimValue(claimName) != null;
+            return hasClaim(claimName) && getStringListClaimValue(claimName) != null;
         }
         catch (MalformedClaimException e)
         {
