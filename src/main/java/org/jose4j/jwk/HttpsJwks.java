@@ -32,6 +32,8 @@ import java.util.List;
  * Represents a set of JSON Web Keys (typically public keys) published at an HTTPS URI.
  * Keys will be retrieved from the given location and cached based on the cache directive
  * headers and/or the {@link #setDefaultCacheDuration(long)}.
+ * The keys are cached per {@code HttpsJwks} instance so your application will need to keep using
+ * the same instance, however is appropriate for that application, to get the benefit of the caching.
  * This class can help facilitate a key publication and rotation model like that which is described
  * in <a href="http://openid.net/specs/openid-connect-core-1_0.html#SigEnc">OpenID Connect, section 10</a>.
  *
