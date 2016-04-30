@@ -69,7 +69,7 @@ public abstract class PublicJsonWebKey extends JsonWebKey
 
         if (params.containsKey(X509_CERTIFICATE_CHAIN_PARAMETER))
         {
-            List<String> x5cStrings = JsonHelp.getStringArray(params, X509_CERTIFICATE_CHAIN_PARAMETER); //todo maybe
+            List<String> x5cStrings = JsonHelp.getStringArray(params, X509_CERTIFICATE_CHAIN_PARAMETER);
             certificateChain = new ArrayList<X509Certificate>(x5cStrings.size());
 
             X509Util x509Util = X509Util.getX509Util(jcaProvider);
