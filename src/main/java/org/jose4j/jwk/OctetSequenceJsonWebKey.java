@@ -51,6 +51,7 @@ public class OctetSequenceJsonWebKey extends JsonWebKey
         // implementations seem to actually care.  So I'm gonna just go w/ AES for now.
         String alg = AesKey.ALGORITHM;
         key = new SecretKeySpec(octetSequence, alg);
+        removeFromOtherParams(KEY_VALUE_MEMBER_NAME);
     }
 
     @Override

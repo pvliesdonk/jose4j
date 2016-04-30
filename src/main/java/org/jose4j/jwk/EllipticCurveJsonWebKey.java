@@ -77,6 +77,8 @@ public class EllipticCurveJsonWebKey extends PublicJsonWebKey
             BigInteger d = getBigIntFromBase64UrlEncodedParam(params, PRIVATE_KEY_MEMBER_NAME, false);
             privateKey = keyUtil.privateKey(d, curve);
         }
+
+        removeFromOtherParams(CURVE_MEMBER_NAME, X_MEMBER_NAME, Y_MEMBER_NAME, PRIVATE_KEY_MEMBER_NAME);
     }
 
     public ECPublicKey getECPublicKey()

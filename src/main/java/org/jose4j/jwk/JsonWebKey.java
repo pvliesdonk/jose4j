@@ -47,6 +47,8 @@ public abstract class JsonWebKey implements Serializable
     private String keyId;
     private String algorithm;
 
+    protected Map<String, Object> otherParameters = new LinkedHashMap<>();
+
     protected Key key;
 
     protected JsonWebKey(Key key)
@@ -56,6 +58,8 @@ public abstract class JsonWebKey implements Serializable
 
     protected JsonWebKey(Map<String, Object> params)
     {
+        otherParameters.putAll(params);
+        removeFromOtherParams(KEY_TYPE_PARAMETER, USE_PARAMETER, KEY_ID_PARAMETER, ALGORITHM_PARAMETER);
         setUse(getString(params, USE_PARAMETER));
         setKeyId(getString(params, KEY_ID_PARAMETER));
         setAlgorithm(getString(params, ALGORITHM_PARAMETER));
@@ -114,6 +118,25 @@ public abstract class JsonWebKey implements Serializable
         this.algorithm = algorithm;
     }
 
+    public void setOtherParameter(String name, Object value)
+    {
+        otherParameters.put(name, value);
+    }
+
+    public <T> T getOtherParameterValue(String name, Class<T> type)
+    {
+        Object o = otherParameters.get(name);
+        return type.cast(o);
+    }
+
+    protected void removeFromOtherParams(String... names)
+    {
+        for (String name : names)
+        {
+            otherParameters.remove(name);
+        }
+    }
+
     public Map<String, Object> toParams(OutputControlLevel outputLevel)
     {
         Map<String, Object> params = new LinkedHashMap<String, Object>();
@@ -122,6 +145,7 @@ public abstract class JsonWebKey implements Serializable
         putIfNotNull(USE_PARAMETER, getUse(), params);
         putIfNotNull(ALGORITHM_PARAMETER, getAlgorithm(), params);
         fillTypeSpecificParams(params, outputLevel);
+        params.putAll(otherParameters);
         return params;
     }
 

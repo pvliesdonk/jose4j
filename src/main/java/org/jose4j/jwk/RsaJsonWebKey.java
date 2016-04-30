@@ -89,6 +89,15 @@ public class RsaJsonWebKey extends PublicJsonWebKey
                 privateKey = rsaKeyUtil.privateKey(modulus, d);
             }
         }
+
+        removeFromOtherParams(MODULUS_MEMBER_NAME,
+                EXPONENT_MEMBER_NAME,
+                PRIVATE_EXPONENT_MEMBER_NAME,
+                FIRST_PRIME_FACTOR_MEMBER_NAME,
+                SECOND_PRIME_FACTOR_MEMBER_NAME,
+                FIRST_FACTOR_CRT_EXPONENT_MEMBER_NAME,
+                SECOND_FACTOR_CRT_EXPONENT_MEMBER_NAME,
+                FIRST_CRT_COEFFICIENT_MEMBER_NAME);
     }
 
     public String getKeyType()

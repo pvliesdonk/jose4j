@@ -62,14 +62,14 @@ public abstract class PublicJsonWebKey extends JsonWebKey
         this(params, null);
     }
 
-    public PublicJsonWebKey(Map<String,Object> params, String jcaProvider) throws JoseException
+    protected PublicJsonWebKey(Map<String,Object> params, String jcaProvider) throws JoseException
     {
         super(params);
         this.jcaProvider = jcaProvider;
 
         if (params.containsKey(X509_CERTIFICATE_CHAIN_PARAMETER))
         {
-            List<String> x5cStrings = JsonHelp.getStringArray(params, X509_CERTIFICATE_CHAIN_PARAMETER);
+            List<String> x5cStrings = JsonHelp.getStringArray(params, X509_CERTIFICATE_CHAIN_PARAMETER); //todo maybe
             certificateChain = new ArrayList<X509Certificate>(x5cStrings.size());
 
             X509Util x509Util = X509Util.getX509Util(jcaProvider);
@@ -85,6 +85,11 @@ public abstract class PublicJsonWebKey extends JsonWebKey
         x5tS256 = getString(params, X509_SHA256_THUMBPRINT_PARAMETER);
 
         x5u = getString(params, X509_URL_PARAMETER);
+
+        removeFromOtherParams(X509_CERTIFICATE_CHAIN_PARAMETER,
+                X509_SHA256_THUMBPRINT_PARAMETER,
+                X509_THUMBPRINT_PARAMETER,
+                X509_URL_PARAMETER);
     }
 
     protected abstract void fillPublicTypeSpecificParams(Map<String,Object> params);

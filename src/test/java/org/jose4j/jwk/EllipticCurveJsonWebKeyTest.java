@@ -53,6 +53,9 @@ public class EllipticCurveJsonWebKeyTest
         assertEquals(ExampleEcKeysFromJws.PRIVATE_256, pubJwk.getPrivateKey());
         assertEquals(ExampleEcKeysFromJws.PUBLIC_256, pubJwk.getPublicKey());
         assertEquals(EllipticCurves.P_256, ((EllipticCurveJsonWebKey)jwk).getCurveName());
+
+        String jsonOut = jwk.toJson(PUBLIC_ONLY);
+        assertFalse(jsonOut.contains("\"d\""));
     }
 
 	@Test
@@ -91,6 +94,9 @@ public class EllipticCurveJsonWebKeyTest
         assertEquals(ExampleEcKeysFromJws.PRIVATE_521, pubJwk.getPrivateKey());
         assertEquals(ExampleEcKeysFromJws.PUBLIC_521, pubJwk.getPublicKey());
         assertEquals(EllipticCurves.P_521, ((EllipticCurveJsonWebKey)jwk).getCurveName());
+
+        String jsonOut = jwk.toJson(PUBLIC_ONLY);
+        assertFalse(jsonOut.contains("\"d\""));
 
         JsonWebKeyTest.checkEncoding(pubJwk.toJson(INCLUDE_PRIVATE), EllipticCurveJsonWebKey.X_MEMBER_NAME, EllipticCurveJsonWebKey.Y_MEMBER_NAME, EllipticCurveJsonWebKey.PRIVATE_KEY_MEMBER_NAME);
     }

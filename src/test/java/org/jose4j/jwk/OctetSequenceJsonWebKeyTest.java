@@ -16,15 +16,12 @@
 
 package org.jose4j.jwk;
 
-import org.hamcrest.CoreMatchers;
 import org.jose4j.keys.AesKey;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.ByteUtil;
 import org.jose4j.lang.JoseException;
-import org.junit.Assert;
 import org.junit.Test;
 
-import java.security.Key;
 import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -42,6 +39,12 @@ public class OctetSequenceJsonWebKeyTest
         String jwkJson ="{\"kty\":\"oct\",\n"+" \"k\":\""+base64UrlKey+"\"\n"+"}";
         JsonWebKey parsedKey = JsonWebKey.Factory.newJwk(jwkJson);
         assertEquals(OctetSequenceJsonWebKey.class, parsedKey.getClass());
+        assertTrue(parsedKey.toJson(INCLUDE_PRIVATE).contains(base64UrlKey));
+        assertTrue(parsedKey.toJson(INCLUDE_PRIVATE).contains("\"k\""));
+        assertTrue(parsedKey.toJson(INCLUDE_SYMMETRIC).contains(base64UrlKey));
+        assertTrue(parsedKey.toJson(INCLUDE_SYMMETRIC).contains("\"k\""));
+        assertFalse(parsedKey.toJson(PUBLIC_ONLY).contains(base64UrlKey));
+        assertFalse(parsedKey.toJson(PUBLIC_ONLY).contains("\"k\""));
 
         // these octets are from an earlier draft version (pre -12 I think) before JWKs were
         // used to encode the example keys. makes for a nice test though
@@ -58,8 +61,11 @@ public class OctetSequenceJsonWebKeyTest
         assertEquals(OctetSequenceJsonWebKey.KEY_TYPE, jwk.getKeyType());
         assertTrue(jwk.toJson().contains(base64UrlKey));
         assertTrue(jwk.toJson(INCLUDE_PRIVATE).contains(base64UrlKey));
+        assertTrue(jwk.toJson(INCLUDE_PRIVATE).contains("\"k\""));
         assertTrue(jwk.toJson(INCLUDE_SYMMETRIC).contains(base64UrlKey));
+        assertTrue(jwk.toJson(INCLUDE_SYMMETRIC).contains("\"k\""));
         assertFalse(jwk.toJson(PUBLIC_ONLY).contains(base64UrlKey));
+        assertFalse(jwk.toJson(PUBLIC_ONLY).contains("\"k\""));
     }
 
     @Test
