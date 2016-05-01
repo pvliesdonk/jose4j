@@ -24,6 +24,7 @@ import org.jose4j.lang.JoseException;
 
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -115,4 +116,24 @@ public class JsonWebKeyTest extends TestCase
         }
     }
 
+    public void testKeyOps() throws Exception
+    {
+        String json = "{\"kty\":\"oct\",\"k\":\"Hdd5Uqtga_B4UilmahWJR8juxF_zw1_xaWeUGAvbg9c\"}";
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(json);
+        assertNull(jwk.getKeyOps());
+        List<String> keyOps = Arrays.asList(KeyOperations.DECRYPT, KeyOperations.DERIVE_BITS, KeyOperations.DERIVE_KEY,
+                KeyOperations.ENCRYPT, KeyOperations.SIGN, KeyOperations.VERIFY, KeyOperations.UNWRAP_KEY, KeyOperations.WRAP_KEY);
+        jwk.setKeyOps(keyOps);
+        json = jwk.toJson(JsonWebKey.OutputControlLevel.INCLUDE_SYMMETRIC);
+        assertTrue(json.contains("\""+JsonWebKey.KEY_OPERATIONS+"\""));
+        jwk = JsonWebKey.Factory.newJwk(json);
+        List<String> keyOpsFromParsed = jwk.getKeyOps();
+        assertTrue(Arrays.equals(keyOps.toArray(), keyOpsFromParsed.toArray()));
+
+        json = "{\"kty\":\"oct\",\"key_ops\":[\"decrypt\",\"encrypt\"],\"k\":\"add14qyge_v4sscm2hWJR8juxF_____cpW8U3ahcp__\"}";
+        jwk = JsonWebKey.Factory.newJwk(json);
+        assertEquals(2, jwk.getKeyOps().size());
+        assertTrue(jwk.getKeyOps().contains(KeyOperations.ENCRYPT));
+        assertTrue(jwk.getKeyOps().contains(KeyOperations.DECRYPT));
+    }
 }

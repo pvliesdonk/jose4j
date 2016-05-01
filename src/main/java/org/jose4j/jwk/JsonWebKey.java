@@ -30,6 +30,7 @@ import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,10 +43,13 @@ public abstract class JsonWebKey implements Serializable
     public static final String USE_PARAMETER = "use";
     public static final String KEY_ID_PARAMETER = "kid";
     public static final String ALGORITHM_PARAMETER = "alg";
+    public static final String KEY_OPERATIONS = "key_ops";
 
     private String use;
     private String keyId;
     private String algorithm;
+
+    private List<String> keyOps;
 
     protected Map<String, Object> otherParameters = new LinkedHashMap<>();
 
@@ -59,10 +63,14 @@ public abstract class JsonWebKey implements Serializable
     protected JsonWebKey(Map<String, Object> params)
     {
         otherParameters.putAll(params);
-        removeFromOtherParams(KEY_TYPE_PARAMETER, USE_PARAMETER, KEY_ID_PARAMETER, ALGORITHM_PARAMETER);
+        removeFromOtherParams(KEY_TYPE_PARAMETER, USE_PARAMETER, KEY_ID_PARAMETER, ALGORITHM_PARAMETER, KEY_OPERATIONS);
         setUse(getString(params, USE_PARAMETER));
         setKeyId(getString(params, KEY_ID_PARAMETER));
         setAlgorithm(getString(params, ALGORITHM_PARAMETER));
+        if (params.containsKey(KEY_OPERATIONS))
+        {
+             keyOps = JsonHelp.getStringArray(params, KEY_OPERATIONS);
+        }
     }
 
     public abstract String getKeyType();
@@ -118,6 +126,16 @@ public abstract class JsonWebKey implements Serializable
         this.algorithm = algorithm;
     }
 
+    public List<String> getKeyOps()
+    {
+        return keyOps;
+    }
+
+    public void setKeyOps(List<String> keyOps)
+    {
+        this.keyOps = keyOps;
+    }
+
     public void setOtherParameter(String name, Object value)
     {
         otherParameters.put(name, value);
@@ -143,6 +161,7 @@ public abstract class JsonWebKey implements Serializable
         params.put(KEY_TYPE_PARAMETER, getKeyType());
         putIfNotNull(KEY_ID_PARAMETER, getKeyId(), params);
         putIfNotNull(USE_PARAMETER, getUse(), params);
+        putIfNotNull(KEY_OPERATIONS, keyOps, params);
         putIfNotNull(ALGORITHM_PARAMETER, getAlgorithm(), params);
         fillTypeSpecificParams(params, outputLevel);
         params.putAll(otherParameters);
@@ -182,7 +201,7 @@ public abstract class JsonWebKey implements Serializable
 
     protected abstract String produceThumbprintHashInput();
 
-    protected void putIfNotNull(String name, String value, Map<String, Object> params)
+    protected void putIfNotNull(String name, Object value, Map<String, Object> params)
     {
         if (value != null)
         {
