@@ -34,7 +34,7 @@ import java.util.List;
  * headers and/or the {@link #setDefaultCacheDuration(long)}.
  * The keys are cached per {@code HttpsJwks} instance so your application will need to keep using
  * the same instance, however is appropriate for that application, to get the benefit of the caching.
- * This class, when used with {@code HttpsJwksVerificationKeyResolver} can help facilitate the consuming side of
+ * This class, when used with {@code HttpsJwksVerificationKeyResolver}, can help facilitate the consuming side of
  * a key publication and rotation model like that which is described
  * in <a href="http://openid.net/specs/openid-connect-core-1_0.html#SigEnc">OpenID Connect, section 10</a>.
  *
