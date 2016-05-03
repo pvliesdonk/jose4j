@@ -39,7 +39,7 @@ public class AlgorithmFactory<A extends Algorithm>
     public AlgorithmFactory(String parameterName, Class<A> type)
     {
         this.parameterName = parameterName;
-        this.log = LoggerFactory.getLogger(getClass() + "->" + type.getSimpleName());
+        this.log = LoggerFactory.getLogger(getClass().getName() + "->" + type.getSimpleName());
     }
 
     public A getAlgorithm(String algorithmIdentifier) throws InvalidAlgorithmException
