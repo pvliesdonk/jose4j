@@ -89,7 +89,6 @@ public class NumericDateValidator implements Validator
 
         if (expirationTime != null)
         {
-            // if (!evaluationTime.isBefore(expirationTime, allowedClockSkewSeconds))
             if ((evaluationTime.getValue() - allowedClockSkewSeconds) >= expirationTime.getValue())
             {
                 return "The JWT is no longer valid - the evaluation time " + evaluationTime + " is on or after the Expiration Time (exp="+expirationTime+") claim value" + skewMessage();
