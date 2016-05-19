@@ -31,7 +31,7 @@ import java.util.*;
  * </p>
  *
  * The specific validation requirements for a JWT are context dependent, however,
- * it typically advisable to require a expiration time, a trusted issuer, and
+ * it typically advisable to require a (reasonable) expiration time, a trusted issuer, and
  * and audience that identifies your system as the intended recipient.
  * For example, a {@code JwtConsumer} might be set up and used like this:
  *
@@ -39,6 +39,7 @@ import java.util.*;
  *
  *   JwtConsumer jwtConsumer = new JwtConsumerBuilder()
      .setRequireExpirationTime() // the JWT must have an expiration time
+     .setMaxFutureValidityInMinutes(300) // but the  expiration time can't be too crazy
      .setExpectedIssuer("Issuer") // whom the JWT needs to have been issued by
      .setExpectedAudience("Audience") // to whom the JWT is intended for
      .setVerificationKey(publicKey) // verify the signature with the public key
