@@ -59,6 +59,10 @@ import java.util.*;
  *
  * </pre>
  *
+ * <p>
+ *   JwtConsumer instances created from this are thread safe and reusable (as long as
+ *   any custom Validators or Customizers used are also thread safe).
+ * </p>
  */
 public class JwtConsumerBuilder
 {
