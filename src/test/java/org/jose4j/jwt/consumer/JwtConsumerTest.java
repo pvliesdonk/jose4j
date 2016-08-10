@@ -1414,6 +1414,83 @@ public class JwtConsumerTest
     }
 
     @Test
+    public void googleIdTokensAndMultipleIssuers() throws JoseException, InvalidJwtException, MalformedClaimException
+    {
+        // https://www.googleapis.com/oauth2/v3/certs
+        String jwksUriContent = "{\n" +
+                " \"keys\": [\n" +
+                "  {\n" +
+                "   \"kty\": \"RSA\",\n" +
+                "   \"alg\": \"RS256\",\n" +
+                "   \"use\": \"sig\",\n" +
+                "   \"kid\": \"6faa4e9ec30030784b8942606fb61762ada97253\",\n" +
+                "   \"n\": \"mQFT4IjnxC1yhSqumpxY-BcRNfwfkqbYVHfIJNxTdQiTdVFizapkQEuRvuLLXVBZcTKJftQNEZ4RHbXTJFq5l6MoDPMSHCH_MBLjkYhrHLSdLpmJRb047PgbjVYCRbAEuuf" +
+                "-ejwLPRTdrPCaC3vEm4-UaJgNoVnKpQKCCl4LRhaSdIXrmAv-AKwq7RmTYwP84UcbL379xhvUUnA3BMrNzSeyEPPUeOJO5eAprcSGQztFE2FuqXFPrOMkD_WK9El21UHEwPzpUD-OvTL4LC" +
+                "9w1dImfzU5SC3g1DBz0N3GZawWGoNSH5x6gYereKVmfdPmX6zbV-Lb4mv3Kh8hki2jOw\",\n" +
+                "   \"e\": \"AQAB\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "   \"kty\": \"RSA\",\n" +
+                "   \"alg\": \"RS256\",\n" +
+                "   \"use\": \"sig\",\n" +
+                "   \"kid\": \"104625465f6d4c7d214e3326913c5a5e4505699c\",\n" +
+                "   \"n\": \"qysmso1d2qSWZzMWqmfDHc7vR75gS5MCv1eMhzOrs9axnpyId0TzUQl2o2Su2o0mMtEfiirEhPFHPbFLVX8xc9SJPF6HCTQVS120_1NIjBhkZeiXzW4J6V8HSgL_9gwIwaMj" +
+                "JYv7MB5SpHYIuIrdiUliaxPBCt2xZKqvAcU7G33kvOi7XneQaFxQrj2yxD9WkX-fRWS_0oZwN9-SBtQ84LJHYSgS-nclK2uuSHBI5_OV14r6A5boRU7Hjq7DLDjz7XxxXGqwbU5KYGjBP-_v" +
+                "3OKvWKyTH4zQr24pmGVeTxZ_R1XAitO73cYtqqa25UvKGvFfam8-6VSVjrPC5tFayQ\",\n" +
+                "   \"e\": \"AQAB\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "   \"kty\": \"RSA\",\n" +
+                "   \"alg\": \"RS256\",\n" +
+                "   \"use\": \"sig\",\n" +
+                "   \"kid\": \"d2d90509119f4e7303c5d00647a27f340f928888\",\n" +
+                "   \"n\": \"39CuERDfCaxMvPM_8cu4wj_decxS7OpB7NPUfO4LiH7e3ZXU83SLsSr4roDwgwlx_he4gFOnEjZ10aastOropI7Mx8Aw-EcHyOKgg1dzk3CjunlLc4vMbqSdRbN_UnQWWa-a" +
+                "YgVGOloXDuVT4LegKrgQpKwUJ-IfaTIVGf5kQhYtJgC-LTgBpu99M2wVFQGLLqurNdbTIomWv75whFli3VRuTcb-0lBq0M9D6d3VEn747YS1c8i38e0Kbd9-XcPHWLCmi0tG0RmJ1iWB9rGi" +
+                "ima9rU-MmIs7oaMg3COFoqtXiCzAWdVp-lsWIa9d7Ci3aykJpBK2AZ-xjMUg7UZfHw\",\n" +
+                "   \"e\": \"AQAB\"\n" +
+                "  }\n" +
+                " ]\n" +
+                "}";
+
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                .setEvaluationTime(NumericDate.fromSeconds(1470854975))
+                .setExpectedAudience("407408718192.apps.googleusercontent.com")
+                .setExpectedIssuers(true, "https://accounts.google.com", "accounts.google.com")
+                .setRequireSubject()
+                .setRequireExpirationTime()
+                .setVerificationKeyResolver(new JwksVerificationKeyResolver(new JsonWebKeySet(jwksUriContent).getJsonWebKeys()))
+                .build();
+
+
+        // id token from https://accounts.google.com/o/oauth2/v2/auth has iss of https://accounts.google.com
+        String jwt = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEwNDYyNTQ2NWY2ZDRjN2QyMTRlMzMyNjkxM2M1YTVlNDUwNTY5OWMifQ" +
+                ".eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhdWQiOiI0MDc0MDg3MTgxOTIuYXBwcy5nb29nbGV1c2VyY29udGVudC5" +
+                "jb20iLCJzdWIiOiIxMDkzNTgzODE5Nzc2Mzg1MTcyODYiLCJhenAiOiI0MDc0MDg3MTgxOTIuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20" +
+                "iLCJub25jZSI6ImZmcyIsImlhdCI6MTQ3MDg1NDg3MCwiZXhwIjoxNDcwODU4NDcwfQ" +
+                ".PeIZ-N5SHIwdYBL-LgCxY3wuKeoarfwbiKiVegEB6sD7UB96j-eNTreTCTSywj8DQIOvegEyaxhCHZaVJ7mIwRsTnlstUUR6soe8tu2gjhO" +
+                "qTkqaYeKAqbPov7-M9afY-MgvHe4xndIEh1So54bf1lJ_PzrJnCXHBaCobhs4clhPMqZuy9XlPaZMDJPDfVsbPdHqV6Uxt4KTQQECI_i9j4wP6ks5g1" +
+                "lbKTpyKrXOm4n-25zp1_HlKSEb7kqd-1zTvEz2W0tq741b2STnrZ1RW13Gh4cZzOVSRvqo2oNNq286R22JEHVWjBuR01OiasgyY8QcYPI_8F-K9cAhsNJhcg";
+
+        JwtClaims jwtClaims = jwtConsumer.processToClaims(jwt);
+        assertThat("ffs", equalTo(jwtClaims.getStringClaimValue("nonce")));
+        assertThat("https://accounts.google.com", equalTo(jwtClaims.getIssuer()));
+
+        // id token from https://accounts.google.com/o/oauth2/auth has iss of accounts.google.com
+        jwt = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjZmYWE0ZTllYzMwMDMwNzg0Yjg5NDI2MDZmYjYxNzYyYWRhOTcyNTMifQ" +
+                ".eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXVkIjoiNDA3NDA4NzE4MTkyLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTA" +
+                "5MzU4MzgxOTc3NjM4NTE3Mjg2IiwiYXpwIjoiNDA3NDA4NzE4MTkyLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQ" +
+                "uY29tIiwibm9uY2UiOiJmZnMiLCJpYXQiOjE0NzA4NTU5ODMsImV4cCI6MTQ3MDg1OTU4M30" +
+                ".lxxxAqApJvQEubL4FXHcJvsG9wu3kxWcCFZTt6OMjB9j_P1KNu6CAgRn-E9T-ACJGpqVjR0GoODlVIdZHF" +
+                "2wnntOxv9hNY7huSPDeWy661nCYuBMJRMcIqx6Hl7M7fCtTEu0ERYRHy9L9-tWnWUyxz3aZVvWQR1LB6P2Z" +
+                "wgv1aZPptoTO5GxyNVIQApHq-BbNtaVd6qa3XDFrLMyq84FYwgGJzCjoM9Vu3YN4S4DZs6M59FC_hM" +
+                "qldOqrkOCDs0Z49-q1pRS3WDZP_5r6gF9AKzyoB2TuEjMGrSHzp3l8YLuzHVCH8gQkiS9uzJESrEbYP9cr5AgMB5e4WGd0n1pXQ";
+        jwtClaims = jwtConsumer.processToClaims(jwt);
+        assertThat("ffs", equalTo(jwtClaims.getStringClaimValue("nonce")));
+        assertThat("accounts.google.com", equalTo(jwtClaims.getIssuer()));
+    }
+
+
+    @Test
     public void roundTripWithMoreLiveDateChecks() throws Exception
     {
         OctetSequenceJsonWebKey octetSequenceJsonWebKey = OctJwkGenerator.generateJwk(256);
@@ -1607,6 +1684,28 @@ public class JwtConsumerTest
         jwtClaims = JwtClaims.parse("{\"iss\":[\"issuer1\", \"nope.not\"]}");
         jwtConsumer = new JwtConsumerBuilder().build();
         SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
+
+        jwtClaims = JwtClaims.parse("{\"iss\":\"accounts.google.com\"}");
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuers(true, "https://accounts.google.com", "accounts.google.com").build();
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
+        jwtClaims = JwtClaims.parse("{\"iss\":\"https://accounts.google.com\"}");
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuers(true, "https://fake.google.com", "nope.google.com").build();
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
+
+        jwtClaims = JwtClaims.parse("{\"iss\":\"d\"}");
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuers(true, "a", "b", "c", "d", "e").build();
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
+        jwtClaims = JwtClaims.parse("{\"iss\":\"x\"}");
+        SimpleJwtConsumerTestHelp.expectValidationFailure(jwtClaims, jwtConsumer);
+
+        // just establish how it works on some odd edge null cases
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuer(true, null).build();
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuers(true).build();
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
+        jwtConsumer = new JwtConsumerBuilder().setExpectedIssuers(true).build();
+        SimpleJwtConsumerTestHelp.goodValidate(jwtClaims, jwtConsumer);
     }
 
     @Test

@@ -18,18 +18,35 @@ package org.jose4j.jwt.consumer;
 
 import org.jose4j.jwt.MalformedClaimException;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  *
  */
 public class IssValidator implements Validator
 {
-    private String expectedIssuer;
+    private Set<String> expectedIssuers;
     private boolean requireIssuer;
 
     public IssValidator(String expectedIssuer, boolean requireIssuer)
     {
-        this.expectedIssuer = expectedIssuer;
+        if (expectedIssuer != null)
+        {
+            this.expectedIssuers = Collections.singleton(expectedIssuer);
+        }
         this.requireIssuer = requireIssuer;
+    }
+
+    public IssValidator(boolean requireIssuer, String... expectedIssuers)
+    {
+        this.requireIssuer = requireIssuer;
+        if (expectedIssuers != null && expectedIssuers.length > 0)
+        {
+            this.expectedIssuers = new HashSet<>();
+            Collections.addAll(this.expectedIssuers, expectedIssuers);
+        }
     }
 
     @Override
@@ -39,15 +56,20 @@ public class IssValidator implements Validator
 
         if (issuer == null)
         {
-            return requireIssuer ? "No Issuer (iss) claim present but was expecting " + expectedIssuer: null;
+            return requireIssuer ? "No Issuer (iss) claim present but was expecting " + expectedValue() : null;
         }
 
-        if (expectedIssuer != null && !issuer.equals(expectedIssuer))
+        if (expectedIssuers != null && !expectedIssuers.contains(issuer))
         {
-            return "Issuer (iss) claim value (" + issuer + ") doesn't match expected value of " + expectedIssuer;
+            return "Issuer (iss) claim value (" + issuer + ") doesn't match expected value of " + expectedValue();
         }
 
         return null;
+    }
+
+    private String expectedValue()
+    {
+        return expectedIssuers.size() == 1 ? expectedIssuers.iterator().next() : "one of " + expectedIssuers;
     }
 }
 

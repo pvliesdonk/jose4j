@@ -365,8 +365,20 @@ public class JwtConsumerBuilder
     }
 
     /**
+     * Indicates whether or not the issuer ("iss") claim is required and optionally what the expected values can be.
+     * @param requireIssuer true if issuer claim is required, false otherwise
+     * @param expectedIssuers the values, one of which the issuer claim must match to pass validation, {@code null} means that any value is acceptable
+     * @return the same JwtConsumerBuilder
+     */
+    public JwtConsumerBuilder setExpectedIssuers(boolean requireIssuer, String... expectedIssuers)
+    {
+        issValidator = new IssValidator(requireIssuer, expectedIssuers);
+        return this;
+    }
+
+    /**
      * Indicates whether or not the issuer ("iss") claim is required and optionally what the expected value is.
-     * @param requireIssuer ture if issuer is required, false otherwise
+     * @param requireIssuer true if issuer is required, false otherwise
      * @param expectedIssuer the value that the issuer claim must have to pass validation, {@code null} means that any value is acceptable
      * @return the same JwtConsumerBuilder
      */
