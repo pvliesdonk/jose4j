@@ -24,6 +24,7 @@ import javax.net.ssl.*;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -55,6 +56,7 @@ public class Get implements SimpleGet
     private SSLSocketFactory sslSocketFactory;
     private HostnameVerifier hostnameVerifier;
     private int responseBodySizeLimit = 1024 * 512;
+    private Proxy proxy;
 
     @Override
     public SimpleResponse get(String location) throws IOException
@@ -66,7 +68,7 @@ public class Get implements SimpleGet
         {
             try
             {
-                URLConnection urlConnection = url.openConnection();
+                URLConnection urlConnection = (proxy == null) ? url.openConnection() : url.openConnection(proxy);
                 urlConnection.setConnectTimeout(connectTimeout);
                 urlConnection.setReadTimeout(readTimeout);
 
@@ -267,6 +269,11 @@ public class Get implements SimpleGet
         {
             throw new UncheckedJoseException("Unable to initialize socket factory with custom trusted  certificates.", e);
         }
+    }
+
+    public void setHttpProxy(Proxy proxy)
+    {
+        this.proxy = proxy;
     }
 
     // todo -> need to give control over acceptable cipher suites? probably...
