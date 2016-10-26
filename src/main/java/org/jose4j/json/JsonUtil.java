@@ -41,9 +41,9 @@ import java.util.*;
  */
 public class JsonUtil
 {
-    private static final ContainerFactory CONTAINER_FACTORY = new ContainerFactory()
+    public static final ContainerFactory CONTAINER_FACTORY = new ContainerFactory()
     {
-        public List creatArrayContainer()
+        public List createArrayContainer()
         {
             return new ArrayList<Object>();
         }

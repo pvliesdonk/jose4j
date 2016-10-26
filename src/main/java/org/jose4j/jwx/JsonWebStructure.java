@@ -62,6 +62,9 @@ public abstract class JsonWebStructure
 
     abstract public String getCompactSerialization() throws JoseException;
     abstract protected void setCompactSerializationParts(String[] parts) throws JoseException;
+    
+    abstract public String getFlattenedJsonSerialization() throws JoseException;
+    abstract public void setFlattenedJsonSerialization(String json) throws JoseException;
 
     abstract public String getPayload() throws JoseException;
     abstract public void setPayload(String payload);

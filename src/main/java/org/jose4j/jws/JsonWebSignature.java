@@ -29,6 +29,8 @@ import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
 
 import java.security.Key;
+import java.util.Map;
+import org.jose4j.json.JsonUtil;
 
 /**
  */
@@ -74,6 +76,32 @@ public class JsonWebSignature extends JsonWebStructure
         return CompactSerializer.serialize(getSigningInput(), getEncodedSignature());
     }
 
+     public void setFlattenedJsonSerialization(String json) throws JoseException
+    {
+        Map<String,Object> parsedJson = JsonUtil.parseJson(json);
+        
+        if (!parsedJson.containsKey("protected") || !parsedJson.containsKey("payload") ||!parsedJson.containsKey("signature"))
+            throw new JoseException("JWS does not contain all required fields ('protected', 'payload', 'signature'");
+                
+        setEncodedHeader((String) parsedJson.get("protected"));
+        setEncodedPayload((String) parsedJson.get("payload"));
+        setSignature(base64url.base64UrlDecode((String) parsedJson.get("signature")));
+    }
+    
+    public String getFlattenedJsonSerialization() throws JoseException
+    {
+        this.sign();
+        //return CompactSerializer.serialize(getSigningInput(), getEncodedSignature());
+        
+        Map<String,Object> json = JsonUtil.CONTAINER_FACTORY.createObjectContainer();
+        
+        
+        json.put("protected", getEncodedHeader());
+        json.put("payload", getEncodedPayload());
+        json.put("signature", getEncodedSignature());
+        return JsonUtil.toJson(json);
+    }
+    
     /**
      * Produces the compact serialization with an empty/detached payload as described in
      * <a href="http://tools.ietf.org/html/rfc7515#appendix-F">Appendix F, Detached Content, of the JWS spec</a>
