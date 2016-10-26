@@ -32,6 +32,9 @@ import org.jose4j.zip.CompressionAlgorithm;
 import org.jose4j.zip.CompressionAlgorithmIdentifiers;
 
 import java.security.Key;
+import java.util.Map;
+import org.jose4j.json.JsonUtil;
+import org.jose4j.json.internal.json_simple.JSONObject;
 
 /**
  */
@@ -175,6 +178,45 @@ public class JsonWebEncryption extends JsonWebStructure
         byte[] tag = base64url.base64UrlDecode(encodedAuthenticationTag);
         setIntegrity(tag);
     }
+        
+    public void setFlattenedJsonSerialization(String json) throws JoseException
+    {
+        Map<String,Object> parsedJson = JsonUtil.parseJson(json);
+        
+        if (parsedJson.containsKey("unprotected") || parsedJson.containsKey("header"))
+        {
+            throw new JoseException("Only protected headers are currently supported.");
+        }
+        if (!parsedJson.containsKey("protected")) 
+            throw new JoseException("No protected header in JSON serialization");
+
+        if(!parsedJson.containsKey("ciphertext"))
+            throw new JoseException("JWE contains no ciphertext");
+        
+        if(parsedJson.containsKey("aad"))
+            throw new JoseException("AAD not currently supported");
+       
+        String encodedHeader = (String) parsedJson.get("protected");
+        setEncodedHeader(encodedHeader);
+        
+        if (parsedJson.containsKey("encrypted_key"))
+            encryptedKey = base64url.base64UrlDecode((String) parsedJson.get("encrypted_key"));
+        
+        if(parsedJson.containsKey("iv"))
+            setEncodedIv((String) parsedJson.get("iv"));
+                
+        String encodedCiphertext = (String) parsedJson.get("ciphertext");
+        checkNotEmptyPart(encodedCiphertext, "Encoded JWE Ciphertext");
+        ciphertext = base64url.base64UrlDecode(encodedCiphertext);
+        
+        if(parsedJson.containsKey("tag")) {
+            String encodedAuthenticationTag = (String) parsedJson.get("tag");
+            checkNotEmptyPart(encodedAuthenticationTag, "Encoded JWE Authentication Tag");
+            byte[] tag = base64url.base64UrlDecode(encodedAuthenticationTag);
+            setIntegrity(tag);
+        }
+        
+    }
 
     private void decrypt() throws JoseException
     {
@@ -278,6 +320,57 @@ public class JsonWebEncryption extends JsonWebStructure
         String encodedEncryptedKey = base64url.base64UrlEncode(encryptedKey);
 
         return CompactSerializer.serialize(getEncodedHeader(), encodedEncryptedKey, encodedIv, encodedCiphertext, encodedTag);
+    }
+    
+    
+    public String getFlattenedJsonSerialization() throws JoseException
+    {
+        KeyManagementAlgorithm keyManagementModeAlg = getKeyManagementModeAlgorithm();
+        ContentEncryptionAlgorithm contentEncryptionAlg = getContentEncryptionAlgorithm();
+
+        ContentEncryptionKeyDescriptor contentEncryptionKeyDesc = contentEncryptionAlg.getContentEncryptionKeyDescriptor();
+        Key managementKey = getKey();
+        if (isDoKeyValidation())
+        {
+            keyManagementModeAlg.validateEncryptionKey(getKey(), contentEncryptionAlg);
+        }
+
+        ContentEncryptionKeys contentEncryptionKeys = keyManagementModeAlg.manageForEncrypt(managementKey, contentEncryptionKeyDesc, getHeaders(), contentEncryptionKey, getProviderCtx());
+        setContentEncryptionKey(contentEncryptionKeys.getContentEncryptionKey());
+        encryptedKey = contentEncryptionKeys.getEncryptedKey();
+
+        byte[] aad = getEncodedHeaderAsciiBytesForAdditionalAuthenticatedData();
+        byte[] contentEncryptionKey = contentEncryptionKeys.getContentEncryptionKey();
+
+        byte[] plaintextBytes = this.plaintext;
+        if (plaintextBytes == null)
+        {
+            throw new NullPointerException("The plaintext payload for the JWE has not been set.");
+        }
+
+        plaintextBytes = compress(getHeaders(), plaintextBytes);
+
+        ContentEncryptionParts contentEncryptionParts = contentEncryptionAlg.encrypt(plaintextBytes, aad, contentEncryptionKey, getHeaders(), getIv(), getProviderCtx());
+        setIv(contentEncryptionParts.getIv());
+        ciphertext = contentEncryptionParts.getCiphertext();
+
+        String encodedIv = base64url.base64UrlEncode(contentEncryptionParts.getIv());
+        String encodedCiphertext = base64url.base64UrlEncode(contentEncryptionParts.getCiphertext());
+        String encodedTag = base64url.base64UrlEncode(contentEncryptionParts.getAuthenticationTag());
+
+
+        byte[] encryptedKey = contentEncryptionKeys.getEncryptedKey();
+        String encodedEncryptedKey = base64url.base64UrlEncode(encryptedKey);
+
+        Map<String,Object> json = JsonUtil.CONTAINER_FACTORY.createObjectContainer();
+        
+        json.put("protected", getEncodedHeader());
+        json.put("encrypted_key", encodedEncryptedKey);
+        json.put("iv",encodedIv);
+        json.put("ciphertext", encodedCiphertext);
+        json.put("tag", encodedTag);
+
+        return JsonUtil.toJson(json);
     }
 
     public byte[] getContentEncryptionKey()
