@@ -74,9 +74,13 @@ public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo imple
             byte[] encryptedKey = cipher.wrap(new SecretKeySpec(contentEncryptionKey, contentEncryptionKeyAlgorithm));
             return new ContentEncryptionKeys(contentEncryptionKey, encryptedKey);
         }
-        catch (IllegalBlockSizeException | InvalidKeyException | InvalidAlgorithmParameterException e)
+        catch  (InvalidKeyException e)
         {
-            throw new JoseException("Unable to encrypt the Content Encryption Key: " + e, e);
+            throw new org.jose4j.lang.InvalidKeyException("Unable to encrypt ("+cipher.getAlgorithm()+") the Content Encryption Key: " + e, e);
+        }
+        catch (IllegalBlockSizeException | InvalidAlgorithmParameterException e)
+        {
+            throw new JoseException("Unable to encrypt ("+cipher.getAlgorithm()+") the Content Encryption Key: " + e, e);
         }
     }
 
@@ -101,9 +105,13 @@ public abstract class WrappingKeyManagementAlgorithm extends AlgorithmInfo imple
         {
             initCipher(cipher, Cipher.UNWRAP_MODE, managementKey);
         }
-        catch (InvalidKeyException | InvalidAlgorithmParameterException e)
+        catch  (InvalidKeyException e)
         {
-            throw new JoseException("Unable to initialize cipher for key decryption", e);
+            throw new org.jose4j.lang.InvalidKeyException("Unable to initialize cipher ("+cipher.getAlgorithm()+") for key decryption", e);
+        }
+        catch (InvalidAlgorithmParameterException e)
+        {
+            throw new JoseException("Unable to initialize cipher ("+cipher.getAlgorithm()+") for key decryption", e);
         }
 
         String cekAlg = cekDesc.getContentEncryptionKeyAlgorithm();

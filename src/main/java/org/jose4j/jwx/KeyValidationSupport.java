@@ -29,18 +29,25 @@ public class KeyValidationSupport
 {
     public static final int MIN_RSA_KEY_LENGTH = 2048;
 
-    public static void checkRsaKeySize(RSAKey rsaKey) throws InvalidKeyException
+    public static void checkRsaKeySize(Key key) throws InvalidKeyException
     {
-        if (rsaKey == null)
+        if (key == null)
         {
             throw new InvalidKeyException("The RSA key must not be null.");
         }
 
-        int size = rsaKey.getModulus().bitLength();
-        if  (size < MIN_RSA_KEY_LENGTH)
+        // some keys are valid for RSA operations with the provider
+        // (like with Sun PKCS11 provider https://bitbucket.org/b_c/jose4j/issues/77 )
+        // but aren't actually an instance of RSAKey so only check the length when we can
+        if (key instanceof RSAKey)
         {
-           throw new InvalidKeyException("An RSA key of size "+MIN_RSA_KEY_LENGTH+
-               " bits or larger MUST be used with the all JOSE RSA algorithms (given key was only "+size+ " bits).");
+            RSAKey rsaKey = (RSAKey) key;
+            int size = rsaKey.getModulus().bitLength();
+            if  (size < MIN_RSA_KEY_LENGTH)
+            {
+                throw new InvalidKeyException("An RSA key of size "+MIN_RSA_KEY_LENGTH+
+                        " bits or larger MUST be used with the all JOSE RSA algorithms (given key was only "+size+ " bits).");
+            }
         }
     }
 

@@ -41,12 +41,12 @@ public class RsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Json
 
     public void validatePublicKey(PublicKey key) throws InvalidKeyException
     {
-        KeyValidationSupport.checkRsaKeySize((RSAPublicKey) key);
+        KeyValidationSupport.checkRsaKeySize(key);
     }
 
     public void validatePrivateKey(PrivateKey privateKey) throws InvalidKeyException
     {
-        KeyValidationSupport.checkRsaKeySize((RSAKey) privateKey);
+        KeyValidationSupport.checkRsaKeySize(privateKey);
     }
 
     public static class RsaPssSha256 extends RsaUsingShaAlgorithm
