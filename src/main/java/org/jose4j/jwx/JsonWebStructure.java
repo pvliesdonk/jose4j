@@ -211,7 +211,7 @@ public abstract class JsonWebStructure
 
     public void setKey(Key key)
     {
-        boolean same = (key == null ? this.key == null : key.equals(this.key));
+        boolean same = (key == null ? this.key == null : this.key != null && key.equals(this.key));
         if (!same)
         {
             onNewKey();

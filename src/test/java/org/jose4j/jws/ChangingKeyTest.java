@@ -23,6 +23,8 @@ import org.jose4j.lang.JoseException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.security.Key;
+
 /**
  *
  */
@@ -54,5 +56,43 @@ public class ChangingKeyTest
         {
             // expected
         }
+    }
+
+
+    @Test
+    public void testSetKeyWithNPEonEqualsImpl()
+    {
+        // to mimic the NPE coming from equals on the nCipher/Thales HSM's KMKey
+        Key key = new Key()
+        {
+            @Override
+            public String getAlgorithm()
+            {
+                return null;
+            }
+
+            @Override
+            public String getFormat()
+            {
+                return null;
+            }
+
+            @Override
+            public byte[] getEncoded()
+            {
+                return new byte[0];
+            }
+
+            @Override
+            public boolean equals(Object obj)
+            {
+                if (obj == null) throw new NullPointerException();
+                return super.equals(obj);
+            }
+        };
+
+
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setKey(key); // make sure this doesn't fail
     }
 }
