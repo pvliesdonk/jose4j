@@ -16,11 +16,12 @@
 
 package org.jose4j.jwk;
 
-import junit.framework.TestCase;
 import org.jose4j.json.JsonUtil;
 import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.JoseException;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -30,8 +31,9 @@ import java.util.Map;
 
 /**
  */
-public class JsonWebKeyTest extends TestCase
+public class JsonWebKeyTest
 {
+    @Test
     public void testFactoryWithRsaPublicKey() throws JoseException
     {
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(ExampleRsaKeyFromJws.PUBLIC_KEY);
@@ -45,6 +47,7 @@ public class JsonWebKeyTest extends TestCase
         assertEquals(RsaJsonWebKey.KEY_TYPE, jwk.getKeyType());
     }
 
+    @Test
     public void testFactoryWithEcPublicKey() throws JoseException
     {
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(ExampleEcKeysFromJws.PUBLIC_256);
@@ -58,6 +61,7 @@ public class JsonWebKeyTest extends TestCase
         assertEquals(EllipticCurveJsonWebKey.KEY_TYPE, jwk.getKeyType());
     }
 
+    @Test
     public void testEcSingleJwkToAndFromJson() throws JoseException
     {
         String jwkJson =
@@ -78,6 +82,7 @@ public class JsonWebKeyTest extends TestCase
         checkEncoding(jsonOut, EllipticCurveJsonWebKey.X_MEMBER_NAME, EllipticCurveJsonWebKey.Y_MEMBER_NAME);
     }
 
+    @Test
     public void testRsaSingleJwkToAndFromJson() throws JoseException
     {
         String jwkJson =
@@ -116,6 +121,7 @@ public class JsonWebKeyTest extends TestCase
         }
     }
 
+    @Test
     public void testKeyOps() throws Exception
     {
         String json = "{\"kty\":\"oct\",\"k\":\"Hdd5Uqtga_B4UilmahWJR8juxF_zw1_xaWeUGAvbg9c\"}";
@@ -135,5 +141,48 @@ public class JsonWebKeyTest extends TestCase
         assertEquals(2, jwk.getKeyOps().size());
         assertTrue(jwk.getKeyOps().contains(KeyOperations.ENCRYPT));
         assertTrue(jwk.getKeyOps().contains(KeyOperations.DECRYPT));
+    }
+
+
+    @Test (expected = JoseException.class)
+    public void howHandleWrongType1() throws Exception
+    {
+        JsonWebKey.Factory.newJwk("{\"kty\":1}");
+    }
+
+    @Test (expected = JoseException.class)
+    public void howHandleWrongType2() throws Exception
+    {
+        String jwkJson =
+                "       {\"kty\":\"RSA\",\n" +
+                "        \"n\": 8929747471717373711113313454114,\n" +
+                "        \"e\":\"AQAB\",\n" +
+                "        \"alg\":\"RS256\"}";
+        JsonWebKey.Factory.newJwk(jwkJson);
+    }
+
+    @Test (expected = JoseException.class)
+    public void howHandleWrongType3() throws Exception
+    {
+        String jwkJson =
+                "       {\"kty\":\"EC\",\n" +
+                "        \"crv\":\"P-256\",\n" +
+                "        \"x\":\"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4\",\n" +
+                "        \"y\":\"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM\",\n" +
+                "        \"use\":true,\n" +
+                "        \"kid\":\"1\"}";
+        JsonWebKey.Factory.newJwk(jwkJson);
+    }
+
+    @Test (expected = JoseException.class)
+    public void howHandleWrongType4() throws Exception
+    {
+        String jwkJson =
+                "       {\"kty\":\"EC\",\n" +
+                "        \"crv\":\"P-256\",\n" +
+                "        \"x\":[\"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4\"],\n" +
+                "        \"y\":\"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM\",\n" +
+                "        \"kid\":\"1s\"}";
+        JsonWebKey.Factory.newJwk(jwkJson);
     }
 }
