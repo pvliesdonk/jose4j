@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * A callback interface that provides a hook to call arbitrary methods on the JsonWebSignature prior
- * to the JwsConsumer using it to verify the signature.
+ * to the JwtConsumer using it to verify the signature.
  */
 public interface JwsCustomizer
 {
