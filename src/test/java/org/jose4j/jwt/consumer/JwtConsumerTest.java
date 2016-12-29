@@ -2014,4 +2014,38 @@ public class JwtConsumerTest
         assertThat(ctx.getJwtClaims().getSubject(), equalTo("me"));
         assertThat(ctx.getJwt(), equalTo(nestedJwt));
     }
+
+
+    @Test
+    public void iatBeforeNbfShouldBeOkay() throws Exception
+    {
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("me");
+        claims.setNotBeforeMinutesInThePast(1);
+        claims.setExpirationTimeMinutesInTheFuture(10);
+        NumericDate issuedAt = NumericDate.now();
+        issuedAt.addSeconds(-120);
+        claims.setIssuedAt(issuedAt);
+        claims.setAudience("audience");
+        claims.setIssuer("issuer");
+
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setPayload(claims.toJson());
+        jws.setKey(ExampleEcKeysFromJws.PRIVATE_256);
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
+        String jwt = jws.getCompactSerialization();
+
+
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                .setExpectedAudience("audience")
+                .setExpectedIssuer("issuer")
+                .setVerificationKey(ExampleEcKeysFromJws.PUBLIC_256)
+                .setRequireExpirationTime()
+                .setRequireNotBefore()
+                .setRequireIssuedAt()
+                .build();
+
+        JwtContext ctx = jwtConsumer.process(jwt);
+        assertThat(ctx.getJwtClaims().getSubject(), equalTo("me"));
+    }
 }
