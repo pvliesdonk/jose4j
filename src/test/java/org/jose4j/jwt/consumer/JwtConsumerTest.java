@@ -57,7 +57,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
 import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.AES_128_GCM;
 import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.AES_192_GCM;
 import static org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers.AES_256_GCM;
@@ -66,6 +68,7 @@ import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.A192GCMKW;
 import static org.jose4j.jwe.KeyManagementAlgorithmIdentifiers.A256GCMKW;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *
@@ -2048,4 +2051,58 @@ public class JwtConsumerTest
         JwtContext ctx = jwtConsumer.process(jwt);
         assertThat(ctx.getJwtClaims().getSubject(), equalTo("me"));
     }
+
+    @Test
+    public void constraintsWereHittingInKeySelectionBeforeJwtConsumerSetThemToBeOkay() throws Exception
+    {
+        // a test for https://bitbucket.org/b_c/jose4j/issues/84/algorithm-constraint-issue-with
+
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("me");
+        claims.setExpirationTimeMinutesInTheFuture(5);
+        claims.setAudience("the audience");
+        claims.setIssuer("the issuer");
+
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setPayload(claims.toJson());
+        jws.setAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS);
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.NONE);
+        String jwt = jws.getCompactSerialization();
+
+        final JwksVerificationKeyResolver jwksVerificationKeyResolver = new JwksVerificationKeyResolver(Collections.<JsonWebKey>emptyList());
+
+        VerificationKeyResolver resolver = new VerificationKeyResolver()
+        {
+            @Override
+            public Key resolveKey(JsonWebSignature jws, List<JsonWebStructure> nestingContext)
+            {
+                try
+                {
+                    return jwksVerificationKeyResolver.resolveKey(jws, nestingContext);
+                }
+                catch (UnresolvableKeyException e)
+                {
+                    return null;
+                }
+            }
+        };
+
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                .setExpectedAudience("the audience")
+                .setExpectedIssuer("the issuer")
+                .setRequireExpirationTime()
+                .setVerificationKeyResolver(resolver)
+                .setJwsAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS)
+                .setDisableRequireSignature()
+                .build();
+
+        // this should not fail (it was previously) with a algorithm constraints message
+        // NO_CONSTRAINTS is set but the key selection was calling jws.getAlgorithm() before the
+        // constraints were set on the jws so the jws still had the default constraints
+
+        JwtContext ctx = jwtConsumer.process(jwt);
+        assertThat(ctx.getJwtClaims().getSubject(), equalTo("me"));
+
+    }
+
 }

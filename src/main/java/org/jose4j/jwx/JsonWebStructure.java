@@ -67,6 +67,7 @@ public abstract class JsonWebStructure
     abstract public void setPayload(String payload);
 
     abstract public Algorithm getAlgorithm() throws InvalidAlgorithmException;
+    abstract public Algorithm getAlgorithmNoConstraintCheck() throws InvalidAlgorithmException;
 
     public static JsonWebStructure fromCompactSerialization(String cs) throws JoseException
     {

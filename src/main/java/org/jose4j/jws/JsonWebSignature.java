@@ -16,6 +16,7 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.jwa.Algorithm;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwa.AlgorithmFactory;
 import org.jose4j.jwa.AlgorithmFactoryFactory;
@@ -130,13 +131,28 @@ public class JsonWebSignature extends JsonWebStructure
     @Override
     public JsonWebSignatureAlgorithm getAlgorithm() throws InvalidAlgorithmException
     {
+        return getAlgorithm(true);
+    }
+
+    @Override
+    public JsonWebSignatureAlgorithm getAlgorithmNoConstraintCheck() throws InvalidAlgorithmException
+    {
+        return getAlgorithm(false);
+    }
+
+    private JsonWebSignatureAlgorithm getAlgorithm(boolean checkConstraints) throws InvalidAlgorithmException
+    {
         String algo = getAlgorithmHeaderValue();
         if (algo == null)
         {
             throw new InvalidAlgorithmException("Signature algorithm header ("+HeaderParameterNames.ALGORITHM+") not set.");
         }
 
-        getAlgorithmConstraints().checkConstraint(algo);
+        if (checkConstraints)
+        {
+            getAlgorithmConstraints().checkConstraint(algo);
+        }
+
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
         AlgorithmFactory<JsonWebSignatureAlgorithm> jwsAlgorithmFactory = factoryFactory.getJwsAlgorithmFactory();
         return jwsAlgorithmFactory.getAlgorithm(algo);
@@ -179,12 +195,12 @@ public class JsonWebSignature extends JsonWebStructure
 
     public String getKeyType() throws InvalidAlgorithmException
     {
-        return getAlgorithm().getKeyType();
+        return getAlgorithmNoConstraintCheck().getKeyType();
     }
 
     public KeyPersuasion getKeyPersuasion() throws InvalidAlgorithmException
     {
-        return getAlgorithm().getKeyPersuasion();
+        return getAlgorithmNoConstraintCheck().getKeyPersuasion();
     }
 
     public void setEncodedPayload(String encodedPayload)

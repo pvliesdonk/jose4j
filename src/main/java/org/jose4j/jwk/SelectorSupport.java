@@ -46,7 +46,7 @@ class SelectorSupport
             filter.setX5tS256(x5tS256, SimpleJwkFilter.OMITTED_OKAY);
         }
 
-        String keyType = jwx.getAlgorithm().getKeyType();
+        String keyType = jwx.getAlgorithmNoConstraintCheck().getKeyType();
         filter.setKty(keyType);
         String use = (jwx instanceof JsonWebSignature) ? Use.SIGNATURE : Use.ENCRYPTION;
         filter.setUse(use, SimpleJwkFilter.OMITTED_OKAY);
