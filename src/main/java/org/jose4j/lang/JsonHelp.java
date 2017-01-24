@@ -31,6 +31,19 @@ public class JsonHelp
         return (String) object;
     }
 
+    public static String getStringChecked(Map<String, Object> map, String name) throws JoseException
+    {
+        Object o = map.get(name);
+        try
+        {
+            return (String) o;
+        }
+        catch (ClassCastException e)
+        {
+            throw new JoseException("'" + name + "' parameter was " + JsonHelp.jsonTypeName(o) + " type but is required to be a String.");
+        }
+    }
+
     public static List<String> getStringArray(Map<String, Object> map, String name)
     {
         Object object = map.get(name);
@@ -47,5 +60,37 @@ public class JsonHelp
     {
         Object o = map.get(name);
         return o != null ? ((Number) o).longValue() : null;
+    }
+
+    public static String jsonTypeName(Object value)
+    {
+        String jsonTypeName;
+
+        if (value instanceof Number)
+        {
+            jsonTypeName = "Number";
+        }
+        else if (value instanceof Boolean)
+        {
+            jsonTypeName = "Boolean";
+        }
+        else if (value instanceof List)
+        {
+            jsonTypeName = "Array";
+        }
+        else if (value instanceof Map)
+        {
+            jsonTypeName = "Object";
+        }
+        else if (value instanceof String)
+        {
+            jsonTypeName = "String";
+        }
+        else
+        {
+            jsonTypeName = "unknown";
+        }
+
+        return jsonTypeName;
     }
 }

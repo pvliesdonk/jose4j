@@ -16,7 +16,7 @@
 
 package org.jose4j.jwk;
 
-import junit.framework.TestCase;
+
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.keys.EllipticCurves;
@@ -24,14 +24,18 @@ import org.jose4j.keys.ExampleEcKeysFromJws;
 import org.jose4j.keys.ExampleRsaKeyFromJws;
 import org.jose4j.lang.JoseException;
 
+import static org.junit.Assert.*;
+import org.junit.Test;
+
 import java.security.Key;
 import java.security.interfaces.ECPublicKey;
 import java.util.*;
 
 /**
  */
-public class JsonWebKeySetTest extends TestCase
+public class JsonWebKeySetTest
 {
+    @Test
     public void testParseExamplePublicKeys() throws JoseException
     {
         // from https://tools.ietf.org/html/draft-ietf-jose-json-web-key Appendix A.1
@@ -87,6 +91,7 @@ public class JsonWebKeySetTest extends TestCase
         assertTrue(json.contains("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx"));
     }
 
+    @Test
     public void testParseExamplePrivateKeys() throws JoseException
     {
         // from https://tools.ietf.org/html/draft-ietf-jose-json-web-key Appendix A.2
@@ -163,6 +168,7 @@ public class JsonWebKeySetTest extends TestCase
         assertTrue(json.contains("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx"));
     }
 
+    @Test
     public void testParseExampleSymmetricKeys() throws JoseException
     {
         // from https://tools.ietf.org/html/draft-ietf-jose-json-web-key Appendix A.3
@@ -201,7 +207,7 @@ public class JsonWebKeySetTest extends TestCase
 
     }
 
-
+    @Test
     public void testFromRsaPublicKeyAndBack() throws JoseException
     {
         RsaJsonWebKey webKey = new RsaJsonWebKey(ExampleRsaKeyFromJws.PUBLIC_KEY);
@@ -226,6 +232,7 @@ public class JsonWebKeySetTest extends TestCase
         assertEquals(ExampleRsaKeyFromJws.PUBLIC_KEY.getPublicExponent(), rsaJsonWebKey.getRsaPublicKey().getPublicExponent());
     }
 
+    @Test
     public void testFromEcPublicKeyAndBack() throws JoseException
     {
 
@@ -259,6 +266,7 @@ public class JsonWebKeySetTest extends TestCase
         }
     }
 
+    @Test
     public void testCreateFromListOfPubJwks() throws JoseException
     {
         List<PublicJsonWebKey> ecjwks = new ArrayList<>();
@@ -268,6 +276,7 @@ public class JsonWebKeySetTest extends TestCase
         assertEquals(2, jsonWebKeySet.getJsonWebKeys().size());
     }
 
+    @Test
     public void testOctAndDefaultToJson() throws JoseException
     {
         JsonWebKeySet jwks = new JsonWebKeySet(OctJwkGenerator.generateJwk(128), OctJwkGenerator.generateJwk(128));
@@ -278,6 +287,7 @@ public class JsonWebKeySetTest extends TestCase
         assertEquals(jwks.getJsonWebKeys().size(), newJwks.getJsonWebKeys().size());
     }
 
+    @Test
     public void testNewWithVarArgsAndAddLater() throws Exception
     {
         JsonWebKey jwk1 = JsonWebKey.Factory.newJwk("{\"kty\":\"oct\",\"k\":\"bbj4v-CvqwOm1q3WkVJEpw\"}");
@@ -299,5 +309,23 @@ public class JsonWebKeySetTest extends TestCase
         assertEquals(4, jwks.getJsonWebKeys().size());
     }
 
+    @Test
+    public void testParseSetContainingInvalid() throws Exception
+    {
+        String json = "{\"keys\":[" +
+            "{\"kty\":\"EC\",\"x\":\"riwTtQeRjmlDsR4PUQELhejpPkZkQstb0_Lf08qeBzM\",\"y\":\"izN8y6z-8j8bB_Lj10gX9mnaE_E0ZK5fl0hJVyLWMKA\",\"crv\":\"P-256\"}," +
+            "{\"kty\":false,\"x\":\"GS2tEeCRf0CFHzI_y68XiLzqa9-RpG4Xn-dq2lPtShY\",\"y\":\"Rq6ybA7IbjhDTfvP2GSzxEql8II7RvRPb3mJ6tzZUgI\",\"crv\":\"P-256\"}," +
+            "{\"kty\":\"EC\",\"x\":\"IiIIM4W-HDen_11XiGlFXh1kOxKcX1YB5gqMrCM-hMM\",\"y\":\"57-3xqdddSBBarwwXcWu4hIG4dAlIiEYdy4aaFGb57s\",\"crv\":\"P-256\"}," +
+            "{\"kty\":\"EC\",\"x\":[\"IiIIM4W-HDen_11XiGlFXh1kOxKcX1YB5gqMrCM-hMM\",\"huh\"],\"y\":\"57-3xqdddSBBarwwXcWu4hIG4dAlIiEYdy4aaFGb57s\",\"crv\":\"P-256\"}," +
+            "{\"kty\":\"EC\",\"x\":\"rO8MozDmEAVZ0B5zQUDD8PGosFlwmoMmi7I-1rspWz4\",\"y\":\"I6ku1iUzFJgTnjNzjAC1sSGkYfiDqs-eEReFMLI-6n8\",\"crv\":\"P-256\"}" +
+            "{\"kty\":1,\"x\":\"IiIIM4W-HDen_11XiGlFXh1kOxKcX1YB5gqMrCM-hMM\",\"y\":\"57-3xqdddSBBarwwXcWu4hIG4dAlIiEYdy4aaFGb57s\",\"crv\":\"P-256\"}," +
+            "{\"kty\":885584955514411149933357445595595145885566661,\"x\":\"IiIIM4W-HDen_11XiGlFXh1kOxKcX1YB5gqMrCM-hMM\",\"y\":\"57-3xqdddSBBarwwXcWu4hIG4dAlIiEYdy4aaFGb57s\",\"crv\":\"P-256\"}," +
+            "{\"kty\":{\"EC\":\"EC\"},\"x\":\"riwTtQeRjmlDsR4PUQELhejpPkZkQstb0_Lf08qeBzM\",\"y\":\"izN8y6z-8j8bB_Lj10gX9mnaE_E0ZK5fl0hJVyLWMKA\",\"crv\":\"P-256\"}," +
+            "{\"kty\":null,\"x\":\"riwTtQeRjmlDsR4PUQELhejpPkZkQstb0_Lf08qeBzM\",\"y\":\"izN8y6z-8j8bB_Lj10gX9mnaE_E0ZK5fl0hJVyLWMKA\",\"crv\":\"P-256\"}," +
+            "]}";
+
+        JsonWebKeySet jwks = new JsonWebKeySet(json);
+        assertEquals(3, jwks.getJsonWebKeys().size());
+    }
 
 }

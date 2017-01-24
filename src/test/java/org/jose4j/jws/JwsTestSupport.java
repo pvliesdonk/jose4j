@@ -16,6 +16,7 @@
 
 package org.jose4j.jws;
 
+import org.jose4j.lang.ExceptionHelp;
 import org.junit.Assert;
 import org.jose4j.jwx.CompactSerializer;
 import org.jose4j.lang.InvalidKeyException;
@@ -97,7 +98,7 @@ public class JwsTestSupport
         }
         catch (JoseException e)
         {
-            log.debug("Expected something like this: {}", e.toString());
+            log.debug("Expected something like this: {}", ExceptionHelp.toStringWithCauses(e));
         }
     }
 
@@ -113,7 +114,7 @@ public class JwsTestSupport
         }
         catch (InvalidKeyException e)
         {
-            log.debug("Expected something like this: {}", e.toString());
+            log.debug("Expected something like this: {}", ExceptionHelp.toStringWithCauses(e));
         }
     }
 }

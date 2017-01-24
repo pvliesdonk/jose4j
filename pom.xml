@@ -25,8 +25,7 @@
 
   <groupId>org.bitbucket.b_c</groupId>
   <artifactId>jose4j</artifactId>
-  <version>0.5.3-pvliesdonk</version>
-  <packaging>jar</packaging>
+  <version>0.5.5-pvliesdonk</version>  <packaging>jar</packaging>
   <name>jose4j</name>
   <description>
      The jose.4.j library is a robust and easy to use open source implementation of JSON Web Token (JWT) and the JOSE specification suite (JWS, JWE, and JWK).

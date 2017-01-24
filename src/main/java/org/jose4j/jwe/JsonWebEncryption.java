@@ -142,16 +142,30 @@ public class JsonWebEncryption extends JsonWebStructure
 
     public KeyManagementAlgorithm getKeyManagementModeAlgorithm() throws InvalidAlgorithmException
     {
+        return getKeyManagementModeAlgorithm(true);
+    }
+
+    KeyManagementAlgorithm getKeyManagementModeAlgorithm(boolean checkConstraints) throws InvalidAlgorithmException
+    {
         String algo = getAlgorithmHeaderValue();
         if (algo == null)
         {
             throw new InvalidAlgorithmException("Encryption key management algorithm header ("+HeaderParameterNames.ALGORITHM+") not set.");
         }
 
-        getAlgorithmConstraints().checkConstraint(algo);
+        if (checkConstraints)
+        {
+            getAlgorithmConstraints().checkConstraint(algo);
+        }
         AlgorithmFactoryFactory factoryFactory = AlgorithmFactoryFactory.getInstance();
         AlgorithmFactory<KeyManagementAlgorithm> factory = factoryFactory.getJweKeyManagementAlgorithmFactory();
         return factory.getAlgorithm(algo);
+    }
+
+    @Override
+    public KeyManagementAlgorithm getAlgorithmNoConstraintCheck() throws InvalidAlgorithmException
+    {
+        return getKeyManagementModeAlgorithm(false);
     }
 
     @Override

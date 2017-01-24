@@ -47,7 +47,7 @@ public class VerificationJwkSelector
 
         if (hasMoreThanOne(filtered) && EllipticCurveJsonWebKey.KEY_TYPE.equals(jws.getKeyType()))
         {
-            JsonWebSignatureAlgorithm algorithm = jws.getAlgorithm();
+            JsonWebSignatureAlgorithm algorithm = jws.getAlgorithmNoConstraintCheck();
             EcdsaUsingShaAlgorithm ecdsaAlgorithm = (EcdsaUsingShaAlgorithm) algorithm;
             filter.setCrv(ecdsaAlgorithm.getCurveName(), SimpleJwkFilter.OMITTED_OKAY);
             filtered = filter.filter(filtered);

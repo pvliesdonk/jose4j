@@ -22,7 +22,11 @@ import java.util.List;
 
 /**
  * A callback interface that provides a hook to call arbitrary methods on the JsonWebEncryption prior
- * to the JwsConsumer using it to decrypt the content.
+ * to the JwtConsumer using it to decrypt the content.
+ *
+ * This allows the usage of new and/or esoteric features such as setting the known critical headers
+ * without having to have specific support at JwtConsumer[Builder] layer.
+ *
  */
 public interface JweCustomizer
 {

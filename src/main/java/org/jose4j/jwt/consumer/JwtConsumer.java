@@ -187,12 +187,13 @@ public class JwtConsumer
                             jws.setDoKeyValidation(false);
                         }
 
-                        Key key = verificationKeyResolver.resolveKey(jws, nestingContext);
-                        jws.setKey(key);
                         if (jwsAlgorithmConstraints != null)
                         {
                             jws.setAlgorithmConstraints(jwsAlgorithmConstraints);
                         }
+
+                        Key key = verificationKeyResolver.resolveKey(jws, nestingContext);
+                        jws.setKey(key);
 
                         if (jwsCustomizer != null)
                         {
@@ -309,17 +310,17 @@ public class JwtConsumer
                         jwe.setDoKeyValidation(false);
                     }
 
+                    if (jweContentEncryptionAlgorithmConstraints != null)
+                    {
+                        jwe.setContentEncryptionAlgorithmConstraints(jweContentEncryptionAlgorithmConstraints);
+                    }
+
                     final List<JsonWebStructure> nestingContext = Collections.unmodifiableList(joseObjects);
                     Key key = decryptionKeyResolver.resolveKey(jwe, nestingContext);
                     jwe.setKey(key);
                     if (jweAlgorithmConstraints != null)
                     {
                         jwe.setAlgorithmConstraints(jweAlgorithmConstraints);
-                    }
-
-                    if (jweContentEncryptionAlgorithmConstraints != null)
-                    {
-                        jwe.setContentEncryptionAlgorithmConstraints(jweContentEncryptionAlgorithmConstraints);
                     }
 
                     if (jweCustomizer != null)

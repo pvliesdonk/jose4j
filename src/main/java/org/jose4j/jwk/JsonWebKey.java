@@ -60,7 +60,7 @@ public abstract class JsonWebKey implements Serializable
         this.key = key;
     }
 
-    protected JsonWebKey(Map<String, Object> params)
+    protected JsonWebKey(Map<String, Object> params) throws JoseException
     {
         otherParameters.putAll(params);
         removeFromOtherParams(KEY_TYPE_PARAMETER, USE_PARAMETER, KEY_ID_PARAMETER, ALGORITHM_PARAMETER, KEY_OPERATIONS);
@@ -209,9 +209,9 @@ public abstract class JsonWebKey implements Serializable
         }
     }
 
-    protected static String getString(Map<String, Object> params, String name)
+    protected static String getString(Map<String, Object> params, String name) throws JoseException
     {
-        return JsonHelp.getString(params, name);
+        return JsonHelp.getStringChecked(params, name);
     }
 
     protected static String getStringRequired(Map<String, Object> params, String name) throws JoseException

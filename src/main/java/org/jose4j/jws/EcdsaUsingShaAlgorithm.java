@@ -207,27 +207,32 @@ public class EcdsaUsingShaAlgorithm extends BaseSignatureAlgorithm implements Js
 
     public void validatePrivateKey(PrivateKey privateKey) throws InvalidKeyException
     {
-        ECPrivateKey ecPrivateKey = (ECPrivateKey) privateKey;
-        validateKeySpec(ecPrivateKey);
+        validateKeySpec(privateKey);
     }
 
     public void validatePublicKey(PublicKey publicKey) throws InvalidKeyException
     {
-        ECPublicKey ecPublicKey = (ECPublicKey) publicKey;
-        validateKeySpec(ecPublicKey);
+        validateKeySpec(publicKey);
     }
 
-    private void validateKeySpec(ECKey ecKey) throws InvalidKeyException
+    private void validateKeySpec(Key key) throws InvalidKeyException
     {
-        ECParameterSpec spec = ecKey.getParams();
-        EllipticCurve curve = spec.getCurve();
-
-        String name = EllipticCurves.getName(curve);
-
-        if (!getCurveName().equals(name))
+        // some keys are valid for EC operations with the provider
+        // (like with Sun PKCS11 provider https://bitbucket.org/b_c/jose4j/issues/77 )
+        // but aren't actually an instance of ECKey so only check the spec when we can
+        if (key instanceof ECKey)
         {
-            throw new InvalidKeyException(getAlgorithmIdentifier() + "/" + getJavaAlgorithm() + " expects a key using " +
-                    getCurveName() + " but was " + name);
+            ECKey ecKey = (ECKey) key;
+            ECParameterSpec spec = ecKey.getParams();
+            EllipticCurve curve = spec.getCurve();
+
+            String name = EllipticCurves.getName(curve);
+
+            if (!getCurveName().equals(name))
+            {
+                throw new InvalidKeyException(getAlgorithmIdentifier() + "/" + getJavaAlgorithm() + " expects a key using " +
+                        getCurveName() + " but was " + name);
+            }
         }
     }
 

@@ -70,6 +70,7 @@ public abstract class JsonWebStructure
     abstract public void setPayload(String payload);
 
     abstract public Algorithm getAlgorithm() throws InvalidAlgorithmException;
+    abstract public Algorithm getAlgorithmNoConstraintCheck() throws InvalidAlgorithmException;
 
     public static JsonWebStructure fromCompactSerialization(String cs) throws JoseException
     {
@@ -214,7 +215,7 @@ public abstract class JsonWebStructure
 
     public void setKey(Key key)
     {
-        boolean same = (key == null ? this.key == null : key.equals(this.key));
+        boolean same = (key == null ? this.key == null : this.key != null && key.equals(this.key));
         if (!same)
         {
             onNewKey();

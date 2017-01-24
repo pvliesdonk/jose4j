@@ -29,6 +29,8 @@ import org.jose4j.lang.JoseException;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.MGF1ParameterSpec;
@@ -47,15 +49,15 @@ public class RsaKeyManagementAlgorithm extends WrappingKeyManagementAlgorithm im
     @Override
     public void validateEncryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
-        RSAPublicKey rsaPublicKey = KeyValidationSupport.castKey(managementKey, RSAPublicKey.class);
-        KeyValidationSupport.checkRsaKeySize(rsaPublicKey);
+        PublicKey pk = KeyValidationSupport.castKey(managementKey, PublicKey.class);
+        KeyValidationSupport.checkRsaKeySize(pk);
     }
 
     @Override
     public void validateDecryptionKey(Key managementKey, ContentEncryptionAlgorithm contentEncryptionAlg) throws InvalidKeyException
     {
-        RSAPrivateKey rsaPrivateKey = KeyValidationSupport.castKey(managementKey, RSAPrivateKey.class);
-        KeyValidationSupport.checkRsaKeySize(rsaPrivateKey);
+        PrivateKey pk = KeyValidationSupport.castKey(managementKey, RSAPrivateKey.class);
+        KeyValidationSupport.checkRsaKeySize(pk);
     }
 
     @Override
